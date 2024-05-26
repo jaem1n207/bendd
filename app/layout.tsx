@@ -1,12 +1,18 @@
 import type { Metadata } from 'next';
-import './globals.css';
-import { Inter } from 'next/font/google';
+import { Inter as FontSans } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+import { cn } from '@/lib/utils';
+import './globals.css';
+
+const fontSans = FontSans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+});
 
 export const metadata: Metadata = {
   title: 'Bendd',
-  description: 'Frontend Software Enginner · jaem1n207',
+  description: 'Frontend Software Engineer · jaem1n207',
   openGraph: {
     type: 'website',
     url: 'https://bendd.me',
@@ -20,7 +26,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={cn(
+          'bd-min-h-screen bd-bg-background bd-font-sans bd-antialiased',
+          fontSans.variable
+        )}
+      >
+        {children}
+      </body>
     </html>
   );
 }
