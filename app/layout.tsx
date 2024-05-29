@@ -4,6 +4,7 @@ import { Inter as FontSans } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { cn } from '@/lib/utils';
 import './globals.css';
+import { host } from './sitemap';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -12,11 +13,19 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: 'Bendd',
+  metadataBase: new URL(host),
+  title: {
+    default: 'Bendd',
+    template: '%s | Bendd',
+  },
   description: 'Frontend Software Engineer · jaem1n207',
   openGraph: {
+    title: 'Bendd',
+    description: 'Frontend Software Engineer · jaem1n207',
     type: 'website',
-    url: 'https://bendd.me',
+    url: host,
+    siteName: 'Bendd',
+    locale: 'ko_KR',
   },
 };
 
@@ -26,13 +35,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning>
-      <body
-        className={cn(
-          'bd-min-h-screen bd-font-sans bd-antialiased',
-          fontSans.variable
-        )}
-      >
+    <html
+      lang="ko"
+      suppressHydrationWarning
+      className={cn(
+        'bd-min-h-screen bd-bg-background bd-text-foreground',
+        fontSans.variable
+      )}
+    >
+      <body className="bd-antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

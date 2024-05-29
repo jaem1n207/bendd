@@ -51,7 +51,4 @@
   * {
     @apply bd-border-border;
   }
-  body {
-    @apply bd-bg-background bd-text-foreground;
-  }
 }
