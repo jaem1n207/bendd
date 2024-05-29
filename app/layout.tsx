@@ -38,10 +38,7 @@ export default function RootLayout({
     <html
       lang="ko"
       suppressHydrationWarning
-      className={cn(
-        'bd-min-h-screen bd-bg-background bd-text-foreground',
-        fontSans.variable
-      )}
+      className={cn('bd-bg-background bd-text-foreground', fontSans.variable)}
     >
       <body className="bd-antialiased">
         <ThemeProvider

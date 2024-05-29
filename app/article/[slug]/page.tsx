@@ -1,0 +1,97 @@
+import { notFound } from 'next/navigation';
+
+import { formatDate, getArticles } from '@/app/article/utils';
+import { host } from '@/app/sitemap';
+import { CustomMDX } from '@/components/mdx';
+
+export async function generateStaticParams() {
+  let posts = getArticles();
+
+  return posts.map(post => ({
+    slug: post.slug,
+  }));
+}
+
+export function generateMetadata({ params }: { params: { slug: string } }) {
+  let post = getArticles().find(post => post.slug === params.slug);
+  if (!post) {
+    return;
+  }
+
+  let {
+    title,
+    publishedAt: publishedTime,
+    summary: description,
+    image,
+  } = post.metadata;
+  let ogImage = image ? image : `${host}/og?title=${encodeURIComponent(title)}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+      publishedTime,
+      url: `${host}/blog/${post.slug}`,
+      images: [
+        {
+          url: ogImage,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
+
+export default function Blog({ params }: { params: { slug: string } }) {
+  let post = getArticles().find(post => post.slug === params.slug);
+
+  if (!post) {
+    notFound();
+  }
+
+  return (
+    <section>
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BlogPosting',
+            headline: post.metadata.title,
+            datePublished: post.metadata.publishedAt,
+            dateModified: post.metadata.publishedAt,
+            description: post.metadata.summary,
+            image: post.metadata.image
+              ? `${host}${post.metadata.image}`
+              : `/og?title=${encodeURIComponent(post.metadata.title)}`,
+            url: `${host}/blog/${post.slug}`,
+            author: {
+              '@type': 'Person',
+              name: 'My Portfolio',
+            },
+          }),
+        }}
+      />
+      <h1 className="bd-text-2xl bd-font-semibold bd-tracking-tighter">
+        {post.metadata.title}
+      </h1>
+      <div className="bd-mb-8 bd-mt-2 bd-flex bd-items-center bd-justify-between bd-text-sm">
+        <p className="bd-text-sm bd-tabular-nums bd-text-primary/60">
+          {formatDate(post.metadata.publishedAt)}
+        </p>
+      </div>
+      <article className="bd-prose bd-prose-slate dark:bd-prose-invert">
+        <CustomMDX source={post.content} />
+      </article>
+    </section>
+  );
+}
