@@ -2,7 +2,7 @@ import { MDXRemote } from 'next-mdx-remote/rsc';
 import Image from 'next/image';
 import Link from 'next/link';
 import { createElement } from 'react';
-import { highlight } from 'sugar-high';
+import { codeToHtml } from 'shiki';
 
 function Table({ data }: { data: { headers: string[]; rows: string[][] } }) {
   let headers = data.headers.map((header, index) => (
@@ -54,8 +54,11 @@ function RoundedImage({ alt, src }: { alt: string; src: string }) {
   return <Image alt={alt} className="rounded-lg" src={src} />;
 }
 
-function Code({ children, ...props }: { children: string }) {
-  let codeHTML = highlight(children);
+async function Code({ children, ...props }: { children: string }) {
+  const codeHTML = await codeToHtml(children, {
+    lang: 'tsx',
+    theme: 'github-dark',
+  });
   return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />;
 }
 
