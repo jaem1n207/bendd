@@ -5,7 +5,7 @@ import { host } from '@/app/sitemap';
 import { CustomMDX } from '@/components/mdx';
 
 export async function generateStaticParams() {
-  let posts = getArticles();
+  const posts = getArticles();
 
   return posts.map(post => ({
     slug: post.slug,
@@ -13,18 +13,18 @@ export async function generateStaticParams() {
 }
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
-  let post = getArticles().find(post => post.slug === params.slug);
+  const post = getArticles().find(post => post.slug === params.slug);
   if (!post) {
     return;
   }
 
-  let {
+  const {
     title,
     publishedAt: publishedTime,
     summary: description,
     image,
   } = post.metadata;
-  let ogImage = image ? image : `${host}/og?title=${encodeURIComponent(title)}`;
+  const ogImage = image ? image : `/api/og?title=${encodeURIComponent(title)}`;
 
   return {
     title,
@@ -51,7 +51,7 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 }
 
 export default function Blog({ params }: { params: { slug: string } }) {
-  let post = getArticles().find(post => post.slug === params.slug);
+  const post = getArticles().find(post => post.slug === params.slug);
 
   if (!post) {
     notFound();
