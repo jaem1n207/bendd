@@ -19,6 +19,10 @@ const config = {
       },
     },
     extend: {
+      backgroundImage: {
+        'navigation-highlight':
+          'linear-gradient(to right, rgba(0, 0, 0, 0), hsl(0 0% 20.5%) 20%,hsl(0 0% 49.4%) 67.19%, rgba(0, 0, 0, 0))',
+      },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
       },
