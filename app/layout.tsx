@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 
 import { ThemeProvider } from '@/components/theme-provider';
+import { siteMetadata } from '@/lib/site-metadata';
 import { cn } from '@/lib/utils';
+
 import './globals.css';
-import { host } from './sitemap';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -13,19 +14,19 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(host),
+  metadataBase: new URL(siteMetadata.siteUrl),
   title: {
-    default: 'Bendd',
-    template: '%s | Bendd',
+    default: siteMetadata.title,
+    template: `%s | ${siteMetadata.title}`,
   },
   description: 'Frontend Software Engineer · jaem1n207',
   openGraph: {
-    title: 'Bendd',
-    description: 'Frontend Software Engineer · jaem1n207',
+    title: siteMetadata.title,
+    description: siteMetadata.description,
     type: 'website',
-    url: host,
-    siteName: 'Bendd',
-    locale: 'ko_KR',
+    url: siteMetadata.siteUrl,
+    siteName: siteMetadata.title,
+    locale: siteMetadata.locale,
   },
 };
 
@@ -36,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="ko"
+      lang={siteMetadata.language}
       suppressHydrationWarning
       className={cn('bd-bg-background bd-text-foreground', fontSans.variable)}
     >

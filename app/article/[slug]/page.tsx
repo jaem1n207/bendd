@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 
 import { formatDate, getArticles } from '@/app/article/utils';
-import { host } from '@/app/sitemap';
 import { CustomMDX } from '@/components/mdx';
+import { siteMetadata } from '@/lib/site-metadata';
 
 export async function generateStaticParams() {
   const posts = getArticles();
@@ -34,7 +34,7 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
       description,
       type: 'article',
       publishedTime,
-      url: `${host}/blog/${post.slug}`,
+      url: `${siteMetadata.siteUrl}/blog/${post.slug}`,
       images: [
         {
           url: ogImage,
@@ -71,12 +71,12 @@ export default function Blog({ params }: { params: { slug: string } }) {
             dateModified: post.metadata.publishedAt,
             description: post.metadata.summary,
             image: post.metadata.image
-              ? `${host}${post.metadata.image}`
+              ? `${siteMetadata.siteUrl}${post.metadata.image}`
               : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${host}/blog/${post.slug}`,
+            url: `${siteMetadata.siteUrl}/blog/${post.slug}`,
             author: {
               '@type': 'Person',
-              name: 'My Portfolio',
+              name: siteMetadata.author,
             },
           }),
         }}

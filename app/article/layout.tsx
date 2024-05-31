@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-import { host } from '@/app/sitemap';
+import { siteMetadata } from '@/lib/site-metadata';
 
 export const metadata: Metadata = {
   title: '피드',
   description: '작성한 글들을 모아놓은 공간입니다.',
   openGraph: {
     type: 'website',
-    url: `${host}/articles`,
+    url: `${siteMetadata.siteUrl}/articles`,
     siteName: 'Bendd의 피드',
   },
 };

@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-import { host } from './sitemap';
+import { siteMetadata } from '@/lib/site-metadata';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: `${host}/sitemap.xml`,
+    sitemap: `${siteMetadata.siteUrl}/sitemap.xml`,
   };
 }
