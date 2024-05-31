@@ -1,26 +1,24 @@
 import Image from 'next/image';
 
-import { ThemeSwitcher } from '@/components/theme-switcher';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { Paragraph, Title } from '@/components/ui/typography';
 
 export default function Home() {
   return (
-    <main className="bd-flex bd-min-h-screen bd-flex-col bd-items-center bd-justify-between bd-p-24">
-      <h1>Bendd</h1>
-      <p>Frontend Software Engineer · jaem1n207</p>
-      <Link href="/article">
-        <Button variant="link">피드</Button>
-      </Link>
-      <ThemeSwitcher />
-      <Image
-        src="/vercel.svg"
-        alt="Vercel Logo"
-        className="dark:bd-invert"
-        width={100}
-        height={24}
-        priority
-      />
+    <main className="bd-relative bd-mx-auto bd-flex bd-min-h-screen bd-max-w-2xl bd-overflow-hidden bd-px-6 bd-py-20 sm:bd-py-32">
+      <div className="bd-flex-1 bd-text-center">
+        <Title className="bd-pb-10">Bendd</Title>
+        <Paragraph size="lg" className="bd-pb-20">
+          Frontend Software Engineer <br />·<br /> jaem1n207
+        </Paragraph>
+        <Image
+          src="/rabbit.svg"
+          alt="primary character"
+          className="bd-mx-auto bd-block dark:bd-invert"
+          width={420}
+          height={436}
+          priority
+        />
+      </div>
     </main>
   );
 }
