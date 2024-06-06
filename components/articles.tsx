@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { formatDate, getArticles } from '@/app/article/utils';
 
-export function ArticlePosts() {
+export function Articles() {
   let allArticles = getArticles();
 
   return (

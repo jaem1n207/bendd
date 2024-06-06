@@ -111,7 +111,7 @@ export function Navigation() {
     <>
       <div
         aria-hidden="true"
-        className="dark:bd-bg-navigation-highlight dark:bd-absolute dark:-bd-top-[1px] dark:-bd-z-10 dark:bd-h-[1px] dark:bd-w-[95%] dark:bd-opacity-20"
+        className="dark:bd-absolute dark:-bd-top-[1px] dark:-bd-z-10 dark:bd-h-[1px] dark:bd-w-[95%] dark:bd-bg-navigation-highlight dark:bd-opacity-20"
       />
       <div className="bd-itesm-end sm bd-flex bd-size-full bd-gap-2 bd-overflow-x-auto bd-overflow-y-hidden bd-py-2">
         {items.map((section, index) => {

@@ -1,4 +1,4 @@
-import { ArticlePosts } from '@/components/articles';
+import { Articles as ArticlePosts } from '@/components/articles';
 
 export default function Articles() {
   return (

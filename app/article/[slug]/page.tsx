@@ -5,9 +5,9 @@ import { CustomMDX } from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
 
 export async function generateStaticParams() {
-  const posts = getArticles();
+  const articles = getArticles();
 
-  return posts.map(post => ({
+  return articles.map(post => ({
     slug: post.slug,
   }));
 }

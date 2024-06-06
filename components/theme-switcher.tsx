@@ -11,7 +11,7 @@ export function ThemeSwitcher() {
 
   return (
     <Button
-      title={isSystemDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      title="Toggle Theme"
       className="bd-relative bd-top-0 bd-flex bd-max-h-10 bd-min-h-10 bd-min-w-10 bd-max-w-10 bd-items-center bd-justify-center !bd-rounded-full !bd-bg-input bd-text-primary/30 hover:!bd-bg-input hover:bd-text-primary/40"
       onClick={() => setTheme(isSystemDark ? 'light' : 'dark')}
     >
