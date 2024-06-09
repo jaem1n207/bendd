@@ -21,9 +21,11 @@ const config = {
     extend: {
       backgroundImage: {
         'navigation-highlight':
-          'linear-gradient(to right, rgba(0, 0, 0, 0), hsl(0, 0%, 22%) 20%,hsl(0, 0%, 45%) 67.19%, rgba(0, 0, 0, 0))',
+          'linear-gradient(to right, rgba(0, 0, 0, 0), hsl(var(--gray-600)) 20%,hsl(var(--gray-900)) 67.19%, rgba(0, 0, 0, 0))',
         'navigation-item-top-highlight':
-          'linear-gradient(to right, rgba(0, 0, 0, 0),hsl(0, 0%, 16%) 20%,hsl(0, 0%, 25%) 67.19%, rgba(0, 0, 0, 0))',
+          'linear-gradient(to right, rgba(0, 0, 0, 0),hsl(var(--gray-400)) 20%,hsl(var(--gray-700)) 67.19%, rgba(0, 0, 0, 0))',
+        'navigation-item':
+          'linear-gradient(to top right, hsl(var(--gray-200)), hsl(var(--gray-300)), hsl(var(--gray-200)), hsl(var(--gray-300)))',
       },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],

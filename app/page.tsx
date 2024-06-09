@@ -13,6 +13,7 @@ export default function Home() {
         <Image
           src="/rabbit.svg"
           alt="primary character"
+          draggable={false}
           className="bd-mx-auto bd-block dark:bd-invert"
           width={420}
           height={436}

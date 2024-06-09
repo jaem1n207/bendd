@@ -1,19 +1,11 @@
-import {
-  Camera,
-  Github,
-  Home,
-  Layers,
-  Mail,
-  Package,
-  Pickaxe,
-  Youtube,
-} from 'lucide-react';
+import { cva } from 'class-variance-authority';
 import Link from 'next/link';
 import { type ReactNode } from 'react';
 
 import { siteMetadata } from '@/lib/site-metadata';
 
-import { cn } from '@/lib/utils';
+import { Book, Bulb, Gallery, GitHub, Home, Mail, Youtube } from './icons';
+import { NavigationDock, NavigationDockItem } from './navigation-dock';
 import { ThemeSwitcher } from './theme-switcher';
 import { ExternalLink } from './ui/external-link';
 import { Separator } from './ui/separator';
@@ -38,6 +30,8 @@ interface SettingsItem extends CommonItem {
   children: ReactNode;
 }
 
+const navigationItemSvg = cva('bd-size-1/2 bd-text-gray-900');
+
 const items: {
   name: string;
   items: (MainItem | SocialItem | SettingsItem)[];
@@ -48,29 +42,23 @@ const items: {
       {
         name: 'Home',
         slug: '/',
-        icon: <Home className="bd-size-1/2" />,
+        icon: <Home className={navigationItemSvg()} />,
       },
       {
-        name: 'Craft',
-        slug: '/craft',
-        icon: <Pickaxe className="bd-size-1/2" />,
+        name: 'Projects',
+        slug: '/projects',
+        icon: <Bulb className={navigationItemSvg()} />,
         disabled: true,
       },
       {
         name: 'Article',
         slug: '/article',
-        icon: <Layers className="bd-size-1/2" />,
-      },
-      {
-        name: 'Projects',
-        slug: '/projects',
-        icon: <Package className="bd-size-1/2" />,
-        disabled: true,
+        icon: <Book className={navigationItemSvg()} />,
       },
       {
         name: 'Photos',
         slug: '/photo',
-        icon: <Camera className="bd-size-1/2" />,
+        icon: <Gallery className={navigationItemSvg()} />,
         disabled: true,
       },
     ],
@@ -81,17 +69,17 @@ const items: {
       {
         name: 'GitHub',
         href: siteMetadata.github,
-        icon: <Github className="bd-size-1/2" />,
+        icon: <GitHub className={navigationItemSvg()} />,
       },
       {
         name: 'YouTube',
         href: siteMetadata.youtube,
-        icon: <Youtube className="bd-size-1/2" />,
+        icon: <Youtube className={navigationItemSvg()} />,
       },
       {
         name: 'Mail',
         href: `mailto:${siteMetadata.email}`,
-        icon: <Mail className="bd-size-1/2" />,
+        icon: <Mail className={navigationItemSvg()} />,
       },
     ],
   },
@@ -113,7 +101,7 @@ export function Navigation() {
         aria-hidden="true"
         className="dark:bd-absolute dark:-bd-top-[1px] dark:-bd-z-10 dark:bd-h-[1px] dark:bd-w-[95%] dark:bd-bg-navigation-highlight dark:bd-opacity-20"
       />
-      <div className="bd-itesm-end sm bd-flex bd-size-full bd-gap-2 bd-overflow-x-auto bd-overflow-y-hidden bd-py-2">
+      <NavigationDock>
         {items.map((section, index) => {
           const isLastSection = index === items.length - 1;
 
@@ -121,44 +109,49 @@ export function Navigation() {
             <>
               {section.items.map(item => {
                 if ('slug' in item) {
+                  if (item.disabled) return null;
+
                   return (
-                    <Link
-                      title={item.name}
-                      key={item.slug}
-                      href={item.slug}
-                      tabIndex={item.disabled ? -1 : undefined}
-                      aria-disabled={item.disabled}
-                      className={cn(
-                        'bd-relative bd-top-0 bd-flex bd-min-h-10 bd-min-w-10 bd-items-center bd-justify-center bd-rounded-full bd-bg-input bd-text-primary/30 hover:bd-text-primary/40',
-                        {
-                          'bd-pointer-events-none bd-opacity-50': item.disabled,
-                        }
-                      )}
-                    >
-                      <div className="bd-contents">{item.icon}</div>
-                    </Link>
+                    <NavigationDockItem key={item.name}>
+                      <Link
+                        title={item.name}
+                        key={item.slug}
+                        href={item.slug}
+                        tabIndex={item.disabled ? -1 : undefined}
+                        aria-disabled={item.disabled}
+                        className="bd-flex bd-size-full bd-items-center bd-justify-center"
+                      >
+                        {item.icon}
+                      </Link>
+                    </NavigationDockItem>
                   );
                 }
 
                 if ('href' in item) {
                   return (
-                    <ExternalLink
-                      title={item.name}
-                      key={item.href}
-                      href={item.href}
-                      className="bd-relative bd-top-0 bd-flex bd-min-h-10 bd-min-w-10 bd-items-center bd-justify-center bd-rounded-full bd-bg-input bd-text-primary/30 hover:bd-text-primary/40"
-                    >
-                      {item.icon}
-                    </ExternalLink>
+                    <NavigationDockItem key={item.name}>
+                      <ExternalLink
+                        title={item.name}
+                        key={item.href}
+                        href={item.href}
+                        className="bd-flex bd-size-full bd-items-center bd-justify-center"
+                      >
+                        {item.icon}
+                      </ExternalLink>
+                    </NavigationDockItem>
                   );
                 }
 
-                return item.children;
+                return (
+                  <NavigationDockItem key={item.name}>
+                    {item.children}
+                  </NavigationDockItem>
+                );
               })}
               {!isLastSection && (
                 <Separator
                   orientation="vertical"
-                  className="bd-mx-2 bd-h-9"
+                  className="bd-mx-2 !bd-h-9"
                   style={{
                     maskImage:
                       'linear-gradient(0deg, transparent, rgb(255, 255, 255) 16px, rgb(255, 255, 255) calc(100% - 16px), transparent)',
@@ -168,7 +161,7 @@ export function Navigation() {
             </>
           );
         })}
-      </div>
+      </NavigationDock>
     </>
   );
 }
