@@ -11,7 +11,7 @@ export const Home = (props: SVGProps<SVGSVGElement>) => (
   >
     <path
       fill="currentColor"
-      fill-opacity="0.25"
+      fillOpacity="0.25"
       d="M5 14.059c0-1.01 0-1.514.222-1.945c.221-.43.632-.724 1.453-1.31l4.163-2.974c.56-.4.842-.601 1.162-.601c.32 0 .601.2 1.162.601l4.163 2.973c.821.587 1.232.88 1.453 1.311c.222.43.222.935.222 1.944V19c0 .943 0 1.414-.293 1.707C18.414 21 17.943 21 17 21H7c-.943 0-1.414 0-1.707-.293C5 20.414 5 19.943 5 19z"
     />
     <path
@@ -31,11 +31,11 @@ export const Bulb = (props: SVGProps<SVGSVGElement>) => (
     fill="none"
     {...props}
   >
-    <g fill="none" stroke="currentColor" stroke-width="1.5">
+    <g fill="none" stroke="currentColor" strokeWidth="1.5">
       <path d="M4.5 9.5a7.5 7.5 0 1 1 12.501 5.59c-1.12 1.003-1.68 1.505-1.832 1.69c-.487.601-.508.65-.63 1.413c-.039.237-.039.593-.039 1.307c0 .935 0 1.402-.201 1.75a1.5 1.5 0 0 1-.549.549C13.402 22 12.935 22 12 22s-1.402 0-1.75-.201a1.5 1.5 0 0 1-.549-.549c-.201-.348-.201-.815-.201-1.75c0-.713 0-1.07-.038-1.307c-.123-.763-.144-.812-.631-1.412c-.151-.186-.712-.688-1.832-1.692A7.482 7.482 0 0 1 4.5 9.5Z" />
       <path d="M14.5 19.5h-5" opacity="0.5" />
       <path
-        stroke-linecap="round"
+        strokeLinecap="round"
         d="M12 17v-2m0 0a2 2 0 0 0 1.732-1M12 15a2 2 0 0 1-1.732-1"
         opacity="0.5"
       />
@@ -55,9 +55,9 @@ export const Book = (props: SVGProps<SVGSVGElement>) => (
     <g
       fill="none"
       stroke="currentColor"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.5"
       color="currentColor"
     >
       <path d="M16.613 16.085C13.98 17.568 12.477 20.64 12 21.5V8c.415-.746 1.602-2.884 3.632-4.336c.855-.612 1.282-.918 1.825-.64c.543.28.543.896.543 2.127v8.84c0 .666 0 .999-.137 1.232c-.136.234-.508.443-1.25.862" />

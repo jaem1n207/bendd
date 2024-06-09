@@ -13,7 +13,8 @@ import {
   useSpring,
   useTransform,
 } from 'framer-motion';
-import type { PropsWithChildren, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
+import type { ReactNode } from 'react';
 import { Children, cloneElement, forwardRef, isValidElement } from 'react';
 import useMeasure from 'react-use-measure';
 
@@ -79,7 +80,7 @@ type NavigationDockItemProps = {
   size?: number;
   className?: string;
   children?: ReactNode;
-  props?: PropsWithChildren;
+  slug?: string;
 } & NavigationDockItemMotionValue;
 
 export const NavigationDockItem = ({
@@ -89,6 +90,7 @@ export const NavigationDockItem = ({
   mousex,
   className,
   children,
+  slug,
 }: NavigationDockItemProps) => {
   const [ref, bounds] = useMeasure();
 
@@ -107,6 +109,9 @@ export const NavigationDockItem = ({
     damping: 12,
   });
 
+  const pathname = usePathname();
+  const isActive = pathname === slug;
+
   return (
     <motion.div
       ref={ref}
@@ -118,6 +123,12 @@ export const NavigationDockItem = ({
     >
       <div className="bd-absolute -bd-top-[1px] -bd-z-10 bd-size-full bd-rounded-full bd-opacity-80 dark:bd-bg-navigation-item-top-highlight" />
       {children}
+      <div
+        className={cn(
+          'bd-absolute -bd-bottom-1.5 bd-left-[calc(50%-0.125rem)] bd-size-1 bd-rounded-full bd-bg-gray-800',
+          isActive ? 'bd-opacity-100' : 'bd-opacity-0'
+        )}
+      />
     </motion.div>
   );
 };

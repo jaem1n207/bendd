@@ -112,7 +112,7 @@ export function Navigation() {
                   if (item.disabled) return null;
 
                   return (
-                    <NavigationDockItem key={item.name}>
+                    <NavigationDockItem key={item.name} slug={item.slug}>
                       <Link
                         title={item.name}
                         key={item.slug}
