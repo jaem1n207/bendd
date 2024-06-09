@@ -27,6 +27,9 @@ const config = {
         'navigation-item':
           'linear-gradient(to top right, hsl(var(--gray-200)), hsl(var(--gray-300)), hsl(var(--gray-200)), hsl(var(--gray-300)))',
       },
+      backgroundSize: {
+        'navigation-item': '200% 100%',
+      },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
       },

@@ -9,6 +9,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import {
   MotionValue,
   motion,
+  useAnimation,
   useMotionValue,
   useSpring,
   useTransform,
@@ -23,7 +24,7 @@ const DEFAULT_MAGNIFICATION = DEFAULT_ITEM_SIZE * 2;
 const DEFAULT_DISTANCE = DEFAULT_MAGNIFICATION * 2;
 
 const navigationDockVariants = cva(
-  'bd-items-end sm bd-flex bd-w-full bd-gap-2 bd-overflow-x-auto bd-overflow-y-hidden bd-py-2'
+  'bd-items-end sm bd-flex bd-w-full bd-gap-2 bd-py-2 sm:bd-h-auto bd-h-20'
 );
 
 type NavigationDockProps = VariantProps<typeof navigationDockVariants> & {
@@ -93,6 +94,8 @@ export const NavigationDockItem = ({
   slug,
 }: NavigationDockItemProps) => {
   const [ref, bounds] = useMeasure();
+  const controls = useAnimation();
+  const pathname = usePathname();
 
   const distanceCalc = useTransform(mousex!, (val: number) => {
     return val - bounds.x - bounds.width / 2;
@@ -109,7 +112,11 @@ export const NavigationDockItem = ({
     damping: 12,
   });
 
-  const pathname = usePathname();
+  const handleClick = async () => {
+    await controls.start({ top: -DEFAULT_ITEM_SIZE / 2 });
+    controls.start({ top: 0 });
+  };
+
   const isActive = pathname === slug;
 
   return (
@@ -117,9 +124,13 @@ export const NavigationDockItem = ({
       ref={ref}
       style={{ width }}
       className={cn(
-        'bd-bg-navigation-item bd-relative bd-top-0 bd-aspect-square bd-rounded-full bd-bg-gray-300 bd-text-gray-900/80 hover:bd-text-gray-900',
+        'bd-relative bd-top-0 bd-aspect-square bd-rounded-full bd-bg-gray-300 bd-bg-navigation-item bd-text-gray-900/80 hover:bd-text-gray-900',
         className
       )}
+      animate={controls}
+      whileTap={{ top: 8 }}
+      onTap={handleClick}
+      initial={{ top: 0 }}
     >
       <div className="bd-absolute -bd-top-[1px] -bd-z-10 bd-size-full bd-rounded-full bd-opacity-80 dark:bd-bg-navigation-item-top-highlight" />
       {children}
