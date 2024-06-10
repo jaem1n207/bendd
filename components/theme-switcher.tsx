@@ -1,11 +1,14 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { motion } from 'framer-motion';
+
+const MotionSun = motion(Sun);
+const MotionMoon = motion(Moon);
 
 export function ThemeSwitcher() {
-  const { setTheme, resolvedTheme, theme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const isSystemDark = resolvedTheme === 'dark';
 
   return (
@@ -14,20 +17,16 @@ export function ThemeSwitcher() {
       className="bd-relative bd-flex bd-size-full bd-items-center bd-justify-center"
       onClick={() => setTheme(isSystemDark ? 'light' : 'dark')}
     >
-      <motion.div
-        tabIndex={-1}
-        initial={false}
-        animate={{
-          rotate: isSystemDark ? 0 : 45,
-        }}
-        className="bd-absolute bd-inset-0 bd-flex bd-items-center bd-justify-center"
-      >
-        {isSystemDark ? (
-          <Sun className="bd-size-1/2" />
-        ) : (
-          <Moon className="bd-size-1/2 -bd-rotate-45" />
-        )}
-      </motion.div>
+      <MotionSun
+        className="bd-block bd-size-1/2 dark:bd-hidden"
+        initial={{ rotate: 0 }}
+        animate={{ rotate: isSystemDark ? -90 : 0 }}
+      />
+      <MotionMoon
+        className="bd-hidden bd-size-1/2 dark:bd-block"
+        initial={{ rotate: 0 }}
+        animate={{ rotate: isSystemDark ? 0 : 90 }}
+      />
       <span className="bd-sr-only">Toggle theme</span>
     </button>
   );
