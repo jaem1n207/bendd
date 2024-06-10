@@ -117,7 +117,7 @@ export const NavigationDockItem = ({
     controls.start({ top: 0 });
   };
 
-  const isActive = pathname === slug;
+  const isActive = new RegExp(`^${slug}(\/|$)`).test(pathname);
 
   return (
     <motion.div
