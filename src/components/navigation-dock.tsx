@@ -18,6 +18,7 @@ import type { ReactNode } from 'react';
 import { Children, cloneElement, forwardRef, isValidElement } from 'react';
 import useMeasure from 'react-use-measure';
 
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 import { cn } from '@/lib/utils';
 
 const DEFAULT_ITEM_SIZE = 40;
@@ -43,6 +44,8 @@ export const NavigationDock = forwardRef<HTMLDivElement, NavigationDockProps>(
     },
     ref
   ) => {
+    const prefersReducedMotion = usePrefersReducedMotion();
+
     const mousex = useMotionValue(Infinity);
 
     const renderChildren = () => {
@@ -60,8 +63,12 @@ export const NavigationDock = forwardRef<HTMLDivElement, NavigationDockProps>(
     return (
       <motion.div
         ref={ref}
-        onMouseMove={e => mousex.set(e.pageX)}
-        onMouseLeave={() => mousex.set(Infinity)}
+        onMouseMove={
+          prefersReducedMotion ? undefined : e => mousex.set(e.pageX)
+        }
+        onMouseLeave={
+          prefersReducedMotion ? undefined : () => mousex.set(Infinity)
+        }
         className={cn(navigationDockVariants({ className }))}
       >
         {renderChildren()}
@@ -98,6 +105,8 @@ export const NavigationDockItem = ({
   const controls = useAnimation();
   const pathname = usePathname();
 
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   const distanceCalc = useTransform(mousex!, (val: number) => {
     return val - bounds.x - bounds.width / 2;
   });
@@ -114,6 +123,8 @@ export const NavigationDockItem = ({
   });
 
   const handleClick = async () => {
+    if (prefersReducedMotion) return;
+
     await controls.start({ top: -DEFAULT_ITEM_SIZE / 2 });
     controls.start({ top: 0 });
   };
@@ -129,7 +140,7 @@ export const NavigationDockItem = ({
         className
       )}
       animate={controls}
-      whileTap={{ top: 8 }}
+      whileTap={prefersReducedMotion ? undefined : { top: 8 }}
       onTap={handleClick}
       initial={{ top: 0 }}
     >
