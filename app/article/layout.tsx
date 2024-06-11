@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: '작성한 글들을 모아놓은 공간입니다.',
   openGraph: {
     type: 'website',
-    url: `${siteMetadata.siteUrl}/articles`,
+    url: `${siteMetadata.siteUrl}/article`,
     siteName: 'Bendd의 피드',
   },
 };

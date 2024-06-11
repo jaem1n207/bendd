@@ -19,12 +19,15 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   }
 
   const {
-    title,
+    title: postTitle,
     publishedAt: publishedTime,
     summary: description,
     image,
   } = post.metadata;
-  const ogImage = image ? image : `/api/og?title=${encodeURIComponent(title)}`;
+  const title = `${postTitle} • ${siteMetadata.title} article`;
+  const ogImage = image
+    ? image
+    : `/api/og?title=${encodeURIComponent(postTitle)}`;
 
   return {
     title,
@@ -34,7 +37,7 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
       description,
       type: 'article',
       publishedTime,
-      url: `${siteMetadata.siteUrl}/blog/${post.slug}`,
+      url: `${siteMetadata.siteUrl}/article/${post.slug}`,
       images: [
         {
           url: ogImage,
@@ -73,7 +76,7 @@ export default function Blog({ params }: { params: { slug: string } }) {
             image: post.metadata.image
               ? `${siteMetadata.siteUrl}${post.metadata.image}`
               : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${siteMetadata.siteUrl}/blog/${post.slug}`,
+            url: `${siteMetadata.siteUrl}/article/${post.slug}`,
             author: {
               '@type': 'Person',
               name: siteMetadata.author,
