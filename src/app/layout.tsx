@@ -7,7 +7,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { siteMetadata } from '@/lib/site-metadata';
 import { cn } from '@/lib/utils';
 
-import './globals.css';
+import '../globals.css';
 
 const fontSans = FontSans({
   subsets: ['latin'],

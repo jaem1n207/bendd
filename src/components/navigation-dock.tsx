@@ -4,7 +4,6 @@
 
 'use client';
 
-import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import {
   MotionValue,
@@ -18,6 +17,8 @@ import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { Children, cloneElement, forwardRef, isValidElement } from 'react';
 import useMeasure from 'react-use-measure';
+
+import { cn } from '@/lib/utils';
 
 const DEFAULT_ITEM_SIZE = 40;
 const DEFAULT_MAGNIFICATION = DEFAULT_ITEM_SIZE * 2;

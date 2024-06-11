@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { formatDate, getArticles } from '@/app/article/utils';
 
 export function Articles() {
-  let allArticles = getArticles();
+  const allArticles = getArticles();
 
   return (
     <>
