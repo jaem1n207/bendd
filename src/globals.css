@@ -34,6 +34,16 @@
     --gray-700: 0 0% 85%;
     --gray-800: 0 0% 78%;
     --gray-900: 0 0% 56%;
+    /* sugar-highlight */
+    --sh-identifier: #354150;
+    --sh-keyword: #f47067;
+    --sh-string: #00a99a;
+    --sh-class: #8d85ff;
+    --sh-property: #4e8fdf;
+    --sh-entity: #6eafad;
+    --sh-jsxliterals: #bf7db6;
+    --sh-sign: #8996a3;
+    --sh-comment: #a19595;
   }
 
   .dark {
@@ -66,6 +76,16 @@
     --gray-700: 0 0% 25%;
     --gray-800: 0 0% 31%;
     --gray-900: 0 0% 45%;
+    /* sugar-highlight */
+    --sh-class: #4d9ef6;
+    --sh-identifier: #6caedd;
+    --sh-sign: #cdd3de;
+    --sh-property: #3182ce;
+    --sh-entity: #2db1bc;
+    --sh-jsxliterals: #939dfd;
+    --sh-string: #26dabd;
+    --sh-keyword: #ff6b6b;
+    --sh-comment: #cbc3c3;
   }
 
   * {

@@ -58,6 +58,14 @@ function RoundedImage({ alt, src }: { alt: string; src: string }) {
   return <Image alt={alt} className="rounded-lg" src={src} />;
 }
 
+function Pre({ children }: { children: string }) {
+  return (
+    <pre className="overflow-x-auto bd-bg-[#f6f6f6] dark:bd-bg-secondary">
+      {children}
+    </pre>
+  );
+}
+
 function Code({ children, ...props }: { children: string }) {
   let codeHTML = highlight(children);
   return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />;
@@ -106,6 +114,7 @@ let components = {
   Image: RoundedImage,
   a: CustomLink,
   code: Code,
+  pre: Pre,
   Table,
 };
 
