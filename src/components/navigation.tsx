@@ -112,9 +112,12 @@ export function Navigation() {
                   if (item.disabled) return null;
 
                   return (
-                    <NavigationDockItem key={item.name} slug={item.slug}>
+                    <NavigationDockItem
+                      key={item.name}
+                      slug={item.slug}
+                      name={item.name}
+                    >
                       <Link
-                        title={item.name}
                         key={item.slug}
                         href={item.slug}
                         tabIndex={item.disabled ? -1 : undefined}
@@ -129,9 +132,8 @@ export function Navigation() {
 
                 if ('href' in item) {
                   return (
-                    <NavigationDockItem key={item.name}>
+                    <NavigationDockItem key={item.name} name={item.name}>
                       <ExternalLink
-                        title={item.name}
                         key={item.href}
                         href={item.href}
                         className="bd-flex bd-size-full bd-items-center bd-justify-center"
@@ -143,7 +145,7 @@ export function Navigation() {
                 }
 
                 return (
-                  <NavigationDockItem key={item.name}>
+                  <NavigationDockItem key={item.name} name={item.name}>
                     {item.children}
                   </NavigationDockItem>
                 );

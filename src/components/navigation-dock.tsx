@@ -20,6 +20,7 @@ import useMeasure from 'react-use-measure';
 
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 const DEFAULT_ITEM_SIZE = 40;
 const DEFAULT_MAGNIFICATION = DEFAULT_ITEM_SIZE * 2;
@@ -79,6 +80,29 @@ export const NavigationDock = forwardRef<HTMLDivElement, NavigationDockProps>(
 
 NavigationDock.displayName = 'NavigationDock';
 
+const NavigationDockItemTooltip = ({
+  children,
+  content,
+}: {
+  children: ReactNode;
+  content: ReactNode;
+}) => {
+  return (
+    <Tooltip delayDuration={50}>
+      <TooltipTrigger asChild>
+        <div className="bd-relative bd-size-full">{children}</div>
+      </TooltipTrigger>
+      <TooltipContent
+        side="top"
+        align="center"
+        className="bd-mb-1 bd-text-sm bd-text-primary/60"
+      >
+        {content}
+      </TooltipContent>
+    </Tooltip>
+  );
+};
+
 type NavigationDockItemMotionValue = {
   magnification?: number;
   distance?: number;
@@ -90,6 +114,7 @@ type NavigationDockItemProps = {
   className?: string;
   children?: ReactNode;
   slug?: string;
+  name: string;
 } & NavigationDockItemMotionValue;
 
 export const NavigationDockItem = ({
@@ -100,6 +125,7 @@ export const NavigationDockItem = ({
   className,
   children,
   slug,
+  name,
 }: NavigationDockItemProps) => {
   const [ref, bounds] = useMeasure();
   const controls = useAnimation();
@@ -145,7 +171,9 @@ export const NavigationDockItem = ({
       initial={{ top: 0 }}
     >
       <div className="bd-absolute -bd-top-[1px] -bd-z-10 bd-size-full bd-rounded-full bd-opacity-80 dark:bd-bg-navigation-item-top-highlight" />
-      {children}
+      <NavigationDockItemTooltip content={name}>
+        {children}
+      </NavigationDockItemTooltip>
       <div
         className={cn(
           'bd-absolute -bd-bottom-1.5 bd-left-[calc(50%-0.125rem)] bd-size-1 bd-rounded-full bd-bg-gray-800',
