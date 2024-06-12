@@ -1,0 +1,2 @@
+# ESLint 및 Prettier 후 'check-types'를 실행하기 위해 concurrent를 비활성화합니다.
+cd "$(dirname "$0")/.." && npx lint-staged --concurrent false
