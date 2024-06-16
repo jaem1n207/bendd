@@ -17,19 +17,15 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteMetadata.siteUrl),
   title: {
     default: siteMetadata.title,
     template: `%s • ${siteMetadata.title}`,
   },
-  description: 'Frontend Software Engineer · jaem1n207',
+  description: siteMetadata.description,
   openGraph: {
-    title: siteMetadata.title,
-    description: siteMetadata.description,
     type: 'website',
     url: siteMetadata.siteUrl,
     siteName: siteMetadata.title,
-    locale: siteMetadata.locale,
   },
 };
 

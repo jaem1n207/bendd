@@ -1,3 +1,4 @@
+import { siteMetadata } from '@/lib/site-metadata';
 import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
 import type { ReactElement } from 'react';
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest): Promise<Response | ImageResponse> {
 
     const title = searchParams.has('title')
       ? searchParams.get('title')
-      : 'Bendd';
+      : siteMetadata.title;
 
     return new ImageResponse(
       (
