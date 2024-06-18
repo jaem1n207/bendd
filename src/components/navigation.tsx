@@ -121,6 +121,7 @@ export function Navigation() {
                         key={item.slug}
                         href={item.slug}
                         tabIndex={item.disabled ? -1 : undefined}
+                        aria-label={item.name}
                         aria-disabled={item.disabled}
                         className="bd-flex bd-size-full bd-items-center bd-justify-center"
                       >
@@ -136,6 +137,7 @@ export function Navigation() {
                       <ExternalLink
                         key={item.href}
                         href={item.href}
+                        aria-label={item.name}
                         className="bd-flex bd-size-full bd-items-center bd-justify-center"
                       >
                         {item.icon}
