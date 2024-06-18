@@ -55,12 +55,20 @@ function CustomLink({
 }
 
 function RoundedImage({ alt, src }: { alt: string; src: string }) {
-  return <Image alt={alt} className="rounded-lg" src={src} />;
+  return (
+    <Image
+      alt={alt}
+      src={src}
+      width={1200}
+      height={400}
+      className="bd-object-cover"
+    />
+  );
 }
 
 function Pre({ children }: { children: string }) {
   return (
-    <pre className="overflow-x-auto bd-bg-[#f6f6f6] dark:bd-bg-secondary">
+    <pre className="bd-overflow-x-auto bd-bg-[#f6f6f6] dark:bd-bg-secondary">
       {children}
     </pre>
   );
@@ -111,7 +119,7 @@ let components = {
   h4: createHeading(4),
   h5: createHeading(5),
   h6: createHeading(6),
-  Image: RoundedImage,
+  img: RoundedImage,
   a: CustomLink,
   code: Code,
   pre: Pre,
