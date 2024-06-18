@@ -20,6 +20,7 @@ import useMeasure from 'react-use-measure';
 import useSound from 'use-sound';
 
 import { cn } from '@/lib/utils';
+import { getSoundEnabled } from './model/sound';
 import { MotionSlot } from './motion-slot';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
@@ -128,13 +129,18 @@ export const NavigationDockItem = ({
   const controls = useAnimation();
   const pathname = usePathname();
 
-  const [playHover, { stop: stopHoverSound }] = useSound(
+  const isSoundEnabled = getSoundEnabled();
+
+  const [playHoverSound, { stop: stopHoverSound }] = useSound(
     '/sounds/test-dock-item-hover.m4a',
     {
       interrupt: true,
+      soundEnabled: isSoundEnabled,
     }
   );
-  const [playClick] = useSound('/sounds/test-dock-item-click.m4a');
+  const [playClickSound] = useSound('/sounds/test-dock-item-click.m4a', {
+    soundEnabled: isSoundEnabled,
+  });
 
   const distanceCalc = useTransform(mousex!, (val: number) => {
     return val - bounds.x - bounds.width / 2;
@@ -153,7 +159,7 @@ export const NavigationDockItem = ({
 
   const handleClick = async () => {
     stopHoverSound();
-    playClick();
+    playClickSound();
     await controls.start({ top: -DEFAULT_ITEM_SIZE / 2 });
     controls.start({ top: 0 });
   };
@@ -170,7 +176,7 @@ export const NavigationDockItem = ({
           className
         )}
         animate={controls}
-        onHoverStart={() => playHover()}
+        onHoverStart={() => playHoverSound()}
         whileTap={{ top: 8 }}
         onTap={handleClick}
         initial={{ top: 0 }}
