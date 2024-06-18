@@ -17,6 +17,7 @@ import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { Children, cloneElement, forwardRef, isValidElement } from 'react';
 import useMeasure from 'react-use-measure';
+import useSound from 'use-sound';
 
 import { cn } from '@/lib/utils';
 import { MotionSlot } from './motion-slot';
@@ -127,6 +128,14 @@ export const NavigationDockItem = ({
   const controls = useAnimation();
   const pathname = usePathname();
 
+  const [playHover, { stop: stopHoverSound }] = useSound(
+    '/sounds/test-dock-item-hover.m4a',
+    {
+      interrupt: true,
+    }
+  );
+  const [playClick] = useSound('/sounds/test-dock-item-click.m4a');
+
   const distanceCalc = useTransform(mousex!, (val: number) => {
     return val - bounds.x - bounds.width / 2;
   });
@@ -143,6 +152,8 @@ export const NavigationDockItem = ({
   });
 
   const handleClick = async () => {
+    stopHoverSound();
+    playClick();
     await controls.start({ top: -DEFAULT_ITEM_SIZE / 2 });
     controls.start({ top: 0 });
   };
@@ -159,6 +170,7 @@ export const NavigationDockItem = ({
           className
         )}
         animate={controls}
+        onHoverStart={() => playHover()}
         whileTap={{ top: 8 }}
         onTap={handleClick}
         initial={{ top: 0 }}
