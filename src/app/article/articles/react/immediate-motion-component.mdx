@@ -1,0 +1,260 @@
+---
+title: '사용자의 동작 감소 옵션을 존중하는 애니메이션 구현하기'
+publishedAt: '2024-06-18'
+category: react
+summary: 'React와 framer-motion을 사용하여 사용자의 '동작 감소' 옵션을 존중하는 애니메이션을 구현하는 방법을 소개합니다. 사용자의 접근성을 향상시키고, 애니메이션을 효과적으로 관리하는 방법을 알아보세요.'
+---
+
+Bendd 웹앱에는 다양한 애니메이션이 적용되어 있습니다. 애니메이션을 개발할 때 절대 잊지 말아야 할 사실이 있는데요. 일부 사용자에게 멀미를 유발할 수 있는 `x/y` 애니메이션을 `opacity`로 바꾸거나, 배경 동영상의 자동 재생을 비활성화하거나, 시차 모션을 끄는 등의 애니메이션을 제어할 수 있도록 제공해야 합니다.
+
+그럼 무엇을 기준으로 애니메이션을 비활성화해야 할까요? 다행히 모든 주요 OS에서는 접근성 설정에서 “모션 감소” 설정을 사용할 수 있습니다. 이 설정을 활성화하면 모든 애니메이션(ex: MacOS에서 요술램프 지니 최소화 효과)을 비활성화합니다. Apple은 미디어 쿼리인 **`prefers-reduced-motion`** 을 사용해 브라우저에 해당 설정을 노출하기 시작했습니다. 이렇게 하면 웹사이트에서 이 미디어 쿼리를 이용해 명시적으로 애니메이션을 비활성화할 수 있습니다.
+
+보통 전역 스타일로 아래와 같이 구성할 수 있습니다:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  * {
+    -webkit-animation-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    -webkit-animation-iteration-count: 1 !important;
+    animation-iteration-count: 1 !important;
+    -webkit-transition-duration: 0.01ms !important;
+    -o-transition-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+```
+
+이 코드만으로 모든 애니메이션의 동작이 줄어들면 좋겠지만, 아쉽게도 애니메이션이 전적으로 CSS로 동작(eg. transitions, keyframe animations)할 때만 잘 실행됩니다. 커서 좌표에 따른 애니메이션 등 CSS를 통해서만 애니메이션을 만들 수 없는 유형은 JS에서 애니메이션을 실행하는데 이 경우엔 의도한 대로 동작하지 않습니다.
+
+이 경우, 사용자의 “모션 감소” 설정 여부를 파악해서 직접 로직에서 애니메이션이 실행되지 않도록 해야 합니다. 그래서 사용자가 OS에서 “모션 감소” 체크박스를 토글하면 콜백 함수를 실행해 React 라이프사이클에 연결하는 훅을 구현했습니다:
+
+```tsx
+import { useSyncExternalStore } from 'react';
+
+const QUERY = '(prefers-reduced-motion: reduce)';
+
+const subscribePrefersReducedMotion = (onStoreChange: () => void) => {
+  const mediaQuery = window.matchMedia(QUERY);
+  mediaQuery.addEventListener('change', onStoreChange);
+
+  return () => mediaQuery.removeEventListener('change', onStoreChange);
+};
+
+const getPrefersReducedMotionSnapshot = () => {
+  return window.matchMedia(QUERY).matches;
+};
+
+const getServerSnapshot = () => {
+  return undefined;
+};
+
+export const usePrefersReducedMotion = () => {
+  return useSyncExternalStore(
+    subscribePrefersReducedMotion,
+    getPrefersReducedMotionSnapshot,
+    getServerSnapshot
+  );
+};
+```
+
+사용자의 기기에서 모션 감소 설정이 활성화된 경우 true를 반환하는 훅입니다. 이 훅으로 JS로 애니메이션을 적용한 요소도 쉽게 제어할 수 있습니다:
+
+```jsx
+export function ThemeSwitcher() {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  return (
+    <motion(Sun)
+      className="block size-1/2 dark:hidden"
+      initial={{ rotate: 0 }}
+      animate={{
+        rotate: isSystemDark ? (prefersReducedMotion ? 0 : -90) : 0,
+      }}
+    />
+  );
+};
+```
+
+### 조금 더 편하게 사용해보기
+
+여전히 `usePrefersReducedMotion` 훅을 통해 반환된 값을 이용해 애니메이션 관련 속성에 삼항 연산자를 이용해 값을 조정하는 과정이 필요합니다. `framer-motion`의 `motion`컴포넌트를 확장해서 `usePrefersReducedMotion` 훅을 사용해 애니메이션을 선택적으로 비활성화 해 이 과정을 간소화해보겠습니다:
+
+```tsx
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+import { motion as Motion, type HTMLMotionProps } from 'framer-motion';
+import { forwardRef } from 'react';
+
+const ReducedMotionDiv = forwardRef<HTMLDivElement, HTMLMotionProps<'div'>>(
+  ({ ...motionProps }, ref) => {
+    const prefersReducedMotion = usePrefersReducedMotion();
+
+    const handler: ProxyHandler<typeof motionProps> = {
+      get: function (target, prop, receiver) {
+        if (
+          typeof prop === 'string' &&
+          prefersReducedMotion &&
+          shouldRemoveProp(prop)
+        ) {
+          return undefined;
+        }
+
+        return Reflect.get(target, prop, receiver);
+      },
+    };
+
+    const shouldRemoveProp = (prop: string) => {
+      const propsToRemove = [
+        'animate',
+        'initial',
+        'transition',
+        'variants',
+        'whileDrag',
+        'whileFocus',
+        'whileHover',
+        'whileInView',
+        'whileTap',
+        'onMouseMove',
+        'onMouseLeave',
+      ];
+      return propsToRemove.includes(prop);
+    };
+
+    const proxiedProps = new Proxy(motionProps, handler);
+
+    return <Motion.div {...proxiedProps} ref={ref} />;
+  }
+);
+
+ReducedMotionDiv.displayName = 'ReducedMotionDiv';
+
+export default ReducedMotionDiv;
+```
+
+`Proxy`를 사용해서 `motion.div`의 속성 액세스를 가로채고, `prefersReducedMotion: true`일 때 애니메이션 관련 속성을 `undefined`로 설정합니다. Reflect 클래스의 도움으로 `motion.div`의 원래 동작은 유지하면서 필요에 따라 애니메이션을 비활성화할 수 있습니다.
+
+Promise 기반 브라우저 익스텐션 API를 사용하는 [확장 프로그램](https://chromewebstore.google.com/detail/synchronize-tab-scrolling/phceoocamipnafpgnchbfhkdlbleeafc)을 개발할 때 프록시를 사용했었기에 큰 어려움은 없었습니다.
+
+현재 구현에 한 가지 불편한 점이 있습니다. `div` 요소가 아닌 다른 요소를 렌더링할 수 없다는 점인데요. 이를 보완하겠습니다. 여기엔 `motion` 컴포넌트를 확장하는 등 여러가지 방법이 있습니다. 그러나 반드시 모든 애니메이션을 비활성화 할 필요는 없다는 점을 기억해야 합니다. 대부분 화면이 반짝이는 플래시 효과나 x/y 애니메이션을 비활성화하고 배경색이 천천히 움직이는 애니메이션은 활성화해도 무방합니다.
+
+따라서 저는 애니메이션 비활성화 선택지를 줄 수 있게 `motion` 컴포넌트를 자식으로 받아, `usePrefersReducedMotion` 훅을 사용해 사용자의 ‘동작 감소’ 선호 여부를 확인하고, 이에 따라 자식 컴포넌트의 애니메이션 속성을 제거하여 반환하는 래퍼 함수로 구현해보겠습니다.
+
+```tsx
+import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
+import { isMotionComponent } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+
+type MotionSlotProps = {
+  children: ReactNode | ReactNode[];
+}
+
+const shouldRemoveProp = (prop: string) => {
+  const propsToRemove = [
+    'animate',
+    'initial',
+    'transition',
+    ...
+  ];
+  return propsToRemove.includes(prop);
+};
+
+export const MotionSlot = ({ children }: MotionSlotProps) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  const processChild = (child: ReactNode): ReactNode => {
+    if (isValidElement(child) && isMotionComponent(child.type)) {
+      const props = Object.keys(child.props).reduce(
+        (acc: Record<string, any>, key) => {
+          if (shouldRemoveProp(key) && prefersReducedMotion) {
+            acc[key] = undefined;
+          } else {
+            acc[key] = child.props[key];
+          }
+          return acc;
+        },
+        {}
+      );
+
+      return cloneElement(child, props);
+    }
+    return child;
+  };
+
+  const processedChildren = Children.map(children, processChild);
+
+  return <>{processedChildren}</>;
+};
+
+MotionSlot.displayName = 'MotionSlot';
+```
+
+`MotionSlot` 컴포넌트는 아래와 같은 과정을 거칩니다:
+
+1. **동작 감소 선호 여부 확인**: `usePrefersReducedMotion` 훅을 통해 사용자가 동작 감소 옵션의 선호 여부를 확인합니다.
+2. **제거할 속성 결정**: `shouldRemoveProp` 함수는 제거해야 할 애니메이션 관련 속성 목록을 정의하고, 주어진 속성 이름이 이 목록에 포함되는지 여부를 반환합니다.
+3. **자식 컴포넌트 처리**: `isMotionComponent()`을 사용해 `motion` 컴포넌트인 자식 요소를 순회합니다.
+4. **애니메이션 관련 속성 제거**: 자식 컴포넌트가 `motion` 컴포넌트이고 사용자가 선호 감소 옵션을 선호한다면, 애니메이션 관련 속성을 `undefined`로 설정합니다. 그렇지 않은 경우, 원래의 속성 값을 유지합니다.
+5. **새로운 React 엘리먼트 구성**: 수정된 속성을 새로운 요소에 적용하여 생성합니다. 마지막으로 `Children.map`을 사용해 처리된 자식 요소들을 모아 반환합니다.
+
+비하인드 스토리로, 원래 `motion` 컴포넌트 여부를 판별할 때 브라우저 콘솔에 출력된 자식 요소의 심볼 값을 바탕으로 판별했는데요:
+
+```tsx
+if (isValidElement(child) && Symbol('motionComponentSymbol')) {...}
+```
+
+그러나 이 구현은 해당 패키지의 관리자가 값을 변경하면 의도한 대로 동작하지 않게 됩니다. 이러한 위험을 방지하고자 `framer-motion` 코드를 훑기 시작했습니다. 그리고 생성된 [Symbol](https://github.com/framer/motion/blob/be06a73f28fa18b5a327917f6832557befacd86f/packages/framer-motion/src/motion/utils/symbol.ts#L1) 값을 바탕으로 [isMotionComponent](https://github.com/framer/motion/blob/be06a73f28fa18b5a327917f6832557befacd86f/packages/framer-motion/src/motion/utils/is-motion-component.ts#L6-L12) 함수를 제공한다는 것을 알아냈고, 안전한 조건문을 구현할 수 있었습니다.
+
+이제 아래와 같이 `div` 뿐만 아니라, 다양한 요소를 렌더링할 수 있게 되었습니다:
+
+```tsx
+<MotionSlot>
+  <motion.span whileTap={}>Span!</motion.span>
+</MotionSlot>
+
+<MotionSlot>
+  <motion.a href='' whileTap={}>Anchor!</motion.span>
+</MotionSlot>
+```
+
+그리고 사용자의 동작 감소 선호 여부를 매번 확인하고 로직을 별도로 작성하지 않아도 됩니다. 아래 영상을 통해 사용자 선호 감소 옵션이 활성화되면 자동으로 애니메이션이 비활성화되는 것을 확인할 수 있습니다.
+
+<video
+  width="100%"
+  controls
+  preload="metadata"
+  autoPlay={false}
+  muted
+  playsInline
+>
+  <source src="/videos/usage-motion-slot.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+`MotionSlot` 사용 전/후 코드를 비교하고 마무리하겠습니다.
+
+```tsx
+// Use MotionSlot
+<MotionSlot>
+  <motion.div
+    ref={ref}
+    onMouseMove={e => mousex.set(e.pageX)}
+    onMouseLeave={() => mousex.set(Infinity)}
+  >
+    {renderChildren()}
+  </motion.div>
+</MotionSlot>;
+
+// Not Use MotionSlot
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+
+const prefersReducedMotion = usePrefersReducedMotion();
+
+<motion.div
+  ref={ref}
+  onMouseMove={prefersReducedMotion ? undefined : e => mousex.set(e.pageX)}
+  onMouseLeave={prefersReducedMotion ? undefined : () => mousex.set(Infinity)}
+>
+  {renderChildren()}
+</motion.div>;
+```
