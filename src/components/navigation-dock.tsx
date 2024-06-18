@@ -18,8 +18,8 @@ import type { ReactNode } from 'react';
 import { Children, cloneElement, forwardRef, isValidElement } from 'react';
 import useMeasure from 'react-use-measure';
 
-import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 import { cn } from '@/lib/utils';
+import { MotionSlot } from './motion-slot';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 const DEFAULT_ITEM_SIZE = 40;
@@ -45,8 +45,6 @@ export const NavigationDock = forwardRef<HTMLDivElement, NavigationDockProps>(
     },
     ref
   ) => {
-    const prefersReducedMotion = usePrefersReducedMotion();
-
     const mousex = useMotionValue(Infinity);
 
     const renderChildren = () => {
@@ -62,18 +60,16 @@ export const NavigationDock = forwardRef<HTMLDivElement, NavigationDockProps>(
     };
 
     return (
-      <motion.div
-        ref={ref}
-        onMouseMove={
-          prefersReducedMotion ? undefined : e => mousex.set(e.pageX)
-        }
-        onMouseLeave={
-          prefersReducedMotion ? undefined : () => mousex.set(Infinity)
-        }
-        className={cn(navigationDockVariants({ className }))}
-      >
-        {renderChildren()}
-      </motion.div>
+      <MotionSlot>
+        <motion.div
+          ref={ref}
+          onMouseMove={e => mousex.set(e.pageX)}
+          onMouseLeave={() => mousex.set(Infinity)}
+          className={cn(navigationDockVariants({ className }))}
+        >
+          {renderChildren()}
+        </motion.div>
+      </MotionSlot>
     );
   }
 );
@@ -131,8 +127,6 @@ export const NavigationDockItem = ({
   const controls = useAnimation();
   const pathname = usePathname();
 
-  const prefersReducedMotion = usePrefersReducedMotion();
-
   const distanceCalc = useTransform(mousex!, (val: number) => {
     return val - bounds.x - bounds.width / 2;
   });
@@ -149,8 +143,6 @@ export const NavigationDockItem = ({
   });
 
   const handleClick = async () => {
-    if (prefersReducedMotion) return;
-
     await controls.start({ top: -DEFAULT_ITEM_SIZE / 2 });
     controls.start({ top: 0 });
   };
@@ -158,28 +150,30 @@ export const NavigationDockItem = ({
   const isActive = new RegExp(`^${slug}(\/|$)`).test(pathname);
 
   return (
-    <motion.div
-      ref={ref}
-      style={{ width }}
-      className={cn(
-        'bd-relative bd-top-0 bd-aspect-square bd-rounded-full bd-bg-gray-300 bd-bg-navigation-item bd-text-gray-900/80 hover:bd-text-gray-900',
-        className
-      )}
-      animate={controls}
-      whileTap={prefersReducedMotion ? undefined : { top: 8 }}
-      onTap={handleClick}
-      initial={{ top: 0 }}
-    >
-      <div className="bd-absolute -bd-top-[1px] -bd-z-10 bd-size-full bd-rounded-full bd-opacity-80 dark:bd-bg-navigation-item-top-highlight" />
-      <NavigationDockItemTooltip content={name}>
-        {children}
-      </NavigationDockItemTooltip>
-      <div
+    <MotionSlot>
+      <motion.div
+        ref={ref}
+        style={{ width }}
         className={cn(
-          'bd-absolute -bd-bottom-1.5 bd-left-[calc(50%-0.125rem)] bd-size-1 bd-rounded-full bd-bg-gray-800',
-          isActive ? 'bd-opacity-100' : 'bd-opacity-0'
+          'bd-relative bd-top-0 bd-aspect-square bd-rounded-full bd-bg-gray-300 bd-bg-navigation-item bd-text-gray-900/80 hover:bd-text-gray-900',
+          className
         )}
-      />
-    </motion.div>
+        animate={controls}
+        whileTap={{ top: 8 }}
+        onTap={handleClick}
+        initial={{ top: 0 }}
+      >
+        <div className="bd-absolute -bd-top-[1px] -bd-z-10 bd-size-full bd-rounded-full bd-opacity-80 dark:bd-bg-navigation-item-top-highlight" />
+        <NavigationDockItemTooltip content={name}>
+          {children}
+        </NavigationDockItemTooltip>
+        <div
+          className={cn(
+            'bd-absolute -bd-bottom-1.5 bd-left-[calc(50%-0.125rem)] bd-size-1 bd-rounded-full bd-bg-gray-800',
+            isActive ? 'bd-opacity-100' : 'bd-opacity-0'
+          )}
+        />
+      </motion.div>
+    </MotionSlot>
   );
 };
