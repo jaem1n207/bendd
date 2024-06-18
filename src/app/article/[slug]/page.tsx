@@ -84,15 +84,16 @@ export default function Blog({ params }: { params: { slug: string } }) {
           }),
         }}
       />
-      <h1 className="bd-text-2xl bd-font-semibold bd-tracking-tighter">
+      <h1 className="bd-mx-auto bd-mt-12 bd-break-keep bd-text-center bd-text-4xl bd-font-bold bd-tracking-tight md:bd-mt-24">
         {post.metadata.title}
       </h1>
-      <div className="bd-mb-8 bd-mt-2 bd-flex bd-items-center bd-justify-between bd-text-sm">
-        <p className="bd-text-sm bd-tabular-nums bd-text-primary/60">
-          {formatDate(post.metadata.publishedAt)}
-        </p>
-      </div>
-      <article className="bd-prose bd-prose-slate dark:bd-prose-invert">
+      <p className="w-full bd-mx-auto bd-mt-6 bd-max-w-lg bd-break-keep bd-text-center bd-text-lg">
+        {post.metadata.summary}
+      </p>
+      <p className="bd-mt-6 bd-text-center bd-text-sm bd-tabular-nums bd-text-primary/60">
+        {formatDate(post.metadata.publishedAt)}
+      </p>
+      <article className="bd-prose bd-prose-slate bd-mt-40 dark:bd-prose-invert md:bd-mt-52">
         <CustomMDX source={post.content} />
       </article>
     </section>
