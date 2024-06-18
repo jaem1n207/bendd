@@ -9,6 +9,7 @@ import { NavigationDock, NavigationDockItem } from './navigation-dock';
 import { ThemeSwitcher } from './theme-switcher';
 import { ExternalLink } from './ui/external-link';
 import { Separator } from './ui/separator';
+import { SoundSwitcher } from './sound-switcher';
 
 interface CommonItem {
   name: string;
@@ -89,6 +90,10 @@ const items: {
       {
         name: 'Toggle theme',
         children: <ThemeSwitcher />,
+      },
+      {
+        name: 'Toggle sound',
+        children: <SoundSwitcher />,
       },
     ],
   },
