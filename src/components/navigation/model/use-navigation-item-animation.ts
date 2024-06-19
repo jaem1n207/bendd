@@ -1,7 +1,7 @@
 import { useAnimation, useSpring, useTransform } from 'framer-motion';
 import useSound from 'use-sound';
 
-import { getSoundEnabled } from '@/components/model/sound';
+import { getSoundEnabled } from '@/components/sound/model/get-sound';
 import {
   DEFAULT_DISTANCE,
   DEFAULT_ITEM_SIZE,
