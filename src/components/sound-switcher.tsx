@@ -2,9 +2,9 @@
 
 import useSound from 'use-sound';
 
-import { SoundMax, SoundMute } from './icons';
-import { useSoundEnabled } from './model/sound';
 import { ClientGate } from './client-gate';
+import { SoundMax, SoundMute } from './icons';
+import { useSoundEnabled } from './sound/model/get-sound';
 
 export function SoundSwitcher() {
   const [isSoundEnabled, setIsSoundEnabled] = useSoundEnabled();
