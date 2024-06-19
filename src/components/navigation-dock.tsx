@@ -130,15 +130,7 @@ export const NavigationDockItem = ({
   const pathname = usePathname();
 
   const isSoundEnabled = getSoundEnabled();
-
-  const [playHoverSound, { stop: stopHoverSound }] = useSound(
-    '/sounds/test-dock-item-hover.m4a',
-    {
-      interrupt: true,
-      soundEnabled: isSoundEnabled,
-    }
-  );
-  const [playClickSound] = useSound('/sounds/test-dock-item-click.m4a', {
+  const [playClickSound] = useSound('/sounds/blop.mp3', {
     soundEnabled: isSoundEnabled,
   });
 
@@ -158,8 +150,7 @@ export const NavigationDockItem = ({
   });
 
   const handleClick = async () => {
-    stopHoverSound();
-    playClickSound();
+    name !== 'Toggle sound' && playClickSound();
     await controls.start({ top: -DEFAULT_ITEM_SIZE / 2 });
     controls.start({ top: 0 });
   };
@@ -176,10 +167,10 @@ export const NavigationDockItem = ({
           className
         )}
         animate={controls}
-        onHoverStart={() => playHoverSound()}
         whileTap={{ top: 8 }}
         onTap={handleClick}
         initial={{ top: 0 }}
+        tabIndex={-1}
       >
         <div className="bd-absolute -bd-top-[1px] -bd-z-10 bd-size-full bd-rounded-full bd-opacity-80 dark:bd-bg-navigation-item-top-highlight" />
         <NavigationDockItemTooltip content={name}>

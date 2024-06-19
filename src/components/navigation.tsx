@@ -34,11 +34,11 @@ interface SettingsItem extends CommonItem {
 const navigationItemSvg = cva('bd-size-1/2 bd-text-gray-900');
 
 const items: {
-  name: string;
+  category: 'main' | 'socials' | 'settings';
   items: (MainItem | SocialItem | SettingsItem)[];
 }[] = [
   {
-    name: 'main',
+    category: 'main',
     items: [
       {
         name: 'Home',
@@ -65,7 +65,7 @@ const items: {
     ],
   },
   {
-    name: 'socials',
+    category: 'socials',
     items: [
       {
         name: 'GitHub',
@@ -85,7 +85,7 @@ const items: {
     ],
   },
   {
-    name: 'settings',
+    category: 'settings',
     items: [
       {
         name: 'Toggle theme',
