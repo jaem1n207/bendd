@@ -27,6 +27,7 @@ export const metadata: Metadata = {
     url: siteMetadata.siteUrl,
     siteName: siteMetadata.title,
   },
+  icons: '/metadata/favicon.png',
 };
 
 export default function RootLayout({
