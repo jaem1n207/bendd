@@ -1,7 +1,7 @@
 export const siteMetadata = {
   title: 'Bendd',
   author: 'jaem1n207',
-  description: 'Frontend Software Engineer · jaem1n207',
+  description: 'Frontend Software Engineer · Bendd(jaem1n207)',
   language: 'ko',
   theme: 'system',
   siteUrl: 'https://bendd.me',
