@@ -51,6 +51,7 @@ export function NavigationItemTooltip({
           whileTap={{ top: 8 }}
           onTap={handleClick}
           tabIndex={-1}
+          aria-hidden
         >
           {children}
         </motion.div>
