@@ -4,17 +4,18 @@ import useSound from 'use-sound';
 
 import { ClientGate } from './client-gate';
 import { SoundMax, SoundMute } from './icons';
-import { useSoundEnabled } from './sound/model/get-sound';
+import { useSoundStore } from './sound';
 
 export function SoundSwitcher() {
-  const [isSoundEnabled, setIsSoundEnabled] = useSoundEnabled();
+  const isSoundEnabled = useSoundStore(state => state.isSoundEnabled);
+  const toggleSoundEnabled = useSoundStore(state => state.toggleSoundEnabled);
 
   const [playUnmuteSound] = useSound('/sounds/unmute.mp3');
   const [playMuteSound] = useSound('/sounds/mute.mp3');
 
   const handleSoundToggle = () => {
     isSoundEnabled ? playMuteSound() : playUnmuteSound();
-    setIsSoundEnabled(!isSoundEnabled);
+    toggleSoundEnabled();
   };
 
   return (

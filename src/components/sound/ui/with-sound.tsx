@@ -3,7 +3,7 @@
 import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
 import useSound from 'use-sound';
 
-import { getSoundEnabled } from '../model/get-sound';
+import { useSoundStore } from '../model/sound-store';
 
 type WithSoundProps = {
   children: ReactNode;
@@ -13,7 +13,7 @@ type WithSoundProps = {
 export function WithSound({ children, assetPath }: WithSoundProps) {
   const child = Children.only(children);
 
-  const isSoundEnabled = getSoundEnabled();
+  const isSoundEnabled = useSoundStore(state => state.isSoundEnabled);
   const [playClickSound] = useSound(assetPath, {
     soundEnabled: isSoundEnabled,
   });
