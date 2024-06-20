@@ -42,7 +42,7 @@ export const useNavigationItemAnimation = ({
   );
   const width = useSpring(widthSync, {
     mass: 0.1,
-    stiffness: 150,
+    stiffness: 140,
     damping: 12,
   });
 
