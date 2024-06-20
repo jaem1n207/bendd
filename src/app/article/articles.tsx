@@ -21,7 +21,7 @@ export function Articles() {
           <WithSound key={article.slug} assetPath="/sounds/page-turn.mp3">
             <Link
               key={article.slug}
-              className="bd-relative -bd-m-3 bd-w-[calc(100%+32px)] bd-items-center bd-gap-3 bd-overflow-hidden bd-rounded-xl bd-p-3 bd-outline-none hover:bd-bg-secondary"
+              className="bd-relative -bd-m-3 bd-w-[calc(100%+32px)] bd-items-center bd-gap-3 bd-overflow-hidden bd-rounded-xl bd-p-3 bd-outline-none hover:bd-bg-secondary focus:bd-ring-2 focus:bd-ring-primary"
               href={`/article/${article.slug}`}
             >
               <div className="bd-flex bd-flex-col bd-gap-1 bd-overflow-hidden">
