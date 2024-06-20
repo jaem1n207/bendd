@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { formatDate, getArticles } from '@/app/article/utils';
 import { CustomMDX } from '@/components/mdx';
+import { isEmptyString } from '@/lib/assertions';
 import { siteMetadata } from '@/lib/site-metadata';
 
 export async function generateStaticParams() {
@@ -14,8 +15,9 @@ export async function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
   const post = getArticles().find(post => post.slug === params.slug);
+
   if (!post) {
-    return;
+    notFound();
   }
 
   const {
@@ -25,9 +27,9 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
     image,
   } = post.metadata;
   const title = `${postTitle} • ${siteMetadata.title} article`;
-  const ogImage = image
-    ? image
-    : `/api/og?title=${encodeURIComponent(postTitle)}`;
+  const ogImage = isEmptyString(image)
+    ? `/api/og?title=${encodeURIComponent(postTitle)}`
+    : image!;
 
   return {
     title,
@@ -75,7 +77,7 @@ export default function Blog({ params }: { params: { slug: string } }) {
             description: post.metadata.summary,
             image: post.metadata.image
               ? `${siteMetadata.siteUrl}${post.metadata.image}`
-              : `/og?title=${encodeURIComponent(post.metadata.title)}`,
+              : `/api/og?title=${encodeURIComponent(post.metadata.title)}`,
             url: `${siteMetadata.siteUrl}/article/${post.slug}`,
             author: {
               '@type': 'Person',
