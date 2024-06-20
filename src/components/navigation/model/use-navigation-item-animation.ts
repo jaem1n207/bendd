@@ -1,7 +1,7 @@
 import { useAnimation, useSpring, useTransform } from 'framer-motion';
 import useSound from 'use-sound';
 
-import { getSoundEnabled } from '@/components/sound/model/get-sound';
+import { useSoundStore } from '@/components/sound';
 import {
   DEFAULT_DISTANCE,
   DEFAULT_ITEM_SIZE,
@@ -25,7 +25,7 @@ export const useNavigationItemAnimation = ({
 }: UseNavigationItemAnimationProps) => {
   const controls = useAnimation();
 
-  const isSoundEnabled = getSoundEnabled();
+  const isSoundEnabled = useSoundStore(state => state.isSoundEnabled);
   const [playClickSound] = useSound('/sounds/blop.mp3', {
     soundEnabled: isSoundEnabled,
   });
