@@ -11,9 +11,9 @@
       "image: ''",
       "---",
       "",
-      "$0"
+      "$0",
     ],
-    "scope": "md,mdx"
+    "scope": "md,mdx",
   },
   "Video Embed": {
     "prefix": ["video", "embed"],
@@ -28,8 +28,8 @@
       ">",
       "  <source src='/videos/$1' type='video/mp4' />",
       "  Your browser does not support the video tag.",
-      "</video>"
+      "</video>",
     ],
-    "scope": "md,mdx"
-  },  
+    "scope": "md,mdx",
+  },
 }
