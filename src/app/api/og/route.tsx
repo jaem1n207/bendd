@@ -11,8 +11,11 @@ const interSemiBold = fetch(
 
 export async function GET(req: NextRequest): Promise<Response | ImageResponse> {
   try {
+    const { searchParams } = new URL(req.url);
     const isLight = req.headers.get('Sec-CH-Prefers-Color-Scheme') === 'light';
-    const title = siteMetadata.title;
+    const title = searchParams.has('title')
+      ? searchParams.get('title')
+      : siteMetadata.title;
 
     return new ImageResponse(
       (

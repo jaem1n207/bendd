@@ -1,8 +1,8 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { formatDate, getArticles } from '@/app/article/utils';
 import { CustomMDX } from '@/components/mdx';
-import { isEmptyString } from '@/lib/assertions';
 import { siteMetadata } from '@/lib/site-metadata';
 
 export async function generateStaticParams() {
@@ -13,7 +13,11 @@ export async function generateStaticParams() {
   }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
+export function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Metadata {
   const post = getArticles().find(post => post.slug === params.slug);
 
   if (!post) {
@@ -24,19 +28,17 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
     title: postTitle,
     publishedAt: publishedTime,
     summary: description,
-    image,
+    image: postImage,
   } = post.metadata;
   const title = `${postTitle} • ${siteMetadata.title} article`;
-  const ogImage = isEmptyString(image)
-    ? `/api/og?title=${encodeURIComponent(postTitle)}`
-    : image!;
+  const ogImage = postImage
+    ? postImage
+    : `/api/og?title=${encodeURIComponent(postTitle)}`;
 
   return {
     title,
     description,
     openGraph: {
-      title,
-      description,
       type: 'article',
       publishedTime,
       url: `${siteMetadata.siteUrl}/article/${post.slug}`,
@@ -48,8 +50,6 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
     },
     twitter: {
       card: 'summary_large_image',
-      title,
-      description,
       images: [ogImage],
     },
   };
