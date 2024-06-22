@@ -19,6 +19,9 @@ const nextConfig = {
       },
     ];
   },
+  eslint: {
+    dirs: ['src'],
+  },
 };
 
 const ContentSecurityPolicy = `
