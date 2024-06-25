@@ -75,6 +75,7 @@ const config = {
           700: 'hsl(var(--gray-700))',
           800: 'hsl(var(--gray-800))',
           900: 'hsl(var(--gray-900))',
+          950: 'hsl(var(--gray-950))',
         },
       },
       borderRadius: {

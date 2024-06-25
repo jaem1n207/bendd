@@ -21,7 +21,7 @@ export function SoundSwitcher() {
   return (
     <button
       title="Toggle Sound"
-      className="bd-relative bd-flex bd-size-full bd-items-center bd-justify-center"
+      className="bd-relative bd-flex bd-size-full bd-items-center bd-justify-center bd-text-gray-950"
       onClick={handleSoundToggle}
     >
       <ClientGate>

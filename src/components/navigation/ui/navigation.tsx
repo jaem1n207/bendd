@@ -59,7 +59,7 @@ export function Navigation() {
   );
 }
 
-const navigationItemSvg = cva('bd-size-1/2 bd-text-gray-900');
+const navigationItemSvg = cva('bd-size-1/2 bd-text-gray-950');
 
 const mainItems = [
   {

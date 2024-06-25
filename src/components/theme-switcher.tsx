@@ -29,7 +29,7 @@ export function ThemeSwitcher() {
   return (
     <button
       title="Toggle Theme"
-      className="bd-relative bd-flex bd-size-full bd-items-center bd-justify-center"
+      className="bd-relative bd-flex bd-size-full bd-items-center bd-justify-center bd-text-gray-950"
       onClick={handleThemeToggle}
     >
       <MotionSun
