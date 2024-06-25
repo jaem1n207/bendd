@@ -9,6 +9,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { isTouchDevice } from '@/lib/detect';
 import { cn } from '@/lib/utils';
 import { DEFAULT_ITEM_SIZE } from '../consts/size';
 import { useNavigationItemAnimation } from '../model/use-navigation-item-animation';
@@ -45,7 +46,13 @@ export function NavigationItemTooltip({
             'bd-relative bd-top-0 bd-aspect-square bd-rounded-full bd-bg-gray-300 bd-bg-navigation-item bd-text-gray-900/80 hover:bd-text-gray-900',
             className
           )}
-          style={{ width }}
+          style={
+            isTouchDevice
+              ? {
+                  width: DEFAULT_ITEM_SIZE,
+                }
+              : { width }
+          }
           animate={controls}
           initial={{ top: 0 }}
           whileTap={{ top: 8 }}
