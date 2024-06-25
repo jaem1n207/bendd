@@ -89,7 +89,7 @@ export default function Blog({ params }: { params: { slug: string } }) {
       <h1 className="bd-mx-auto bd-mt-12 bd-break-keep bd-text-center bd-text-4xl bd-font-bold bd-tracking-tight md:bd-mt-24">
         {post.metadata.title}
       </h1>
-      <p className="w-full bd-mx-auto bd-mt-6 bd-max-w-lg bd-break-keep bd-text-center bd-text-lg">
+      <p className="bd-mx-auto bd-mt-6 bd-w-full bd-max-w-lg bd-break-keep bd-text-center bd-text-lg">
         {post.metadata.summary}
       </p>
       <p className="bd-mt-6 bd-text-center bd-text-sm bd-tabular-nums bd-text-primary/60">
