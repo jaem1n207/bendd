@@ -6,7 +6,7 @@ test('serves a robots.txt', async ({ page }) => {
   const body = await response?.body();
 
   expect(body?.toString()).toEqual(
-    `User-Agent: *\nAllow: /\n\nHost: ${siteMetadata.siteUrl}\nSitemap: ${siteMetadata.siteUrl}/sitemap.xml\n`
+    `User-Agent: *\n\nHost: ${siteMetadata.siteUrl}\nSitemap: ${siteMetadata.siteUrl}/sitemap.xml\n`
   );
 });
 
