@@ -30,7 +30,7 @@ pnpm install
 - ♻️ Type checking [TypeScript](https://www.typescriptlang.org)
 - 🌈 Integrate with [Tailwind CSS](https://tailwindcss.com)
 - ✅ Strict Mode for TypeScript and React 18
-<!-- - 🌐 Multi-language (i18n) with [next-intl](https://next-intl-docs.vercel.app/) and [Crowdin](https://l.crowdin.com/next-js) -->
+<!-- - 🌐 Multi-language (i18n) with [next-intl](https://next-intl-docs.vercel.app/) and [Crowdin](https://l.crowdin.com/next-js) 곧 지원 예정. -->
 - 🚨 Linter with [ESLint](https://eslint.org) (default Next.js, Next.js Core Web Vitals, prettier configuration)
 - 💖 Code Formatter with [Prettier](https://prettier.io)
 - 🐶 Husky for Git Hooks

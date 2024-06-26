@@ -12,7 +12,7 @@ const titleVariants = cva(null, {
     size: {
       h1: 'bd-tracking-tight bd-font-extrabold bd-text-4xl md:bd-text-5xl',
       h2: 'bd-tracking-tight bd-font-semibold bd-text-3xl md:bd-text-4xl',
-      h3: 'bd-tracking-tightbd- font-semibold bd-text-2xl md:bd-text-3xl',
+      h3: 'bd-tracking-tight bd-font-semibold bd-text-2xl md:bd-text-3xl',
       h4: 'bd-font-semibold bd-text-xl md:bd-text-2xl',
       h5: 'bd-font-semibold bd-text-lg md:bd-text-xl',
     },
