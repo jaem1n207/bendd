@@ -23,7 +23,7 @@ import {
 export function Navigation() {
   return (
     <>
-      <div className="dark:bd-absolute dark:-bd-top-[1px] dark:-bd-z-10 dark:bd-h-[1px] dark:bd-w-[95%] dark:bd-bg-navigation-highlight dark:bd-opacity-20" />
+      <div className="dark:bd-absolute dark:-bd-top-px dark:-bd-z-10 dark:bd-h-px dark:bd-w-[95%] dark:bd-bg-navigation-highlight dark:bd-opacity-20" />
       <NavigationAnimateTrigger>
         {mainItems.map(item => {
           if (item.disabled) {
