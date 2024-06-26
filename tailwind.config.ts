@@ -17,6 +17,9 @@ const config = {
       },
     },
     extend: {
+      screens: {
+        xs: '430px',
+      },
       backgroundImage: {
         'navigation-highlight':
           'linear-gradient(to right, rgba(0, 0, 0, 0), hsl(var(--gray-600)) 20%,hsl(var(--gray-900)) 67.19%, rgba(0, 0, 0, 0))',

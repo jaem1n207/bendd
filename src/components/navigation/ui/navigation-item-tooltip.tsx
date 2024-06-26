@@ -43,7 +43,7 @@ export function NavigationItemTooltip({
         <motion.div
           ref={ref}
           className={cn(
-            'bd-relative bd-top-0 bd-aspect-square bd-rounded-full bd-bg-gray-300 bd-bg-navigation-item bd-text-gray-900/80 hover:bd-text-gray-900',
+            'bd-relative bd-top-0 bd-aspect-square bd-rounded-full bd-bg-gray-300 bd-bg-navigation-item bd-text-gray-900/80 hover:bd-text-gray-900 bd-shrink-0',
             className
           )}
           style={

@@ -11,7 +11,7 @@ import { DEFAULT_DISTANCE, DEFAULT_MAGNIFICATION } from '../consts/size';
 import type { ItemMotionProps } from '../types/motion';
 
 const navigationAnimateTriggerVariants = cva(
-  'bd-items-end sm bd-flex bd-w-full bd-gap-2 bd-py-2 sm:bd-h-auto bd-h-20'
+  'bd-flex bd-h-20 bd-w-full bd-items-end bd-gap-2 bd-overflow-x-auto bd-overflow-y-hidden bd-py-2 xs:bd-h-auto xs:bd-overflow-visible'
 );
 
 type NavigationAnimateTriggerProps = VariantProps<
