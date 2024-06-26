@@ -3,21 +3,18 @@ import { forwardRef, type AnchorHTMLAttributes, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
-const linkVariants = cva(
-  'select-none interactive-focus-ring transition-color',
-  {
-    variants: {
-      variant: {
-        default: 'bd-text-foreground/60 hover:bd-text-foreground/100',
-        primary: 'bd-text-primary/90 hover:bd-text-primary/100',
-        icon: 'bd-opacity-75 hover:bd-opacity-100 hover:bd-text-primary/90',
-      },
+const linkVariants = cva('bd-select-none bd-transition-colors', {
+  variants: {
+    variant: {
+      default: 'bd-text-foreground/60 hover:bd-text-foreground/100',
+      primary: 'bd-text-primary/90 hover:bd-text-primary/100',
+      icon: 'bd-opacity-75 hover:bd-text-primary/90 hover:bd-opacity-100',
     },
-    defaultVariants: {
-      variant: 'default',
-    },
-  }
-);
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+});
 
 type LinkProps = {
   /**

@@ -10,11 +10,11 @@ const titleVariants = cva(null, {
       primary: 'bd-text-primary',
     },
     size: {
-      h1: 'bd-tracking-tight bd-font-extrabold bd-text-4xl md:bd-text-5xl',
-      h2: 'bd-tracking-tight bd-font-semibold bd-text-3xl md:bd-text-4xl',
-      h3: 'bd-tracking-tight bd-font-semibold bd-text-2xl md:bd-text-3xl',
-      h4: 'bd-font-semibold bd-text-xl md:bd-text-2xl',
-      h5: 'bd-font-semibold bd-text-lg md:bd-text-xl',
+      h1: 'bd-text-4xl bd-font-extrabold bd-tracking-tight md:bd-text-5xl',
+      h2: 'bd-text-3xl bd-font-semibold bd-tracking-tight md:bd-text-4xl',
+      h3: 'bd-text-2xl bd-font-semibold bd-tracking-tight md:bd-text-3xl',
+      h4: 'bd-text-xl bd-font-semibold md:bd-text-2xl',
+      h5: 'bd-text-lg bd-font-semibold md:bd-text-xl',
     },
   },
   defaultVariants: {
@@ -53,8 +53,8 @@ const paragraphVariants = cva(null, {
     },
     size: {
       default: 'bd-leading-7',
-      sm: 'bd-font-medium bd-leading-none bd-text-sm',
-      lg: 'bd-font-semibold bd-text-lg',
+      sm: 'bd-text-sm bd-font-medium bd-leading-none',
+      lg: 'bd-text-lg bd-font-semibold',
     },
   },
   defaultVariants: {
