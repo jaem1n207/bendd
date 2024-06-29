@@ -26,8 +26,8 @@ export default function Home() {
           alt="primary character"
           draggable={false}
           className="bd-mx-auto bd-block dark:bd-invert"
-          width={420}
-          height={436}
+          width={1220}
+          height={1267}
           priority
         />
       </div>

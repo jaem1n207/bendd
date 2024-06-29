@@ -59,8 +59,9 @@ function RoundedImage({ alt, src }: { alt: string; src: string }) {
     <Image
       alt={alt}
       src={src}
-      width={1200}
-      height={400}
+      width={1344}
+      height={768}
+      sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
       className="bd-object-cover"
     />
   );
