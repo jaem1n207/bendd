@@ -1,5 +1,6 @@
 'use client';
 
+import { track } from '@vercel/analytics';
 import useSound from 'use-sound';
 
 import { ClientGate } from './client-gate';
@@ -16,6 +17,9 @@ export function SoundSwitcher() {
   const handleSoundToggle = () => {
     isSoundEnabled ? playMuteSound() : playUnmuteSound();
     toggleSoundEnabled();
+    track('toggle_sound', {
+      enabled: !isSoundEnabled,
+    });
   };
 
   return (
