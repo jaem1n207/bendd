@@ -24,6 +24,22 @@ export const metadata: Metadata = {
         ? `https://${process.env.VERCEL_URL}`
         : `http://localhost:${process.env.PORT || 3000}`
   ),
+  alternates: {
+    types: {
+      ['application/rss+xml']: [
+        {
+          title: `${siteMetadata.title} RSS feed`,
+          url: '/rss.xml',
+        },
+      ],
+      ['application/xml']: [
+        {
+          title: 'sitemap',
+          url: '/sitemap.xml',
+        },
+      ],
+    },
+  },
   title: {
     default: siteMetadata.title,
     template: `%s • ${siteMetadata.title}`,
