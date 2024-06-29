@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { formatDate, getArticles } from '@/app/article/utils';
+import { Giscus } from '@/components/comments/giscus';
 import { CustomMDX } from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
 
@@ -95,9 +96,10 @@ export default function Blog({ params }: { params: { slug: string } }) {
       <p className="bd-mt-6 bd-text-center bd-text-sm bd-tabular-nums bd-text-primary/60">
         {formatDate(post.metadata.publishedAt)}
       </p>
-      <article className="bd-prose bd-prose-slate bd-mt-40 dark:bd-prose-invert md:bd-mt-52">
+      <article className="bd-prose bd-prose-slate bd-mb-24 bd-mt-40 dark:bd-prose-invert md:bd-mb-40 md:bd-mt-52">
         <CustomMDX source={post.content} />
       </article>
+      <Giscus />
     </section>
   );
 }
