@@ -16,13 +16,13 @@ pnpm install
 
 ## Scripts
 
-`pnpm dev` - 로컬에서 개발 모드로 애플리케이션을 시작합니다.
-`pnpm build` - 최적화된 프로덕션 빌드를 생성합니다. 결과물로 각 경로에 대한 정보가 표시됩니다. 번들을 분석하려면 `pnpm build-stats`를 실행합니다.
-`pnpm start` - 로컬에서 프로덕션 모드로 애플리케이션을 시작합니다. `next-build`로 먼저 컴파일되어야 합니다.
-`test:e2e` - Playwright 사용해 E2E 테스트를 실행합니다. SEO 관련 동작, 헤더 설정에 관한 동작을 위주로 테스트합니다.
-`pnpm lint` - `src/` 폴더에 있는 모든 파일에 대해 ESLint를 실행합니다. 범위는 `nextConfig.eslint.dirs`에서 설정합니다.
-`pnpm format` - `src/` 폴더에 있는 모든 파일에 대해 Prettier를 실행합니다.
-`pnpm cz` - git 커밋 메시지 작성을 도와줍니다.
+- `pnpm dev` - 로컬에서 개발 모드로 애플리케이션을 시작합니다.
+- `pnpm build` - 최적화된 프로덕션 빌드를 생성합니다. 결과물로 각 경로에 대한 정보가 표시됩니다. 번들을 분석하려면 `pnpm build-stats`를 실행합니다.
+- `pnpm start` - 로컬에서 프로덕션 모드로 애플리케이션을 시작합니다. `next-build`로 먼저 컴파일되어야 합니다.
+- `test:e2e` - Playwright 사용해 E2E 테스트를 실행합니다. SEO 관련 동작, 헤더 설정에 관한 동작을 위주로 테스트합니다.
+- `pnpm lint` - `src/` 폴더에 있는 모든 파일에 대해 ESLint를 실행합니다. 범위는 `nextConfig.eslint.dirs`에서 설정합니다.
+- `pnpm format` - `src/` 폴더에 있는 모든 파일에 대해 Prettier를 실행합니다.
+- `pnpm cz` - git 커밋 메시지 작성을 도와줍니다.
 
 ### Features
 
