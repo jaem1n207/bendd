@@ -94,7 +94,7 @@ export default function Blog({ params }: { params: { slug: string } }) {
         {post.metadata.summary}
       </p>
       <p className="bd-mt-6 bd-text-center bd-text-sm bd-tabular-nums bd-text-primary/60">
-        {formatDate(post.metadata.publishedAt)}
+        {formatDate(post.metadata.publishedAt, true)}
       </p>
       <article className="bd-prose bd-prose-slate bd-mb-24 bd-mt-40 dark:bd-prose-invert md:bd-mb-40 md:bd-mt-52">
         <CustomMDX source={post.content} />
