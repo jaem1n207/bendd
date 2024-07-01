@@ -4,7 +4,7 @@ test('sets a security headers', async ({ request }) => {
   for (const pathname of ['/', '/article']) {
     const headers = (await request.get(pathname)).headers();
     expect(headers['content-security-policy']).toBe(
-      "default-src 'self' vercel.live;    script-src 'self' 'unsafe-eval' 'unsafe-inline' cdn.vercel-insights.com vercel.live va.vercel-scripts.com;    style-src 'self' 'unsafe-inline';    img-src * blob: data:;    media-src 'self';    connect-src *;    font-src 'self' data:;    frame-src 'self' *.codesandbox.io vercel.live;"
+      "default-src 'self' vercel.live;    script-src 'self' 'unsafe-eval' 'unsafe-inline' cdn.vercel-insights.com vercel.live va.vercel-scripts.com giscus.app;    style-src 'self' 'unsafe-inline' giscus.app;    img-src * blob: data:;    media-src 'self';    connect-src *;    font-src 'self' data:;    frame-src 'self' *.codesandbox.io vercel.live giscus.app;"
     );
     expect(headers['referrer-policy']).toBe('origin-when-cross-origin');
     expect(headers['x-frame-options']).toBe('DENY');
