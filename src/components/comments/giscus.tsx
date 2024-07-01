@@ -35,17 +35,5 @@ export function Giscus() {
     ref.current.appendChild(script);
   }, [theme]);
 
-  // 테마가 변경되면 giscus iframe을 찾아서 테마 변경을 요청합니다.
-  // https://github.com/giscus/giscus/blob/main/ADVANCED-USAGE.md#isetconfigmessage
-  useEffect(() => {
-    const iframe = document.querySelector<HTMLIFrameElement>(
-      'iframe.giscus-frame'
-    );
-    iframe?.contentWindow?.postMessage(
-      { giscus: { setConfig: { theme } } },
-      'https://giscus.app'
-    );
-  }, [theme]);
-
   return <section className="bd-min-h-96 bd-w-full" ref={ref} />;
 }

@@ -10,7 +10,7 @@ import {
   Youtube,
 } from '@/components/icons';
 import { SoundSwitcher } from '@/components/sound-switcher';
-import { ThemeSwitcher } from '@/components/theme-switcher';
+import { ThemeSwitcher } from '@/components/theme/theme-switcher';
 import { Separator } from '@/components/ui/separator';
 import { siteMetadata } from '@/lib/site-metadata';
 import { NavigationAnimateTrigger } from './navigation-animate-trigger';
