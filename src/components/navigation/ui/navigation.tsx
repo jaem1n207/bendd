@@ -1,5 +1,7 @@
 import { cva } from 'class-variance-authority';
 
+import { SoundSwitcher } from '@/components/sound';
+import { ThemeSwitcher } from '@/components/theme';
 import {
   Book,
   Bulb,
@@ -8,9 +10,7 @@ import {
   Home,
   Mail,
   Youtube,
-} from '@/components/icons';
-import { SoundSwitcher } from '@/components/sound';
-import { ThemeSwitcher } from '@/components/theme';
+} from '@/components/ui/icons';
 import { Separator } from '@/components/ui/separator';
 import { siteMetadata } from '@/lib/site-metadata';
 import { NavigationAnimateTrigger } from './navigation-animate-trigger';

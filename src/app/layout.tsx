@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 
 import { Navigation } from '@/components/navigation';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/components/theme';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { siteMetadata } from '@/lib/site-metadata';
 import { cn } from '@/lib/utils';
