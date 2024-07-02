@@ -9,8 +9,8 @@ import {
   Mail,
   Youtube,
 } from '@/components/icons';
-import { SoundSwitcher } from '@/components/sound-switcher';
-import { ThemeSwitcher } from '@/components/theme/theme-switcher';
+import { SoundSwitcher } from '@/components/sound';
+import { ThemeSwitcher } from '@/components/theme';
 import { Separator } from '@/components/ui/separator';
 import { siteMetadata } from '@/lib/site-metadata';
 import { NavigationAnimateTrigger } from './navigation-animate-trigger';

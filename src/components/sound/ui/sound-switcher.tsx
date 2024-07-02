@@ -3,9 +3,9 @@
 import { track } from '@vercel/analytics';
 import useSound from 'use-sound';
 
-import { ClientGate } from './client-gate';
-import { SoundMax, SoundMute } from './icons';
-import { useSoundStore } from './sound';
+import { useSoundStore } from '..';
+import { ClientGate } from '../../client-gate';
+import { SoundMax, SoundMute } from '../../icons';
 
 export function SoundSwitcher() {
   const isSoundEnabled = useSoundStore(state => state.isSoundEnabled);
