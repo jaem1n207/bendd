@@ -17,6 +17,18 @@ const config = {
       },
     },
     extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            'code::before': {
+              content: 'normal',
+            },
+            'code::after': {
+              content: 'normal',
+            },
+          },
+        },
+      },
       screens: {
         xs: '430px',
       },
