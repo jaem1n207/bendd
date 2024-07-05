@@ -94,7 +94,7 @@ export default function Blog({ params }: { params: { slug: string } }) {
           {post.metadata.title}
         </h1>
         <p className="bd-mx-auto bd-mt-6 bd-w-full bd-max-w-lg bd-break-keep bd-text-center bd-text-lg">
-          {post.metadata.summary}
+          {post.metadata.description}
         </p>
         <p className="bd-mt-6 bd-text-center bd-text-sm bd-tabular-nums bd-text-primary/60">
           {formatDate(post.metadata.publishedAt, true)}
