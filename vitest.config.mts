@@ -10,7 +10,7 @@ export default defineConfig({
     globals: true,
     include: ['src/**/*.spec.{ts,tsx}'],
     exclude: ['**/*.d.ts'],
-    reporters: ['html'],
+    reporters: ['default'],
     environment: 'jsdom',
   },
 });
