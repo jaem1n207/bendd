@@ -1,4 +1,4 @@
-import { getArticles } from '@/app/article/utils';
+import { createMDXProcessor } from '@/components/article';
 import { siteMetadata } from '@/lib/site-metadata';
 
 type RssItem = {
@@ -19,7 +19,8 @@ type Rss = {
 };
 
 export async function GET() {
-  const articles = getArticles();
+  const processor = createMDXProcessor();
+  const articles = processor.getOriginalArticles();
 
   const items: RssItem[] = articles.map(article => {
     return {

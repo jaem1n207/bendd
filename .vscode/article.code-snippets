@@ -5,9 +5,10 @@
     "body": [
       "---",
       "title: '$1'",
-      "publishedAt: '$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE'",
-      "category: ''",
       "summary: ''",
+      "description: ''",
+      "category: ''",
+      "publishedAt: '$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE'",
       "image: ''",
       "---",
       "",

@@ -68,8 +68,8 @@ const mainItems = [
     icon: <Home className={navigationItemSvg()} />,
   },
   {
-    name: 'Projects',
-    slug: '/projects',
+    name: 'Craft',
+    slug: '/craft',
     icon: <Bulb className={navigationItemSvg()} />,
     disabled: true,
   },

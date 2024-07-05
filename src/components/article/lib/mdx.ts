@@ -1,0 +1,217 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { z } from 'zod';
+
+import type { ArticleInfo } from '../types/article';
+
+const MetadataSchema = z.object({
+  title: z.string().max(30),
+  publishedAt: z.string(),
+  category: z.string(),
+  description: z.string().max(150),
+  summary: z.string().max(40),
+  image: z.string().optional(),
+});
+
+type Metadata = z.infer<typeof MetadataSchema>;
+type Article = { metadata: Metadata; slug: string; content: string };
+
+const validateMetadata = (metadata: Metadata): Metadata => {
+  try {
+    return MetadataSchema.parse(metadata);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error('front matter 유효성 검사에 실패했어요:');
+      error.errors.forEach(err => {
+        console.error(`- ${err.path.join('.')}: ${err.message}`);
+      });
+    }
+    throw error;
+  }
+};
+
+const parseFrontmatter = (fileContent: string) => {
+  const frontmatterRegex = /---\s*([\s\S]*?)\s*---/;
+  const match = frontmatterRegex.exec(fileContent);
+  if (!match) {
+    throw new Error('MDX 파일에서 front matter를 찾지 못했어요.');
+  }
+
+  const frontMatterBlock = match[1];
+  const content = fileContent.replace(frontmatterRegex, '').trim();
+  const frontMatterLines = frontMatterBlock.trim().split('\n');
+  const metadata = frontMatterLines.reduce((acc, line) => {
+    const [key, ...valueArr] = line.split(': ');
+    const value = valueArr
+      .join(': ')
+      .trim()
+      .replace(/^['"](.*)['"]$/, '$1');
+    return { ...acc, [key.trim()]: value };
+  }, {} as Metadata);
+
+  return { metadata, content };
+};
+
+const getMDXFiles = (dir: string): string[] =>
+  fs
+    .readdirSync(dir, { withFileTypes: true })
+    .flatMap(file =>
+      file.isDirectory()
+        ? getMDXFiles(path.join(dir, file.name))
+        : file.name.endsWith('.mdx')
+          ? [path.join(dir, file.name)]
+          : []
+    );
+
+const readMDXFile = (filePath: string): Article => {
+  const rawContent = fs.readFileSync(filePath, 'utf-8');
+  const { metadata, content } = parseFrontmatter(rawContent);
+  const validatedMetadata = validateMetadata(metadata);
+  const slug = path.basename(filePath, path.extname(filePath));
+  return { metadata: validatedMetadata, slug, content };
+};
+
+export const formatDate = (date: string, includeRelative = false) => {
+  const currentDate = new Date();
+  const targetDate = new Date(date.includes('T') ? date : `${date}T00:00:00`);
+
+  const yearsAgo = currentDate.getFullYear() - targetDate.getFullYear();
+  const monthsAgo = currentDate.getMonth() - targetDate.getMonth();
+  const daysAgo = currentDate.getDate() - targetDate.getDate();
+
+  const relativeDate =
+    yearsAgo > 0
+      ? `${yearsAgo}년 전`
+      : monthsAgo > 0
+        ? `${monthsAgo}개월 전`
+        : daysAgo > 0
+          ? `${daysAgo}일 전`
+          : '오늘';
+
+  const fullDate = targetDate.toLocaleString('ko-KR', {
+    year: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
+  });
+
+  return includeRelative ? `${fullDate} (${relativeDate})` : fullDate;
+};
+
+class MDXProcessor {
+  private articles: Article[];
+
+  constructor(dir: string) {
+    const mdxFiles = getMDXFiles(dir);
+    this.articles = mdxFiles.map(readMDXFile);
+  }
+
+  sortByDateDesc(): MDXProcessor {
+    this.articles.sort(
+      (a, b) =>
+        new Date(b.metadata.publishedAt).getTime() -
+        new Date(a.metadata.publishedAt).getTime()
+    );
+    return this;
+  }
+
+  sortByDateAsc(): MDXProcessor {
+    this.articles.sort(
+      (a, b) =>
+        new Date(a.metadata.publishedAt).getTime() -
+        new Date(b.metadata.publishedAt).getTime()
+    );
+    return this;
+  }
+
+  formatForDisplay(
+    options: { includeRelativeDate?: boolean } = {}
+  ): ArticleInfo[] {
+    return this.articles.map(article => ({
+      name: article.metadata.title,
+      summary: article.metadata.summary,
+      href: `/article/${article.slug}`,
+      publishedAt: formatDate(
+        article.metadata.publishedAt,
+        options.includeRelativeDate
+      ),
+    }));
+  }
+
+  filterByCategory(category: string): MDXProcessor {
+    this.articles = this.articles.filter(
+      article => article.metadata.category === category
+    );
+    return this;
+  }
+
+  limit(count: number): MDXProcessor {
+    this.articles = this.articles.slice(0, count);
+    return this;
+  }
+
+  getSlugs(): string[] {
+    return this.articles.map(article => article.slug);
+  }
+
+  getOriginalArticles(): Article[] {
+    return this.articles;
+  }
+}
+
+export const createMDXProcessor = (dir?: string) =>
+  new MDXProcessor(dir ?? path.join(process.cwd(), 'content'));
+
+export type TOCSection = TOCSubSection & {
+  subSections: TOCSubSection[];
+};
+
+export type TOCSubSection = {
+  slug: string;
+  text: string;
+};
+
+export const parseToc = (source: string) => {
+  return source
+    .split('\n')
+    .filter(line => line.match(/(^#{1,3})\s/))
+    .reduce<TOCSection[]>((ac, rawHeading) => {
+      const nac = [...ac];
+      const removeMdx = rawHeading
+        .replace(/^##*\s/, '')
+        .replace(/[\*,\~]{2,}/g, '')
+        .replace(/(?<=\])\((.*?)\)/g, '')
+        .replace(/(?<!\S)((http)(s?):\/\/|www\.).+?(?=\s)/g, '');
+
+      const section = {
+        slug: removeMdx
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9ㄱ-ㅎ|ㅏ-ㅣ|가-힣 -]/g, '')
+          .replace(/\s/g, '-'),
+        text: removeMdx,
+      };
+
+      const isSubTitle = rawHeading.split('#').length - 1 === 3;
+
+      if (ac.length && isSubTitle) {
+        nac.at(-1)?.subSections.push(section);
+      } else {
+        nac.push({ ...section, subSections: [] });
+      }
+
+      return nac;
+    }, []);
+};
+
+/** 글 파싱 */
+export const contentToDescription = (content: string) => {
+  const parsedContent = content
+    .replace(/(?<=\])\((.*?)\)/g, '')
+    .replace(/(?<!\S)((http)(s?):\/\/|www\.).+?(?=\s)/g, '')
+    .replace(/[#*\|\[\]]|(\-{3,})|(`{3})(\S*)(?=\s)/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 157);
+
+  return `${parsedContent}...`;
+};

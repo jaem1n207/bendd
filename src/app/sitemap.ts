@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
+import { createMDXProcessor } from '@/components/article';
 import { siteMetadata } from '@/lib/site-metadata';
-import { getArticles } from './article/utils';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = ['', 'article'].map(route => ({
@@ -9,7 +9,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date().toISOString().split('T')[0],
   }));
 
-  const articles = getArticles().map(article => ({
+  const processor = createMDXProcessor();
+  const articles = processor.getOriginalArticles().map(article => ({
     url: `${siteMetadata.siteUrl}/article/${article.slug}`,
     lastModified: article.metadata.publishedAt,
   }));
