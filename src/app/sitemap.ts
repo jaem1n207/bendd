@@ -10,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   const processor = createMDXProcessor();
-  const articles = processor.getOriginalArticles().map(article => ({
+  const articles = processor.map(article => ({
     url: `${siteMetadata.siteUrl}/article/${article.slug}`,
     lastModified: article.metadata.publishedAt,
   }));

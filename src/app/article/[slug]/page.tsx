@@ -9,7 +9,7 @@ import { siteMetadata } from '@/lib/site-metadata';
 export async function generateStaticParams() {
   const processor = createMDXProcessor();
 
-  return processor.getSlugs();
+  return processor.map(article => article.slug);
 }
 
 export function generateMetadata({
@@ -18,8 +18,7 @@ export function generateMetadata({
   params: { slug: string };
 }): Metadata {
   const processor = createMDXProcessor();
-  const articles = processor.getOriginalArticles();
-  const post = articles.find(post => post.slug === params.slug);
+  const post = processor.getArticleBySlug(params.slug);
 
   if (!post) {
     notFound();
@@ -58,8 +57,7 @@ export function generateMetadata({
 
 export default function Blog({ params }: { params: { slug: string } }) {
   const processor = createMDXProcessor();
-  const articles = processor.getOriginalArticles();
-  const post = articles.find(post => post.slug === params.slug);
+  const post = processor.getArticleBySlug(params.slug);
 
   if (!post) {
     notFound();
@@ -97,7 +95,10 @@ export default function Blog({ params }: { params: { slug: string } }) {
           {post.metadata.description}
         </p>
         <p className="bd-mt-6 bd-text-center bd-text-sm bd-tabular-nums bd-text-primary/60">
-          {formatDate(post.metadata.publishedAt, true)}
+          {formatDate({
+            date: post.metadata.publishedAt,
+            includeRelative: true,
+          })}
         </p>
         <article className="bd-prose bd-prose-slate bd-mb-24 bd-mt-40 dark:bd-prose-invert md:bd-mb-40 md:bd-mt-52">
           <CustomMDX source={post.content} />

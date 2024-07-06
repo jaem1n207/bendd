@@ -20,9 +20,8 @@ type Rss = {
 
 export async function GET() {
   const processor = createMDXProcessor();
-  const articles = processor.getOriginalArticles();
 
-  const items: RssItem[] = articles.map(article => {
+  const items: RssItem[] = processor.map(article => {
     return {
       title: article.metadata.title,
       description: article.metadata.summary,

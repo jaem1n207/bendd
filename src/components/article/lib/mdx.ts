@@ -71,7 +71,13 @@ const readMDXFile = (filePath: string): Article => {
   return { metadata: validatedMetadata, slug, content };
 };
 
-export const formatDate = (date: string, includeRelative = false) => {
+export const formatDate = ({
+  date,
+  includeRelative = false,
+}: {
+  date: string;
+  includeRelative?: boolean;
+}) => {
   const currentDate = new Date();
   const targetDate = new Date(date.includes('T') ? date : `${date}T00:00:00`);
 
@@ -98,68 +104,111 @@ export const formatDate = (date: string, includeRelative = false) => {
 };
 
 class MDXProcessor {
-  private articles: Article[];
+  private readonly articles: ReadonlyArray<Article>;
+  private readonly operations: Array<
+    (articles: ReadonlyArray<Article>) => ReadonlyArray<Article>
+  >;
 
-  constructor(dir: string) {
+  private constructor(
+    articles: ReadonlyArray<Article>,
+    operations: Array<
+      (articles: ReadonlyArray<Article>) => ReadonlyArray<Article>
+    > = []
+  ) {
+    this.articles = articles;
+    this.operations = operations;
+  }
+
+  static fromDirectory(dir: string): MDXProcessor {
     const mdxFiles = getMDXFiles(dir);
-    this.articles = mdxFiles.map(readMDXFile);
+    const articles = mdxFiles.map(readMDXFile);
+    return new MDXProcessor(articles);
+  }
+
+  private applyOperations(): ReadonlyArray<Article> {
+    return this.operations.reduce(
+      (articles, operation) => operation(articles),
+      this.articles
+    );
   }
 
   sortByDateDesc(): MDXProcessor {
-    this.articles.sort(
-      (a, b) =>
-        new Date(b.metadata.publishedAt).getTime() -
-        new Date(a.metadata.publishedAt).getTime()
-    );
-    return this;
+    const sortOperation = (articles: ReadonlyArray<Article>) =>
+      [...articles].sort(
+        (a, b) =>
+          new Date(b.metadata.publishedAt).getTime() -
+          new Date(a.metadata.publishedAt).getTime()
+      );
+    return new MDXProcessor(this.articles, [...this.operations, sortOperation]);
   }
 
   sortByDateAsc(): MDXProcessor {
-    this.articles.sort(
-      (a, b) =>
-        new Date(a.metadata.publishedAt).getTime() -
-        new Date(b.metadata.publishedAt).getTime()
-    );
-    return this;
+    const sortOperation = (articles: ReadonlyArray<Article>) =>
+      [...articles].sort(
+        (a, b) =>
+          new Date(a.metadata.publishedAt).getTime() -
+          new Date(b.metadata.publishedAt).getTime()
+      );
+    return new MDXProcessor(this.articles, [...this.operations, sortOperation]);
   }
 
   formatForDisplay(
-    options: { includeRelativeDate?: boolean } = {}
+    options: { includeSummary?: boolean; includeRelativeDate?: boolean } = {}
   ): ArticleInfo[] {
-    return this.articles.map(article => ({
+    return this.applyOperations().map(article => ({
       name: article.metadata.title,
       summary: article.metadata.summary,
       href: `/article/${article.slug}`,
-      publishedAt: formatDate(
-        article.metadata.publishedAt,
-        options.includeRelativeDate
-      ),
+      publishedAt: formatDate({
+        date: article.metadata.publishedAt,
+        includeRelative: options.includeRelativeDate,
+      }),
+      ...(options.includeSummary && { summary: article.metadata.summary }),
     }));
   }
 
   filterByCategory(category: string): MDXProcessor {
-    this.articles = this.articles.filter(
-      article => article.metadata.category === category
-    );
-    return this;
+    const filterOperation = (articles: ReadonlyArray<Article>) =>
+      articles.filter(article => article.metadata.category === category);
+    return new MDXProcessor(this.articles, [
+      ...this.operations,
+      filterOperation,
+    ]);
   }
 
   limit(count: number): MDXProcessor {
-    this.articles = this.articles.slice(0, count);
-    return this;
+    const limitOperation = (articles: ReadonlyArray<Article>) =>
+      articles.slice(0, count);
+    return new MDXProcessor(this.articles, [
+      ...this.operations,
+      limitOperation,
+    ]);
   }
 
-  getSlugs(): string[] {
-    return this.articles.map(article => article.slug);
+  getArticles(): ReadonlyArray<Article> {
+    return this.applyOperations();
   }
 
-  getOriginalArticles(): Article[] {
-    return this.articles;
+  getArticleBySlug(slug: string): Article | undefined {
+    return this.applyOperations().find(article => article.slug === slug);
+  }
+
+  map<T>(fn: (article: Article) => T): T[] {
+    return this.applyOperations().map(fn);
+  }
+
+  filter(predicate: (article: Article) => boolean): MDXProcessor {
+    const filterOperation = (articles: ReadonlyArray<Article>) =>
+      articles.filter(predicate);
+    return new MDXProcessor(this.articles, [
+      ...this.operations,
+      filterOperation,
+    ]);
   }
 }
 
 export const createMDXProcessor = (dir?: string) =>
-  new MDXProcessor(dir ?? path.join(process.cwd(), 'content'));
+  MDXProcessor.fromDirectory(dir ?? path.join(process.cwd(), 'content'));
 
 export type TOCSection = TOCSubSection & {
   subSections: TOCSubSection[];
