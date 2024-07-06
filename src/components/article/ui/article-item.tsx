@@ -74,7 +74,7 @@ export function ArticleItem({
       <MotionLink
         ref={itemRef}
         href={href}
-        className="bd-relative -bd-m-3 bd-flex bd-w-[calc(100%+1rem)] bd-items-center bd-gap-3 bd-overflow-hidden bd-rounded-xl bd-px-3 bd-py-4 hover:bd-bg-gray-300"
+        className="bd-relative -bd-m-3 bd-block bd-w-[calc(100%+1rem)] bd-overflow-hidden bd-rounded-xl bd-px-3 bd-py-4 hover:bd-bg-gray-300 sm:bd-flex sm:bd-items-center sm:bd-gap-3"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -92,7 +92,7 @@ export function ArticleItem({
         </motion.span>
         <motion.div
           ref={lineRef}
-          className="bd-h-px bd-flex-1 bd-origin-left bd-bg-gray-700"
+          className="bd-hidden bd-h-px bd-origin-left bd-bg-gray-700 sm:bd-inline-block sm:bd-flex-1"
         />
         <motion.span
           ref={publishedAtRef}
