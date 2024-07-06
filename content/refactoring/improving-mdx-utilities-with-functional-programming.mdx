@@ -1,0 +1,170 @@
+---
+title: 'MDX 유틸리티의 함수형 프로그래밍 개선'
+summary: 'MDX 처리 코드를 함수형으로 리팩토링하기'
+description: 'MDX 파일 처리 유틸리티를 함수형 프로그래밍 패러다임을 적용하여 개선한 과정을 소개합니다. 코드의 유연성, 재사용성, 확장성을 높이는 방법과 그 이점을 설명합니다.'
+category: 'refactorign'
+publishedAt: '2024-07-06'
+---
+
+## 소개
+
+MDX(Markdown + JSX) 파일을 처리하는 유틸리티를 개발하면서, 코드의 유연성과 확장성을 높일 필요성을 느꼈습니다.
+이 글에서는 기존의 MDX 처리 코드를 함수형 프로그래밍 패러다임을 적용하여 개선한 과정을 공유하고자 합니다.
+
+## 기존 코드의 한계
+
+원래 MDX를 처리하는 코드는 다음과 같은 구조를 가지고 있었습니다:
+
+```typescript
+function getArticles() {
+  return getMDXData(path.join(process.cwd(), 'content'));
+}
+
+function sortArticlesByDateDesc(articles: ReturnType<typeof getArticles>) {
+  return articles.sort((a, b) => {
+    if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
+      return -1;
+    }
+    return 1;
+  });
+}
+
+// 최근 5개의 JavaScript 관련 글의 제목과 요약 가져오기
+const allArticles = getArticles();
+const jsArticles = allArticles.filter(
+  article => article.metadata.category === 'JavaScript'
+);
+const sortJsArticles = sortArticlesByDateDesc(jsArticles);
+const latestJsArticles = sortJsArticles.slice(0, 5);
+const formatedJsArticleInfo = latestJsArticles.map(article => ({
+  name: article.metadata.title,
+  summary: article.metadata.summary,
+}));
+```
+
+이 접근 방식에는 몇 가지 한계가 있었습니다.
+
+최신순으로 가져오기 위해 `sortArticlesByDateDesc` 함수를 가져와 호출하고 slice 메서드로 최신 5개만 가져오는 등의 작업이 번거로웠습니다.
+이런 방식은 코드의 가독성을 떨어뜨리고, 유지보수성을 낮추는 요인이 되었습니다.
+
+또한, 특정 필드만 추출하거나 필터링하는 등의 일반적인 작업을 위해 새로운 함수를 계속 만들어야 했습니다.
+
+## 함수형 프로그래밍 접근법
+
+이런 문제를 해결하기 위해, 함수형 프로그래밍 원칙을 적용하여 코드를 개선했는데요.
+주요 변경 사항은 다음과 같습니다:
+
+1. 불변성: 원본 데이터를 변경하지 않고 새로운 상태를 생성합니다.
+2. 메서드 체이닝: 여러 작업을 연속적으로 수행할 수 있도록 했습니다.
+3. 고차 함수 사용: map, filter 등의 함수를 활용했습니다.
+4. 유연한 데이터 처리: 특정 필드 추출, 정렬, 필터링 등을 자유롭게 조합할 수 있게 했습니다.
+
+## MDX Processor
+
+새로 구현된 `MDXProcessor` 클래스는 다음과 같은 구조를 가집니다:
+
+```typescript
+class MDXProcessor {
+  private readonly articles: ReadonlyArray<Article>;
+  private readonly operations: Array<
+    (articles: ReadonlyArray<Article>) => ReadonlyArray<Article>
+  >;
+
+  private constructor(
+    articles: ReadonlyArray<Article>,
+    operations: Array<
+      (articles: ReadonlyArray<Article>) => ReadonlyArray<Article>
+    > = []
+  ) {
+    this.articles = articles;
+    this.operations = operations;
+  }
+
+  static fromDirectory(dir: string): MDXProcessor {
+    const mdxFiles = getMDXFiles(dir);
+    const articles = mdxFiles.map(readMDXFile);
+    return new MDXProcessor(articles);
+  }
+
+  private applyOperations(): ReadonlyArray<Article> {
+    return this.operations.reduce(
+      (articles, operation) => operation(articles),
+      this.articles
+    );
+  }
+
+  sortByDateDesc(): MDXProcessor {
+    const sortOperation = (articles: ReadonlyArray<Article>) =>
+      [...articles].sort(
+        (a, b) =>
+          new Date(b.metadata.publishedAt).getTime() -
+          new Date(a.metadata.publishedAt).getTime()
+      );
+    return new MDXProcessor(this.articles, [...this.operations, sortOperation]);
+  }
+
+  // 다양한 메서드들 (filterByCategory, limit 등)
+
+  getArticles(): ReadonlyArray<Article> {
+    return this.applyOperations();
+  }
+
+  map<T>(fn: (article: Article) => T): T[] {
+    return this.applyOperations().map(fn);
+  }
+
+  filter(predicate: (article: Article) => boolean): MDXProcessor {
+    const filterOperation = (articles: ReadonlyArray<Article>) =>
+      articles.filter(predicate);
+    return new MDXProcessor(this.articles, [
+      ...this.operations,
+      filterOperation,
+    ]);
+  }
+}
+
+export const createMDXProcessor = (dir: string) => new MDXProcessor(dir);
+```
+
+이 구조는 다음과 같은 이점을 제공합니다:
+
+1. 원하는 데이터를 쉽게 추출할 수 있습니다.
+2. 복잡한 데이터 처리 작업을 간결하게 표현
+3. 다양한 요구사항에 유연하게 대응 가능
+4. 코드의 가독성과 유지보수성 향상
+
+기존 코드를 새로운 `MDXProcessor` 클래스로 대체하면, 다음과 같이 간단하게 JavaScript 관련 최신 글 5개의 제목과 요약을 가져올 수 있습니다:
+
+```typescript
+const processor = createMDXProcessor();
+const latestArticles = processor
+  .filterByCategory('JavaScript')
+  .sortByDateDesc()
+  .limit(5)
+  .map(article => ({
+    name: article.metadata.title,
+    summary: article.metadata.summary,
+  }));
+```
+
+의도를 한 눈에 파악할 수 있고, 필요한 작업을 간단하게 체이닝하여 수행할 수 있습니다.
+
+이 외에도 다음과 같이 다양한 작업을 수행할 수 있습니다:
+
+```typescript
+const processor = createMDXProcessor();
+
+// 2023년에 작성된 글만 가져오기
+const articles2023 = processor
+  .filter(article => article.metadata.publishedAt.startsWith('2023'))
+  .getArticles();
+
+// 모든 글의 제목만 추출하기
+const titles = processor.map(article => article.metadata.title);
+```
+
+이러한 접근 방식은 코드의 가독성을 높이고, 다양한 요구사항에 유연하게 대응할 수 있게 해줍니다.
+
+## 결론
+
+함수형 프로그래밍 접근법을 통해 MDX 처리 유틸리티를 크게 개선할 수 있었습니다. 이제 더욱 유연하고, 확장 가능하며, 재사용성이 높은 코드를 작성할 수 있게 되었습니다.
