@@ -74,8 +74,8 @@ export default function Blog({ params }: { params: { slug: string } }) {
               '@context': 'https://schema.org',
               '@type': 'BlogPosting',
               headline: post.metadata.title,
-              datePublished: post.metadata.publishedAt,
-              dateModified: post.metadata.publishedAt,
+              datePublished: new Date(post.metadata.publishedAt).toISOString(),
+              dateModified: new Date(post.metadata.publishedAt).toISOString(),
               description: post.metadata.summary,
               image: post.metadata.image
                 ? `${siteMetadata.siteUrl}${post.metadata.image}`
@@ -84,6 +84,7 @@ export default function Blog({ params }: { params: { slug: string } }) {
               author: {
                 '@type': 'Person',
                 name: siteMetadata.author,
+                url: siteMetadata.github,
               },
             }),
           }}
