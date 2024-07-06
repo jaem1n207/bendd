@@ -31,7 +31,7 @@ export function generateMetadata({
     summary: description,
     image: postImage,
   } = post.metadata;
-  const title = `${postTitle} • ${siteMetadata.title} article`;
+  const title = `${postTitle}`;
   const ogImage = postImage
     ? postImage
     : `/api/og?title=${encodeURIComponent(postTitle)}`;
