@@ -222,7 +222,7 @@ export type TOCSubSection = {
 export const parseToc = (source: string) => {
   return source
     .split('\n')
-    .filter(line => line.match(/(^#{1,3})\s/))
+    .filter(line => line.match(/(^#{2,4})\s/))
     .reduce<TOCSection[]>((ac, rawHeading) => {
       const nac = [...ac];
       const removeMdx = rawHeading
@@ -250,17 +250,4 @@ export const parseToc = (source: string) => {
 
       return nac;
     }, []);
-};
-
-/** 글 파싱 */
-export const contentToDescription = (content: string) => {
-  const parsedContent = content
-    .replace(/(?<=\])\((.*?)\)/g, '')
-    .replace(/(?<!\S)((http)(s?):\/\/|www\.).+?(?=\s)/g, '')
-    .replace(/[#*\|\[\]]|(\-{3,})|(`{3})(\S*)(?=\s)/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 157);
-
-  return `${parsedContent}...`;
 };

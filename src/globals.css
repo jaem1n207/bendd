@@ -93,4 +93,115 @@
   * {
     @apply bd-border-border;
   }
+
+  a > code {
+    text-decoration: none !important;
+    text-decoration-style: unset !important;
+    text-decoration-color: unset !important;
+    text-decoration-thickness: unset !important;
+  }
+
+  h2::after,
+  h3::after,
+  h4::after,
+  h5::after {
+    content: '#';
+    color: #ffffff;
+    margin-left: 0.5rem;
+    font-size: 1.5rem;
+    position: relative;
+    visibility: hidden;
+  }
+
+  h2:hover::after,
+  h3:hover::after,
+  h4:hover::after,
+  h5:hover::after {
+    visibility: visible;
+  }
+
+  pre > code {
+    /* 
+   * Starlight unsets some styles so important is needed here.
+   * https://github.com/withastro/starlight/blob/main/packages/starlight/style/markdown.css#L94
+   */
+    counter-reset: line !important;
+  }
+
+  figcaption {
+    /* https://github.com/withastro/starlight/blob/main/packages/starlight/style/markdown.css#L4  */
+    margin-bottom: -1rem;
+  }
+
+  code[data-theme*=' '] {
+    @apply bd-pl-1.5 bd-pr-0.5;
+  }
+
+  code[data-theme*=' '],
+  code[data-theme*=' '] span {
+    color: var(--shiki-light);
+    @apply bd-rounded-[4px];
+  }
+
+  @media (prefers-color-scheme: dark) {
+    code[data-theme*=' '],
+    code[data-theme*=' '] span {
+      color: var(--shiki-dark);
+    }
+  }
+
+  code[data-line-numbers] {
+    counter-reset: line;
+  }
+
+  code[data-line-numbers] > [data-line]::before {
+    counter-increment: line;
+    content: counter(line);
+    @apply bd-inline-block bd-w-4 bd-mr-4 bd-text-right;
+  }
+
+  pre [data-line] {
+    @apply bd-px-1 bd-border-l-2 bd-border-l-transparent;
+  }
+
+  [data-highlighted-line] {
+    background: rgba(200, 200, 255, 0.1);
+    @apply bd-border-l-blue-400;
+  }
+
+  [data-highlighted-chars] {
+    @apply bd-bg-zinc-600/50 bd-rounded;
+    box-shadow: 0 0 0 4px rgb(82 82 91 / 0.5);
+  }
+
+  [data-chars-id] {
+    @apply bd-shadow-none bd-p-1 bd-border-b-2;
+  }
+
+  [data-chars-id='v'] {
+    @apply !bd-text-pink-300 bd-bg-rose-800/50 bd-border-b-pink-600 bd-font-bold;
+  }
+
+  [data-chars-id='s'] {
+    @apply !bd-text-yellow-300 bd-bg-yellow-800/50 bd-border-b-yellow-600 bd-font-bold;
+  }
+
+  [data-chars-id='i'] {
+    @apply !bd-text-purple-200 bd-bg-purple-800/50 bd-border-b-purple-600 bd-font-bold;
+  }
+
+  [data-rehype-pretty-code-title] {
+    @apply bd-bg-zinc-700 bd-text-zinc-200 bd-rounded-t-lg bd-py-2 bd-px-3 bd-font-semibold bd-text-sm;
+  }
+
+  figure[data-rehype-pretty-code-figure]:has(> [data-rehype-pretty-code-title])
+    pre {
+    @apply !bd-rounded-t-none;
+  }
+
+  pre,
+  code,
+  figure {
+    @apply bd-overflow-x-auto;
+  }
 }

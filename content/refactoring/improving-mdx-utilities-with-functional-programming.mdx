@@ -15,7 +15,7 @@ MDX(Markdown + JSX) 파일을 처리하는 유틸리티를 개발하면서, 코�
 
 원래 MDX를 처리하는 코드는 다음과 같은 구조를 가지고 있었습니다:
 
-```typescript
+```typescript {15-24}
 function getArticles() {
   return getMDXData(path.join(process.cwd(), 'content'));
 }
