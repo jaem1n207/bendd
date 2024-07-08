@@ -1,0 +1,85 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { useCallback, useRef } from 'react';
+
+import { cn } from '@/lib/utils';
+import { useTocActiveId } from '../hook/use-toc-active-id';
+import type { TOCSection } from '../types/toc';
+
+export function TableOfContents({
+  toc,
+  className,
+}: {
+  toc: TOCSection[];
+  className?: string;
+}) {
+  const { activeId } = useTocActiveId();
+  const containerRef = useRef<HTMLUListElement>(null);
+
+  const getItemPosition = useCallback((id: string): number => {
+    if (!containerRef.current) return 0;
+    const item = containerRef.current.querySelector(`a[href="#${id}"]`);
+    return item
+      ? item.getBoundingClientRect().top -
+          containerRef.current.getBoundingClientRect().top
+      : 0;
+  }, []);
+
+  return (
+    <>
+      <ul
+        ref={containerRef}
+        className={cn(
+          'bd-h-full bd-overflow-y-auto bd-mt-1 bd-rounded-sm',
+          className
+        )}
+      >
+        {toc.map(section => {
+          return (
+            <li key={section.slug} className="bd-py-1">
+              <a
+                href={`#${section.slug}`}
+                className={cn(
+                  'bd-block bd-text-sm bd-font-medium bd-transition-colors hover:bd-text-foreground bd-truncate',
+                  activeId === section.slug
+                    ? 'bd-text-foreground'
+                    : 'bd-text-muted-foreground/70'
+                )}
+              >
+                {section.text}
+              </a>
+              {section.subSections.length > 0 && (
+                <ul className="bd-ml-4 bd-mt-1">
+                  {section.subSections.map(subSection => (
+                    <li key={subSection.slug} className="bd-py-1">
+                      <a
+                        href={`#${subSection.slug}`}
+                        className={cn(
+                          'bd-block bd-text-xs bd-font-medium bd-transition-colors hover:bd-text-foreground bd-truncate',
+                          activeId === subSection.slug
+                            ? 'bd-text-foreground'
+                            : 'bd-text-muted-foreground/70'
+                        )}
+                      >
+                        {subSection.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      <motion.div
+        className="bd-absolute -bd-left-px bd-top-0 bd-h-2.5 bd-w-0.5 bd-bg-foreground"
+        initial={{ opacity: 0 }}
+        animate={{
+          opacity: activeId ? 1 : 0,
+          y: getItemPosition(activeId),
+        }}
+      />
+    </>
+  );
+}

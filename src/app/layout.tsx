@@ -16,7 +16,7 @@ const fontSans = FontSans({
   variable: '--font-sans',
 });
 
-export const metadata: Metadata = {
+export const metadata = {
   metadataBase: new URL(
     process.env.VERCEL_ENV === 'production'
       ? siteMetadata.siteUrl
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     url: siteMetadata.siteUrl,
     siteName: siteMetadata.title,
   },
-};
+} satisfies Metadata;
 
 export default function RootLayout({
   children,

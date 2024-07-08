@@ -10,6 +10,9 @@ import {
 } from 'react';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
+import smartypants from 'remark-smartypants';
+
+import styles from '../style/mdx.module.css';
 
 function CustomLink({
   href,
@@ -135,20 +138,17 @@ let components: MDXRemoteProps['components'] = {
 
 export function CustomMDX({ source }: { source: string }) {
   return (
-    <>
+    <div className={styles.container}>
       <MDXRemote
         source={source}
         options={{
           mdxOptions: {
+            remarkPlugins: [smartypants],
             rehypePlugins: [
               [
                 rehypePrettyCode,
                 {
-                  defaultLang: '.token',
-                  theme: {
-                    dark: 'github-dark-dimmed',
-                    light: 'github-light',
-                  },
+                  theme: 'vitesse-dark',
                 },
               ],
               rehypeSlug,
@@ -157,6 +157,6 @@ export function CustomMDX({ source }: { source: string }) {
         }}
         components={components}
       />
-    </>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { createMDXProcessor } from '@/components/article';
+import { createMDXProcessor } from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
 
 type RssItem = {

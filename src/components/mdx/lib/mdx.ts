@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
 
-import type { ArticleInfo } from '../types/article';
+import type { ArticleInfo } from '../../article/types/article';
 
 const MetadataSchema = z.object({
   title: z.string().max(30),
@@ -209,45 +209,3 @@ class MDXProcessor {
 
 export const createMDXProcessor = (dir?: string) =>
   MDXProcessor.fromDirectory(dir ?? path.join(process.cwd(), 'content'));
-
-export type TOCSection = TOCSubSection & {
-  subSections: TOCSubSection[];
-};
-
-export type TOCSubSection = {
-  slug: string;
-  text: string;
-};
-
-export const parseToc = (source: string) => {
-  return source
-    .split('\n')
-    .filter(line => line.match(/(^#{2,4})\s/))
-    .reduce<TOCSection[]>((ac, rawHeading) => {
-      const nac = [...ac];
-      const removeMdx = rawHeading
-        .replace(/^##*\s/, '')
-        .replace(/[\*,\~]{2,}/g, '')
-        .replace(/(?<=\])\((.*?)\)/g, '')
-        .replace(/(?<!\S)((http)(s?):\/\/|www\.).+?(?=\s)/g, '');
-
-      const section = {
-        slug: removeMdx
-          .trim()
-          .toLowerCase()
-          .replace(/[^a-z0-9ㄱ-ㅎ|ㅏ-ㅣ|가-힣 -]/g, '')
-          .replace(/\s/g, '-'),
-        text: removeMdx,
-      };
-
-      const isSubTitle = rawHeading.split('#').length - 1 === 3;
-
-      if (ac.length && isSubTitle) {
-        nac.at(-1)?.subSections.push(section);
-      } else {
-        nac.push({ ...section, subSections: [] });
-      }
-
-      return nac;
-    }, []);
-};

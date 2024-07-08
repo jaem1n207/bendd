@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-import { createMDXProcessor } from '@/components/article';
+import { createMDXProcessor } from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -1,9 +1,14 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { createMDXProcessor, formatDate } from '@/components/article';
 import { Giscus } from '@/components/comments/giscus';
-import { CustomMDX } from '@/components/mdx';
+import {
+  CustomMDX,
+  TableOfContents,
+  createMDXProcessor,
+  formatDate,
+  parseToc,
+} from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
 
 export async function generateStaticParams() {
@@ -12,11 +17,7 @@ export async function generateStaticParams() {
   return processor.map(article => article.slug);
 }
 
-export function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Metadata {
+export function generateMetadata({ params }: { params: { slug: string } }) {
   const processor = createMDXProcessor();
   const post = processor.getArticleBySlug(params.slug);
 
@@ -52,7 +53,7 @@ export function generateMetadata({
       card: 'summary_large_image',
       images: [ogImage],
     },
-  };
+  } satisfies Metadata;
 }
 
 export default function Blog({ params }: { params: { slug: string } }) {
@@ -62,6 +63,8 @@ export default function Blog({ params }: { params: { slug: string } }) {
   if (!post) {
     notFound();
   }
+
+  const toc = parseToc(post.content);
 
   return (
     <main className="bd-relative bd-mx-auto bd-my-0 bd-min-h-screen bd-max-w-2xl bd-overflow-hidden bd-px-6 bd-py-32">
@@ -89,6 +92,11 @@ export default function Blog({ params }: { params: { slug: string } }) {
             }),
           }}
         />
+        <nav className="bd-fixed bd-bottom-0 bd-left-5 bd-top-24 bd-w-72 bd-overflow-hidden">
+          <div className="bd-relative bd-border-l bd-border-solid bd-border-border bd-pl-4">
+            <TableOfContents toc={toc} className="bd-hidden md:bd-block" />
+          </div>
+        </nav>
         <h1 className="bd-mx-auto bd-mt-12 bd-break-keep bd-text-center bd-text-4xl bd-font-bold bd-tracking-tight md:bd-mt-24">
           {post.metadata.title}
         </h1>

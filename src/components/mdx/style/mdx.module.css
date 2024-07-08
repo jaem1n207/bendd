@@ -1,0 +1,110 @@
+.container :global(a > code) {
+  text-decoration: none !important;
+  text-decoration-style: unset !important;
+  text-decoration-color: unset !important;
+  text-decoration-thickness: unset !important;
+}
+
+.container :global(h2::after),
+.container :global(h3::after),
+.container :global(h4::after),
+.container :global(h5::after) {
+  content: '#';
+  color: #ffffff;
+  margin-left: 0.5rem;
+  font-size: 1.5rem;
+  position: relative;
+  visibility: hidden;
+}
+
+.container :global(h2:hover::after),
+.container :global(h3:hover::after),
+.container :global(h4:hover::after),
+.container :global(h5:hover::after) {
+  visibility: visible;
+}
+
+.container :global(pre > code) {
+  counter-reset: line !important;
+}
+
+.container :global(figcaption) {
+  margin-bottom: -1rem;
+}
+
+.container :global(code[data-theme*=' ']) {
+  @apply bd-pl-1.5 bd-pr-0.5;
+}
+
+.container :global(code[data-theme*=' ']),
+.container :global(code[data-theme*=' '] span) {
+  color: var(--shiki-light);
+  @apply bd-rounded-[4px];
+}
+
+@media (prefers-color-scheme: dark) {
+  .container :global(code[data-theme*=' ']),
+  .container :global(code[data-theme*=' '] span) {
+    color: var(--shiki-dark);
+  }
+}
+
+.container :global(code[data-line-numbers]) {
+  counter-reset: line;
+}
+
+.container :global(code[data-line-numbers] > [data-line]::before) {
+  counter-increment: line;
+  content: counter(line);
+  @apply bd-inline-block bd-w-4 bd-mr-4 bd-text-right;
+}
+
+.container :global(pre [data-line]) {
+  @apply bd-px-1 bd-border-l-2 bd-border-l-transparent;
+}
+
+.container :global([data-highlighted-line]) {
+  background: rgba(200, 200, 255, 0.1);
+  @apply bd-border-l-blue-400;
+}
+
+.container :global([data-highlighted-chars]) {
+  @apply bd-bg-zinc-600/50 bd-rounded;
+  box-shadow: 0 0 0 4px rgb(82 82 91 / 0.5);
+}
+
+.container :global([data-chars-id]) {
+  @apply bd-shadow-none bd-p-1 bd-border-b-2;
+}
+
+.container :global([data-chars-id='v']) {
+  @apply !bd-text-pink-300 bd-bg-rose-800/50 bd-border-b-pink-600 bd-font-bold;
+}
+
+.container :global([data-chars-id='s']) {
+  @apply !bd-text-yellow-300 bd-bg-yellow-800/50 bd-border-b-yellow-600 bd-font-bold;
+}
+
+.container :global([data-chars-id='i']) {
+  @apply !bd-text-purple-200 bd-bg-purple-800/50 bd-border-b-purple-600 bd-font-bold;
+}
+
+.container :global([data-rehype-pretty-code-title]) {
+  @apply bd-bg-zinc-700 bd-text-zinc-200 bd-rounded-t-lg bd-py-2 bd-px-3 bd-font-semibold bd-text-sm;
+}
+
+.container
+  :global(
+    figure[data-rehype-pretty-code-figure]:has(
+        > [data-rehype-pretty-code-title]
+      )
+      pre
+  ) {
+  @apply !bd-rounded-t-none;
+}
+
+.container :global(pre),
+.container :global(code),
+.container :global(figure) {
+  @apply bd-overflow-x-auto;
+}

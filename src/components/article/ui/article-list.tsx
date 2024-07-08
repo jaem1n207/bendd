@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { createMDXProcessor } from '../lib/mdx';
+import { createMDXProcessor } from '../../mdx/lib/mdx';
 import { ArticleItem } from './article-item';
 
 export function ArticleList({ className }: { className?: string }) {
