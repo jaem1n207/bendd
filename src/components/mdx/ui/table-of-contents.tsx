@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useCallback, useRef } from 'react';
 
+import { Paragraph } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
 import { useTocActiveId } from '../hook/use-toc-active-id';
 import type { TOCSection } from '../types/toc';
@@ -28,6 +29,17 @@ export function TableOfContents({
 
   return (
     <>
+      <motion.div
+        className="bd-absolute -bd-left-px bd-top-10 bd-h-3 bd-w-0.5 bd-bg-primary"
+        initial={{ opacity: 0 }}
+        animate={{
+          opacity: activeId ? 1 : 0,
+          y: getItemPosition(activeId),
+        }}
+      />
+      <Paragraph size="sm" className="!bd-leading-8">
+        On this page
+      </Paragraph>
       <ul
         ref={containerRef}
         className={cn(
@@ -72,14 +84,6 @@ export function TableOfContents({
           );
         })}
       </ul>
-      <motion.div
-        className="bd-absolute -bd-left-px bd-top-0 bd-h-2.5 bd-w-0.5 bd-bg-foreground"
-        initial={{ opacity: 0 }}
-        animate={{
-          opacity: activeId ? 1 : 0,
-          y: getItemPosition(activeId),
-        }}
-      />
     </>
   );
 }
