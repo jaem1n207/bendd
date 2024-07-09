@@ -1,3 +1,14 @@
+import {
+  transformerCompactLineOptions,
+  transformerMetaHighlight,
+  transformerMetaWordHighlight,
+  transformerNotationDiff,
+  transformerNotationErrorLevel,
+  transformerNotationFocus,
+  transformerNotationHighlight,
+  transformerNotationWordHighlight,
+  transformerRenderWhitespace,
+} from '@shikijs/transformers';
 import { MDXRemote, type MDXRemoteProps } from 'next-mdx-remote/rsc';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -69,28 +80,6 @@ function Heading({
   return createElement(tag, props, <a href={`#${props.id}`}>{children}</a>);
 }
 
-// function Table({ data }: { data: { headers: string[]; rows: string[][] } }) {
-//   let headers = data.headers.map((header, index) => (
-//     <th key={index}>{header}</th>
-//   ));
-//   let rows = data.rows.map((row, index) => (
-//     <tr key={index}>
-//       {row.map((cell, cellIndex) => (
-//         <td key={cellIndex}>{cell}</td>
-//       ))}
-//     </tr>
-//   ));
-
-//   return (
-//     <table>
-//       <thead>
-//         <tr>{headers}</tr>
-//       </thead>
-//       <tbody>{rows}</tbody>
-//     </table>
-//   );
-// }
-
 let components: MDXRemoteProps['components'] = {
   h2: props => <Heading level={2} {...props} />,
   h3: props => <Heading level={3} {...props} />,
@@ -126,14 +115,6 @@ let components: MDXRemoteProps['components'] = {
       </pre>
     );
   },
-  // table: (
-  //   props: DetailedHTMLProps<
-  //     TableHTMLAttributes<HTMLTableElement>,
-  //     HTMLTableElement
-  //   >
-  // ) => {
-  //   const { children, ...rest } = props;
-  // },
 };
 
 export function CustomMDX({ source }: { source: string }) {
@@ -149,6 +130,20 @@ export function CustomMDX({ source }: { source: string }) {
                 rehypePrettyCode,
                 {
                   theme: 'vitesse-dark',
+                  transformers: [
+                    transformerNotationHighlight(),
+                    transformerNotationFocus({
+                      classActivePre: 'has-focused-lines',
+                      classActiveLine: 'has-focus',
+                    }),
+                    transformerNotationDiff(),
+                    transformerMetaHighlight(),
+                    transformerRenderWhitespace(),
+                    transformerMetaWordHighlight(),
+                    transformerNotationErrorLevel(),
+                    transformerCompactLineOptions(),
+                    transformerNotationWordHighlight(),
+                  ],
                 },
               ],
               rehypeSlug,

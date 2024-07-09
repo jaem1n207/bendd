@@ -63,6 +63,18 @@
   @apply bd-px-1 bd-border-l-2 bd-border-l-transparent;
 }
 
+.container :global(pre.has-focused-lines [data-line]:not(.has-focus)) {
+  filter: blur(0.095rem);
+  transition:
+    filter 0.35s,
+    opacity 0.35s;
+  @apply bd-opacity-40;
+}
+.container :global(pre.has-focused-lines:hover [data-line]:not(.has-focus)) {
+  filter: blur(0);
+  opacity: 1;
+}
+
 .container :global([data-highlighted-line]) {
   background: rgba(200, 200, 255, 0.1);
   @apply bd-border-l-blue-400;
