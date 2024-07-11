@@ -24,6 +24,7 @@
       "  width='100%'",
       "  controls",
       "  preload='metadata'",
+      "  loop",
       "  muted",
       "  playsInline",
       ">",

@@ -1,0 +1,340 @@
+---
+title: '글 목록 애니메이션 구현'
+summary: 'Rauno 스타일의 텍스트 애니메이션 구현 과정'
+description: 'Rauno의 프로젝트 페이지의 애니메이션을 따라 구현한 과정을 소개하고 한글 처리, 코드 가독성, 그리고 최적화에 대한 고민을 공유합니다.'
+category: 'craft'
+publishedAt: '2024-07-06'
+---
+
+## 동기
+
+인터랙션 디자인 기술에 대해 공부할 때 우연히 [rauno](https://github.com/raunofreiberg)를 알게 되었고 이 분의 [rauno-projects](https://rauno.me/projects)에서 각 프로젝트를 렌더링할 때 나오는 애니메이션이 저에게 너무나 매력적인 시각적 효과로 다가왔습니다.
+
+이를 똑같이 구현해보고 싶었고 이에 대한 시행착오를 공유하고자 합니다. 생각보다 디테일이 많이 들어간 애니메이션이었고 그만큼 구현하고 나서 해냈다는 보람이 커서 좋았습니다. :)
+
+![rauno-projects-animation](/images/craft/implement-rauno-style-text-animation/rauno-projects-animation.gif)
+
+## 탐구
+
+애니메이션의 동작 방식을 살펴보겠습니다.
+
+1. 시작점: 각 요소(제목, 설명, 선)가 왼쪽에서 오른쪽으로 서서히 나타납니다.
+2. 타이밍: 모든 요소의 텍스트 변환 애니메이션은 동시에 시작되는 것 같습니다. 대신 각 아이템에 약간의 지연 시간이 추가되어 순차적으로 나타납니다.
+3. 글자 단위: 제목, 설명, 연도 모두 한 글자씩 나타나며 랜덤한 문자가 보이다 원래 텍스트로 나타납니다.
+
+## 첫 번째 구현
+
+랜덤한 문자는 [jh3y-GRLKMPY](https://codepen.io/jh3y/pen/GRLKMPY) 에 정의된 `GLYPHS` 변수를 이용해 보기로 했습니다.
+
+```tsx
+const GLYPHS =
+  'ラドクリフマラソンわたしワタシんょンョたばこタバコとうきょうトウキョウ0123456789±!@#$%^&*()_+ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+```
+
+우선 요소(제목, 설명, 연도)의 텍스트를 문자열 배열로 변환하고 각 범위의 문자를 `GLYPHS` 변수에서 랜덤하게 문자를 가져와 대체해주는 코드를 작성했습니다. 그리고 프레임마다 이 작업을 계속 반복합니다.
+
+그러나 이 방식은 아래 영상에서 볼 수 있듯, 텍스트가 변환되는 모습이 어색해 보입니다.
+
+<video width="100%" controls preload="metadata" loop muted playsInline>
+  <source
+    src="/videos/craft/implement-rauno-style-text-animation/animated-text.mp4"
+    type="video/mp4"
+  />
+  Your browser does not support the video tag.
+</video>
+
+제가 생각한 부드러운 느낌이 아니었죠. 그래서 조금 더 살펴보기 시작했습니다.
+
+## 두 번째 구현
+
+rauno의 애니메이션과 비슷한 애니메이션 느낌을 내기 위해 천천히 연구를 해보았습니다. 그러다 우연히 [Shuffle Text Effect With jQuery](https://demo.tutorialzine.com/2011/09/shuffle-letters-effect-jquery/)를 보았고 큰 깨달음💡을 얻을 수 있었습니다!
+
+### 자연스러움의 조건
+
+보다 자연스러운 텍스트 변환 느낌을 주려면 다음 조건이 충족되어야 합니다:
+
+1. 각 문자의 유형에 맞는 랜덤한 문자를 생성해야 합니다. ex: 소문자 영어는 소문자 영어로 랜덤한 문자 생성
+2. 공백이 아닌 문자만 변환해야 합니다.
+3. 가장 중요한 건 적절한 반복 횟수와 프레임을 설정해야 합니다.
+
+나머지 요소는 어떻게 구현한다 쳐도 한 가지 문제가 있었습니다. 어떻게 한글 문자를 랜덤하게 생성하는 것이냐였죠. 영어 알파벳은 26개지만, 한글은 하나의 문자로 11,172개의 글자를 만들 수 있기 때문이었죠.
+
+### 랜덤한 한글 문자열 얻기
+
+물론 “가나다라…”로 표현할 수 있겠지만 변환되는 애니메이션의 멋을 위해 조금 더 다양한 글자를 랜덤하게 표현할 수 있길 원했습니다. 좋은 방법을 고민하다 예전에 유니코드를 사용해 이모지 유무를 검사한 작업을 했었던 게 생각났고 유니코드를 사용해 한글 문자를 생성하도록 시도했습니다. 결국 모든 문자는 유니코드로 표현될 수 있으니까요.
+
+한글을 표현하는 유니코드 값은 AC00~D7A3까지라는 것을 구글링을 통해 쉽게 알 수 있습니다.
+
+<aside>
+💡 한글이 가지는 유니코드 값은 **AC00부터 D7A3**까지며, 총 11,172개의 코드로 모든 한글을 표현할 수 있다. - 나무위키 -
+
+</aside>
+
+`String.fromCharCode(0xac00)`를 실행하면 “가” 문자열을 얻을 수 있습니다. 한글을 표현할 수 있는 유니코드 값 범위 내에서 랜덤하게 얻는 것을 코드로 표현하면 아래와 같습니다:
+
+```tsx
+String.fromCharCode(0xac00 + Math.floor(Math.random() * 11172));
+```
+
+이를 이용하면 유효성 검사 함수를 작성할 때도 아래와 같이 구현할 수 있겠죠:
+
+```tsx
+function isKorean(char: string): boolean {
+  const code = char.charCodeAt(0);
+  return code >= 0xac00 && code <= 0xd7a3;
+}
+
+// 물론 유효성 검사는 정규식으로 표현할 수도 있겠지만요
+// String.fromCharCode(0xac00) -> '가'
+// String.fromCharCode(0xd7a3) -> '힣'
+const isKorean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+```
+
+### 애니메이션 동작 정의
+
+이제 요소 내의 텍스트를 랜덤하게 섞어 자연스럽게 변환되는 애니메이션을 구현해 보겠습니다. 정확하게는 **텍스트의 각 문자를 순차적으로 랜덤한 문자로 대체한 후 원래 문자로 복원하는 방식으로 동작**하도록 하는 함수를 구현합니다.
+
+먼저 문자의 유형을 정의해야 합니다:
+
+```tsx
+type CharType = 'lowerCase' | 'upperCase' | 'digit' | 'symbol' | 'korean';
+```
+
+그런 다음 주어진 문자 유형에 따라 랜덤한 문자를 생성하는 함수를 구현합니다:
+
+```tsx
+const charPools: Record<CharType, string> = {
+  lowerCase: 'abcdefghijklmnopqrstuvwxyz',
+  upperCase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  digit: '0123456789',
+  symbol: '!@#$%^&*()_+-=[]{}|;:,.<>?',
+  korean: '',
+  space: ' ',
+};
+
+function getRandomCharacterForType(charType: CharType): string {
+  const pool = charPools[charType];
+
+  if (charType === 'korean') {
+    return String.fromCharCode(0xac00 + Math.floor(Math.random() * 11172));
+  }
+
+  return pool[Math.floor(Math.random() * pool.length)] || '';
+}
+```
+
+이제 핵심 함수를 구현할 차례입니다. 외부에서 문자를 섞을 반복 횟수(iterations)와 업데이트할 초당 프레임 수(fps)를 결졍할 수 있도록 옵션을 받도록 하겠습니다:
+
+```tsx
+export function shuffleLetters(
+  element: HTMLElement,
+  config: ShuffleConfig = {}
+): () => void {
+  // 기본 값과 전달 받은 값을 병합합니다.
+  const options = {
+    iterations: 8,
+    fps: 30,
+    onComplete: () => {},
+    ...config,
+  };
+
+  // 유효성 검사를 합니다...
+}
+```
+
+그리고 전달 받은 요소의 문자열을 다음과 같이 분석해야 합니다.
+
+- 요소의 텍스트를 문자열 배열로 변환
+- 각 문자의 유형을 결정
+- 공백이 아닌 문자의 위치를 기록
+
+이를 코드로 표현하면 다음과 같습니다:
+
+```tsx
+const text = element.textContent ?? '';
+const charsArray = Array.from(text);
+const charsTypes = charsArray.map(char => {
+  if (/\s/.test(char)) return 'space';
+  if (isKorean(char)) return 'korean';
+  if (/[a-z]/.test(char)) return 'lowerCase';
+  if (/[A-Z]/.test(char)) return 'upperCase';
+  if (/[0-9]/.test(char)) return 'digit';
+  return 'symbol';
+});
+
+const charsPositions = charsArray.reduce<number[]>((acc, char, index) => {
+  if (!/\s/.test(char)) acc.push(index);
+  return acc;
+}, []);
+
+element.textContent = '';
+```
+
+그런 다음 재귀적으로 호출되며 다음을 수행하는 애니메이션을 구현해야 합니다.
+
+- 지정된 범위의 문자를 랜덤한 문자로 대체
+- 결과로 얻은 문자열을 요소에 적용
+- 설정된 fps 값에 따라 다음 프레임을 예약
+
+이를 코드로 표현하면 다음과 같습니다:
+
+```tsx
+let timeout: NodeJS.Timeout | null = null;
+
+const shuffle = (start: number): void => {
+  if (start > charsPositions.length) {
+    options.onComplete(element);
+    return;
+  }
+
+  const shuffledChars = [...charsArray];
+  for (let i = Math.max(start, 0); i < charsPositions.length; i++) {
+    if (i < start + options.iterations) {
+      const charType = charsTypes[charsPositions[i]];
+      if (charType !== 'space') {
+        shuffledChars[charsPositions[i]] = getRandomCharacterForType(
+          charType as Exclude<typeof charType, 'space'>
+        );
+      }
+    } else {
+      shuffledChars[charsPositions[i]] = '';
+    }
+  }
+
+  element.textContent = shuffledChars.join('');
+
+  timeout = setTimeout(() => shuffle(start + 1), 1000 / options.fps);
+};
+```
+
+마지막으로 첫 셔플을 시작하고, 애니메이션을 중지할 수 있는 함수를 반환하고 구현을 마무리합니다:
+
+```tsx
+shuffle(-options.iterations);
+
+return () => {
+  if (timeout) clearTimeout(timeout);
+};
+```
+
+이렇게 자연스럽게 텍스트가 변환하는 느낌을 구현한 함수를 사용해서 샘플 데이터에 애니메이션을 적용해보았고 성공했습니다.
+
+추가적으로 한 것은 `useInView` 훅을 사용하여 화면에 보이는 요소만 애니메이션을 실행하도록 했습니다. 선은 `scaleX` 애니메이션을 사용하여 선이 왼쪽에서 오른쪽으로 자연스럽게 늘어나도록 했고 opacity를 조절하여 더 부드러운 효과를 만들었습니다.
+
+<video width="100%" controls preload="metadata" loop muted playsInline>
+  <source
+    src="/videos/craft/implement-rauno-style-text-animation/new-animated-text.mp4"
+    type="video/mp4"
+  />
+  <img
+    src="/images/craft/implement-rauno-style-text-animation/new-animated-text.gif"
+    alt=""
+  />
+</video>
+
+rauno의 애니메이션에 비하면 아직도 조금은 어색한 것 같습니다. iterations과 fps의 적절한 값을 찾아 적용하면 더욱 자연스러워질 것 같네요.
+
+### 코드 가독성
+
+코드 가독성에 대해 간단하게 이야기하고 마무리하고 싶습니다.
+
+저는 누구나 이해하기 쉽고 수정하기 쉬운 코드를 지향하는 편입니다. 이는 유지보수와 협업에 있어 큰 장점을 갖기 때문입니다. 예로 배열에서 짝수를 필터링하고 그 합계를 구하는 간단한 작업을 들어보겠습니다:
+
+```tsx
+// 1.
+const calculateEvenSum = arr =>
+  arr.filter(num => !(num & 1)).reduce((acc, val) => acc + val, 0);
+
+// 2.
+const calculateEvenSum = numbers => {
+  const evenNumbers = numbers.filter(function (number) {
+    return number % 2 === 0;
+  });
+
+  const sum = evenNumbers.reduce(function (total, number) {
+    return total + number;
+  }, 0);
+
+  return sum;
+};
+```
+
+어느 함수가 더 잘 읽히나요? 다소 극단적인 예시지만 아마 대부분의 개발자가 2번을 고를 것 같습니다.
+
+첫 번째 구현은 비트 연산자를 사용하고 있으며 자바스크립트 초보자는 코드의 의도를 바로 파악하기 어려울 수 있습니다.
+
+두 번째 구현은 첫 번째에 비해 약간 더 길지만, **코드의 의도와 동작을 명확하게 전달**합니다. 각 단계가 분리되어 있어 로직을 따라가기 쉽고 기본적인 JS 문법만 사용해 초보자도 이해하기 쉽죠.
+
+[lodash](https://github.com/lodash/lodash) 라이브러리가 이런 방식으로 구현되어 있습니다. 최대한 복잡한 구문은 사용하지 않고 기본적인 for 루프와 if 문만 사용해 초보자도 쉽게 이해할 수 있습니다. 어쩔 수 없이 복잡하게 구현되는 코어 로직은 내부로 캡슐화해서 관리하기 때문에 나름 유명한 오픈소스 중에 초보자도 쉽게 기여할 수 있는 저장소가 아닐까 싶습니다.
+
+이번에 문자 유형에 따라 랜덤한 문자를 생성하는 함수를 구현할 때도 비슷한 상황이 있었는데요. 처음에 아래와 같은 방식으로 작성했습니다:
+
+```tsx twoslash
+type CharType =
+  | 'space'
+  | 'lowerCase'
+  | 'upperCase'
+  | 'digit'
+  | 'symbol'
+  | 'korean';
+
+function getRandomCharacterForType(charType: CharType): string {
+  switch (charType) {
+    case 'lowerCase':
+      return String.fromCharCode(97 + Math.floor(Math.random() * 26));
+    case 'upperCase':
+      return String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    case 'digit':
+      return String.fromCharCode(48 + Math.floor(Math.random() * 10));
+    case 'symbol':
+      return String.fromCharCode(33 + Math.floor(Math.random() * 14));
+    case 'korean':
+      return String.fromCharCode(0xac00 + Math.floor(Math.random() * 11172));
+    default:
+      return '';
+  }
+}
+```
+
+이 방법은 유니코드 범위를 활용해 한 눈에 `getRandomCharacterForType` 함수의 의도를 알 수 있습니다. 그러나 다시 생각해보니 이는 새로운 문자 유형을 추가하거나 기존 유형의 문자 풀을 수정하기 어려울 것 같았습니다.
+
+예로 새로운 문자 유형을 추가하거나 ‘symbol’ 문자 풀을 변경하려면 해당 문자의 유니코드 값을 검색하고 코드에 반영해야 합니다. 이는 매우 번거로울 것입니다. 또 `String.fromCharCode` 는 `if` 문처럼 자주 사용되는 함수는 아니기에 초보자들은 잘 모를 수도 있을 수도 있고요.
+
+그래서 아래처럼 수정했습니다:
+
+```tsx
+const charPools: Record<CharType, string> = {
+  lowerCase: 'abcdefghijklmnopqrstuvwxyz',
+  upperCase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  digit: '0123456789',
+  symbol: '!@#$%^&*()_+-=[]{}|;:,.<>?',
+  korean: '',
+  space: ' ',
+};
+
+function getRandomCharacterForType(charType: CharType): string {
+  const pool = charPools[charType];
+
+  if (charType === 'korean') {
+    return String.fromCharCode(0xac00 + Math.floor(Math.random() * 11172));
+  }
+
+  return pool[Math.floor(Math.random() * pool.length)] || '';
+}
+```
+
+`charPools`를 정의하고, 어쩔 수 없는 한글 문자에 대해서는 유니코드 범위를 활용합니다.
+
+이 코드는 다음과 같은 장점을 가집니다:
+
+1. 가독성: `charPools` 객체를 통해 각 문자 유형별로 사용 가능한 문자들을 명확히 볼 수 있습니다.
+2. 확장성: 새로운 문자 유형을 추가하거나 기존 유형의 문자 풀을 수정하기 쉽습니다.
+
+물론 단점도 있습니다. `charPools` 객체에서 korean 키에 대한 값이 명확하게 정의되어 있지 않다는 것이죠. 하지만 이는 매우 예외적인 언어의 특성으로 어쩔 수 없습니다.
+
+저는 기존에 비하면 새로운 문자 유형을 추가하거나 기존 문자 풀을 변경하는 게 간단한 이 방식이 좋은 것 같습니다.
+
+## 참고
+
+- [rauno-projects](https://rauno.me/projects)
+- [georapbox-shuffle-lettersjs](https://github.com/georapbox/shuffle-letters?tab=readme-ov-file#shuffle-lettersjs)
