@@ -63,6 +63,7 @@ function RoundedImage({ alt, src }: { alt: string; src: string }): JSX.Element {
       height={768}
       sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
       className="bd-rounded-lg bd-object-cover"
+      quality={80}
     />
   );
 }
