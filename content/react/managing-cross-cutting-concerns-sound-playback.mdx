@@ -16,7 +16,7 @@ Bendd 웹앱에는 조금 더 생동감 있는 경험을 제공하기 위해 소
 2. `useSound` 훅을 사용하여 소리(ex: mp3) 에셋 로드
 3. 이벤트 핸들러(ex: `onClick`)에 소리를 재생하는 함수 추가
 
-```tsx
+```tsx {12-15}
 'use client';
 
 import useSound from 'use-sound';
@@ -51,7 +51,7 @@ function TestSoundButton() {
 
 ## WithSound 컴포넌트 구현
 
-```tsx
+```tsx /cloneElement/
 'use client';
 
 import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
@@ -97,7 +97,7 @@ export function WithSound({ children, assetPath }: WithSoundProps) {
 
 ### WithSound 사용 예시
 
-```tsx
+```ts {3,9}
 function TestSoundButton() {
   return (
     <WithSound assetPath="/sounds/test.mp3">

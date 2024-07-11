@@ -15,7 +15,7 @@ MDX(Markdown + JSX) 파일을 처리하는 유틸리티를 개발하면서, 코�
 
 원래 MDX를 처리하는 코드는 다음과 같은 구조를 가지고 있었습니다:
 
-```typescript {15-24}
+```ts
 function getArticles() {
   return getMDXData(path.join(process.cwd(), 'content'));
 }
@@ -29,6 +29,7 @@ function sortArticlesByDateDesc(articles: ReturnType<typeof getArticles>) {
   });
 }
 
+// [!code focus:10]
 // 최근 5개의 JavaScript 관련 글의 제목과 요약 가져오기
 const allArticles = getArticles();
 const jsArticles = allArticles.filter(
@@ -123,7 +124,7 @@ class MDXProcessor {
   }
 }
 
-export const createMDXProcessor = (dir: string) => new MDXProcessor(dir);
+export const createMDXProcessor = (dir: string) => new MDXProcessor(dir); // [!code highlight]
 ```
 
 이 구조는 다음과 같은 이점을 제공합니다:
@@ -137,6 +138,9 @@ export const createMDXProcessor = (dir: string) => new MDXProcessor(dir);
 
 ```typescript
 const processor = createMDXProcessor();
+
+// [!code focus:10]
+// 최근 5개의 JavaScript 관련 글의 제목과 요약 가져오기
 const latestArticles = processor
   .filterByCategory('JavaScript')
   .sortByDateDesc()

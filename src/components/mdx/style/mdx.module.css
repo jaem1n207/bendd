@@ -76,9 +76,9 @@
   opacity: 1;
 }
 
-.container :global([data-highlighted-line]) {
-  background: rgba(200, 200, 255, 0.1);
-  @apply bd-border-l-blue-400;
+.container :global(.highlighted) {
+  background-color: var(--twoslash-highlighted-bg);
+  border: 1px solid var(--twoslash-highlighted-border);
 }
 
 .container :global([data-highlighted-chars]) {
