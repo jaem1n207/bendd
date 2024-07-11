@@ -1,4 +1,4 @@
-import { createMDXProcessor } from '@/components/mdx';
+import { createCraftMDXProcessor, createMDXProcessor } from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
 
 type RssItem = {
@@ -20,6 +20,7 @@ type Rss = {
 
 export async function GET() {
   const processor = createMDXProcessor();
+  const craftProcessor = createCraftMDXProcessor();
 
   const items: RssItem[] = processor.map(article => {
     return {
@@ -31,12 +32,22 @@ export async function GET() {
     };
   });
 
+  const craftItems: RssItem[] = craftProcessor.map(article => {
+    return {
+      title: article.metadata.title,
+      description: article.metadata.summary,
+      link: `${siteMetadata.siteUrl}/craft/${article.slug}`,
+      pubDate: new Date(article.metadata.publishedAt).toUTCString(),
+      guid: `${siteMetadata.siteUrl}/craft/${article.slug}`,
+    };
+  });
+
   const rss: Rss = {
     title: siteMetadata.title,
     description: siteMetadata.description,
     lang: siteMetadata.language,
     link: siteMetadata.siteUrl,
-    items,
+    items: [...items, ...craftItems],
   };
 
   const generateRss = ({ title, description, lang, link, items }: Rss) => {

@@ -1,10 +1,10 @@
 import { MetadataRoute } from 'next';
 
-import { createMDXProcessor } from '@/components/mdx';
+import { createCraftMDXProcessor, createMDXProcessor } from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ['', 'article'].map(route => ({
+  const routes = ['', 'craft', 'article'].map(route => ({
     url: `${siteMetadata.siteUrl}/${route}`,
     lastModified: new Date().toISOString().split('T')[0],
   }));
@@ -15,5 +15,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: article.metadata.publishedAt,
   }));
 
-  return [...routes, ...articles];
+  const mdxProcessor = createCraftMDXProcessor();
+  const crafts = mdxProcessor.map(article => ({
+    url: `${siteMetadata.siteUrl}/craft/${article.slug}`,
+    lastModified: article.metadata.publishedAt,
+  }));
+
+  return [...routes, ...crafts, ...articles];
 }
