@@ -71,7 +71,6 @@ const mainItems = [
     name: 'Craft',
     slug: '/craft',
     icon: <Bulb className={navigationItemSvg()} />,
-    disabled: true,
   },
   {
     name: 'Article',
