@@ -167,6 +167,21 @@ class MDXProcessor {
     }));
   }
 
+  formatForCraftDisplay(
+    options: { includeSummary?: boolean; includeRelativeDate?: boolean } = {}
+  ): ArticleInfo[] {
+    return this.applyOperations().map(article => ({
+      name: article.metadata.title,
+      summary: article.metadata.summary,
+      href: `/craft/${article.slug}`,
+      publishedAt: formatDate({
+        date: article.metadata.publishedAt,
+        includeRelative: options.includeRelativeDate,
+      }),
+      ...(options.includeSummary && { summary: article.metadata.summary }),
+    }));
+  }
+
   filterByCategory(category: string): MDXProcessor {
     const filterOperation = (articles: ReadonlyArray<Article>) =>
       articles.filter(article => article.metadata.category === category);
@@ -209,3 +224,6 @@ class MDXProcessor {
 
 export const createMDXProcessor = (dir?: string) =>
   MDXProcessor.fromDirectory(dir ?? path.join(process.cwd(), 'content'));
+
+export const createCraftMDXProcessor = () =>
+  MDXProcessor.fromDirectory(path.join(process.cwd(), 'craft'));
