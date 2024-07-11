@@ -9,6 +9,7 @@ import {
   transformerNotationWordHighlight,
   transformerRenderWhitespace,
 } from '@shikijs/transformers';
+import { rendererRich, transformerTwoslash } from '@shikijs/twoslash';
 import { MDXRemote, type MDXRemoteProps } from 'next-mdx-remote/rsc';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -131,6 +132,13 @@ export function CustomMDX({ source }: { source: string }) {
                 {
                   theme: 'vitesse-dark',
                   transformers: [
+                    transformerTwoslash({
+                      renderer: rendererRich(),
+                      explicitTrigger: true,
+                      onTwoslashError: (error, code) => {
+                        console.error(error, code);
+                      },
+                    }),
                     transformerNotationHighlight(),
                     transformerNotationFocus({
                       classActivePre: 'has-focused-lines',
