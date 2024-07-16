@@ -26,6 +26,7 @@
 
 .container :global(pre > code) {
   counter-reset: line !important;
+  @apply bd-font-mono;
 }
 
 .container :global(figcaption) {
