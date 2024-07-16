@@ -78,7 +78,17 @@ function Heading({
   level: 2 | 3 | 4;
 }) {
   const tag = `h${level}`;
-  return createElement(tag, props, <a href={`#${props.id}`}>{children}</a>);
+  return createElement(
+    tag,
+    props,
+    <a
+      className="bd-font-bold"
+      href={`#${props.id}`}
+      aria-label={typeof children === 'string' ? children : undefined}
+    >
+      {children}
+    </a>
+  );
 }
 
 let components: MDXRemoteProps['components'] = {
