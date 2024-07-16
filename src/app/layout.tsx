@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/react';
 import type { Metadata } from 'next';
-import { Inter as FontSans } from 'next/font/google';
+import { Fira_Mono as FontMono, Inter as FontSans } from 'next/font/google';
 
 import { Navigation } from '@/components/navigation';
 import { ThemeProvider } from '@/components/theme';
@@ -14,6 +14,13 @@ const fontSans = FontSans({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-sans',
+});
+
+const fontMono = FontMono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-mono',
+  weight: ['400', '500', '700'],
 });
 
 export const metadata = {
@@ -61,7 +68,11 @@ export default function RootLayout({
     <html
       lang={siteMetadata.language}
       suppressHydrationWarning
-      className={cn('bd-bg-background bd-text-foreground', fontSans.variable)}
+      className={cn(
+        'bd-bg-background bd-text-foreground',
+        fontSans.variable,
+        fontMono.variable
+      )}
     >
       <body className="bd-antialiased">
         <ThemeProvider
