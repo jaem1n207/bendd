@@ -30,7 +30,7 @@
 }
 
 .container :global(figcaption) {
-  margin-bottom: -1rem;
+  @apply bd-text-center bd-max-w-2xl;
 }
 
 .container :global(code[data-theme*=' ']) {

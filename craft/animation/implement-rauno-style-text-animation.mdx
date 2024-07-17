@@ -12,7 +12,12 @@ publishedAt: '2024-07-06'
 
 이를 똑같이 구현해보고 싶었고 이에 대한 시행착오를 공유하고자 합니다. 생각보다 디테일이 많이 들어간 애니메이션이었고 그만큼 구현하고 나서 해냈다는 보람이 커서 좋았습니다. :)
 
-![rauno-projects-animation](/images/craft/implement-rauno-style-text-animation/rauno-projects-animation.gif)
+<figure>
+  <>![rauno's projects page animation](/images/craft/implement-rauno-style-text-animation/rauno-projects-animation.gif)</>
+  <figcaption>rauno의 projects 페이지 애니메이션</figcaption>
+</figure>
+
+<Callout>This is a default callout.</Callout>
 
 ## 탐구
 
@@ -27,8 +32,7 @@ publishedAt: '2024-07-06'
 랜덤한 문자는 [jh3y-GRLKMPY](https://codepen.io/jh3y/pen/GRLKMPY) 에 정의된 `GLYPHS` 변수를 이용해 보기로 했습니다.
 
 ```tsx
-const GLYPHS =
-  'ラドクリフマラソンわたしワタシんょンョたばこタバコとうきょうトウキョウ0123456789±!@#$%^&*()_+ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const GLYPHS = 'ラドクリフマラソンわたしワタシんょンョたばこタバコとうきょうトウキョウ0123456789±!@#$%^&*()_+ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 ```
 
 우선 요소(제목, 설명, 연도)의 텍스트를 문자열 배열로 변환하고 각 범위의 문자를 `GLYPHS` 변수에서 랜덤하게 문자를 가져와 대체해주는 코드를 작성했습니다. 그리고 프레임마다 이 작업을 계속 반복합니다.
@@ -36,10 +40,7 @@ const GLYPHS =
 그러나 이 방식은 아래 영상에서 볼 수 있듯, 텍스트가 변환되는 모습이 어색해 보입니다.
 
 <video width="100%" controls preload="metadata" loop muted playsInline>
-  <source
-    src="/videos/craft/implement-rauno-style-text-animation/animated-text.mp4"
-    type="video/mp4"
-  />
+  <source src="/videos/craft/implement-rauno-style-text-animation/animated-text.mp4" type="video/mp4" />
   Your browser does not support the video tag.
 </video>
 
@@ -126,10 +127,7 @@ function getRandomCharacterForType(charType: CharType): string {
 이제 핵심 함수를 구현할 차례입니다. 외부에서 문자를 섞을 반복 횟수(iterations)와 업데이트할 초당 프레임 수(fps)를 결졍할 수 있도록 옵션을 받도록 하겠습니다:
 
 ```tsx
-export function shuffleLetters(
-  element: HTMLElement,
-  config: ShuffleConfig = {}
-): () => void {
+export function shuffleLetters(element: HTMLElement, config: ShuffleConfig = {}): () => void {
   // 기본 값과 전달 받은 값을 병합합니다.
   const options = {
     iterations: 8,
@@ -192,9 +190,7 @@ const shuffle = (start: number): void => {
     if (i < start + options.iterations) {
       const charType = charsTypes[charsPositions[i]];
       if (charType !== 'space') {
-        shuffledChars[charsPositions[i]] = getRandomCharacterForType(
-          charType as Exclude<typeof charType, 'space'>
-        );
+        shuffledChars[charsPositions[i]] = getRandomCharacterForType(charType as Exclude<typeof charType, 'space'>);
       }
     } else {
       shuffledChars[charsPositions[i]] = '';
@@ -222,14 +218,8 @@ return () => {
 추가적으로 한 것은 `useInView` 훅을 사용하여 화면에 보이는 요소만 애니메이션을 실행하도록 했습니다. 선은 `scaleX` 애니메이션을 사용하여 선이 왼쪽에서 오른쪽으로 자연스럽게 늘어나도록 했고 opacity를 조절하여 더 부드러운 효과를 만들었습니다.
 
 <video width="100%" controls preload="metadata" loop muted playsInline>
-  <source
-    src="/videos/craft/implement-rauno-style-text-animation/new-animated-text.mp4"
-    type="video/mp4"
-  />
-  <img
-    src="/images/craft/implement-rauno-style-text-animation/new-animated-text.gif"
-    alt=""
-  />
+  <source src="/videos/craft/implement-rauno-style-text-animation/new-animated-text.mp4" type="video/mp4" />
+  <img src="/images/craft/implement-rauno-style-text-animation/new-animated-text.gif" alt="" />
 </video>
 
 rauno의 애니메이션에 비하면 아직도 조금은 어색한 것 같습니다. iterations과 fps의 적절한 값을 찾아 적용하면 더욱 자연스러워질 것 같네요.
@@ -242,8 +232,7 @@ rauno의 애니메이션에 비하면 아직도 조금은 어색한 것 같습�
 
 ```tsx
 // 1.
-const calculateEvenSum = arr =>
-  arr.filter(num => !(num & 1)).reduce((acc, val) => acc + val, 0);
+const calculateEvenSum = arr => arr.filter(num => !(num & 1)).reduce((acc, val) => acc + val, 0);
 
 // 2.
 const calculateEvenSum = numbers => {
@@ -270,13 +259,7 @@ const calculateEvenSum = numbers => {
 이번에 문자 유형에 따라 랜덤한 문자를 생성하는 함수를 구현할 때도 비슷한 상황이 있었는데요. 처음에 아래와 같은 방식으로 작성했습니다:
 
 ```tsx twoslash
-type CharType =
-  | 'space'
-  | 'lowerCase'
-  | 'upperCase'
-  | 'digit'
-  | 'symbol'
-  | 'korean';
+type CharType = 'space' | 'lowerCase' | 'upperCase' | 'digit' | 'symbol' | 'korean';
 
 function getRandomCharacterForType(charType: CharType): string {
   switch (charType) {
