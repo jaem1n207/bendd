@@ -70,7 +70,7 @@ export function ArticleItem({
   }, [isInView]);
 
   return (
-    <WithSound assetPath="/sounds/page-turn.mp3">
+    <WithSound assetPath="/sounds/stapling.mp3">
       <MotionLink
         ref={itemRef}
         href={href}
