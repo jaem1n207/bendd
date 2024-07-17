@@ -34,4 +34,16 @@
     ],
     "scope": "md,mdx",
   },
+  "Image Embed": {
+    "prefix": ["figure", "image", "img"],
+    "description": "embed image",
+    "body": [
+      "<figure>",
+      "  <>![${1:Alt Text}]($2)</>",
+      "  <figcaption>",
+      "    $3",
+      "  </figcaption>",
+      "</figure>",
+    ],
+  },
 }
