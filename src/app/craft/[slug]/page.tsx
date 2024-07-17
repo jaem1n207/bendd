@@ -67,7 +67,7 @@ export default function Craft({ params }: { params: { slug: string } }) {
   const toc = parseToc(post.content);
 
   return (
-    <main className="bd-relative bd-mx-auto bd-my-0 bd-min-h-screen bd-max-w-2xl bd-overflow-hidden bd-px-6 bd-py-32">
+    <main className="bd-relative bd-mx-auto bd-my-0 bd-min-h-screen bd-max-w-2xl bd-overflow-hidden bd-px-6 bd-py-32 bd-font-tmoney">
       <section>
         <script
           type="application/ld+json"
