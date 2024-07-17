@@ -21,7 +21,7 @@ export const parseToc = (source: string) => {
         text: removeMdx,
       };
 
-      const isSubTitle = rawHeading.split('#').length - 1 === 3;
+      const isSubTitle = rawHeading.split('#').length - 1 === 4;
 
       if (ac.length && isSubTitle) {
         nac.at(-1)?.subSections.push(section);
