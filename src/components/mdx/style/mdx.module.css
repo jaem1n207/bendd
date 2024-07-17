@@ -5,23 +5,23 @@
   text-decoration-thickness: unset !important;
 }
 
+.container :global(p > code) {
+  @apply bd-border-border bd-text-sm bd-font-normal bd-bg-gray-400 bd-border bd-px-1 bd-py-0.5 bd-rounded-sm bd-break-words;
+}
+
 .container :global(h2::after),
 .container :global(h3::after),
 .container :global(h4::after),
 .container :global(h5::after) {
   content: '#';
-  color: #ffffff;
-  margin-left: 0.5rem;
-  font-size: 1.5rem;
-  position: relative;
-  visibility: hidden;
+  @apply bd-invisible bd-relative bd-ml-2 bd-text-gray-800;
 }
 
 .container :global(h2:hover::after),
 .container :global(h3:hover::after),
 .container :global(h4:hover::after),
 .container :global(h5:hover::after) {
-  visibility: visible;
+  @apply bd-visible;
 }
 
 .container :global(pre > code) {
