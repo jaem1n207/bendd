@@ -1,0 +1,25 @@
+.container :global(h3) {
+  counter-increment: step;
+
+  &::before {
+    @apply bd-absolute bd-size-8;
+    @apply bd-border-4 bd-border-border bd-bg-gray-100 dark:bd-bg-muted;
+    @apply bd-rounded-full bd-text-muted-foreground bd-text-base bd-text-center -bd-indent-px;
+    @apply bd-mt-0.5 -bd-ml-10;
+    content: counter(step);
+  }
+}
+.container :global(h4) {
+  counter-increment: step;
+
+  &::before {
+    @apply bd-absolute bd-size-6;
+    @apply bd-border-4 bd-border-border bd-bg-muted;
+    @apply bd-rounded-full bd-text-muted-foreground bd-text-xs bd-text-center -bd-indent-px;
+    @apply -bd-ml-9;
+    content: counter(step);
+  }
+}
+.container:global(.bendd-steps p) {
+  @apply bd-mt-2;
+}

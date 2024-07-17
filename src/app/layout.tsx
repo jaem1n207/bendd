@@ -91,6 +91,7 @@ export default function RootLayout({
         fontMono.variable,
         fontTmoney.variable
       )}
+      dir="ltr"
     >
       <body className="bd-antialiased">
         <ThemeProvider
