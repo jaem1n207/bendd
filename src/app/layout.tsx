@@ -5,6 +5,7 @@ import localFont from 'next/font/local';
 
 import { Navigation } from '@/components/navigation';
 import { ThemeProvider } from '@/components/theme';
+import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { siteMetadata } from '@/lib/site-metadata';
 import { cn } from '@/lib/utils';
@@ -113,6 +114,7 @@ export default function RootLayout({
               <Navigation />
             </footer>
           </TooltipProvider>
+          <Toaster />
         </ThemeProvider>
         <Analytics />
       </body>
