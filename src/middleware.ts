@@ -6,3 +6,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL('/api/feed', request.url));
   }
 }
+
+export const config = {
+  matcher: ['/rss.xml'],
+};

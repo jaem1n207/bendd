@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function ShuffleLettersDemo() {
-  const [text, setText] = useState("Test Rauno's Animation");
+  const [text, setText] = useState('한글 영어 테스트!!');
   const [iterations, setIterations] = useState(8);
   const [fps, setFps] = useState(30);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -152,12 +152,11 @@ export default function ShuffleLettersDemo() {
       <div className="bd-mt-4 bd-w-full bd-max-w-md bd-rounded-lg bd-bg-gray-100 bd-p-4">
         <h3 className="bd-mb-2 bd-text-lg bd-font-semibold">Help</h3>
         <ul className="bd-list-disc bd-space-y-1 bd-pl-5">
-          <li>&quot;test&quot; 필드에 원하는 텍스트를 입력합니다.</li>
+          <li>&quot;text&quot; 필드에 원하는 텍스트를 입력합니다.</li>
           <li>iterations(1~50)와 초당 fps(1~60)를 설정합니다.</li>
           <li>애니메이션을 시작하려면 &quot;Shuffle&quot;을 클릭합니다.</li>
           <li>
-            진행 중인 애니메이션을 중지하려면 언제든지 ESC 키를 누르고 원본
-            텍스트를 복원합니다.
+            진행 중인 애니메이션을 중지하려면 언제든지 ESC 키를 눌러주세요.
           </li>
         </ul>
       </div>
