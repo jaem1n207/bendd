@@ -18,10 +18,11 @@ import smartypants from 'remark-smartypants';
 
 import { Callout } from './callout';
 import { CustomLink } from './custom-link';
-import { Heading } from './heading';
 import { CustomPre } from './custom-pre';
+import { Heading } from './heading';
 import { RoundedImage } from './rounded-image';
 import { Steps } from './steps';
+import { AutoplayVideo, PreLoadVideo } from './video';
 
 import styles from '../style/mdx.module.css';
 
@@ -30,6 +31,8 @@ const components: MDXRemoteProps['components'] = {
   h3: props => <Heading level={3} {...props} />,
   h4: props => <Heading level={4} {...props} />,
   img: RoundedImage,
+  AutoplayVideo: AutoplayVideo,
+  PreLoadVideo: PreLoadVideo,
   a: (
     props: DetailedHTMLProps<
       AnchorHTMLAttributes<HTMLAnchorElement>,
