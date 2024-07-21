@@ -16,7 +16,7 @@ export function CustomPre({
       <pre
         ref={preRef}
         className={cn(
-          'bd-overflow-x-auto bd-rounded-lg bd-border bd-border-solid bd-border-border bd-bg-neutral-900 bd-px-0 bd-py-3 dark:bd-bg-gray-100',
+          'bd-my-0 bd-overflow-x-auto bd-rounded-lg bd-border bd-border-solid bd-border-border bd-bg-neutral-900 bd-px-0 bd-py-3 dark:bd-bg-gray-100',
           'contrast-more:bd-border-current contrast-more:dark:bd-border-current'
         )}
         {...props}
