@@ -25,6 +25,10 @@ const nextConfig = {
   eslint: {
     dirs: ['src'],
   },
+  images: {
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
 };
 
 const ContentSecurityPolicy = `
