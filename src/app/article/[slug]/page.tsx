@@ -92,7 +92,7 @@ export default function Blog({ params }: { params: { slug: string } }) {
             }),
           }}
         />
-        <nav className="bd-fixed bd-bottom-0 bd-left-5 bd-top-24 bd-hidden bd-w-72 bd-overflow-hidden lg:bd-block">
+        <nav className="bd-fixed bd-bottom-0 bd-left-5 bd-top-24 bd-hidden bd-overflow-hidden lg:bd-block">
           <div className="bd-relative bd-border-l bd-border-solid bd-border-border bd-pl-4">
             <TableOfContents toc={toc} />
           </div>
