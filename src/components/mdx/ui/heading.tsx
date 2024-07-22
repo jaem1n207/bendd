@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { createElement } from 'react';
 
 export function Heading({
@@ -12,13 +13,13 @@ export function Heading({
 }) {
   const tag = `h${level}`;
   return (
-    <a
+    <Link
       className="bd-font-bold bd-no-underline"
       href={`#${props.id}`}
       tabIndex={-1}
       aria-label={typeof children === 'string' ? children : undefined}
     >
       {createElement(tag, props, children)}
-    </a>
+    </Link>
   );
 }

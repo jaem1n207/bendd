@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { ExternalLink } from '@/components/ui/external-link';
+
 export function CustomLink({
   href,
   children,
@@ -21,13 +23,13 @@ export function CustomLink({
     );
   }
 
-  if (href.startsWith('#')) {
-    return <a {...props} />;
-  }
-
   return (
-    <a target="_blank" rel="noopener noreferrer" href={href} {...props}>
+    <ExternalLink
+      prefixEl={<span className="browser-icon" />}
+      href={href}
+      {...props}
+    >
       {children}
-    </a>
+    </ExternalLink>
   );
 }

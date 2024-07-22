@@ -99,4 +99,34 @@
   * {
     @apply bd-border-border;
   }
+
+  .browser-icon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background-image: url('./assets/browser_sprites.webp');
+    vertical-align: middle;
+    margin-right: 2px;
+  }
+  .browser-chrome .browser-icon {
+    background-position: -10px -78px;
+  }
+  .browser-firefox .browser-icon {
+    background-position: -78px -10px;
+  }
+  .browser-safari .browser-icon {
+    background-position: -78px -44px;
+  }
+  .browser-edge .browser-icon {
+    background-position: -44px -44px;
+  }
+  .browser-opera .browser-icon {
+    background-position: -10px -44px;
+  }
+  .browser-vivaldi .browser-icon {
+    background-position: -44px -10px;
+  }
+  .browser-unknown .browser-icon {
+    background-position: -10px -10px;
+  }
 }

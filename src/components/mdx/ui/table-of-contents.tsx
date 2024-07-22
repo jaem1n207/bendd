@@ -5,6 +5,7 @@ import { useCallback, useRef } from 'react';
 
 import { Paragraph } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 import { useTocActiveId } from '../hook/use-toc-active-id';
 import type { TOCSection } from '../types/toc';
 
@@ -43,14 +44,14 @@ export function TableOfContents({
       <ul
         ref={containerRef}
         className={cn(
-          'bd-h-full bd-overflow-y-auto bd-mt-1 bd-rounded-sm',
+          'bd-h-full bd-overflow-y-auto bd-mt-1 bd-rounded-sm bd-font-sans',
           className
         )}
       >
         {toc.map(section => {
           return (
             <li key={section.slug} className="bd-py-1">
-              <a
+              <Link
                 href={`#${section.slug}`}
                 className={cn(
                   'bd-block bd-text-sm bd-font-medium bd-transition-colors hover:bd-text-foreground bd-truncate',
@@ -60,12 +61,12 @@ export function TableOfContents({
                 )}
               >
                 {section.text}
-              </a>
+              </Link>
               {section.subSections.length > 0 && (
                 <ul className="bd-ml-4 bd-mt-1">
                   {section.subSections.map(subSection => (
                     <li key={subSection.slug} className="bd-py-1">
-                      <a
+                      <Link
                         href={`#${subSection.slug}`}
                         className={cn(
                           'bd-block bd-text-xs bd-font-medium bd-transition-colors hover:bd-text-foreground bd-truncate',
@@ -75,7 +76,7 @@ export function TableOfContents({
                         )}
                       >
                         {subSection.text}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>

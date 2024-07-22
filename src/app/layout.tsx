@@ -2,12 +2,14 @@ import { Analytics } from '@vercel/analytics/react';
 import type { Metadata } from 'next';
 import { Fira_Mono as FontMono, Inter as FontSans } from 'next/font/google';
 import localFont from 'next/font/local';
+import { headers } from 'next/headers';
 
 import { Navigation } from '@/components/navigation';
 import { ThemeProvider } from '@/components/theme';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { siteMetadata } from '@/lib/site-metadata';
+import { getBrowserInfo, type PlatformHint } from '@/lib/user-agent';
 import { cn } from '@/lib/utils';
 
 import '../globals.css';
@@ -82,6 +84,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = headers();
+  const userAgent = headersList.get('user-agent');
+  const browser = getBrowserInfo(userAgent);
+  const platformHint = headersList.get('Sec-CH-UA-Platform');
+  const platform = (platformHint?.replace(/"/g, '') ||
+    'Unknown') as PlatformHint;
+
   return (
     <html
       lang={siteMetadata.language}
@@ -90,7 +99,9 @@ export default function RootLayout({
         'bd-bg-background bd-text-foreground',
         fontSans.variable,
         fontMono.variable,
-        fontTmoney.variable
+        fontTmoney.variable,
+        `platform-${platform}`,
+        `browser-${browser}`
       )}
       dir="ltr"
     >

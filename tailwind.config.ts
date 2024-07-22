@@ -3,7 +3,12 @@ import { fontFamily } from 'tailwindcss/defaultTheme';
 
 const config = {
   darkMode: ['class', 'html[class~="dark"]'],
-  content: ['./src/**/*.{ts,tsx}', './content/**/*.mdx', './public/**/*.svg'],
+  content: [
+    './src/**/*.{ts,tsx}',
+    './content/**/*.mdx',
+    './public/**/*.svg',
+    './craft/**/*.mdx',
+  ],
   prefix: 'bd-',
   future: {
     hoverOnlyWhenSupported: true,
