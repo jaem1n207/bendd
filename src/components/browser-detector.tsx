@@ -7,7 +7,8 @@ export function BrowserDetector() {
   useLayoutEffect(() => {
     const request = new NextRequest(window.location.href);
     const ua = userAgent(request);
-    document.documentElement.classList.add(`browser-${ua.browser.name}`);
+    const browserName = ua.browser.name?.toLowerCase().replace(/\s+/g, '-');
+    document.documentElement.classList.add(`browser-${browserName}`);
   }, []);
 
   return null;

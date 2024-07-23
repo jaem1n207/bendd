@@ -109,25 +109,39 @@
     vertical-align: middle;
     margin-right: 2px;
   }
-  .browser-Chrome .browser-icon {
+
+  .browser-chrome .browser-icon,
+  .browser-mobile-chrome .browser-icon {
     background-position: -10px -78px;
   }
-  .browser-Whale .browser-icon {
+
+  .browser-whale .browser-icon,
+  .browser-mobile-whale .browser-icon {
     background-position: -10px -78px;
   }
-  .browser-Firefox .browser-icon {
+
+  .browser-firefox .browser-icon,
+  .browser-mobile-firefox .browser-icon {
     background-position: -78px -10px;
   }
-  .browser-Safari .browser-icon {
+
+  .browser-safari .browser-icon,
+  .browser-mobile-safari .browser-icon {
     background-position: -78px -44px;
   }
-  .browser-Edge .browser-icon {
+
+  .browser-edge .browser-icon,
+  .browser-mobile-edge .browser-icon {
     background-position: -44px -44px;
   }
-  .browser-Opera .browser-icon {
+
+  .browser-opera .browser-icon,
+  .browser-mobile-opera .browser-icon {
     background-position: -10px -44px;
   }
-  .browser-Vivaldi .browser-icon {
+
+  .browser-vivaldi .browser-icon,
+  .browser-mobile-vivaldi .browser-icon {
     background-position: -44px -10px;
   }
 }
