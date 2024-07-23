@@ -105,28 +105,29 @@
     width: 14px;
     height: 14px;
     background-image: url('./assets/browser_sprites.webp');
+    background-position: -10px -10px;
     vertical-align: middle;
     margin-right: 2px;
   }
-  .browser-chrome .browser-icon {
+  .browser-Chrome .browser-icon {
     background-position: -10px -78px;
   }
-  .browser-firefox .browser-icon {
+  .browser-Whale .browser-icon {
+    background-position: -10px -78px;
+  }
+  .browser-Firefox .browser-icon {
     background-position: -78px -10px;
   }
-  .browser-safari .browser-icon {
+  .browser-Safari .browser-icon {
     background-position: -78px -44px;
   }
-  .browser-edge .browser-icon {
+  .browser-Edge .browser-icon {
     background-position: -44px -44px;
   }
-  .browser-opera .browser-icon {
+  .browser-Opera .browser-icon {
     background-position: -10px -44px;
   }
-  .browser-vivaldi .browser-icon {
+  .browser-Vivaldi .browser-icon {
     background-position: -44px -10px;
-  }
-  .browser-unknown .browser-icon {
-    background-position: -10px -10px;
   }
 }
