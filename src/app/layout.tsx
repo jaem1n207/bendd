@@ -59,6 +59,11 @@ export const metadata = {
         : `http://localhost:${process.env.PORT || 3000}`
   ),
   alternates: {
+    canonical: siteMetadata.siteUrl,
+    languages: {
+      ko: siteMetadata.siteUrl,
+      ['x-default']: siteMetadata.siteUrl,
+    },
     types: {
       ['application/rss+xml']: [
         {

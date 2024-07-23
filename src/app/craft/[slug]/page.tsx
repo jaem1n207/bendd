@@ -39,6 +39,13 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   return {
     title,
     description,
+    alternates: {
+      canonical: `${siteMetadata.siteUrl}/craft/${post.slug}`,
+      languages: {
+        ko: `${siteMetadata.siteUrl}/craft/${post.slug}`,
+        ['x-default']: `${siteMetadata.siteUrl}/craft/${post.slug}`,
+      },
+    },
     openGraph: {
       type: 'article',
       publishedTime,

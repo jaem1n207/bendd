@@ -13,6 +13,13 @@ export async function generateMetadata(
   return {
     title: '작업 목록',
     description: '작업한 결과물을 모아놓은 공간입니다.',
+    alternates: {
+      canonical: `${siteMetadata.siteUrl}/craft`,
+      languages: {
+        ko: `${siteMetadata.siteUrl}/craft`,
+        ['x-default']: `${siteMetadata.siteUrl}/craft`,
+      },
+    },
     openGraph: {
       type: 'website',
       url: `${siteMetadata.siteUrl}/craft`,
