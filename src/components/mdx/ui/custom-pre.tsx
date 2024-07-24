@@ -21,6 +21,7 @@ export function CustomPre({
         )}
         {...props}
         tabIndex={-1}
+        translate="no"
       >
         {children}
       </pre>

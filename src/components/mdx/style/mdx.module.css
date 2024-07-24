@@ -103,7 +103,7 @@
 }
 
 .container :global([data-rehype-pretty-code-title]) {
-  @apply bd-bg-zinc-700 bd-text-zinc-200 bd-rounded-t-lg bd-py-2 bd-px-3 bd-font-semibold bd-text-sm;
+  @apply bd-bg-secondary bd-text-secondary-foreground bd-rounded-t-lg bd-py-2 bd-px-3 bd-font-semibold bd-text-sm;
 }
 
 .container
