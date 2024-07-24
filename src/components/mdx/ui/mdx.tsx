@@ -21,6 +21,7 @@ import { CustomLink } from './custom-link';
 import { CustomPre } from './custom-pre';
 import { Heading } from './heading';
 import { RoundedImage } from './rounded-image';
+import { ShikiMagicMoveWrapper } from './shiki-magic-move-wrapper';
 import { Steps } from './steps';
 import { AutoplayVideo, PreLoadVideo } from './video';
 
@@ -47,6 +48,7 @@ const components: MDXRemoteProps['components'] = {
     );
   },
   pre: CustomPre,
+  MagicMove: ShikiMagicMoveWrapper,
   Callout: Callout,
   Steps: Steps,
 };

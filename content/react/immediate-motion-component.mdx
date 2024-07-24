@@ -33,7 +33,7 @@ Bendd 웹앱에는 다양한 애니메이션이 적용되어 있습니다. 애�
 
 이 경우, 사용자의 “모션 감소” 설정 여부를 파악해서 직접 로직에서 애니메이션이 실행되지 않도록 해야 합니다. 그래서 사용자가 OS에서 “모션 감소” 체크박스를 토글하면 콜백 함수를 실행해 React 라이프사이클에 연결하는 훅을 구현했습니다:
 
-```tsx
+```tsx twoslash
 import { useSyncExternalStore } from 'react';
 
 const QUERY = '(prefers-reduced-motion: reduce)';
@@ -84,7 +84,7 @@ export function ThemeSwitcher() {
 
 여전히 `usePrefersReducedMotion` 훅을 통해 반환된 값을 이용해 애니메이션 관련 속성에 삼항 연산자를 이용해 값을 조정하는 과정이 필요합니다. `framer-motion`의 `motion`컴포넌트를 확장해서 `usePrefersReducedMotion` 훅을 사용해 애니메이션을 선택적으로 비활성화 해 이 과정을 간소화해보겠습니다:
 
-```tsx
+```tsx /shouldRemoveProp/
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 import { motion as Motion, type HTMLMotionProps } from 'framer-motion';
 import { forwardRef } from 'react';
@@ -194,11 +194,27 @@ MotionSlot.displayName = 'MotionSlot';
 
 `MotionSlot` 컴포넌트는 아래와 같은 과정을 거칩니다:
 
-1. **동작 감소 선호 여부 확인**: `usePrefersReducedMotion` 훅을 통해 사용자가 동작 감소 옵션의 선호 여부를 확인합니다.
-2. **제거할 속성 결정**: `shouldRemoveProp` 함수는 제거해야 할 애니메이션 관련 속성 목록을 정의하고, 주어진 속성 이름이 이 목록에 포함되는지 여부를 반환합니다.
-3. **자식 컴포넌트 처리**: `isMotionComponent()`을 사용해 `motion` 컴포넌트인 자식 요소를 순회합니다.
-4. **애니메이션 관련 속성 제거**: 자식 컴포넌트가 `motion` 컴포넌트이고 사용자가 선호 감소 옵션을 선호한다면, 애니메이션 관련 속성을 `undefined`로 설정합니다. 그렇지 않은 경우, 원래의 속성 값을 유지합니다.
-5. **새로운 React 엘리먼트 구성**: 수정된 속성을 새로운 요소에 적용하여 생성합니다. 마지막으로 `Children.map`을 사용해 처리된 자식 요소들을 모아 반환합니다.
+<Steps>
+#### 동작 감소 선호 여부 확인
+
+`usePrefersReducedMotion` 훅을 통해 사용자가 동작 감소 옵션의 선호 여부를 확인합니다.
+
+#### 제거할 속성 결정
+
+`shouldRemoveProp` 함수는 제거해야 할 애니메이션 관련 속성 목록을 정의하고, 주어진 속성 이름이 이 목록에 포함되는지 여부를 반환합니다.
+
+#### 자식 컴포넌트 처리
+
+`isMotionComponent()`을 사용해 `motion` 컴포넌트인 자식 요소를 순회합니다.
+
+#### 애니메이션 관련 속성 제거
+
+자식 컴포넌트가 `motion` 컴포넌트이고 사용자가 선호 감소 옵션을 선호한다면, 애니메이션 관련 속성을 `undefined`로 설정합니다. 그렇지 않은 경우, 원래의 속성 값을 유지합니다.
+
+#### 새로운 React 엘리먼트 구성
+
+수정된 속성을 새로운 요소에 적용하여 생성합니다. 마지막으로 `Children.map`을 사용해 처리된 자식 요소들을 모아 반환합니다.
+</Steps>
 
 비하인드 스토리로, 원래 `motion` 컴포넌트 여부를 판별할 때 브라우저 콘솔에 출력된 자식 요소의 심볼 값을 바탕으로 판별했는데요:
 
@@ -227,22 +243,9 @@ if (isValidElement(child) && Symbol('motionComponentSymbol')) {...}
   Your browser does not support the video tag.
 </video>
 
-`MotionSlot` 사용 전/후 코드를 비교하고 마무리하겠습니다.
+아래에서 `MotionSlot` 컴포넌트를 사용할 때와 사용하지 않을 때의 코드를 비교해보세요:
 
-```tsx
-// Use MotionSlot
-<MotionSlot>
-  <motion.div
-    ref={ref}
-    onMouseMove={e => mousex.set(e.pageX)}
-    onMouseLeave={() => mousex.set(Infinity)}
-  >
-    {renderChildren()}
-  </motion.div>
-</MotionSlot>;
-
-// Not Use MotionSlot
-import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+<MagicMove lang="ts" initCode={`import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 
 const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -252,5 +255,12 @@ const prefersReducedMotion = usePrefersReducedMotion();
   onMouseLeave={prefersReducedMotion ? undefined : () => mousex.set(Infinity)}
 >
   {renderChildren()}
-</motion.div>;
-```
+</motion.div>;`} nextCode={`<MotionSlot>
+  <motion.div
+    ref={ref}
+    onMouseMove={e => mousex.set(e.pageX)}
+    onMouseLeave={() => mousex.set(Infinity)}
+  >
+    {renderChildren()}
+  </motion.div>
+</MotionSlot>;`} />
