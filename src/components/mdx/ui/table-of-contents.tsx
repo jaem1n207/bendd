@@ -29,7 +29,7 @@ export function TableOfContents({
   }, []);
 
   return (
-    <>
+    <nav className="bd-relative bd-border-l bd-border-solid bd-border-border bd-pl-4">
       <motion.div
         className="bd-absolute -bd-left-px bd-top-10 bd-h-3 bd-w-0.5 bd-bg-primary"
         initial={{ opacity: 0 }}
@@ -85,6 +85,6 @@ export function TableOfContents({
           );
         })}
       </ul>
-    </>
+    </nav>
   );
 }
