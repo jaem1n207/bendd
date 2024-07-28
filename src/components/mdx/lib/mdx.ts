@@ -5,7 +5,7 @@ import { z } from 'zod';
 import type { ArticleInfo } from '../../article/types/article';
 
 const MetadataSchema = z.object({
-  title: z.string().max(30),
+  title: z.string().max(38),
   publishedAt: z.string(),
   category: z.string(),
   description: z.string().max(150),
