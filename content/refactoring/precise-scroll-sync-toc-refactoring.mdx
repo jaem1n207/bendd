@@ -1,0 +1,162 @@
+---
+title: 'TOC에서 InterSectionObserver API를 제거한 이유'
+summary: '스크롤 이벤트 기반 방식으로 전환한 과정'
+description: 'TOC를 구현할 때 IntersectionObserver API를 제거하고 스크롤 이벤트 기반 방식으로 전환한 과정과 그 이유를 상세히 설명합니다.'
+category: 'refactoring'
+publishedAt: '2024-07-29'
+---
+
+## 소개
+
+독자에게 페이지에 대한 요약을 볼 수 있게 해주는 Table of Contents(TOC)는 긴 문서에서 사용자의 네비게이션을 돕는 중요한 요소입니다.
+이 컴포넌트는 페이지의 섹션을 나타내는 목록을 보여주고, 사용자가 스크롤할 때 현재 보고 있는 섹션을 강조해주는 기능을 제공합니다.
+
+최근 저는 TOC 컴포넌트를 리팩토링하면서, 기존에 사용하던 IntersectionObserver API를 제거하고 스크롤 이벤트 기반 방식으로 전환했습니다.
+이 글에서는 그 과정과 이유, 그리고 얻은 이점에 대해 상세히 설명하겠습니다.
+
+## IntersectionObserver API의 한계
+
+[IntersectionObserver API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)는 요소의 가시성 변화를 효율적으로 관찰할 수 있는 수단을 제공합니다.
+제가 구현한 `TOC` 컴포넌트도 이 API를 사용하여 각 섹션의 가시성을 감지하고 **해당하는 TOC 항목을 활성화**하는 방식을 사용했습니다.
+
+기존 코드의 핵심 부분은 다음과 같았습니다:
+
+```ts
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const id = entry.target.getAttribute('id');
+      setActiveId(id);
+    }
+  });
+}, {
+  rootMargin: '-20% 0px -80% 0px'
+});
+
+useEffect(() => {
+  const headings = document.querySelectorAll('h2, h3, h4');
+  headings.forEach(heading => observer.observe(heading));
+
+  return () => {
+    headings.forEach(heading => observer.unobserve(heading));
+  };
+}, []);
+```
+
+이 방식은 기본적인 기능은 잘 수행했지만, 사용하다보니 다음과 같은 한계점을 발견할 수 있었습니다:
+
+- 여러 요소가 동시에 viewport에 있을 때, **어느 요소가 더 중요한지 판단하기 어려웠습니다.**
+- `IntersectionObserver`는 요소가 특정 `threshold`를 넘어갈 때만 콜백을 호출합니다. 이로 인해 미세한 스크롤 변화를 감지하기 어려웠고, 특히 긴 섹션에서는 **강조할 TOC 항목이 부정확**할 수 있었습니다.
+- **빠른 스크롤 시 중간 섹션을 건너뛰는 문제**가 있었습니다.
+
+빠르게 스크롤할 때 TOC 항목이 제대로 강조되지 않아 사용자에게 혼란을 줄 수 있었던 것도 크지만, 더 중요한 것은 **세밀한 제어가 어렵다**는 점이었죠.
+전 보통 문서를 읽을 때 위로 살짝 올려 이전 섹션의 내용을 보기도 합니다. 그래서 현재 뷰포트에 더 많은 공간을 차지하는 섹션이 있더라도 이전 섹션을 강조해주는 것이 사용자에게 더 직관적일 거라 생각했습니다.
+
+아래 영상을 보면 다시 스크롤을 위로 올려도 이전 항목이 강조되지 않는 것을 확인할 수 있습니다:
+<AutoplayVideo src='/videos/content/refactoring/precise-scroll-sync-toc-refactoring/before-active-anchor.mp4' />
+
+## 새로운 접근 방식: 스크롤 이벤트 기반 정밀 제어
+
+이러한 한계를 극복하기 위해, 저는 스크롤 이벤트를 직접 활용하는 방식으로 전환했습니다. 핵심 코드는 다음과 같습니다:
+
+```ts
+function useActiveAnchor(
+  containerRef: RefObject<HTMLElement>,
+  markerRef: RefObject<HTMLElement>
+) {
+  useEffect(() => {
+    function setActiveLink() {
+      const scrollY = window.scrollY;
+      const innerHeight = window.innerHeight;
+      const offsetHeight = document.body.offsetHeight;
+      const isBottom = Math.abs(scrollY + innerHeight - offsetHeight) < 1;
+
+      const headers = resolvedHeaders
+        .map(({ element, link }) => ({
+          link,
+          top: getAbsoluteTop(element),
+        }))
+        .filter(({ top }) => !Number.isNaN(top))
+        .sort((a, b) => a.top - b.top);
+
+      let activeLink: string | null = null;
+      for (const { link, top } of headers) {
+        if (top > scrollY + getScrollOffset()) {
+          break;
+        }
+        activeLink = link;
+      }
+      activateLink(activeLink);
+    }
+
+    const onScroll = throttleAndDebounce(setActiveLink, 100);
+    window.addEventListener('scroll', onScroll);
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [containerRef, markerRef]);
+}
+```
+
+이 코드는 다음과 같은 이점을 제공합니다:
+
+- 픽셀 단위의 스크롤 위치를 정확히 추적할 수 있어, **더 정확하게 TOC 항목을 강조**하는 게 가능해졌습니다.
+  <AutoplayVideo src='/videos/content/refactoring/precise-scroll-sync-toc-refactoring/refactoring-active-anchor.mp4' />
+- 특정 요구사항에 맞춰 강조하는 로직을 세밀하게 조정할 수 있게 되었습니다. 예를 들어, 특정 섹션을 무시하거나 헤더의 상대적 위치를 고려하는 등의 커스텀 로직을 쉽게 추가할 수 있습니다. 아래는 최하단에 도달했을 때 마지막 항목을 강조하는 예시입니다:
+  <AutoplayVideo src='/videos/content/refactoring/precise-scroll-sync-toc-refactoring/refactoring-active-anchor-bottom.mp4' />
+
+### 성능 최적화
+
+스크롤 이벤트는 매우 빈번하게 발생하기 때문에, 성능 최적화가 중요합니다. 이를 위해 `throttle`과 `debounce`를 결합한 함수를 구현할 수 있습니다:
+
+```ts
+function throttleAndDebounce(fn: () => void, delay: number): () => void {
+  let timeoutId: NodeJS.Timeout;
+  let called = false;
+
+  return () => {
+    if (timeoutId) clearTimeout(timeoutId);
+
+    if (!called) {
+      fn();
+      (called = true) && setTimeout(() => (called = false), delay);
+    } else timeoutId = setTimeout(fn, delay);
+  };
+}
+
+// 사용 예:
+const onScroll = throttleAndDebounce(setActiveLink, 100);
+window.addEventListener('scroll', onScroll);
+```
+
+이 함수는 스크롤 이벤트의 처리 빈도를 제어하면서도, 마지막 이벤트에 대한 반응을 보장합니다.
+이를 통해 좋은 UX를 유지하면서 성능을 최적화할 수 있었습니다.
+
+## 추가적인 개선사항
+
+`IntersectionObserver` API를 제거하고 새로운 방식을 도입하면서, TOC 컴포넌트의 다른 부분들도 함께 개선했습니다:
+
+<Steps>
+#### 타입 안정성 강화
+
+더욱 정교하게 타입을 정의했습니다. 예를 들어, 헤딩 레벨에 대한 명확한 타입을 정의하고 querySelector를 사용할 때 올바른 반환 유형을 추론할 수 있도록 했습니다:
+```ts
+export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+const headers = querySelectorAll('h2') // -> (HTMLHeadingElement | null)[]
+```
+
+#### 가독성 향상
+
+TOC 관련 로직을 적절히 분리하여 가독성을 향상시켰습니다. 이를 통해 유지보수성을 높였습니다.
+
+#### 접근성 개선
+
+적절한 ARIA 속성을 추가하여 스크린 리더 사용자의 경험을 개선했습니다.
+</Steps>
+
+## 마무리
+
+`IntersectionObserver` API를 사용해도 크게 문제는 없었지만 세밀한 제어가 필요한 상황에서는 한계가 있었습니다.
+좋은 UX를 위해 스크롤 이벤트 기반 방식으로 전환하면서 `TOC` 컴포넌트가 특정 섹션을 강조하는 정밀도를 크게 향상시킬 수 있었습니다.
+이는 UX 개선으로 이어졌으며, 동시에 더 복잡한 스크롤 관련 기능을 구현할 수 있는 기반을 마련했습니다.
