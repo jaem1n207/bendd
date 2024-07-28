@@ -1,15 +1,19 @@
 import type { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 
 import { Giscus } from '@/components/comments/giscus';
-import {
-  CustomMDX,
-  TableOfContents,
-  createMDXProcessor,
-  formatDate,
-  parseToc,
-} from '@/components/mdx';
+import { SkeletonTableOfContents } from '@/components/loading/skeleton-table-of-contents';
+import { CustomMDX, createMDXProcessor, formatDate } from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
+
+const TableOfContents = dynamic(
+  () => import('@/components/mdx').then(mod => mod.TableOfContents),
+  {
+    ssr: false,
+    loading: SkeletonTableOfContents,
+  }
+);
 
 export async function generateStaticParams() {
   const processor = createMDXProcessor();
@@ -71,11 +75,9 @@ export default function Blog({ params }: { params: { slug: string } }) {
     notFound();
   }
 
-  const toc = parseToc(post.content);
-
   return (
     <main className="bd-relative bd-mx-auto bd-my-0 bd-min-h-screen bd-max-w-2xl bd-overflow-hidden bd-px-6 bd-py-32 bd-font-tmoney">
-      <section>
+      <section id="BenddDoc">
         <script
           type="application/ld+json"
           suppressHydrationWarning
@@ -100,7 +102,7 @@ export default function Blog({ params }: { params: { slug: string } }) {
           }}
         />
         <div className="bd-fixed bd-bottom-0 bd-left-5 bd-top-24 bd-hidden bd-overflow-hidden lg:bd-block">
-          <TableOfContents toc={toc} />
+          <TableOfContents />
         </div>
         <h1 className="bd-mx-auto bd-mt-12 bd-break-keep bd-text-center bd-text-4xl bd-font-bold bd-tracking-tight md:bd-mt-24">
           {post.metadata.title}

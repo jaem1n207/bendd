@@ -100,6 +100,13 @@
     @apply bd-border-border;
   }
 
+  .toc-navbar {
+    @apply bd-relative bd-border-l bd-border-solid bd-border-border bd-pl-4;
+  }
+  .header-anchor {
+    @apply bd-font-bold bd-no-underline;
+  }
+
   .browser-icon {
     display: inline-block;
     width: 14px;

@@ -9,18 +9,12 @@
   @apply bd-border-border bd-text-sm bd-font-normal bd-bg-gray-400 bd-border bd-px-1 bd-py-0.5 bd-rounded-sm bd-break-words;
 }
 
-.container :global(h2::after),
-.container :global(h3::after),
-.container :global(h4::after),
-.container :global(h5::after) {
+.container :global(.header-anchor::after) {
   content: '#';
-  @apply bd-invisible bd-relative bd-ml-2 bd-text-gray-800;
+  @apply bd-invisible bd-relative bd-ml-2 bd-text-gray-900;
 }
 
-.container :global(h2:hover::after),
-.container :global(h3:hover::after),
-.container :global(h4:hover::after),
-.container :global(h5:hover::after) {
+.container :global(.header-anchor:hover::after) {
   @apply bd-visible;
 }
 

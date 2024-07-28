@@ -22,6 +22,14 @@ const config = {
       },
     },
     extend: {
+      transitionTimingFunction: {
+        'in-quad': 'cubic-bezier(.55, .085, .68, .53)',
+        'in-cubic': 'cubic-bezier(.550, .055, .675, .19)',
+        'in-quart': 'cubic-bezier(.895, .03, .685, .22)',
+        'in-quint': 'cubic-bezier(.755, .05, .855, .06)',
+        'in-expo': 'cubic-bezier(.95, .05, .795, .035)',
+        'in-circ': 'cubic-bezier(.6, .04, .98, .335)',
+      },
       typography: {
         DEFAULT: {
           css: {
@@ -31,7 +39,8 @@ const config = {
             'code::after': {
               content: 'normal',
             },
-            'h1, h2, h3, h4, h5': {
+            'h1, h2, h3, h4, h5, h6': {
+              fontWeight: 700,
               '& a': {
                 textDecoration: 'none',
               },

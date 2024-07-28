@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { createElement } from 'react';
 
+import type { HeadingLevel } from '../types/toc';
+
 export function Heading({
   level,
   children,
@@ -9,17 +11,20 @@ export function Heading({
   React.HTMLAttributes<HTMLHeadingElement>,
   HTMLHeadingElement
 > & {
-  level: 2 | 3 | 4;
+  level: HeadingLevel;
 }) {
   const tag = `h${level}`;
-  return (
+  return createElement(
+    tag,
+    { tabIndex: -1, ...props },
     <Link
-      className="bd-font-bold bd-no-underline"
+      className="header-anchor"
       href={`#${props.id}`}
-      tabIndex={-1}
-      aria-label={typeof children === 'string' ? children : undefined}
+      aria-label={
+        typeof children === 'string' ? `Permalink to "${children}"` : undefined
+      }
     >
-      {createElement(tag, props, children)}
+      {children}
     </Link>
   );
 }
