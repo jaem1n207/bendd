@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { ExternalLink } from '@/components/ui/external-link';
 
-export function CustomLink({
+export function MDXCustomLink({
   href,
   children,
   ...props

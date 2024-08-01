@@ -7,7 +7,7 @@ type RoundedImageProps = Omit<
   'srcSet' | 'width' | 'height'
 >;
 
-export function RoundedImage({
+export function MDXRoundedImage({
   className,
   alt = '',
   src,

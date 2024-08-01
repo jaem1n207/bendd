@@ -3,7 +3,7 @@ import { createElement } from 'react';
 
 import type { HeadingLevel } from '../types/toc';
 
-export function Heading({
+export function MDXHeading({
   level,
   children,
   ...props
