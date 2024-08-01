@@ -2,7 +2,7 @@ import type { Metadata, ResolvingMetadata } from 'next';
 
 import { ArticleItem } from '@/components/article/ui/article-item';
 import { siteMetadata } from '@/lib/site-metadata';
-import { createCraftMDXProcessor } from '@/mdx';
+import { createCraftMDXProcessor } from '@/mdx/mdx';
 
 export async function generateMetadata(
   {},

@@ -6,18 +6,18 @@ import { ShikiMagicMove } from 'shiki-magic-move/react';
 import { z } from 'zod';
 
 import { cn } from '@/lib/utils';
-import { CopyToClipboard } from '../../common/copy-to-clipboard/copy-to-clipboard';
-
-import 'shiki-magic-move/dist/style.css';
-import { createMDXComponent } from '../../common/create-mdx-component';
+import { CopyToClipboard } from '@/mdx/common/copy-to-clipboard/copy-to-clipboard';
+import { createMDXComponent } from '@/mdx/common/create-mdx-component';
 import {
   Step,
   StepContent,
   StepInfo,
   StepNavigation,
   StepSelect,
-} from '../../common/step-content-wrapper/step-content-wrapper';
-import '../style/magic-move.css';
+} from '@/mdx/common/step-content-wrapper/step-content-wrapper';
+
+import 'shiki-magic-move/dist/style.css';
+import './magic-move.css';
 
 const CodeSnippetSchema = z.object({
   code: z.string(),

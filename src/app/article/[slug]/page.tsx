@@ -3,12 +3,16 @@ import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 
 import { Giscus } from '@/components/comments/giscus';
-import { SkeletonTableOfContents } from '@/components/loading/skeleton-table-of-contents';
 import { siteMetadata } from '@/lib/site-metadata';
-import { CustomMDX, createMDXProcessor, formatDate } from '@/mdx';
+import { SkeletonTableOfContents } from '@/mdx/common/table-of-contents/skeleton-table-of-contents';
+import { CustomMDX } from '@/mdx/custom-mdx';
+import { createMDXProcessor, formatDate } from '@/mdx/mdx';
 
 const TableOfContents = dynamic(
-  () => import('@/mdx').then(mod => mod.TableOfContents),
+  () =>
+    import('@/mdx/common/table-of-contents/table-of-contents').then(
+      mod => mod.TableOfContents
+    ),
   {
     ssr: false,
     loading: SkeletonTableOfContents,

@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
-import { createMDXProcessor } from '../../../mdx/mdx';
 import { ArticleItem } from './article-item';
+import { createMDXProcessor } from '@/mdx/mdx';
 
 export function ArticleList({ className }: { className?: string }) {
   const processor = createMDXProcessor();

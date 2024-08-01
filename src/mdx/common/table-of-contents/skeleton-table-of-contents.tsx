@@ -1,5 +1,5 @@
+import { Skeleton } from '@/components/ui/skeleton';
 import { createFixedArray } from '@/lib/utils';
-import { Skeleton } from '../ui/skeleton';
 
 export function SkeletonTableOfContents() {
   return (

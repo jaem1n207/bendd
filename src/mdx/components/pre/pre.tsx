@@ -3,7 +3,7 @@
 import { useRef, type HTMLAttributes } from 'react';
 
 import { cn } from '@/lib/utils';
-import { CopyToClipboard } from './copy-to-clipboard';
+import { CopyToClipboard } from '@/mdx/common/copy-to-clipboard/copy-to-clipboard';
 
 export function MDXPre({ children, ...props }: HTMLAttributes<HTMLPreElement>) {
   const preRef = useRef<HTMLPreElement | null>(null);
