@@ -43,6 +43,38 @@ pnpm install
 - 🗺️ Sitemap.xml and robots.txt
 - ⚙️ [Bundler Analyzer](https://www.npmjs.com/package/@next/bundle-analyzer)
 
+## MDX 컴포넌트 개발 가이드라인
+
+### 파일 구조
+
+MDX 컴포넌트는 다음 두 위치 중 하나에 생성해야 합니다:
+- `src/components/mdx/{component}/{component}.tsx`
+- `src/components/mdx/{component}/ui/{component}.tsx`
+
+### Prop 유효성 검사
+
+모든 MDX 컴포넌트는 반드시 `createMDXComponent` 함수를 사용하여 prop 유효성 검사를 수행해야 합니다.
+
+```typescript
+import { z } from 'zod';
+import { createMDXComponent } from '../lib/mdx-components';
+
+const ComponentSchema = z.object({
+  // 스키마 정의
+});
+
+type ComponentProps = z.infer<typeof ComponentSchema>;
+
+const Component: React.FC<ComponentProps> = (props) => {
+  const validatedProps = validateProps(ComponentSchema, props, 'Component');
+  if (!validatedProps) return null;
+
+  // 컴포넌트 로직
+};
+
+export const MDXComponent = createMDXComponent(Component, ComponentSchema);
+```
+
 ## VSCode information
 
 `.vscode/article.code-snippets`에 정의된 스니펫을 통해 블로그 글을 쉽고 편하게 작성할 수 있습니다.

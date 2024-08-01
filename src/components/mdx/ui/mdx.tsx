@@ -16,7 +16,7 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import smartypants from 'remark-smartypants';
 
-import { Callout } from './callout';
+import { MDXCallout } from './callout';
 import { CustomLink } from './custom-link';
 import { CustomPre } from './custom-pre';
 import { Heading } from './heading';
@@ -49,7 +49,7 @@ const components: MDXRemoteProps['components'] = {
   },
   pre: CustomPre,
   MagicMove: ShikiMagicMoveWrapper,
-  Callout: Callout,
+  Callout: MDXCallout,
   Steps: Steps,
 };
 
