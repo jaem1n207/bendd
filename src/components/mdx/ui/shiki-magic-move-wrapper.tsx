@@ -1,39 +1,37 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { HighlighterCore } from 'shiki';
 import { ShikiMagicMove } from 'shiki-magic-move/react';
 import { z } from 'zod';
 
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { CopyToClipboard } from './copy-to-clipboard';
 
-import { Paragraph } from '@/components/ui/typography';
 import 'shiki-magic-move/dist/style.css';
+import {
+  Step,
+  StepContent,
+  StepInfo,
+  StepNavigation,
+  StepSelect,
+} from '../step-content-wrapper/step-content-wrapper';
 import '../style/magic-move.css';
 import { createMDXComponent } from './create-mdx-component';
 
-type ShikiMagicMoveWrapperProps = z.infer<typeof ShikiMagicMoveWrapperSchema>;
+const CodeSnippetSchema = z.object({
+  code: z.string(),
+  description: z.string(),
+  title: z.string(),
+});
 
 const ShikiMagicMoveWrapperSchema = z.object({
-  codeSnippets: z.array(
-    z.object({
-      code: z.string(),
-      description: z.string(),
-      title: z.string(),
-    })
-  ),
+  codeSnippets: z.array(CodeSnippetSchema),
   lang: z.string(),
 });
+
+type CodeSnippet = z.infer<typeof CodeSnippetSchema>;
+type ShikiMagicMoveWrapperProps = z.infer<typeof ShikiMagicMoveWrapperSchema>;
 
 function ShikiMagicMoveWrapper({
   codeSnippets,
@@ -42,81 +40,38 @@ function ShikiMagicMoveWrapper({
   const [currentIndex, setCurrentIndex] = useState(0);
   const highlighter = useHighlighter();
 
-  const goToNext = useCallback(() => {
-    setCurrentIndex(prev => (prev + 1) % codeSnippets.length);
-  }, [codeSnippets.length]);
-
-  const goToPrevious = useCallback(() => {
-    setCurrentIndex(
-      prev => (prev - 1 + codeSnippets.length) % codeSnippets.length
-    );
-  }, [codeSnippets.length]);
-
-  const handleSelectChange = useCallback((value: string) => {
-    setCurrentIndex(parseInt(value, 10));
-  }, []);
-
-  const currentSnippet = useMemo(
-    () => codeSnippets[currentIndex],
-    [codeSnippets, currentIndex]
+  const steps: Step<CodeSnippet>[] = useMemo(
+    () =>
+      codeSnippets.map(snippet => ({
+        title: snippet.title,
+        description: snippet.description,
+        content: snippet,
+      })),
+    [codeSnippets]
   );
 
-  return (
-    <div className="bd-relative">
-      <div className="bd-mb-1 bd-flex bd-items-center bd-justify-between">
-        <Select
-          onValueChange={handleSelectChange}
-          value={currentIndex.toString()}
-        >
-          <SelectTrigger className="bd-mr-1 bd-flex-1">
-            <SelectValue placeholder="코드 예시 선택" />
-          </SelectTrigger>
-          <SelectContent>
-            {codeSnippets.map((snippet, index) => (
-              <SelectItem key={index} value={index.toString()}>
-                {snippet.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="bd-flex bd-items-center bd-space-x-2">
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={goToPrevious}
-            disabled={currentIndex === 0}
-          >
-            <ChevronLeft className="bd-size-4" />
-          </Button>
-          <span className="bd-text-sm">
-            {currentIndex + 1} / {codeSnippets.length}
-          </span>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={goToNext}
-            disabled={currentIndex === codeSnippets.length - 1}
-          >
-            <ChevronRight className="bd-size-4" />
-          </Button>
-        </div>
-      </div>
+  const currentStep = steps[currentIndex];
 
-      <div className="bd-rounded-md bd-border bd-border-border bd-bg-background bd-px-4 bd-py-2 bd-shadow">
-        <Paragraph size="lg" className="bd-mb-2">
-          {currentSnippet.title}
-        </Paragraph>
-        <Paragraph>{currentSnippet.description}</Paragraph>
-      </div>
+  const handlePrevious = useCallback(() => {
+    setCurrentIndex(prev => (prev > 0 ? prev - 1 : prev));
+  }, []);
 
-      {highlighter && (
+  const handleNext = useCallback(() => {
+    setCurrentIndex(prev => (prev < steps.length - 1 ? prev + 1 : prev));
+  }, [steps.length]);
+
+  const renderContent = useCallback(
+    (content: CodeSnippet) => {
+      if (!highlighter) return null;
+
+      return (
         <div className="bd-relative">
           <ShikiMagicMove
             className={cn(
               'bd-overflow-x-auto bd-rounded-lg bd-border bd-border-solid bd-border-border bd-bg-neutral-900 bd-px-0 bd-py-3 dark:bd-bg-gray-100',
               'contrast-more:bd-border-current contrast-more:dark:bd-border-current'
             )}
-            code={currentSnippet.code}
+            code={content.code}
             lang={lang}
             theme="vitesse-dark"
             highlighter={highlighter}
@@ -128,10 +83,31 @@ function ShikiMagicMoveWrapper({
             }}
           />
           <div className="bd-absolute bd-right-2 bd-top-2 bd-flex bd-gap-1 bd-opacity-0 bd-transition focus-within:bd-opacity-100 [div:hover>&]:bd-opacity-100">
-            <CopyToClipboard getValue={() => currentSnippet.code} />
+            <CopyToClipboard getValue={() => content.code} />
           </div>
         </div>
-      )}
+      );
+    },
+    [highlighter, lang]
+  );
+
+  return (
+    <div>
+      <div className="bd-flex bd-justify-between bd-items-center bd-mb-1">
+        <StepSelect
+          steps={steps}
+          currentIndex={currentIndex}
+          onStepChange={setCurrentIndex}
+        />
+        <StepNavigation
+          currentIndex={currentIndex}
+          totalSteps={steps.length}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+        />
+      </div>
+      <StepInfo step={currentStep} />
+      <StepContent step={currentStep} render={renderContent} />
     </div>
   );
 }
