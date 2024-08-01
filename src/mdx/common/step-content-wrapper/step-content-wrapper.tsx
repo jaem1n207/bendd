@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -9,7 +11,6 @@ import {
 import { Paragraph } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import React from 'react';
 
 export type Step<T> = {
   title: string;
@@ -73,7 +74,7 @@ export function StepInfo<T>({ step, className }: StepInfoProps<T>) {
 
 type StepContentProps<T> = {
   step: Step<T>;
-  render: (content: T) => React.ReactNode;
+  render: (content: T) => ReactNode;
 } & CommonProps;
 
 export function StepContent<T>({

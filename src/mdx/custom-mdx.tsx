@@ -16,7 +16,14 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import smartypants from 'remark-smartypants';
 
+import { MDXCustomLink } from './components/a/custom-link';
 import { MDXHeading } from './components/heading/heading';
+import { MDXRoundedImage } from './components/img/rounded-image';
+import { MDXAutoplayVideo, MDXPreLoadVideo } from './components/video/video';
+import { MDXShikiMagicMoveWrapper } from './components/shiki-magic-move/shiki-magic-move-wrapper';
+import { MDXCallout } from './components/callout/callout';
+import { MDXPre } from './components/pre/pre';
+import { MDXSteps } from './components/steps/steps';
 
 import styles from './mdx.module.css';
 

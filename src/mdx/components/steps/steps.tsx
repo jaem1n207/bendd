@@ -1,8 +1,8 @@
 import { isValidElement, type ReactNode } from 'react';
+import { z } from 'zod';
 
 import { cn } from '@/lib/utils';
-import { z } from 'zod';
-import styles from '../style/steps.module.css';
+import styles from './steps.module.css';
 
 type StepsProps = z.infer<typeof StepsSchema>;
 
