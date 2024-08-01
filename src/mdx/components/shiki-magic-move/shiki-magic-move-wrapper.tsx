@@ -9,18 +9,19 @@ import { cn } from '@/lib/utils';
 import { CopyToClipboard } from '@/mdx/common/copy-to-clipboard/copy-to-clipboard';
 import { createMDXComponent } from '@/mdx/common/create-mdx-component';
 import {
-  Step,
+  StepActions,
   StepContent,
+  StepData,
   StepInfo,
-  StepNavigation,
   StepSelect,
+  useInitializeSteps,
 } from '@/mdx/common/step-content-wrapper/step-content-wrapper';
 
 import 'shiki-magic-move/dist/style.css';
 import './magic-move.css';
 
 const CodeSnippetSchema = z.object({
-  code: z.string(),
+  content: z.string(),
   description: z.string(),
   title: z.string(),
 });
@@ -37,10 +38,9 @@ function ShikiMagicMoveWrapper({
   codeSnippets,
   lang,
 }: ShikiMagicMoveWrapperProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const highlighter = useHighlighter();
 
-  const steps: Step<CodeSnippet>[] = useMemo(
+  const steps: StepData<CodeSnippet>[] = useMemo(
     () =>
       codeSnippets.map(snippet => ({
         title: snippet.title,
@@ -50,15 +50,7 @@ function ShikiMagicMoveWrapper({
     [codeSnippets]
   );
 
-  const currentStep = steps[currentIndex];
-
-  const handlePrevious = useCallback(() => {
-    setCurrentIndex(prev => (prev > 0 ? prev - 1 : prev));
-  }, []);
-
-  const handleNext = useCallback(() => {
-    setCurrentIndex(prev => (prev < steps.length - 1 ? prev + 1 : prev));
-  }, [steps.length]);
+  useInitializeSteps(steps);
 
   const renderContent = useCallback(
     (content: CodeSnippet) => {
@@ -71,7 +63,7 @@ function ShikiMagicMoveWrapper({
               'bd-overflow-x-auto bd-rounded-lg bd-border bd-border-solid bd-border-border bd-bg-neutral-900 bd-px-0 bd-py-3 dark:bd-bg-gray-100',
               'contrast-more:bd-border-current contrast-more:dark:bd-border-current'
             )}
-            code={content.code}
+            code={content.content}
             lang={lang}
             theme="vitesse-dark"
             highlighter={highlighter}
@@ -83,7 +75,7 @@ function ShikiMagicMoveWrapper({
             }}
           />
           <div className="bd-absolute bd-right-2 bd-top-2 bd-flex bd-gap-1 bd-opacity-0 bd-transition focus-within:bd-opacity-100 [div:hover>&]:bd-opacity-100">
-            <CopyToClipboard getValue={() => content.code} />
+            <CopyToClipboard getValue={() => content.content} />
           </div>
         </div>
       );
@@ -94,20 +86,11 @@ function ShikiMagicMoveWrapper({
   return (
     <div>
       <div className="bd-mb-1 bd-flex bd-items-center bd-justify-between">
-        <StepSelect
-          steps={steps}
-          currentIndex={currentIndex}
-          onStepChange={setCurrentIndex}
-        />
-        <StepNavigation
-          currentIndex={currentIndex}
-          totalSteps={steps.length}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-        />
+        <StepSelect />
+        <StepActions />
       </div>
-      <StepInfo step={currentStep} />
-      <StepContent step={currentStep} render={renderContent} />
+      <StepInfo />
+      <StepContent render={renderContent} />
     </div>
   );
 }
