@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import type { DetailedHTMLProps, VideoHTMLAttributes } from 'react';
 
-export function AutoplayVideo({
+export function MDXAutoplayVideo({
   src,
   className,
   ...props
@@ -25,7 +25,7 @@ export function AutoplayVideo({
   );
 }
 
-export function PreLoadVideo({
+export function MDXPreLoadVideo({
   src,
   className,
   ...props

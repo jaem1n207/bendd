@@ -5,10 +5,7 @@ import { useRef, type HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 import { CopyToClipboard } from './copy-to-clipboard';
 
-export function CustomPre({
-  children,
-  ...props
-}: HTMLAttributes<HTMLPreElement>) {
+export function MDXPre({ children, ...props }: HTMLAttributes<HTMLPreElement>) {
   const preRef = useRef<HTMLPreElement | null>(null);
 
   return (

@@ -39,7 +39,7 @@ const CalloutSchema = z.object({
     ),
 });
 
-function CalloutBase({
+function Callout({
   type = 'info',
   emoji = TypeToEmoji[type],
   children,
@@ -66,4 +66,4 @@ function CalloutBase({
   );
 }
 
-export const MDXCallout = createMDXComponent(CalloutBase, CalloutSchema);
+export const MDXCallout = createMDXComponent(Callout, CalloutSchema);

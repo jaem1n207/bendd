@@ -1,13 +1,23 @@
-import type { ComponentProps } from 'react';
+import { isValidElement, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
+import { z } from 'zod';
 import styles from '../style/steps.module.css';
 
-export function Steps({
-  children,
-  className,
-  ...props
-}: ComponentProps<'div'>) {
+type StepsProps = z.infer<typeof StepsSchema>;
+
+const StepsSchema = z.object({
+  children: z
+    .custom<ReactNode>(v => isValidElement(v) || typeof v === 'string')
+    .or(
+      z.array(
+        z.custom<ReactNode>(v => isValidElement(v) || typeof v === 'string')
+      )
+    ),
+  className: z.string().optional(),
+});
+
+export function MDXSteps({ children, className }: StepsProps) {
   return (
     <div
       className={cn(
@@ -16,7 +26,6 @@ export function Steps({
         '[counter-reset:step]',
         className
       )}
-      {...props}
     >
       {children}
     </div>
