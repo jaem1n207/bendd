@@ -6,18 +6,18 @@ import { ShikiMagicMove } from 'shiki-magic-move/react';
 import { z } from 'zod';
 
 import { cn } from '@/lib/utils';
-import { CopyToClipboard } from './copy-to-clipboard';
+import { CopyToClipboard } from '../../common/copy-to-clipboard/copy-to-clipboard';
 
 import 'shiki-magic-move/dist/style.css';
+import { createMDXComponent } from '../../common/create-mdx-component';
 import {
   Step,
   StepContent,
   StepInfo,
   StepNavigation,
   StepSelect,
-} from '../step-content-wrapper/step-content-wrapper';
+} from '../../common/step-content-wrapper/step-content-wrapper';
 import '../style/magic-move.css';
-import { createMDXComponent } from './create-mdx-component';
 
 const CodeSnippetSchema = z.object({
   code: z.string(),
@@ -93,7 +93,7 @@ function ShikiMagicMoveWrapper({
 
   return (
     <div>
-      <div className="bd-flex bd-justify-between bd-items-center bd-mb-1">
+      <div className="bd-mb-1 bd-flex bd-items-center bd-justify-between">
         <StepSelect
           steps={steps}
           currentIndex={currentIndex}

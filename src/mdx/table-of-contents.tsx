@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Paragraph } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
 import { getHeaders, useActiveAnchor } from '../hook/use-toc';
-import type { MenuItem } from '../types/toc';
+import type { MenuItem } from './toc';
 
 export function TableOfContents() {
   const [toc, setToc] = useState<MenuItem[]>([]);

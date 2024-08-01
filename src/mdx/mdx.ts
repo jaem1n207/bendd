@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
 
-import type { ArticleInfo } from '../../article/types/article';
+import type { ArticleInfo } from '../components/article/types/article';
 
 const MetadataSchema = z.object({
   title: z.string().max(38),

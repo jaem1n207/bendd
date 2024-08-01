@@ -4,11 +4,11 @@ import { notFound } from 'next/navigation';
 
 import { Giscus } from '@/components/comments/giscus';
 import { SkeletonTableOfContents } from '@/components/loading/skeleton-table-of-contents';
-import { CustomMDX, createMDXProcessor, formatDate } from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
+import { CustomMDX, createMDXProcessor, formatDate } from '@/mdx';
 
 const TableOfContents = dynamic(
-  () => import('@/components/mdx').then(mod => mod.TableOfContents),
+  () => import('@/mdx').then(mod => mod.TableOfContents),
   {
     ssr: false,
     loading: SkeletonTableOfContents,
