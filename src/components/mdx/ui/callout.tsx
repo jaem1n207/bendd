@@ -1,14 +1,12 @@
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
+import { z } from 'zod';
 
 import { cn } from '@/lib/utils';
 
-import {
-  createMDXComponent,
-  createPropValidator,
-} from '../model/mdx-component-validator';
+import { createMDXComponent } from './create-mdx-component';
 
 const TypeToEmoji = {
-  default: '💡',
+  info: '💡',
   error: '🚫',
   warning: '⚠️',
 };
@@ -16,7 +14,7 @@ const TypeToEmoji = {
 type CalloutType = keyof typeof TypeToEmoji;
 
 const classes: Record<CalloutType, string> = {
-  default: cn(
+  info: cn(
     'bd-border-blue-100 bd-bg-blue-50 bd-text-blue-800 dark:bd-border-blue-400/30 dark:bd-bg-blue-400/20 dark:bd-text-blue-300'
   ),
   error: cn(
@@ -27,22 +25,24 @@ const classes: Record<CalloutType, string> = {
   ),
 };
 
-type CalloutProps = {
-  type?: CalloutType;
-  emoji?: string | ReactNode;
-  children: ReactNode;
-};
+type CalloutProps = z.infer<typeof CalloutSchema>;
 
-const calloutValidator = createPropValidator<CalloutProps>(['children'], {
-  type: value => ['default', 'error', 'warning'].includes(value || 'default'),
-  emoji: value => typeof value === 'string' || isValidElement(value),
-  children: value => isValidElement(value) || typeof value === 'string',
+const CalloutSchema = z.object({
+  type: z.enum(['info', 'warning', 'error']).optional().default('info'),
+  emoji: z.string().optional(),
+  children: z
+    .custom<ReactNode>(v => isValidElement(v) || typeof v === 'string')
+    .or(
+      z.array(
+        z.custom<ReactNode>(v => isValidElement(v) || typeof v === 'string')
+      )
+    ),
 });
 
-function MDXCallout({
-  children,
-  type = 'default',
+function CalloutBase({
+  type = 'info',
   emoji = TypeToEmoji[type],
+  children,
 }: CalloutProps): ReactElement {
   return (
     <div
@@ -66,4 +66,4 @@ function MDXCallout({
   );
 }
 
-export const Callout = createMDXComponent(MDXCallout, calloutValidator);
+export const MDXCallout = createMDXComponent(CalloutBase, CalloutSchema);
