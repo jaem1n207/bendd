@@ -107,7 +107,7 @@
       )
       pre
   ) {
-  @apply !bd-rounded-t-none;
+  @apply !bd-rounded-t-none !bd-mt-0;
 }
 
 .container :global(pre),
