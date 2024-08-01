@@ -1,6 +1,11 @@
-import type { ReactElement, ReactNode } from 'react';
+import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
+
+import {
+  createMDXComponent,
+  createPropValidator,
+} from '../model/mdx-component-validator';
 
 const TypeToEmoji = {
   default: '💡',
@@ -28,7 +33,13 @@ type CalloutProps = {
   children: ReactNode;
 };
 
-export function Callout({
+const calloutValidator = createPropValidator<CalloutProps>(['children'], {
+  type: value => ['default', 'error', 'warning'].includes(value || 'default'),
+  emoji: value => typeof value === 'string' || isValidElement(value),
+  children: value => isValidElement(value) || typeof value === 'string',
+});
+
+function MDXCallout({
   children,
   type = 'default',
   emoji = TypeToEmoji[type],
@@ -54,3 +65,5 @@ export function Callout({
     </div>
   );
 }
+
+export const Callout = createMDXComponent(MDXCallout, calloutValidator);
