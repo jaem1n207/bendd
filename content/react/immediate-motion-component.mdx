@@ -245,7 +245,13 @@ if (isValidElement(child) && Symbol('motionComponentSymbol')) {...}
 
 아래에서 `MotionSlot` 컴포넌트를 사용할 때와 사용하지 않을 때의 코드를 비교해보세요:
 
-<MagicMove lang="ts" initCode={`import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+<MagicMove
+  lang="ts"
+  codeSnippets={[
+    {
+      title: "초기 코드",
+      description: "사용자의 reduced motion 설정을 고려한 초기 코드",
+      code: `import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 
 const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -255,7 +261,12 @@ const prefersReducedMotion = usePrefersReducedMotion();
   onMouseLeave={prefersReducedMotion ? undefined : () => mousex.set(Infinity)}
 >
   {renderChildren()}
-</motion.div>;`} nextCode={`<MotionSlot>
+</motion.div>;`
+    },
+    {
+      title: "리팩토링된 코드",
+      description: "MotionSlot을 사용하여 리팩토링된 코드",
+      code: `<MotionSlot>
   <motion.div
     ref={ref}
     onMouseMove={e => mousex.set(e.pageX)}
@@ -263,4 +274,7 @@ const prefersReducedMotion = usePrefersReducedMotion();
   >
     {renderChildren()}
   </motion.div>
-</MotionSlot>;`} />
+</MotionSlot>;`
+    },
+  ]}
+/>
