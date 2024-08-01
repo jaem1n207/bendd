@@ -57,7 +57,7 @@ MDX 컴포넌트는 다음 두 위치 중 하나에 생성해야 합니다:
 
 ```typescript
 import { z } from 'zod';
-import { createMDXComponent } from '../lib/mdx-components';
+import { createMDXComponent } from './create-mdx-component';
 
 const ComponentSchema = z.object({
   // 스키마 정의
