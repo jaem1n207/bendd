@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
-import { createCraftMDXProcessor, createMDXProcessor } from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
+import { createCraftMDXProcessor, createMDXProcessor } from '@/mdx';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = ['', 'craft', 'article'].map(route => ({

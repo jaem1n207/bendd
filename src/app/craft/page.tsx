@@ -1,8 +1,8 @@
 import type { Metadata, ResolvingMetadata } from 'next';
 
 import { ArticleItem } from '@/components/article/ui/article-item';
-import { createCraftMDXProcessor } from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
+import { createCraftMDXProcessor } from '@/mdx';
 
 export async function generateMetadata(
   {},

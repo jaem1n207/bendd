@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { cn } from '@/lib/utils';
 
-import { createMDXComponent } from './create-mdx-component';
+import { createMDXComponent } from '../../common/create-mdx-component';
 
 const TypeToEmoji = {
   info: '💡',

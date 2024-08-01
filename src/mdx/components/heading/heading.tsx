@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { createElement } from 'react';
 
-import type { HeadingLevel } from '../types/toc';
+import type { HeadingLevel } from '../../toc';
 
 export function MDXHeading({
   level,

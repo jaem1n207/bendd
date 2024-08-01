@@ -16,16 +16,9 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import smartypants from 'remark-smartypants';
 
-import { MDXCallout } from './callout';
-import { MDXCustomLink } from './custom-link';
-import { MDXPre } from './custom-pre';
-import { MDXHeading } from './heading';
-import { MDXRoundedImage } from './rounded-image';
-import { MDXShikiMagicMoveWrapper } from './shiki-magic-move-wrapper';
-import { MDXSteps } from './steps';
-import { MDXAutoplayVideo, MDXPreLoadVideo } from './video';
+import { MDXHeading } from './components/heading/heading';
 
-import styles from '../style/mdx.module.css';
+import styles from './mdx.module.css';
 
 const components: MDXRemoteProps['components'] = {
   h2: props => <MDXHeading level={2} {...props} />,

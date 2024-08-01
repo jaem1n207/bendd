@@ -1,5 +1,5 @@
-import { createCraftMDXProcessor, createMDXProcessor } from '@/components/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
+import { createCraftMDXProcessor, createMDXProcessor } from '@/mdx';
 
 type RssItem = {
   title: string;
