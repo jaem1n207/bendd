@@ -194,6 +194,262 @@ MotionSlot.displayName = 'MotionSlot';
 
 `MotionSlot` 컴포넌트는 아래와 같은 과정을 거칩니다:
 
+<MagicMove
+  lang="ts"
+  codeSnippets={[
+    {
+      title: "동작 감소 선호 여부 확인",
+      description: "`usePrefersReducedMotion` 훅을 통해 사용자가 동작 감소 옵션의 선호 여부를 확인합니다.",
+      content: `import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
+import { isMotionComponent } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+ 
+type MotionSlotProps = {
+  children: ReactNode | ReactNode[];
+}
+ 
+const shouldRemoveProp = (prop: string) => {
+  const propsToRemove = [
+    'animate',
+    'initial',
+    'transition',
+    ...
+  ];
+  return propsToRemove.includes(prop);
+};
+ 
+export const MotionSlot = ({ children }: MotionSlotProps) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+ 
+  const processChild = (child: ReactNode): ReactNode => {
+    if (isValidElement(child) && isMotionComponent(child.type)) {
+      const props = Object.keys(child.props).reduce(
+        (acc: Record<string, any>, key) => {
+          if (shouldRemoveProp(key) && prefersReducedMotion) {
+            acc[key] = undefined;
+          } else {
+            acc[key] = child.props[key];
+          }
+          return acc;
+        },
+        {}
+      );
+ 
+      return cloneElement(child, props);
+    }
+    return child;
+  };
+ 
+  const processedChildren = Children.map(children, processChild);
+ 
+  return <>{processedChildren}</>;
+};
+ 
+MotionSlot.displayName = 'MotionSlot';`
+    },
+    {
+      title: "제거할 속성 결정",
+      description: "`shouldRemoveProp` 함수는 제거해야 할 애니메이션 관련 속성 목록을 정의하고, 주어진 속성 이름이 이 목록에 포함되는지 여부를 반환합니다.",
+      content: `import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
+import { isMotionComponent } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+ 
+type MotionSlotProps = {
+  children: ReactNode | ReactNode[];
+}
+ 
+const shouldRemoveProp = (prop: string) => {
+  const propsToRemove = [
+    'animate',
+    'initial',
+    'transition',
+    ...
+  ];
+  return propsToRemove.includes(prop);
+};
+ 
+export const MotionSlot = ({ children }: MotionSlotProps) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+ 
+  const processChild = (child: ReactNode): ReactNode => {
+    if (isValidElement(child) && isMotionComponent(child.type)) {
+      const props = Object.keys(child.props).reduce(
+        (acc: Record<string, any>, key) => {
+          if (shouldRemoveProp(key) && prefersReducedMotion) {
+            acc[key] = undefined;
+          } else {
+            acc[key] = child.props[key];
+          }
+          return acc;
+        },
+        {}
+      );
+ 
+      return cloneElement(child, props);
+    }
+    return child;
+  };
+ 
+  const processedChildren = Children.map(children, processChild);
+ 
+  return <>{processedChildren}</>;
+};
+ 
+MotionSlot.displayName = 'MotionSlot';`
+    },
+     {
+      title: "자식 컴포넌트 처리",
+      description: "`isMotionComponent()`을 사용해 `motion` 컴포넌트인 자식 요소를 순회합니다.",
+      content: `import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
+import { isMotionComponent } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+ 
+type MotionSlotProps = {
+  children: ReactNode | ReactNode[];
+}
+ 
+const shouldRemoveProp = (prop: string) => {
+  const propsToRemove = [
+    'animate',
+    'initial',
+    'transition',
+    ...
+  ];
+  return propsToRemove.includes(prop);
+};
+ 
+export const MotionSlot = ({ children }: MotionSlotProps) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+ 
+  const processChild = (child: ReactNode): ReactNode => {
+    if (isValidElement(child) && isMotionComponent(child.type)) {
+      const props = Object.keys(child.props).reduce(
+        (acc: Record<string, any>, key) => {
+          if (shouldRemoveProp(key) && prefersReducedMotion) {
+            acc[key] = undefined;
+          } else {
+            acc[key] = child.props[key];
+          }
+          return acc;
+        },
+        {}
+      );
+ 
+      return cloneElement(child, props);
+    }
+    return child;
+  };
+ 
+  const processedChildren = Children.map(children, processChild);
+ 
+  return <>{processedChildren}</>;
+};
+ 
+MotionSlot.displayName = 'MotionSlot';`
+    },
+     {
+      title: "애니메이션 관련 속성 제거",
+      description: "자식 컴포넌트가 `motion` 컴포넌트이고 사용자가 선호 감소 옵션을 선호한다면, 애니메이션 관련 속성을 `undefined`로 설정합니다. 그렇지 않은 경우, 원래의 속성 값을 유지합니다.",
+      content: `import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
+import { isMotionComponent } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+ 
+type MotionSlotProps = {
+  children: ReactNode | ReactNode[];
+}
+ 
+const shouldRemoveProp = (prop: string) => {
+  const propsToRemove = [
+    'animate',
+    'initial',
+    'transition',
+    ...
+  ];
+  return propsToRemove.includes(prop);
+};
+ 
+export const MotionSlot = ({ children }: MotionSlotProps) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+ 
+  const processChild = (child: ReactNode): ReactNode => {
+    if (isValidElement(child) && isMotionComponent(child.type)) {
+      const props = Object.keys(child.props).reduce(
+        (acc: Record<string, any>, key) => {
+          if (shouldRemoveProp(key) && prefersReducedMotion) {
+            acc[key] = undefined;
+          } else {
+            acc[key] = child.props[key];
+          }
+          return acc;
+        },
+        {}
+      );
+ 
+      return cloneElement(child, props);
+    }
+    return child;
+  };
+ 
+  const processedChildren = Children.map(children, processChild);
+ 
+  return <>{processedChildren}</>;
+};
+ 
+MotionSlot.displayName = 'MotionSlot';`
+    },
+         {
+      title: "새로운 React 엘리먼트 구성",
+      description: "수정된 속성을 새로운 요소에 적용하여 생성합니다. 마지막으로 `Children.map`을 사용해 처리된 자식 요소들을 모아 반환합니다.",
+      content: `import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
+import { isMotionComponent } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+ 
+type MotionSlotProps = {
+  children: ReactNode | ReactNode[];
+}
+ 
+const shouldRemoveProp = (prop: string) => {
+  const propsToRemove = [
+    'animate',
+    'initial',
+    'transition',
+    ...
+  ];
+  return propsToRemove.includes(prop);
+};
+ 
+export const MotionSlot = ({ children }: MotionSlotProps) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+ 
+  const processChild = (child: ReactNode): ReactNode => {
+    if (isValidElement(child) && isMotionComponent(child.type)) {
+      const props = Object.keys(child.props).reduce(
+        (acc: Record<string, any>, key) => {
+          if (shouldRemoveProp(key) && prefersReducedMotion) {
+            acc[key] = undefined;
+          } else {
+            acc[key] = child.props[key];
+          }
+          return acc;
+        },
+        {}
+      );
+ 
+      return cloneElement(child, props);
+    }
+    return child;
+  };
+ 
+  const processedChildren = Children.map(children, processChild);
+ 
+  return <>{processedChildren}</>;
+};
+ 
+MotionSlot.displayName = 'MotionSlot';`
+    },
+  ]}
+/>
+
 <Steps>
 #### 동작 감소 선호 여부 확인
 
@@ -251,7 +507,7 @@ if (isValidElement(child) && Symbol('motionComponentSymbol')) {...}
     {
       title: "초기 코드",
       description: "사용자의 reduced motion 설정을 고려한 초기 코드",
-      code: `import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+      content: `import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 
 const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -266,7 +522,7 @@ const prefersReducedMotion = usePrefersReducedMotion();
     {
       title: "리팩토링된 코드",
       description: "MotionSlot을 사용하여 리팩토링된 코드",
-      code: `import { MotionSlot } from '@/components/MotionSlot';
+      content: `import { MotionSlot } from '@/components/MotionSlot';
       
 <MotionSlot>
   <motion.div
