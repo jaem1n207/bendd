@@ -6,7 +6,7 @@
 }
 
 .container :global(p > code) {
-  @apply bd-border-border bd-text-sm bd-font-normal bd-bg-gray-400 bd-border bd-px-1 bd-py-0.5 bd-rounded-sm bd-break-words;
+  @apply bd-border-border bd-text-sm bd-font-normal bd-bg-gray-300 bd-border bd-px-1 bd-py-0.5 bd-rounded-sm bd-break-words;
 }
 
 .container :global(.header-anchor::after) {
@@ -97,7 +97,7 @@
 }
 
 .container :global([data-rehype-pretty-code-title]) {
-  @apply bd-bg-secondary bd-text-secondary-foreground bd-rounded-t-lg bd-py-2 bd-px-3 bd-font-semibold bd-text-sm;
+  @apply bd-border bd-border-border bd-bg-gray-100 bd-text-primary bd-rounded-t-lg bd-py-2 bd-px-3 bd-font-semibold bd-text-sm;
 }
 
 .container
@@ -108,6 +108,11 @@
       pre
   ) {
   @apply !bd-rounded-t-none !bd-mt-0;
+}
+
+.container :global(figure[data-rehype-pretty-code-figure] pre),
+.container :global(pre.shiki-magic-move-container) {
+  @apply bd-bg-gray-400 dark:!bd-bg-background;
 }
 
 .container :global(pre),
