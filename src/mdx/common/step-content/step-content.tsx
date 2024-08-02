@@ -1,7 +1,5 @@
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect, type ReactNode } from 'react';
-import useMeasure from 'react-use-measure';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -13,26 +11,14 @@ import {
 } from '@/components/ui/select';
 import { Paragraph } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
-import { useStepStore } from './use-step-store';
 
-export type StepData<T> = {
-  title: string;
-  description: string;
-  content: T;
-};
-
-export function useInitializeSteps<T>(steps: StepData<T>[]) {
-  const setStepData = useStepStore(state => state.setStepsData);
-
-  useEffect(() => {
-    if (steps.length > 0) {
-      setStepData(steps);
-    }
-  }, [steps, setStepData]);
-}
+import useMeasure from 'react-use-measure';
+import { useStepContentStore } from './provider';
+import type { StepData } from './step-data';
 
 export function StepSelect() {
-  const { stepsData, currentStep, setCurrentStep } = useStepStore();
+  const { stepsData, currentStep, isAnimating, setCurrentStep } =
+    useStepContentStore(state => state);
 
   if (stepsData.length === 0) return null;
 
@@ -40,14 +26,15 @@ export function StepSelect() {
     <Select
       value={currentStep.toString()}
       onValueChange={value => setCurrentStep(Number(value))}
+      disabled={isAnimating}
     >
       <SelectTrigger className="bd-mr-1 bd-flex-1">
         <SelectValue placeholder="단계 선택" />
       </SelectTrigger>
       <SelectContent>
-        {stepsData.map((stepData, index) => (
+        {stepsData.map((step, index) => (
           <SelectItem key={index} value={index.toString()}>
-            {stepData.title}
+            {step.title}
           </SelectItem>
         ))}
       </SelectContent>
@@ -56,8 +43,11 @@ export function StepSelect() {
 }
 
 export function StepInfo({ className }: { className?: string }) {
-  const { currentStep, stepsData, direction } = useStepStore();
+  const { stepsData, currentStep, direction, setIsAnimating } =
+    useStepContentStore(state => state);
+
   const [ref, bounds] = useMeasure();
+
   const stepData = stepsData[currentStep];
 
   if (!stepData) return null;
@@ -65,9 +55,9 @@ export function StepInfo({ className }: { className?: string }) {
   return (
     <MotionConfig
       transition={{
-        duration: 0.5,
+        duration: 0.4,
         type: 'spring',
-        bounce: 0,
+        bounce: 0.15,
       }}
     >
       <motion.div
@@ -78,7 +68,12 @@ export function StepInfo({ className }: { className?: string }) {
         )}
       >
         <div ref={ref} className="bd-px-4 bd-py-2">
-          <AnimatePresence mode="popLayout" initial={false} custom={direction}>
+          <AnimatePresence
+            mode="popLayout"
+            initial={false}
+            custom={direction}
+            onExitComplete={() => setIsAnimating(false)}
+          >
             <motion.div
               key={currentStep}
               variants={variants}
@@ -109,11 +104,12 @@ export function StepContent<T>({
   render,
   className,
 }: {
-  render: (content: T) => ReactNode;
+  render: (content: T) => React.ReactNode;
   className?: string;
 }) {
-  const { currentStep, stepsData } = useStepStore();
-  const stepData = stepsData[currentStep];
+  const { stepsData, currentStep } = useStepContentStore(state => state);
+
+  const stepData = stepsData[currentStep] as StepData<T>;
 
   if (!stepData) return null;
 
@@ -123,7 +119,8 @@ export function StepContent<T>({
 }
 
 export function StepActions({ className }: { className?: string }) {
-  const { currentStep, stepsData, previousStep, nextStep } = useStepStore();
+  const { stepsData, currentStep, isAnimating, nextStep, previousStep } =
+    useStepContentStore(state => state);
 
   if (stepsData.length === 0) return null;
 
@@ -136,7 +133,7 @@ export function StepActions({ className }: { className?: string }) {
         size="icon"
         variant="outline"
         onClick={previousStep}
-        disabled={currentStep === 0}
+        disabled={currentStep === 0 || isAnimating}
       >
         <ChevronLeft className="bd-size-4" />
       </Button>
@@ -147,7 +144,7 @@ export function StepActions({ className }: { className?: string }) {
         size="icon"
         variant="outline"
         onClick={nextStep}
-        disabled={currentStep === stepsData.length - 1}
+        disabled={currentStep === stepsData.length - 1 || isAnimating}
       >
         <ChevronRight className="bd-size-4" />
       </Button>
