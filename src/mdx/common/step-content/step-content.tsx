@@ -17,8 +17,9 @@ import { useStepContentStore } from './provider';
 import type { StepData } from './step-data';
 
 export function StepSelect() {
-  const { stepsData, currentStep, isAnimating, setCurrentStep } =
-    useStepContentStore(state => state);
+  const { stepsData, currentStep, setCurrentStep } = useStepContentStore(
+    state => state
+  );
 
   if (stepsData.length === 0) return null;
 
@@ -26,7 +27,6 @@ export function StepSelect() {
     <Select
       value={currentStep.toString()}
       onValueChange={value => setCurrentStep(Number(value))}
-      disabled={isAnimating}
     >
       <SelectTrigger className="bd-mr-1 bd-flex-1">
         <SelectValue placeholder="단계 선택" />
@@ -43,14 +43,9 @@ export function StepSelect() {
 }
 
 export function StepInfo({ className }: { className?: string }) {
-  const { stepsData, currentStep, direction, setIsAnimating } =
-    useStepContentStore(state => state);
+  const direction = useStepContentStore(state => state.direction);
 
   const [ref, bounds] = useMeasure();
-
-  const stepData = stepsData[currentStep];
-
-  if (!stepData) return null;
 
   return (
     <MotionConfig
@@ -68,29 +63,39 @@ export function StepInfo({ className }: { className?: string }) {
         )}
       >
         <div ref={ref} className="bd-px-4 bd-py-2">
-          <AnimatePresence
-            mode="popLayout"
-            initial={false}
-            custom={direction}
-            onExitComplete={() => setIsAnimating(false)}
-          >
-            <motion.div
-              key={currentStep}
-              variants={variants}
-              initial="initial"
-              animate="active"
-              exit="exit"
-              custom={direction}
-            >
-              <Paragraph size="lg" className="bd-mb-2">
-                {stepData.title}
-              </Paragraph>
-              <Paragraph>{stepData.description}</Paragraph>
-            </motion.div>
+          <AnimatePresence mode="popLayout" initial={false} custom={direction}>
+            {/* 애니메이션 중 변경된 요소가 컴포넌트 트리에 여전히 존재하는지 액세스 가능하도록 */}
+            <StepInfoContent />
           </AnimatePresence>
         </div>
       </motion.div>
     </MotionConfig>
+  );
+}
+
+function StepInfoContent() {
+  const { stepsData, currentStep, direction } = useStepContentStore(
+    state => state
+  );
+
+  const stepData = stepsData[currentStep];
+
+  if (!stepData) return null;
+
+  return (
+    <motion.div
+      key={currentStep}
+      variants={variants}
+      initial="initial"
+      animate="active"
+      exit="exit"
+      custom={direction}
+    >
+      <Paragraph size="lg" className="bd-mb-2">
+        {stepData.title}
+      </Paragraph>
+      <Paragraph>{stepData.description}</Paragraph>
+    </motion.div>
   );
 }
 
@@ -119,7 +124,7 @@ export function StepContent<T>({
 }
 
 export function StepActions({ className }: { className?: string }) {
-  const { stepsData, currentStep, isAnimating, nextStep, previousStep } =
+  const { stepsData, currentStep, nextStep, previousStep } =
     useStepContentStore(state => state);
 
   if (stepsData.length === 0) return null;
@@ -133,7 +138,7 @@ export function StepActions({ className }: { className?: string }) {
         size="icon"
         variant="outline"
         onClick={previousStep}
-        disabled={currentStep === 0 || isAnimating}
+        disabled={currentStep === 0}
       >
         <ChevronLeft className="bd-size-4" />
       </Button>
@@ -144,7 +149,7 @@ export function StepActions({ className }: { className?: string }) {
         size="icon"
         variant="outline"
         onClick={nextStep}
-        disabled={currentStep === stepsData.length - 1 || isAnimating}
+        disabled={currentStep === stepsData.length - 1}
       >
         <ChevronRight className="bd-size-4" />
       </Button>

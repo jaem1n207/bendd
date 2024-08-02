@@ -57,7 +57,6 @@ function MagicMoveContent({ lang }: { lang: string }) {
             theme="vitesse-dark"
             highlighter={highlighter}
             options={{
-              splitTokens: true,
               duration: 750,
               stagger: 3,
               lineNumbers: true,
@@ -94,7 +93,6 @@ function MagicMove({ codeSnippets, lang }: MagicMoveProps) {
         stepsData: steps,
         currentStep: 0,
         direction: 0,
-        isAnimating: false,
       }}
     >
       <div>
