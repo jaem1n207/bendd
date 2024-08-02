@@ -135,9 +135,7 @@ ReducedMotionDiv.displayName = 'ReducedMotionDiv';
 export default ReducedMotionDiv;
 ```
 
-`Proxy`를 사용해서 `motion.div`의 속성 액세스를 가로채고, `prefersReducedMotion: true`일 때 애니메이션 관련 속성을 `undefined`로 설정합니다. Reflect 클래스의 도움으로 `motion.div`의 원래 동작은 유지하면서 필요에 따라 애니메이션을 비활성화할 수 있습니다.
-
-Promise 기반 브라우저 익스텐션 API를 사용하는 [확장 프로그램](https://chromewebstore.google.com/detail/synchronize-tab-scrolling/phceoocamipnafpgnchbfhkdlbleeafc)을 개발할 때 프록시를 사용했었기에 큰 어려움은 없었습니다.
+`Proxy`를 사용해서 `motion.div`의 속성 액세스를 가로채고, `prefersReducedMotion: true`일 때 애니메이션 관련 속성을 `undefined`로 설정합니다. Reflect 클래스의 도움으로 `motion.div`의 원래 동작은 유지하면서 필요에 따라 애니메이션을 비활성화할 수 있습니다. (Promise 기반 브라우저 익스텐션 API를 사용하는 [확장 프로그램](https://chromewebstore.google.com/detail/synchronize-tab-scrolling/phceoocamipnafpgnchbfhkdlbleeafc)을 개발할 때 프록시를 사용했었기에 큰 어려움은 없었습니다.)
 
 현재 구현에 한 가지 불편한 점이 있습니다. `div` 요소가 아닌 다른 요소를 렌더링할 수 없다는 점인데요. 이를 보완하겠습니다. 여기엔 `motion` 컴포넌트를 확장하는 등 여러가지 방법이 있습니다. 그러나 반드시 모든 애니메이션을 비활성화 할 필요는 없다는 점을 기억해야 합니다. 대부분 화면이 반짝이는 플래시 효과나 x/y 애니메이션을 비활성화하고 배경색이 천천히 움직이는 애니메이션은 활성화해도 무방합니다.
 
@@ -200,49 +198,15 @@ MotionSlot.displayName = 'MotionSlot';
     {
       title: "동작 감소 선호 여부 확인",
       description: "`usePrefersReducedMotion` 훅을 통해 사용자가 동작 감소 옵션의 선호 여부를 확인합니다.",
-      content: `import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
-import { isMotionComponent } from 'framer-motion';
+      content: `import { type ReactNode } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
  
 type MotionSlotProps = {
   children: ReactNode | ReactNode[];
 }
  
-const shouldRemoveProp = (prop: string) => {
-  const propsToRemove = [
-    'animate',
-    'initial',
-    'transition',
-    ...
-  ];
-  return propsToRemove.includes(prop);
-};
- 
 export const MotionSlot = ({ children }: MotionSlotProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
- 
-  const processChild = (child: ReactNode): ReactNode => {
-    if (isValidElement(child) && isMotionComponent(child.type)) {
-      const props = Object.keys(child.props).reduce(
-        (acc: Record<string, any>, key) => {
-          if (shouldRemoveProp(key) && prefersReducedMotion) {
-            acc[key] = undefined;
-          } else {
-            acc[key] = child.props[key];
-          }
-          return acc;
-        },
-        {}
-      );
- 
-      return cloneElement(child, props);
-    }
-    return child;
-  };
- 
-  const processedChildren = Children.map(children, processChild);
- 
-  return <>{processedChildren}</>;
 };
  
 MotionSlot.displayName = 'MotionSlot';`
@@ -250,8 +214,7 @@ MotionSlot.displayName = 'MotionSlot';`
     {
       title: "제거할 속성 결정",
       description: "`shouldRemoveProp` 함수는 제거해야 할 애니메이션 관련 속성 목록을 정의하고, 주어진 속성 이름이 이 목록에 포함되는지 여부를 반환합니다.",
-      content: `import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
-import { isMotionComponent } from 'framer-motion';
+      content: `import { type ReactNode } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
  
 type MotionSlotProps = {
@@ -270,29 +233,6 @@ const shouldRemoveProp = (prop: string) => {
  
 export const MotionSlot = ({ children }: MotionSlotProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
- 
-  const processChild = (child: ReactNode): ReactNode => {
-    if (isValidElement(child) && isMotionComponent(child.type)) {
-      const props = Object.keys(child.props).reduce(
-        (acc: Record<string, any>, key) => {
-          if (shouldRemoveProp(key) && prefersReducedMotion) {
-            acc[key] = undefined;
-          } else {
-            acc[key] = child.props[key];
-          }
-          return acc;
-        },
-        {}
-      );
- 
-      return cloneElement(child, props);
-    }
-    return child;
-  };
- 
-  const processedChildren = Children.map(children, processChild);
- 
-  return <>{processedChildren}</>;
 };
  
 MotionSlot.displayName = 'MotionSlot';`
@@ -300,7 +240,7 @@ MotionSlot.displayName = 'MotionSlot';`
      {
       title: "자식 컴포넌트 처리",
       description: "`isMotionComponent()`을 사용해 `motion` 컴포넌트인 자식 요소를 순회합니다.",
-      content: `import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
+      content: `import { cloneElement, isValidElement, type ReactNode } from 'react';
 import { isMotionComponent } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
  
@@ -325,12 +265,6 @@ export const MotionSlot = ({ children }: MotionSlotProps) => {
     if (isValidElement(child) && isMotionComponent(child.type)) {
       const props = Object.keys(child.props).reduce(
         (acc: Record<string, any>, key) => {
-          if (shouldRemoveProp(key) && prefersReducedMotion) {
-            acc[key] = undefined;
-          } else {
-            acc[key] = child.props[key];
-          }
-          return acc;
         },
         {}
       );
@@ -339,10 +273,6 @@ export const MotionSlot = ({ children }: MotionSlotProps) => {
     }
     return child;
   };
- 
-  const processedChildren = Children.map(children, processChild);
- 
-  return <>{processedChildren}</>;
 };
  
 MotionSlot.displayName = 'MotionSlot';`
@@ -350,7 +280,7 @@ MotionSlot.displayName = 'MotionSlot';`
      {
       title: "애니메이션 관련 속성 제거",
       description: "자식 컴포넌트가 `motion` 컴포넌트이고 사용자가 선호 감소 옵션을 선호한다면, 애니메이션 관련 속성을 `undefined`로 설정합니다. 그렇지 않은 경우, 원래의 속성 값을 유지합니다.",
-      content: `import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
+      content: `import { cloneElement, isValidElement, type ReactNode } from 'react';
 import { isMotionComponent } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
  
@@ -389,10 +319,6 @@ export const MotionSlot = ({ children }: MotionSlotProps) => {
     }
     return child;
   };
- 
-  const processedChildren = Children.map(children, processChild);
- 
-  return <>{processedChildren}</>;
 };
  
 MotionSlot.displayName = 'MotionSlot';`
@@ -449,28 +375,6 @@ MotionSlot.displayName = 'MotionSlot';`
     },
   ]}
 />
-
-<Steps>
-#### 동작 감소 선호 여부 확인
-
-`usePrefersReducedMotion` 훅을 통해 사용자가 동작 감소 옵션의 선호 여부를 확인합니다.
-
-#### 제거할 속성 결정
-
-`shouldRemoveProp` 함수는 제거해야 할 애니메이션 관련 속성 목록을 정의하고, 주어진 속성 이름이 이 목록에 포함되는지 여부를 반환합니다.
-
-#### 자식 컴포넌트 처리
-
-`isMotionComponent()`을 사용해 `motion` 컴포넌트인 자식 요소를 순회합니다.
-
-#### 애니메이션 관련 속성 제거
-
-자식 컴포넌트가 `motion` 컴포넌트이고 사용자가 선호 감소 옵션을 선호한다면, 애니메이션 관련 속성을 `undefined`로 설정합니다. 그렇지 않은 경우, 원래의 속성 값을 유지합니다.
-
-#### 새로운 React 엘리먼트 구성
-
-수정된 속성을 새로운 요소에 적용하여 생성합니다. 마지막으로 `Children.map`을 사용해 처리된 자식 요소들을 모아 반환합니다.
-</Steps>
 
 비하인드 스토리로, 원래 `motion` 컴포넌트 여부를 판별할 때 브라우저 콘솔에 출력된 자식 요소의 심볼 값을 바탕으로 판별했는데요:
 
