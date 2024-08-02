@@ -90,7 +90,12 @@ function MagicMove({ codeSnippets, lang }: MagicMoveProps) {
 
   return (
     <StepContentStoreProvider
-      initState={{ stepsData: steps, currentStep: 0, direction: 0 }}
+      initState={{
+        stepsData: steps,
+        currentStep: 0,
+        direction: 0,
+        isAnimating: false,
+      }}
     >
       <div>
         <div className="bd-mb-1 bd-flex bd-items-center bd-justify-between">
