@@ -17,13 +17,13 @@ import rehypeSlug from 'rehype-slug';
 import smartypants from 'remark-smartypants';
 
 import { MDXCustomLink } from './components/a/custom-link';
+import { MDXCallout } from './components/callout/callout';
 import { MDXHeading } from './components/heading/heading';
 import { MDXRoundedImage } from './components/img/rounded-image';
-import { MDXAutoplayVideo, MDXPreLoadVideo } from './components/video/video';
-import { MDXShikiMagicMoveWrapper } from './components/shiki-magic-move/shiki-magic-move-wrapper';
-import { MDXCallout } from './components/callout/callout';
+import { MDXMagicMove } from './components/magic-move/magic-move';
 import { MDXPre } from './components/pre/pre';
 import { MDXSteps } from './components/steps/steps';
+import { MDXAutoplayVideo, MDXPreLoadVideo } from './components/video/video';
 
 import styles from './mdx.module.css';
 
@@ -48,7 +48,7 @@ const components: MDXRemoteProps['components'] = {
   pre: MDXPre,
   AutoplayVideo: MDXAutoplayVideo,
   PreLoadVideo: MDXPreLoadVideo,
-  MagicMove: MDXShikiMagicMoveWrapper,
+  MagicMove: MDXMagicMove,
   Callout: MDXCallout,
   Steps: MDXSteps,
 };
