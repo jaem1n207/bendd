@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { Moon, Sun } from 'lucide-react';
 
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+import { transitionViewIfSupported } from '../../lib/experiment-apis';
 import { MotionSlot } from '../motion-slot';
 import { useThemeManager } from './use-theme-manger';
 
@@ -11,12 +13,18 @@ const MotionMoon = motion(Moon);
 
 export function ThemeSwitcher() {
   const { isDarkTheme, toggleTheme } = useThemeManager();
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const handleToggleTheme = () => {
+    prefersReducedMotion
+      ? toggleTheme()
+      : transitionViewIfSupported(toggleTheme);
+  };
 
   return (
     <button
       title="Toggle Theme"
       className="bd-relative bd-flex bd-size-full bd-items-center bd-justify-center bd-text-gray-950"
-      onClick={toggleTheme}
+      onClick={handleToggleTheme}
     >
       <MotionSlot>
         <MotionSun

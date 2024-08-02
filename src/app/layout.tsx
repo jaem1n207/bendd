@@ -12,6 +12,7 @@ import { siteMetadata } from '@/lib/site-metadata';
 import { cn } from '@/lib/utils';
 
 import '../globals.css';
+import '../theme-switch-effect.css';
 
 const BrowserDetector = dynamic(
   () =>

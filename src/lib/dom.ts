@@ -1,3 +1,5 @@
+import type { QueryResult } from 'dom';
+
 export function querySelector<T extends string>(query: T): QueryResult<T> {
   return document.querySelector(query) as QueryResult<T>;
 }
