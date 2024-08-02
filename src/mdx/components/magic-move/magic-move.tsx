@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useDeferredValue, useState } from 'react';
 import { ShikiMagicMove } from 'shiki-magic-move/react';
 import { z } from 'zod';
 
@@ -40,6 +40,7 @@ type MagicMoveProps = z.infer<typeof MagicMoveSchema>;
 function MagicMoveContent({ lang }: { lang: string }) {
   const highlighter = useHighlighter();
   const { stepsData, currentStep } = useStepContentStore(state => state);
+  const deferredCurrentStep = useDeferredValue(currentStep);
 
   const renderContent = useCallback(
     (content: CodeSnippet) => {
@@ -71,7 +72,7 @@ function MagicMoveContent({ lang }: { lang: string }) {
     [highlighter, lang]
   );
 
-  const stepData = stepsData[currentStep] as StepData<CodeSnippet>;
+  const stepData = stepsData[deferredCurrentStep] as StepData<CodeSnippet>;
 
   if (!stepData) return null;
 
