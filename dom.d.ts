@@ -50,7 +50,21 @@ type MatchEachElement<V, L extends Element | null = null> = V extends []
       ? MatchEachElement<R, L | ElementByName<V[0]>>
       : L;
 
-type QueryResult<T extends string> = MatchEachElement<GetElementNames<T>>;
+export type QueryResult<T extends string> = MatchEachElement<
+  GetElementNames<T>
+>;
 
 declare function querySelector<T extends string>(query: T): QueryResult<T>;
 declare function querySelectorAll<T extends string>(query: T): QueryResult<T>[];
+
+declare global {
+  interface Document {
+    /**
+     * 비표준 기능을 사용합니다.
+     * @see https://developer.mozilla.org/docs/Web/API/Document/startViewTransition
+     */
+    startViewTransition?: (callback: () => void) => void;
+  }
+}
+
+export {};
