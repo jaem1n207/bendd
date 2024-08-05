@@ -6,83 +6,116 @@ category: 'react'
 publishedAt: '2024-08-01'
 ---
 
-import { Callout } from '@/components/Callout'
-import { CodeBlock } from '@/components/CodeBlock'
+블로그 글을 작성하며 MDX 파일에서 JSX 컴포넌트를 사용하다 새로운 문제를 발견할 수 있었습니다.
+분명 컴포넌트는 올바르게 구현했는데 예상과 다른 UI로 렌더링되던 것이었죠. 문제는 특정 prop 값을 올바르게 전달해주지 않았던 것이었습니다.
+MDX 파일에선 TypeScript의 타입 체크가 작동하지 않아 이러한 문제를 미리 잡아내기 어려웠습니다.
 
-React 생태계에서 MDX의 인기가 높아짐에 따라, 개발자들은 새로운 도전에 직면하고 있습니다. 바로 MDX 파일에서 사용되는 컴포넌트의 타입 안전성을 보장하는 것입니다. 이 블로그 포스트에서는 이 문제를 해결하기 위한 재사용 가능한 유틸리티 함수를 구현하는 방법을 살펴보겠습니다.
+이러한 문제를 해결하기 위해 재사용 가능한 유틸리티 함수를 만들어보기로 했습니다.
+이 함수는 MDX와 TypeScript 사이의 간극을 메워주어 타입 안전성을 보장해줄 것입니다.
 
 ## 배경 지식
 
-MDX는 Markdown에 JSX를 더한 강력한 포맷입니다. 이를 통해 개발자는 Markdown의 간결함과 React 컴포넌트의 유연성을 동시에 활용할 수 있습니다.
+MDX는 Markdown에 JSX를 더한 문서 포맷입니다. 이를 통해 개발자는 Markdown의 간결함과 React 컴포넌트의 유연성을 동시에 활용할 수 있게 됩니다.
 
-<Callout type='info'>
-  이 포스트는 TypeScript, React, 그리고 기본적인 MDX 사용법에 대한 이해를 전제로 합니다.
-</Callout>
+<Callout type='warning'>이 포스트는 TypeScript, React, 그리고 기본적인 MDX 사용법에 대한 이해를 전제로 합니다.</Callout>
 
-## 문제: MDX에서의 타입 안전성 도전
+## 문제: MDX에서의 타입 안전성 보장하기
 
-MDX 파일에서는 일반적인 TypeScript 체크가 작동하지 않습니다. 이로 인해 다음과 같은 문제가 발생할 수 있습니다:
+MDX 파일에서는 일반적인 TypeScript 검사가 작동하지 않습니다. 이로 인해 다음과 같은 문제가 발생할 수 있습니다:
 
 - 필수 props 누락
 - 잘못된 타입의 props 전달
 - 존재하지 않는 props 사용
 
 이러한 문제는 런타임 에러로 이어질 수 있어, 개발 과정에서 미리 잡아내는 것이 중요합니다.
+만약 저처럼 컴포넌트를 대충 만들고 예외처리를 제대로 해두지 않았다면 디버깅에 많은 시간을 투자해야 할 것입니다. 😔
 
-## 해결책: 재사용 가능한 유틸리티 함수
+### 재사용 가능한 MDX 컴포넌트 전용 유효성 검사 유틸 함수 만들기
 
-우리의 접근 방식은 validator 함수를 만드는 것입니다. 이 함수는 MDX와 TypeScript 사이의 간극을 메워줍니다.
+처음 생각한 접근 방식은 validator 함수를 만드는 것입니다. 이 함수는 MDX와 TypeScript 사이의 간극을 메워줍니다.
 
-## 핵심 유틸리티 함수 구현
+## 유틸리티 함수 구현
 
 다음은 핵심 유틸리티 함수의 구현입니다:
 
-```ts
-import { ComponentType, ReactElement } from 'react';
+<Steps>
 
-type ValidatorFunction<P> = (props: P) => string | undefined;
+### createMDXComponent 함수
+
+컴포넌트와 validator 함수를 받아 새로운 래퍼 컴포넌트를 반환합니다.
+
+```ts
+import React, { ComponentType, ReactElement } from 'react';
+
+type ValidatorFunction<P> = (
+  props: P,
+  componentName: string
+) => string | undefined;
 
 export function createMDXComponent<P extends {}>(
   Component: ComponentType<P>,
   validator: ValidatorFunction<P>
 ): (props: P) => ReactElement {
+  const componentName = Component.displayName || Component.name || 'Component';
+
   const MDXComponent = (props: P): ReactElement => {
-    if (process.env.NODE_ENV !== 'production') {
-      const error = validator(props);
+    if (process.env.VERCEL_ENV !== 'production') {
+      const error = validator(props, componentName);
       if (error) {
-        console.error(\`[MDX Component Error] \${Component.name}: \${error}\`);
+        throw new Error(`[MDX Component Error] ${componentName}: ${error}`);
       }
     }
-    return <Component {...props} />;
+    return React.createElement(Component, props);
   };
 
-  MDXComponent.displayName = \`MDX\${Component.displayName || Component.name || 'Component'}\`;
+  MDXComponent.displayName = `MDX${componentName}`;
 
   return MDXComponent;
 }
 ```
 
-이 함수는 컴포넌트와 validator 함수를 받아, 새로운 래퍼 컴포넌트를 반환합니다.
-
-## 컴포넌트별 Validator 생성
-
-각 컴포넌트에 대한 validator를 만들어 보겠습니다:
+### 각 컴포넌트에 대한 validator 생성
 
 ```ts
+type PropValidator<T> = (value: T) => boolean;
+
+function getTypeName(value: any): string {
+  if (value === null) return 'null';
+  if (Array.isArray(value)) return 'array';
+  if (
+    typeof value === 'object' &&
+    value.constructor &&
+    value.constructor.name
+  ) {
+    return value.constructor.name;
+  }
+  return typeof value;
+}
+
 export function createPropValidator<P extends object>(
   requiredProps: (keyof P)[],
-  propTypes: {[K in keyof P]?: (value: P[K]) => boolean}
-): ValidatorFunction<P> {
+  propTypes: { [K in keyof P]?: PropValidator<P[K]> }
+) {
   return (props: P) => {
     for (const prop of requiredProps) {
       if (!(prop in props)) {
-        return \`Missing required prop: \${String(prop)}\`;
+        throw new Error(`필수 prop을 전달하지 않았어요: ${String(prop)}`);
       }
     }
 
-    for (const [key, validator] of Object.entries(propTypes)) {
-      if (key in props && validator && !validator(props[key as keyof P])) {
-        return \`Invalid value for prop: \${String(key)}\`;
+    for (const [key, validator] of Object.entries(propTypes) as [
+      keyof P,
+      PropValidator<any> | undefined,
+    ][]) {
+      if (key in props) {
+        const value = props[key as keyof P];
+        if (!validator?.(value)) {
+          const expectedType = propTypes[key as keyof P]?.name || 'unknown';
+          const actualType = getTypeName(value);
+          throw new TypeError(
+            `잘못된 prop의 값을 전달했어요: ${String(key)}. ${actualType} 타입을 전달받았어요.`
+          );
+        }
       }
     }
 
@@ -91,55 +124,123 @@ export function createPropValidator<P extends object>(
 }
 ```
 
+</Steps>
+
 ## MDX 컴포넌트와의 통합
 
-이제 이 유틸리티를 사용하여 MDX 안전 컴포넌트를 만들어 보겠습니다:
+이제 이 유틸리티를 사용하여 기존 Callout MDX 컴포넌트를 수정해보겠습니다:
 
 ```ts
-import { Button, ButtonProps } from './Button';
 import { createMDXComponent, createPropValidator } from './mdx-utils';
 
-const buttonValidator = createPropValidator<ButtonProps>(
-  ['children'],
-  {
-    variant: (value) => ['primary', 'secondary', 'tertiary'].includes(value),
-    onClick: (value) => typeof value === 'function',
-  }
-);
+const calloutValidator = createPropValidator<CalloutProps>(['children'], {
+  type: value => ['info', 'error', 'warning'].includes(value || 'info'),
+  emoji: value => typeof value === 'string' || isValidElement(value),
+  children: value => isValidElement(value) || typeof value === 'string',
+});
 
-export const MDXButton = createMDXComponent(Button, buttonValidator);
+export const MDXCallout = createMDXComponent(Callout, calloutValidator);
 ```
 
-이제 MDX 파일에서 `MDXButton`을 안전하게 사용할 수 있습니다!
+이제 MDX 파일에서 `Callout`을 안전하게 사용할 수 있습니다. 만약 필수 prop을 누락하거나 잘못된 타입의 prop을 전달하면 런타임 에러가 발생합니다:
 
-## 고급 사용법 및 엣지 케이스
+![type-error-callout](/images/enhancing-type-safety/type-error-callout.webp)
 
-복잡한 prop 타입이나 선택적 props를 다루는 방법 등 고급 사용법에 대해서도 고려해야 합니다. 이는 validator 함수를 더욱 정교하게 만들어 처리할 수 있습니다.
+## 한계점
 
-## 성능 고려사항
+이 접근 방식은 대부분의 상황에서 잘 작동하지만, 복잡한 prop 타입이나 선택적 props를 다루는 방법 등 사용성에 대해서도 고려해야 합니다.
+또한, 이 방법은 props를 변경하면 validator 함수도 함께 수정해야 한다는 점을 염두에 두어야 합니다. 이는 유지관리에 있어 추가적인 부담을 줄 수 있을 것 같았습니다._createMdxContent
 
-validator 함수는 개발 환경에서만 실행되도록 설계되었습니다. 프로덕션 빌드에서는 이 검사가 생략되어 성능에 영향을 미치지 않습니다.
+## zod와 함께 사용하기
 
-## 모범 사례 및 팁
+zod를 사용하면 스키마를 정의하고 이를 통해 유효성 검증과 타입 선언을 한 번에 해결할 수 있습니다.
+zod를 사용할 때와 사용하지 않았을 때 구문을 비교해보겠습니다.
 
-- validator 함수의 이름을 일관성 있게 지정하세요 (예: `createButtonValidator`)
-- 프로젝트의 `utils` 또는 `helpers` 폴더에 이러한 유틸리티를 배치하세요
-- 컴포넌트가 변경될 때마다 validator를 업데이트하는 것을 잊지 마세요
+### 유효성 검증 및 타입 선언 구문 비교
 
-## 한계점 및 고려사항
+<MagicMove
+  lang="ts"
+  codeSnippets={[
+    {
+      title: "zod 사용 x",
+      description: "Callout 컴포넌트의 유효성 검증 스키마 정의",
+      content: `type CalloutProps = {
+  type?: CalloutType;
+  emoji?: string | ReactNode;
+  children: ReactNode;
+};
 
-이 접근 방식은 대부분의 상황에서 잘 작동하지만, 매우 동적인 prop 타입이나 복잡한 제네릭을 사용하는 경우 한계가 있을 수 있습니다.
+const calloutValidator = createPropValidator<CalloutProps>(['children'], {
+  type: value => ['info', 'error', 'warning'].includes(value || 'info'),
+  emoji: value => typeof value === 'string' || isValidElement(value),
+  children: value => isValidElement(value) || typeof value === 'string',
+});`
+    },
+     {
+      title: "zod 사용",
+      description: "Callout 컴포넌트의 유효성 검증 스키마 정의",
+      content: `import { z } from 'zod';
+
+type CalloutProps = z.infer<typeof CalloutSchema>;
+
+const CalloutSchema = z.object({
+  type: z.enum(['info', 'warning', 'error']).optional().default('info'),
+  emoji: z.string().optional(),
+  children: z
+    .custom<ReactNode>(v => isValidElement(v) || typeof v === 'string')
+    .or(
+      z.array(
+        z.custom<ReactNode>(v => isValidElement(v) || typeof v === 'string')
+      )
+    ),
+});`
+    }
+  ]}
+/>
+
+마지막으로 `validateProps` 함수와 `createMDXComponent` 함수를 적절히 수정하면 됩니다:
+
+```ts
+type MDXComponent<T extends z.ZodType> = React.FC<z.infer<T>>;
+
+export function createMDXComponent<T extends z.ZodType>(
+  Component: React.FC<z.infer<T>>,
+  schema: T
+): MDXComponent<T> {
+  const MDXComponent: MDXComponent<T> = props => {
+    const componentName =
+      Component.displayName || Component.name || 'Unknown Component Name';
+    validateProps(schema, props, componentName);
+
+    return createElement(Component, props);
+  };
+
+  return MDXComponent;
+}
+
+function validateProps<T extends z.ZodType>(
+  schema: T,
+  props: z.infer<T>,
+  componentName: string
+) {
+  if (process.env.VERCEL_ENV !== 'production') {
+    try {
+      schema.parse(props);
+    } catch (error) {
+      throw new Error(`[${componentName} Error]: ${fromError(error)}`);
+    }
+  }
+}
+```
+
+zod를 사용해 코드 가독성을 향상하고, 타입 선언과 유효성 검증을 한 번에 처리할 수 있게 되었습니다.
 
 ## 결론
 
-재사용 가능한 유틸리티 함수를 통해 MDX 파일에서의 타입 안전성을 크게 향상시킬 수 있습니다. 이는 개발 과정에서 많은 잠재적 오류를 미리 잡아내고, 더 안정적인 애플리케이션을 만드는 데 도움을 줍니다.
+재사용 가능한 유틸리티 함수를 통해 MDX 파일에서의 타입 안전성을 크게 향상시킬 수 있습니다.
+이는 개발 과정에서 많은 잠재적 오류를 미리 잡아내고, 더 안정적인 웹앱을 만드는 데 도움을 줄 것입니다. 
 
-여러분의 프로젝트에 이 접근 방식을 적용해보시고, 그 결과를 공유해주세요!
-
-## 추가 자료
+## 참고
 
 - [MDX 공식 문서](https://mdxjs.com/)
-- [TypeScript 핸드북](https://www.typescriptlang.org/docs/)
-- [React 공식 문서](https://reactjs.org/docs/getting-started.html)
-
-이 블로그 포스트가 MDX에서의 타입 안전성 향상에 도움이 되었기를 바랍니다. 질문이나 의견이 있다면 언제든 댓글로 남겨주세요!
+- [zod 공식 문서](https://zod.dev/)
