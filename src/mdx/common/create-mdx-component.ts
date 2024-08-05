@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { fromError } from 'zod-validation-error';
 
 type MDXComponent<T extends z.ZodType> = React.FC<z.infer<T>>;
+
 export function createMDXComponent<T extends z.ZodType>(
   Component: React.FC<z.infer<T>>,
   schema: T
