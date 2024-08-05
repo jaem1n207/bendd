@@ -22,6 +22,7 @@ import { useHighlighter } from './use-highlighter';
 
 import 'shiki-magic-move/dist/style.css';
 import './magic-move.css';
+import { HighlighterCore } from 'shiki';
 
 const CodeSnippetSchema = z.object({
   content: z.string(),
@@ -37,15 +38,18 @@ const MagicMoveSchema = z.object({
 type CodeSnippet = z.infer<typeof CodeSnippetSchema>;
 type MagicMoveProps = z.infer<typeof MagicMoveSchema>;
 
-function MagicMoveContent({ lang }: { lang: string }) {
-  const highlighter = useHighlighter();
+function MagicMoveContent({
+  lang,
+  highlighter,
+}: {
+  lang: string;
+  highlighter: HighlighterCore;
+}) {
   const { stepsData, currentStep } = useStepContentStore(state => state);
   const deferredCurrentStep = useDeferredValue(currentStep);
 
   const renderContent = useCallback(
     (content: CodeSnippet) => {
-      if (!highlighter) return null;
-
       return (
         <div className="bd-relative">
           <ShikiMagicMove
@@ -88,6 +92,8 @@ function MagicMove({ codeSnippets, lang }: MagicMoveProps) {
     }))
   );
 
+  const highlighter = useHighlighter();
+
   return (
     <StepContentStoreProvider
       initState={{
@@ -102,7 +108,13 @@ function MagicMove({ codeSnippets, lang }: MagicMoveProps) {
           <StepActions />
         </div>
         <StepInfo />
-        <StepContent render={() => <MagicMoveContent lang={lang} />} />
+        {highlighter && (
+          <StepContent
+            render={() => (
+              <MagicMoveContent lang={lang} highlighter={highlighter} />
+            )}
+          />
+        )}
       </div>
     </StepContentStoreProvider>
   );

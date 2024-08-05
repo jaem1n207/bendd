@@ -152,3 +152,18 @@
     background-position: -44px -10px;
   }
 }
+
+.bend-signature {
+  stroke-dasharray: 28;
+  stroke-dashoffset: 28;
+  animation: dash 4s linear alternate infinite;
+}
+
+@keyframes dash {
+  from {
+    stroke-dashoffset: 28;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

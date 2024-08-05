@@ -14,6 +14,13 @@ import { cn } from '@/lib/utils';
 import '../globals.css';
 import '../theme-switch-effect.css';
 
+const Signature = dynamic(
+  () => import('../components/signature').then(mod => mod.Signature),
+  {
+    ssr: false,
+  }
+);
+
 const BrowserDetector = dynamic(
   () =>
     import('../components/browser-detector').then(mod => mod.BrowserDetector),
@@ -119,6 +126,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TooltipProvider>
+            <Signature />
             {children}
             <footer
               aria-labelledby="footer-navigation"

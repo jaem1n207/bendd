@@ -1,3 +1,5 @@
+'use client';
+
 import { useSyncExternalStore, type ReactNode } from 'react';
 
 const emptySubscribe = () => () => {};

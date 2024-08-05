@@ -128,10 +128,15 @@ const config = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' },
         },
+        signature: {
+          '0%': { strokeDashoffset: '28.13859748840332' },
+          '100%': { strokeDashoffset: '0' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        signature: 'signature 4s ease-in-out alternate infinite',
       },
     },
   },
