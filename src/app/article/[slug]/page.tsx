@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
+import type { BlogPosting, WithContext } from 'schema-dts';
 
 import { Giscus } from '@/components/comments/giscus';
 import { siteMetadata } from '@/lib/site-metadata';
@@ -79,6 +80,24 @@ export default function Blog({ params }: { params: { slug: string } }) {
     notFound();
   }
 
+  const jsonLd: WithContext<BlogPosting> = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.metadata.title,
+    datePublished: new Date(post.metadata.publishedAt).toISOString(),
+    dateModified: new Date(post.metadata.publishedAt).toISOString(),
+    description: post.metadata.summary,
+    image: post.metadata.image
+      ? `${siteMetadata.siteUrl}${post.metadata.image}`
+      : `/api/og?title=${encodeURIComponent(post.metadata.title)}`,
+    url: `${siteMetadata.siteUrl}/article/${post.slug}`,
+    author: {
+      '@type': 'Person',
+      name: siteMetadata.author,
+      url: siteMetadata.github,
+    },
+  };
+
   return (
     <main className="bd-relative bd-mx-auto bd-my-0 bd-min-h-screen bd-max-w-2xl bd-overflow-hidden bd-px-6 bd-py-32 bd-font-tmoney">
       <section id="BenddDoc">
@@ -86,23 +105,7 @@ export default function Blog({ params }: { params: { slug: string } }) {
           type="application/ld+json"
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'BlogPosting',
-              headline: post.metadata.title,
-              datePublished: new Date(post.metadata.publishedAt).toISOString(),
-              dateModified: new Date(post.metadata.publishedAt).toISOString(),
-              description: post.metadata.summary,
-              image: post.metadata.image
-                ? `${siteMetadata.siteUrl}${post.metadata.image}`
-                : `/api/og?title=${encodeURIComponent(post.metadata.title)}`,
-              url: `${siteMetadata.siteUrl}/article/${post.slug}`,
-              author: {
-                '@type': 'Person',
-                name: siteMetadata.author,
-                url: siteMetadata.github,
-              },
-            }),
+            __html: JSON.stringify(jsonLd),
           }}
         />
         <div className="bd-fixed bd-bottom-0 bd-left-5 bd-top-24 bd-hidden bd-overflow-hidden lg:bd-block">
