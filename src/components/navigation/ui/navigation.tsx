@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+import { type Route } from 'next';
 
 import { SoundSwitcher } from '@/components/sound';
 import { ThemeSwitcher } from '@/components/theme';
@@ -33,7 +34,7 @@ export function Navigation() {
           return (
             <MainNavigationItem
               key={item.name}
-              slug={item.slug}
+              slug={item.slug as Route<''>}
               name={item.name}
               icon={item.icon}
             />

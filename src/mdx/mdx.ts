@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
+import { type Route } from 'next';
 
 import type { ArticleInfo } from '../components/article/types/article';
 
@@ -158,7 +159,7 @@ class MDXProcessor {
     return this.applyOperations().map(article => ({
       name: article.metadata.title,
       summary: article.metadata.summary,
-      href: `/article/${article.slug}`,
+      href: `/article/${article.slug}` as Route<''>,
       publishedAt: formatDate({
         date: article.metadata.publishedAt,
         includeRelative: options.includeRelativeDate,
@@ -173,7 +174,7 @@ class MDXProcessor {
     return this.applyOperations().map(article => ({
       name: article.metadata.title,
       summary: article.metadata.summary,
-      href: `/craft/${article.slug}`,
+      href: `/craft/${article.slug}` as Route<''>,
       publishedAt: formatDate({
         date: article.metadata.publishedAt,
         includeRelative: options.includeRelativeDate,

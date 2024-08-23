@@ -1,5 +1,6 @@
 'use client';
 
+import { type Route } from 'next';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
@@ -47,7 +48,7 @@ function renderItems(items: MenuItem[]) {
   return items.map(item => (
     <li key={item.link} className="bd-py-1">
       <Link
-        href={item.link}
+        href={item.link as Route<''>}
         className={cn(
           'bd-block bd-text-sm bd-font-medium bd-transition-colors hover:bd-text-foreground bd-truncate',
           'bd-text-muted-foreground/70'

@@ -1,3 +1,4 @@
+import { type Route } from 'next';
 import Link from 'next/link';
 
 import { ExternalLink } from '@/components/ui/external-link';
@@ -7,7 +8,7 @@ export function MDXCustomLink({
   children,
   ...props
 }: {
-  href?: string;
+  href?: Route<''> | string;
   children: React.ReactNode;
   [key: string]: any;
 }) {
@@ -17,7 +18,7 @@ export function MDXCustomLink({
 
   if (href.startsWith('/')) {
     return (
-      <Link href={href} {...props}>
+      <Link href={href as Route<''>} {...props}>
         {props.children}
       </Link>
     );

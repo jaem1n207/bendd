@@ -1,3 +1,5 @@
+import { type Route } from 'next';
+
 export type MenuItem = {
   /**
    * `1` to `6` 사이의 숫자로 헤딩 레벨을 지정합니다.

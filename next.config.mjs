@@ -13,6 +13,7 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ['@shikijs/twoslash'],
+    typedRoutes: true,
   },
   headers() {
     return [

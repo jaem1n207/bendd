@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
+import { type Route } from 'next';
 
 import { ExternalLink } from '@/components/ui/external-link';
 import { cn } from '@/lib/utils';
@@ -10,7 +11,7 @@ import type { ItemMotionProps } from '../types/motion';
 import { NavigationItemTooltip } from './navigation-item-tooltip';
 
 type MainNavigationItemProps = {
-  slug: string;
+  slug: Route<''>;
   name: string;
   icon: ReactNode;
 } & ItemMotionProps;
