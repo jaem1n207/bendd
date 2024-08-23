@@ -1,10 +1,13 @@
+import { CornerUpLeft } from 'lucide-react';
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { BlogPosting, WithContext } from 'schema-dts';
 
 import { Giscus } from '@/components/comments/giscus';
 import { siteMetadata } from '@/lib/site-metadata';
+import { cn } from '@/lib/utils';
 import { SkeletonTableOfContents } from '@/mdx/common/table-of-contents/skeleton-table-of-contents';
 import { CustomMDX } from '@/mdx/custom-mdx';
 import { createCraftMDXProcessor, formatDate } from '@/mdx/mdx';
@@ -109,6 +112,17 @@ export default function Craft({ params }: { params: { slug: string } }) {
           }}
         />
         <div className="bd-fixed bd-bottom-0 bd-left-5 bd-top-24 bd-hidden bd-overflow-hidden lg:bd-block">
+          <Link
+            href="/craft"
+            className={cn(
+              'bd-flex bd-itesm-center bd-gap-x-1 bd-w-fit bd-leading-5 bd-text-sm',
+              'bd-p-1 -bd-m-1',
+              'bd-text-muted-foreground bd-transition-colors hover:bd-text-primary'
+            )}
+          >
+            <CornerUpLeft className="bd-size-4" />
+            Craft
+          </Link>
           <TableOfContents />
         </div>
         <h1 className="bd-mx-auto bd-mt-12 bd-break-keep bd-text-center bd-text-4xl bd-font-bold bd-tracking-tight md:bd-mt-24">

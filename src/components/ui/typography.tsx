@@ -20,7 +20,7 @@ export const typographyVariants = cva(null, {
       large: 'bd-text-lg bd-font-semibold',
       small: 'bd-text-sm bd-font-medium bd-leading-none',
       muted: 'bd-text-sm bd-text-muted-foreground',
-      removePMargin: '[&:not(:first-child)]:bd-mt-0',
+      removePMargin: '[&:not(:first-child)]:!bd-mt-0',
     },
   },
   defaultVariants: {
