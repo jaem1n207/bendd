@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
-import { Paragraph } from '@/components/ui/typography';
+import { Typography } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
 import type { MenuItem } from './toc';
 import { getHeaders, useActiveAnchor } from './use-toc';
@@ -28,9 +28,9 @@ export function TableOfContents() {
           'bd-transition-[opacity,top,background-color] motion-reduce:bd-transition-none motion-reduce:hover:bd-transition-none'
         )}
       />
-      <Paragraph size="sm" className="!bd-leading-8">
-        On this page
-      </Paragraph>
+      <Typography variant="p" affects="small" asChild className="!bd-leading-8">
+        <p>On this page</p>
+      </Typography>
       <ul
         ref={containerRef}
         className={cn(

@@ -9,9 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Paragraph } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
 
+import { Typography } from '@/components/ui/typography';
 import useMeasure from 'react-use-measure';
 import { useStepContentStore } from './provider';
 import type { StepData } from './step-data';
@@ -91,10 +91,12 @@ function StepInfoContent() {
       exit="exit"
       custom={direction}
     >
-      <Paragraph size="lg" className="bd-mb-2">
-        {stepData.title}
-      </Paragraph>
-      <Paragraph>{stepData.description}</Paragraph>
+      <Typography variant="p" affects="large" asChild className="bd-mb-2">
+        <p>{stepData.title}</p>
+      </Typography>
+      <Typography variant="p" asChild>
+        <p>{stepData.description}</p>
+      </Typography>
     </motion.div>
   );
 }
