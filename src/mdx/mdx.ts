@@ -15,7 +15,7 @@ const MetadataSchema = z.object({
 });
 
 type Metadata = z.infer<typeof MetadataSchema>;
-type Article = { metadata: Metadata; slug: string; content: string };
+export type Article = { metadata: Metadata; slug: string; content: string };
 
 const validateMetadata = (metadata: Metadata): Metadata => {
   try {

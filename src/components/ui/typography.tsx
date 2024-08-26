@@ -12,6 +12,8 @@ export const typographyVariants = cva(null, {
       h4: 'bd-scroll-m-20 bd-text-xl bd-font-semibold md:bd-text-2xl',
       h5: 'bd-text-lg bd-font-semibold md:bd-text-xl',
       p: 'bd-leading-7 [&:not(:first-child)]:bd-mt-6',
+      blockquote:
+        '-bd-ml-4 bd-border-l-4 bd-px-4 bd-py-2 bd-text-base bd-text-muted-foreground',
     },
     affects: {
       default: '',
@@ -20,6 +22,8 @@ export const typographyVariants = cva(null, {
       large: 'bd-text-lg bd-font-semibold',
       small: 'bd-text-sm bd-font-medium bd-leading-none',
       muted: 'bd-text-sm bd-text-muted-foreground',
+    },
+    prose: {
       removePMargin: '[&:not(:first-child)]:!bd-mt-0',
     },
   },
@@ -36,11 +40,13 @@ interface TypographyProps
 }
 
 export const Typography = forwardRef<HTMLParagraphElement, TypographyProps>(
-  ({ className, variant, affects, asChild = false, ...props }, ref) => {
+  ({ className, variant, affects, prose, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : 'h1';
     return (
       <Comp
-        className={cn(typographyVariants({ variant, affects, className }))}
+        className={cn(
+          typographyVariants({ variant, affects, prose, className })
+        )}
         ref={ref}
         {...props}
       />

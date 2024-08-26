@@ -1,27 +1,9 @@
-import { CornerUpLeft } from 'lucide-react';
 import type { Metadata } from 'next';
-import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import type { BlogPosting, WithContext } from 'schema-dts';
 
-import { Giscus } from '@/components/comments/giscus';
+import { MdxLayout } from '@/components/layout/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
-import { cn } from '@/lib/utils';
-import { SkeletonTableOfContents } from '@/mdx/common/table-of-contents/skeleton-table-of-contents';
-import { CustomMDX } from '@/mdx/custom-mdx';
-import { createCraftMDXProcessor, formatDate } from '@/mdx/mdx';
-
-const TableOfContents = dynamic(
-  () =>
-    import('@/mdx/common/table-of-contents/table-of-contents').then(
-      mod => mod.TableOfContents
-    ),
-  {
-    ssr: false,
-    loading: SkeletonTableOfContents,
-  }
-);
+import { createCraftMDXProcessor } from '@/mdx/mdx';
 
 export async function generateStaticParams() {
   const processor = createCraftMDXProcessor();
@@ -75,7 +57,7 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   } satisfies Metadata;
 }
 
-export default function Craft({ params }: { params: { slug: string } }) {
+export default function CraftPage({ params }: { params: { slug: string } }) {
   const processor = createCraftMDXProcessor();
   const post = processor.getArticleBySlug(params.slug);
 
@@ -83,65 +65,5 @@ export default function Craft({ params }: { params: { slug: string } }) {
     notFound();
   }
 
-  const jsonLd: WithContext<BlogPosting> = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.metadata.title,
-    datePublished: new Date(post.metadata.publishedAt).toISOString(),
-    dateModified: new Date(post.metadata.publishedAt).toISOString(),
-    description: post.metadata.summary,
-    image: post.metadata.image
-      ? `${siteMetadata.siteUrl}${post.metadata.image}`
-      : `/api/og?title=${encodeURIComponent(post.metadata.title)}`,
-    url: `${siteMetadata.siteUrl}/craft/${post.slug}`,
-    author: {
-      '@type': 'Person',
-      name: siteMetadata.author,
-      url: siteMetadata.github,
-    },
-  };
-
-  return (
-    <main className="bd-relative bd-mx-auto bd-my-0 bd-min-h-screen bd-max-w-2xl bd-overflow-hidden bd-px-6 bd-py-32 bd-font-tmoney">
-      <section id="BenddDoc">
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(jsonLd),
-          }}
-        />
-        <div className="bd-fixed bd-bottom-0 bd-left-5 bd-top-24 bd-hidden bd-overflow-hidden lg:bd-block">
-          <Link
-            href="/craft"
-            className={cn(
-              'bd-flex bd-itesm-center bd-gap-x-1 bd-w-fit bd-leading-5 bd-text-sm',
-              'bd-p-1 -bd-m-1',
-              'bd-text-muted-foreground bd-transition-colors hover:bd-text-primary'
-            )}
-          >
-            <CornerUpLeft className="bd-size-4" />
-            Craft
-          </Link>
-          <TableOfContents />
-        </div>
-        <h1 className="bd-mx-auto bd-mt-12 bd-break-keep bd-text-center bd-text-4xl bd-font-bold bd-tracking-tight md:bd-mt-24">
-          {post.metadata.title}
-        </h1>
-        <p className="bd-mx-auto bd-mt-6 bd-w-full bd-max-w-lg bd-break-keep bd-text-center bd-text-lg">
-          {post.metadata.description}
-        </p>
-        <p className="bd-mt-6 bd-text-center bd-text-sm bd-tabular-nums bd-text-primary/60">
-          {formatDate({
-            date: post.metadata.publishedAt,
-            includeRelative: true,
-          })}
-        </p>
-        <article className="bd-prose bd-prose-slate bd-mb-24 bd-mt-40 dark:bd-prose-invert md:bd-mb-40 md:bd-mt-52">
-          <CustomMDX source={post.content} />
-        </article>
-        <Giscus />
-      </section>
-    </main>
-  );
+  return <MdxLayout post={post} type="craft" />;
 }
