@@ -6,13 +6,18 @@ import { cn } from '@/lib/utils';
 const linkVariants = cva('bd-select-none bd-transition-colors', {
   variants: {
     variant: {
-      default: 'bd-text-foreground/60 hover:bd-text-foreground/100',
-      primary: 'bd-text-primary/90 hover:bd-text-primary/100',
+      default: 'bd-text-muted-foreground hover:bd-text-primary',
+      primary: 'bd-text-primary hover:bd-text-primary/90',
       icon: 'bd-opacity-75 hover:bd-text-primary/90 hover:bd-opacity-100',
+    },
+    affects: {
+      default: '',
+      mdx: 'bd-text-sm bd-decoration-1 bd-underline-offset-4',
     },
   },
   defaultVariants: {
     variant: 'default',
+    affects: 'default',
   },
 });
 
@@ -44,6 +49,7 @@ export const ExternalLink = forwardRef<HTMLAnchorElement, LinkProps>(
     {
       className,
       variant,
+      affects,
       external = true,
       disabled = false,
       prefixEl,
@@ -63,10 +69,11 @@ export const ExternalLink = forwardRef<HTMLAnchorElement, LinkProps>(
           {
             'bd-space-x-1 bd-leading-tight': prefixEl || suffixEl,
           },
-          linkVariants({ variant, className }),
+          linkVariants({ variant, affects }),
           {
             'bd-pointer-events-none bd-opacity-50': disabled,
-          }
+          },
+          className
         )}
         ref={ref}
         aria-disabled={disabled}
