@@ -2,7 +2,6 @@ import { Analytics } from '@vercel/analytics/react';
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { Fira_Mono as FontMono, Inter as FontSans } from 'next/font/google';
-import localFont from 'next/font/local';
 
 import { Navigation } from '@/components/navigation';
 import { ThemeProvider } from '@/components/theme';
@@ -40,22 +39,6 @@ const fontMono = FontMono({
   display: 'swap',
   variable: '--font-mono',
   weight: ['400', '500', '700'],
-});
-
-const fontTmoney = localFont({
-  variable: '--font-tmoney',
-  src: [
-    {
-      path: '../assets/TmoneyRoundWindRegular.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../assets/TmoneyRoundWindExtraBold.woff2',
-      weight: '800',
-      style: 'normal',
-    },
-  ],
 });
 
 export const metadata = {
@@ -111,8 +94,7 @@ export default function RootLayout({
       className={cn(
         'bd-bg-background bd-text-foreground',
         fontSans.variable,
-        fontMono.variable,
-        fontTmoney.variable
+        fontMono.variable
       )}
       dir="ltr"
     >
