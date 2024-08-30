@@ -6,7 +6,7 @@
 }
 
 .container :global(p > code) {
-  @apply bd-border-border bd-text-sm bd-font-normal bd-bg-gray-300 bd-border bd-px-1 bd-py-0.5 bd-rounded-sm bd-break-words;
+  @apply bd-border-gray-500 bd-text-sm bd-font-normal bd-bg-gray-200 bd-border bd-px-1 bd-py-0.5 bd-rounded-sm bd-break-words;
 }
 
 .container :global(.header-anchor::after) {
