@@ -26,6 +26,7 @@ export function MDXCustomLink({
 
   return (
     <ExternalLink
+      affects="mdx"
       prefixEl={<span className="browser-icon" />}
       href={href}
       {...props}
