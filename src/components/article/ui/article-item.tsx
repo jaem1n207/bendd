@@ -72,6 +72,7 @@ export function ArticleItem({
   return (
     <WithSound assetPath="/sounds/stapling.mp3">
       <MotionLink
+        target="_blank"
         ref={itemRef}
         href={href}
         className="bd-relative -bd-m-3 bd-block bd-w-[calc(100%+1rem)] bd-overflow-hidden bd-rounded-xl bd-px-3 bd-py-4 hover:bd-bg-gray-300 sm:bd-flex sm:bd-items-center sm:bd-gap-3"
