@@ -9,7 +9,7 @@ export function ArticleList({ className }: { className?: string }) {
   });
 
   return (
-    <div className={cn('bd-flex bd-flex-col bd-gap-7', className)}>
+    <div className={cn('bd-flex bd-flex-col bd-gap-7 bd-group', className)}>
       {formattedArticleInfo.map((article, index) => (
         <ArticleItem key={article.href} {...article} index={index} />
       ))}

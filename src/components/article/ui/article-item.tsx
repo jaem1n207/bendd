@@ -6,6 +6,8 @@ import { useEffect, useRef } from 'react';
 
 import { shuffleLetters } from '@/components/article/lib/shuffle-letters';
 import { WithSound } from '@/components/sound';
+import { cn } from '@/lib/utils';
+
 import type { ArticleInfo } from '../types/article';
 
 const MotionLink = motion(Link);
@@ -75,7 +77,9 @@ export function ArticleItem({
         target="_blank"
         ref={itemRef}
         href={href}
-        className="bd-relative -bd-m-3 bd-block bd-w-[calc(100%+1rem)] bd-overflow-hidden bd-rounded-xl bd-px-3 bd-py-4 hover:bd-bg-gray-300 sm:bd-flex sm:bd-items-center sm:bd-gap-3"
+        className={cn("bd-relative -bd-m-3 bd-block bd-w-[calc(100%+1rem)] bd-overflow-hidden bd-rounded-xl bd-px-3 bd-py-4 hover:bd-bg-gray-300 sm:bd-flex sm:bd-items-center sm:bd-gap-3",
+          "motion-reduce:bd-transition-none motion-reduce:group-hover:!bd-blur-none bd-transition-[filter] group-hover:[&:not(:hover)]:bd-blur-[2px]"
+        )}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
