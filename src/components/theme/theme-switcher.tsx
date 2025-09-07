@@ -1,50 +1,74 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Moon, Sun } from 'lucide-react';
+import { flushSync } from 'react-dom';
+import useMeasure from 'react-use-measure';
 
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
-import { transitionViewIfSupported } from '../../lib/experiment-apis';
-import { MotionSlot } from '../motion-slot';
+import { ClientGate } from '../client-gate';
 import { useThemeManager } from './use-theme-manger';
-
-const MotionSun = motion(Sun);
-const MotionMoon = motion(Moon);
 
 export function ThemeSwitcher() {
   const { isDarkTheme, toggleTheme } = useThemeManager();
   const prefersReducedMotion = usePrefersReducedMotion();
-  const handleToggleTheme = () => {
-    prefersReducedMotion
-      ? toggleTheme()
-      : transitionViewIfSupported(toggleTheme);
+  const [buttonRef, bounds] = useMeasure();
+
+  const handleToggleTheme = async () => {
+    if (
+      !buttonRef ||
+      !document.startViewTransition ||
+      prefersReducedMotion
+    ) {
+      toggleTheme();
+      return;
+    }
+
+    await (document).startViewTransition(() => {
+      flushSync(() => {
+        toggleTheme();
+      });
+    }).ready;
+
+    const { top, left, width, height } = bounds;
+    const x = left + width / 2;
+    const y = top + height / 2;
+    const right = window.innerWidth - left;
+    const bottom = window.innerHeight - top;
+    const maxRadius = Math.hypot(
+      Math.max(left, right),
+      Math.max(top, bottom),
+    );
+
+    document.documentElement.animate(
+      {
+        clipPath: [
+          `circle(0px at ${x}px ${y}px)`,
+          `circle(${maxRadius}px at ${x}px ${y}px)`,
+        ],
+      },
+      {
+        duration: 600,
+        easing: 'ease-in-out',
+        pseudoElement: '::view-transition-new(root)',
+      }
+    );
   };
 
   return (
     <button
+      ref={buttonRef}
       title="Toggle Theme"
-      className="bd-relative bd-flex bd-size-full bd-items-center bd-justify-center bd-text-gray-950"
+      className="bd-relative bd-flex bd-size-full bd-items-center bd-justify-center bd-text-gray-950 bd-transition-transform hover:bd-scale-105"
       onClick={handleToggleTheme}
     >
-      <MotionSlot>
-        <MotionSun
-          className="bd-block bd-size-1/2 dark:bd-hidden"
-          initial={{ rotate: 0 }}
-          animate={{
-            rotate: isDarkTheme ? -90 : 0,
-          }}
-        />
-      </MotionSlot>
-      <MotionSlot>
-        <MotionMoon
-          className="bd-hidden bd-size-1/2 dark:bd-block"
-          initial={{ rotate: 0 }}
-          animate={{
-            rotate: isDarkTheme ? 0 : 90,
-          }}
-        />
-      </MotionSlot>
-      <span className="bd-sr-only">Toggle theme</span>
+      <ClientGate>
+        {isDarkTheme ? (
+          <Sun className="bd-size-1/2" />
+        ) : (
+          <Moon className="bd-size-1/2" />
+        )}
+      </ClientGate>
+      <span className="bd-sr-only">테마 전환</span>
     </button>
   );
 }
