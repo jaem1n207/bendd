@@ -63,7 +63,9 @@ declare global {
      * 비표준 기능을 사용합니다.
      * @see https://developer.mozilla.org/docs/Web/API/Document/startViewTransition
      */
-    startViewTransition(updateCallback: () => Promise<void> | void): ViewTransition;
+    startViewTransition(
+      updateCallback: () => Promise<void> | void
+    ): ViewTransition;
   }
 
   interface ViewTransition {
@@ -71,8 +73,7 @@ declare global {
     ready: Promise<void>;
     updateCallbackDone: Promise<void>;
     skipTransition(): void;
-}
+  }
 }
 
-export { };
-
+export {};

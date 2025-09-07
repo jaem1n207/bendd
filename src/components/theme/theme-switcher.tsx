@@ -14,16 +14,12 @@ export function ThemeSwitcher() {
   const [buttonRef, bounds] = useMeasure();
 
   const handleToggleTheme = async () => {
-    if (
-      !buttonRef ||
-      !document.startViewTransition ||
-      prefersReducedMotion
-    ) {
+    if (!buttonRef || !document.startViewTransition || prefersReducedMotion) {
       toggleTheme();
       return;
     }
 
-    await (document).startViewTransition(() => {
+    await document.startViewTransition(() => {
       flushSync(() => {
         toggleTheme();
       });
@@ -34,10 +30,7 @@ export function ThemeSwitcher() {
     const y = top + height / 2;
     const right = window.innerWidth - left;
     const bottom = window.innerHeight - top;
-    const maxRadius = Math.hypot(
-      Math.max(left, right),
-      Math.max(top, bottom),
-    );
+    const maxRadius = Math.hypot(Math.max(left, right), Math.max(top, bottom));
 
     document.documentElement.animate(
       {
