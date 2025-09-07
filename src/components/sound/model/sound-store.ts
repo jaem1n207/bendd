@@ -9,7 +9,7 @@ type SoundState = {
 export const useSoundStore = create<SoundState>()(
   persist(
     (set, get) => ({
-      isSoundEnabled: true,
+      isSoundEnabled: false,
       toggleSoundEnabled: () => {
         set({ isSoundEnabled: !get().isSoundEnabled });
       },
