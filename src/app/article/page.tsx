@@ -30,8 +30,8 @@ export async function generateMetadata(
 
 export default function ArticlePage() {
   return (
-    <main className="bd-relative bd-mx-auto bd-my-0 bd-min-h-screen bd-max-w-4xl bd-overflow-y-auto bd-px-6 bd-pt-10 sm:bd-py-32">
-      <ArticleList className="bd-mt-8" />
+    <main>
+      <ArticleList />
     </main>
   );
 }

@@ -76,7 +76,8 @@ export function ArticleItem({
       <MotionLink
         ref={itemRef}
         href={href}
-        className={cn("bd-relative -bd-m-3 bd-block bd-w-[calc(100%+1rem)] bd-overflow-hidden bd-rounded-xl bd-px-3 bd-py-4 hover:bd-bg-gray-300 sm:bd-flex sm:bd-items-center sm:bd-gap-3"
+        className={cn(
+          'bd-relative bd-block bd-w-[calc(100%+1rem)] bd-overflow-hidden bd-rounded-xl bd-px-3 bd-py-4 hover:bd-bg-gray-300 sm:bd-flex sm:bd-items-center sm:bd-gap-3'
         )}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
