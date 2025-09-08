@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function ShuffleLettersDemo() {
-  const [text, setText] = useState('한글 영어 테스트!!');
+  const [text, setText] = useState(
+    '한글 English 123456789 @#$%^&*()_+-=[]{}|;:,.<>?'
+  );
   const [iterations, setIterations] = useState(8);
   const [fps, setFps] = useState(30);
   const [isAnimating, setIsAnimating] = useState(false);
