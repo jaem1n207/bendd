@@ -22,6 +22,7 @@ import { MDXHeading } from './components/heading/heading';
 import { MDXRoundedImage } from './components/img/rounded-image';
 import { MDXMagicMove } from './components/magic-move/magic-move';
 import { MDXPre } from './components/pre/pre';
+import { MDXShuffleLettersDemo } from './components/shuffle-letters-demo/shuffle-letters-demo';
 import { MDXSteps } from './components/steps/steps';
 import { MDXAutoplayVideo, MDXPreLoadVideo } from './components/video/video';
 
@@ -51,6 +52,7 @@ const components: MDXRemoteProps['components'] = {
   MagicMove: MDXMagicMove,
   Callout: MDXCallout,
   Steps: MDXSteps,
+  ShuffleLettersDemo: MDXShuffleLettersDemo,
 };
 
 export function CustomMDX({ source }: { source: string }) {

@@ -16,21 +16,21 @@ const charPools: Record<CharType, string> = {
 };
 
 function getRandomCharacterForType(charType: CharType): string {
-  const pool = charPools[charType];
-
   if (charType === 'korean') {
     return String.fromCharCode(0xac00 + Math.floor(Math.random() * 11172));
   }
 
+  const pool = charPools[charType];
+
   return pool[Math.floor(Math.random() * pool.length)] || '';
 }
 
-export function isKorean(char: string): boolean {
+function isKorean(char: string): boolean {
   const code = char.charCodeAt(0);
   return code >= 0xac00 && code <= 0xd7a3;
 }
 
-export function isElement(value: unknown): value is Element {
+function isElement(value: unknown): value is Element {
   return (
     !!value &&
     typeof value === 'object' &&

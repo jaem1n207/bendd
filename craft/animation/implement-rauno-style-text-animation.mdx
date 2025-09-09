@@ -21,19 +21,19 @@ publishedAt: '2024-07-06'
 
 ## 애니메이션 이해하기
 
-이 애니메이션은 다음과 같이 작동합니다:
+이 애니메이션의 핵심은 **점진적 문자 변환**입니다. 각 문자가 무작위 문자에서 최종 문자로 순차적으로 변환되면서 자연스러운 타이핑 효과를 만들어냅니다:
 
 <Steps>
 #### 초기 상태
  
-각 요소(제목, 설명, 선)가 왼쪽에서 오른쪽으로 점진적으로 나타납니다.
+모든 텍스트는 공백 상태로 시작하고, 각 요소(제목, 설명, 선)가 왼쪽에서 오른쪽으로 점진적으로 나타납니다.
  
-#### 타이밍
+#### 타이밍과 순서
  
-모든 텍스트 변환 애니메이션이 동시에 시작되는 것처럼 보이며, 각 항목에 약간의 지연 시간이 추가되어 순차적으로 나타납니다.
+애니메이션은 동시에 시작되지만, 각 문자가 안정화되는 시점이 다릅니다. 첫 번째 문자부터 순서대로 안정화되어 **파도처럼 퍼지는 효과**를 만들어냅니다.
 
-#### 문자별 변환
-제목, 설명, 연도가 한 글자씩 나타나며, 실제 텍스트가 표시되기 전에 랜덤한 문자들이 보입니다.
+#### 문자별 변환 메커니즘
+실제 구현에서는 각 문자 위치마다 `iterations` 횟수만큼 무작위 문자를 표시한 후, 원래 문자로 고정됩니다. 이 과정에서 **문자 유형을 유지**하는 것이 자연스러움의 핵심이라 생각했습니다.
 </Steps>
 
 ## 첫 번째 시도
@@ -52,33 +52,69 @@ const GLYPHS = 'ラドクリフマラソンわたしワタシんょンョたば�
 
 추가 연구 끝에 [Shuffle Text Effect With jQuery](https://demo.tutorialzine.com/2011/09/shuffle-letters-effect-jquery/)에서 영감💡을 얻어 몇 가지 중요한 통찰을 얻었습니다.
 
-### 자연스러운 애니메이션을 위한 조건
+### 자연스러운 애니메이션을 위한 핵심 원칙
 
-더 자연스러운 텍스트 변환을 위해:
+첫 번째 시도에서 부자연스러웠던 이유를 분석해보니 다음과 같은 원칙들이 중요했습니다:
 
-- 각 문자의 유형에 맞는 랜덤 문자를 생성합니다 (예: 영어 소문자는 영어 소문자로).
-- 공백이 아닌 문자만 변환합니다.
-- 적절한 반복 횟수와 프레임 속도를 설정합니다.
+#### 1. 문자 유형 일관성 (Character Type Consistency)
+각 문자의 **원본 특성을 유지**하면서 변환해야 합니다:
+- 영어 소문자 → 영어 소문자 랜덤 생성
+- 한글 → 한글 랜덤 생성  
+- 숫자 → 숫자 랜덤 생성
+- 특수문자 → 특수문자 랜덤 생성
 
-적절한 반복 횟수와 프레임 속도를 설정하기 위해 `iterations`와 `fps` 옵션을 가지고 놀아볼 수 있는 [Playground](https://bendd.me/playground/shuffle-letters) 페이지를 만들었습니다:
+이렇게 해야 사용자의 눈이 "비슷한 형태"로 인식해서 자연스럽게 느껴집니다.
 
-<AutoplayVideo src='/videos/craft/implement-rauno-style-text-animation/shuffle-letters-playground.mp4' />
+#### 2. 공백 문자 보존 (Whitespace Preservation)
+공백과 줄바꿈은 변환하지 않고 그대로 유지해야 텍스트의 구조가 깨지지 않습니다.
+
+#### 3. 최적의 타이밍 (Optimal Timing)
+- **iterations**: 각 문자당 몇 번의 랜덤 변환을 거칠지 (기본값: 8)
+- **fps**: 초당 몇 번 업데이트할지 (기본값: 30)
+
+이 값들을 실험해볼 수 있는 자그마한 데모를 만들었습니다:
+
+<ShuffleLettersDemo />
+
+다양한 텍스트와 설정값을 시도해보면서 자연스러운 애니메이션을 만드는 원리를 이해할 수 있습니다:
 
 
-### 랜덤 한글 문자 생성하기
+### 한글 처리
 
-영어의 글자 수는 26개지만 한글은 가능한 조합이 11,172개로 매우 많아 랜덤한 한글 문자를 생성하는 방법을 고민했습니다. 
-일일이 한글 문자를 배열에 저장하는 것은 비효율적이라고 생각했고, 이 문제를 해결하기 위해 유니코드를 사용했습니다:
+한글 문자 생성에서 마주한 도전은 **문자 집합의 크기**였습니다:
 
-모든 문자는 유니코드로 표현될 수 있다는 점을 이용해 다음과 같이 랜덤 한글 문자를 생성할 수 있습니다:
+#### 문제 상황
+- **영어**: 소문자 26개, 대문자 26개 → 간단한 배열로 처리 가능
+- **한글**: 가능한 조합이 **11,172개** → 배열로 저장하기엔 너무 방대함
+
+#### 유니코드 기반 해결책
+
+한글의 유니코드 특성을 활용한 효율적인 접근:
 
 ```tsx
-String.fromCharCode(0xac00 + Math.floor(Math.random() * 11172));
+// 한글 유니코드 범위: 0xAC00(가) ~ 0xD7A3(힣)
+function getRandomCharacterForType(charType: CharType): string {
+  if (charType === 'korean') {
+    // 0xAC00부터 11,172개의 한글 문자 중 랜덤 선택
+    return String.fromCharCode(0xac00 + Math.floor(Math.random() * 11172));
+  }
+  // 다른 문자 유형들...
+}
 ```
 
-이 코드는 유효한 유니코드 범위(AC00에서 D7A3) 내에서 무작위 한글 문자를 생성합니다.
+#### 한글 문자 감지 로직
 
-<Callout>한글이 가지는 유니코드 값은 **AC00부터 D7A3**까지며, 총 11,172개의 코드로 모든 한글을 표현할 수 있습니다.</Callout>
+입력된 텍스트에서 한글을 정확히 식별하는 것도 중요한 부분입니다:
+
+```tsx
+function isKorean(char: string): boolean {
+  const code = char.charCodeAt(0);
+  // 한글 완성형 범위 체크
+  return code >= 0xac00 && code <= 0xd7a3;
+}
+```
+
+<Callout>**한글 유니코드 범위**: 0xAC00(가)부터 0xD7A3(힣)까지 총 11,172개의 완성형 한글을 포함합니다. 이는 초성(19개) × 중성(21개) × 종성(28개)의 조합으로 구성됩니다.</Callout>
 
 ### 애니메이션 구현하기
 
@@ -114,20 +150,24 @@ function getRandomCharacterForType(charType: CharType): string {
 }
 ```
 
-#### 주요 애니메이션 함수 구현:
+#### 핵심 애니메이션 로직 구현
+
+애니메이션의 핵심은 **파도치는 효과(Wave Effect)**를 만드는 `shuffle` 함수입니다:
 
 ```tsx
 export function shuffleLetters(element: HTMLElement, config: ShuffleConfig = {}): () => void {
   const options = {
-    iterations: 8,
-    fps: 30,
+    iterations: 8,    // 각 문자당 랜덤 변환 횟수
+    fps: 30,          // 초당 프레임 수
     onComplete: () => {},
     ...config,
   };
 
-  // 텍스트 내용 분석
+  // 1. 텍스트 분석 및 전처리
   const text = element.textContent ?? '';
   const charsArray = Array.from(text);
+  
+  // 각 문자의 타입 분류
   const charsTypes = charsArray.map(char => {
     if (/\s/.test(char)) return 'space';
     if (isKorean(char)) return 'korean';
@@ -136,21 +176,52 @@ export function shuffleLetters(element: HTMLElement, config: ShuffleConfig = {})
     if (/[0-9]/.test(char)) return 'digit';
     return 'symbol';
   });
+  
+  // 공백이 아닌 문자들의 위치만 수집 (애니메이션 대상)
   const charsPositions = charsArray.reduce<number[]>((acc, char, index) => {
     if (!/\s/.test(char)) acc.push(index);
     return acc;
   }, []);
 
-  element.textContent = '';
+  element.textContent = ''; // 초기화
 
-  // 재귀적 애니메이션 함수 구현
+  // 2. 파도 효과 생성하는 애니메이션 함수
   const shuffle = (start: number): void => {
-    // 문자를 랜덤한 것으로 대체
-    // 결과 문자열을 요소에 적용
-    // fps에 따라 다음 프레임 예약
+    // 재귀 종료 조건: 모든 문자가 처리됨
+    if (start > charsPositions.length) {
+      options.onComplete(element);
+      return;
+    }
+
+    const shuffledChars = [...charsArray];
+    
+    // 각 문자 위치에 대해 처리
+    for (let i = Math.max(start, 0); i < charsPositions.length; i++) {
+      const charIndex = charsPositions[i];
+      
+      if (i < start + options.iterations) {
+        // 아직 처리되지 않은 문자들 → 랜덤 문자로 표시
+        const charType = charsTypes[charIndex];
+        if (charType !== 'space') {
+          shuffledChars[charIndex] = getRandomCharacterForType(
+            charType as Exclude<typeof charType, 'space'>
+          );
+        }
+      } else {
+        // 아직 시작되지 않은 문자들 → 공백으로 표시
+        shuffledChars[charIndex] = '';
+      }
+      // start 이후의 문자들은 원본 그대로 (이미 처리됨)
+    }
+
+    // DOM 업데이트
+    element.textContent = shuffledChars.join('');
+
+    // 다음 프레임 예약
+    timeout = setTimeout(() => shuffle(start + 1), 1000 / options.fps);
   };
 
-  // 애니메이션 시작 및 중지 함수 반환
+  // 3. 더 자연스러운 효과를 위해 음수에서 애니메이션 시작
   shuffle(-options.iterations);
 
   return () => {
@@ -159,52 +230,90 @@ export function shuffleLetters(element: HTMLElement, config: ShuffleConfig = {})
 }
 ```
 
+#### 파도 효과(Wave Effect)의 원리
+
+위 코드에서 핵심은 `start` 매개변수입니다:
+
+- **start < 0**: 아직 아무것도 보이지 않음
+- **start = 0**: 첫 번째 문자가 랜덤하게 변환 시작
+- **start = 1**: 첫 번째 문자는 안정화, 두 번째 문자가 랜덤 변환 시작
+- **start = n**: n번째 문자까지 안정화, n+1번째부터 랜덤 변환
+
+이렇게 각 프레임마다 안정화되는 문자가 하나씩 늘어나면서 **왼쪽에서 오른쪽으로 퍼지는 파도 효과**가 만들어집니다.
+
 </Steps>
 
-## 결과 및 추가 개선 사항
+## 최종 결과와 성능 최적화
 
-결과적으로 얻은 애니메이션은 원본과 훨씬 더 유사해졌습니다:
+모든 개선사항을 적용한 최종 애니메이션입니다:
 
 <AutoplayVideo src="/videos/craft/implement-rauno-style-text-animation/new-animated-text.mp4" />
 
-추가적인 개선 사항:
-- `useInView` 훅을 사용하여 화면에 보이는 요소만 애니메이션 적용
-- 선에 `scaleX` 애니메이션을 적용하여 왼쪽에서 오른쪽으로 자연스럽게 늘어나도록 함
-- 부드러운 효과를 위해 `opacity` 값 조정
-- 자연스러움을 위해 `iterations`와 `fps` 값을 미세 조정
+### 프로덕션 레벨 최적화
 
-## 코드 가독성 고려사항
+실제 사용을 위해 추가로 구현한 최적화 기법들:
 
-요구사항을 코드로 구현할 때는 코드의 가독성과 유지보수성을 고려해야 합니다.
-예를 들어, 배열에서 짝수를 필터링하고 그 합계를 구할 때 다음과 같은 접근 방식을 고려해볼 수 있습니다:
+#### 1. 성능 최적화
+- **인터섹션 옵저버 활용**: `useInView` 훅으로 뷰포트에 보이는 요소만 애니메이션 실행
+- **메모리 관리**: 컴포넌트 언마운트 시 timeout 정리로 메모리 누수 방지
+- **배치 업데이트**: DOM 조작 최소화를 위한 효율적인 문자열 조합
+
+#### 2. 사용자 경험 개선
+- **ESC 키 중단**: 진행 중인 애니메이션을 언제든 중단 가능
+- **즉시 복원**: 중단 시 원본 텍스트로 즉시 복원
+- **상태 관리**: `isAnimating` 상태로 중복 실행 방지
+
+#### 3. 시각적 완성도
+- **선 애니메이션**: `scaleX` 변환으로 왼쪽에서 오른쪽으로 자연스럽게 확장
+- **투명도 조절**: `opacity` 값으로 부드러운 페이드인 효과
+- **타이밍 튜닝**: 적절한 `iterations`, `fps` 값 설정
+
+### 실제 사용 예시
 
 ```tsx
-// 방식 1: 비트 연산자 사용해 한 줄로 작성
-const calculateEvenSum = arr => arr.filter(num => !(num & 1)).reduce((acc, val) => acc + val, 0);
-
-// 방식 2: 각 단계를 변수에 할당
-const calculateEvenSum = numbers => {
-  const evenNumbers = numbers.filter(function (number) {
-    return number % 2 === 0;
-  });
- 
-  const sum = evenNumbers.reduce(function (total, number) {
-    return total + number;
-  }, 0);
- 
-  return sum;
+// 실제 사용 예시:
+const MyComponent = () => {
+  const textRef = useRef<HTMLDivElement>(null);
+  
+  const handleClick = () => {
+    if (textRef.current) {
+      const cleanup = shuffleLetters(textRef.current, {
+        iterations: 8,
+        fps: 30,
+        onComplete: () => console.log('애니메이션 완료!')
+      });
+      
+      // 필요시 중단
+      // cleanup();
+    }
+  };
+  
+  return (
+    <div ref={textRef} onClick={handleClick}>
+      안녕하세요~
+    </div>
+  );
 };
 ```
 
-다소 극단적인 예시지만, 대부분의 개발자가 (둘 중에선)두 번째 방식을 선호할 것입니다.
+## 회고와 배운 점
 
-첫 번째 방식은 간결하지만, 비트 연산자를 사용하고 있으며 자바스크립트 초보자는 코드의 의도를 바로 파악하기 어려울 수 있습니다.
+### 기술적 성과
 
-두 번째 방식은 첫 번째에 비해 약간 더 길지만, 코드의 의도와 동작을 명확하게 전달합니다. 각 단계가 분리되어 있어 로직을 따라가기 쉽고 기본적인 JS 문법만 사용해 초보자도 이해하기 쉽죠.
+rauno의 텍스트 애니메이션을 재현하면서 생각했던 것보다 재밌게 고민할 수 있던 부분이 많았습니다. 특히:
 
-## 결론
+1. 자연스러운 애니메이션을 위한 **문자 유형별 일관성** 구현
+2. **한글 처리**를 위한 유니코드 활용
 
-rauno의 텍스트 애니메이션 효과를 재현하는 과정이 재밌었습니다. 자연스러운 문자 전환을 위한 방법을 연구하고 노력했습니다. 결과적으로, rauno의 프로젝트 페이지와 비슷한 애니메이션을 구현할 수 있었습니다.
+### 개발 과정에서의 인사이트
+
+- **첫 시도의 부자연스러움** → 문자 유형 분류의 필요성 발견
+- **한글 문자** → 효율적인 유니코드 기반 해결책 도출
+- **단순한 랜덤 교체** → 파도 효과를 통한 시각적 완성도 향상
+
+이 작업을 통해 **기술적 구현과 디자인적 완성도** 사이의 균형을 맞추는 것이 얼마나 중요한지 다시 한번 느낄 수 있었습니다.
+
+연구할수록 자연스러워지는 애니메이션 동작을 볼 때마다 보람찼고, 최종적으로 원하던 결과를 얻어 좋았습니다.
 
 ## 참고 자료
 
