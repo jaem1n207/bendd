@@ -23,7 +23,7 @@ export async function generateMetadata(
     openGraph: {
       type: 'website',
       url: `${siteMetadata.siteUrl}/craft`,
-      siteName: 'Bendd의 작업 목록',
+      siteName: `${siteMetadata.author}의 작업 목록`,
       images: [...previousImages],
     },
   };

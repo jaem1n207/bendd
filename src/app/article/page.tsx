@@ -22,7 +22,7 @@ export async function generateMetadata(
     openGraph: {
       type: 'website',
       url: `${siteMetadata.siteUrl}/article`,
-      siteName: 'Bendd의 피드',
+      siteName: `${siteMetadata.author}의 피드`,
       images: [...previousImages],
     },
   };
