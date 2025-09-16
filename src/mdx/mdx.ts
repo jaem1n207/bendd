@@ -82,18 +82,65 @@ export const formatDate = ({
   const currentDate = new Date();
   const targetDate = new Date(date.includes('T') ? date : `${date}T00:00:00`);
 
-  const yearsAgo = currentDate.getFullYear() - targetDate.getFullYear();
-  const monthsAgo = currentDate.getMonth() - targetDate.getMonth();
-  const daysAgo = currentDate.getDate() - targetDate.getDate();
+  const diffInMs = currentDate.getTime() - targetDate.getTime();
+  const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-  const relativeDate =
-    yearsAgo > 0
-      ? `${yearsAgo}년 전`
-      : monthsAgo > 0
-        ? `${monthsAgo}개월 전`
-        : daysAgo > 0
-          ? `${daysAgo}일 전`
-          : '오늘';
+  let relativeDate: string;
+
+  // 1분 미만
+  if (diffInMinutes < 1) {
+    relativeDate = '방금 전';
+  }
+  // 1시간 미만
+  else if (diffInMinutes < 60) {
+    relativeDate = `${diffInMinutes}분 전`;
+  }
+  // 24시간 미만
+  else if (diffInHours < 24) {
+    relativeDate = `${diffInHours}시간 전`;
+  }
+  // 1일
+  else if (diffInDays === 1) {
+    relativeDate = '하루 전';
+  }
+  // 7일 미만
+  else if (diffInDays < 7) {
+    relativeDate = `${diffInDays}일 전`;
+  }
+  // 4주 미만
+  else if (diffInDays < 28) {
+    const weeks = Math.floor(diffInDays / 7);
+    relativeDate = weeks === 1 ? '일주일 전' : `${weeks}주 전`;
+  }
+  // 월/년 계산
+  else {
+    // 정확한 월 계산
+    let years = currentDate.getFullYear() - targetDate.getFullYear();
+    let months = currentDate.getMonth() - targetDate.getMonth();
+
+    // 일자까지 고려한 정확한 월 계산
+    if (currentDate.getDate() < targetDate.getDate()) {
+      months--;
+    }
+
+    // 음수 월을 년에서 차감
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    const totalMonths = years * 12 + months;
+
+    if (totalMonths < 12) {
+      relativeDate = `${totalMonths}개월 전`;
+    } else if (months === 0) {
+      relativeDate = `${years}년 전`;
+    } else {
+      relativeDate = `${years}년 ${months}개월 전`;
+    }
+  }
 
   const fullDate = targetDate.toLocaleString('ko-KR', {
     year: '2-digit',
