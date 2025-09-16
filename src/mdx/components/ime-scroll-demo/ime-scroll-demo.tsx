@@ -4,8 +4,8 @@ import { Input } from '@/components/ui/input';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 
-import { createMDXComponent } from '../../common/create-mdx-component';
 import { ClientGate } from '@/components/client-gate';
+import { createMDXComponent } from '../../common/create-mdx-component';
 
 const ImeScrollDemoSchema = z.object({
   initialText: z.string().optional().default(''),
@@ -127,7 +127,7 @@ function ImeScrollDemo({ initialText = '' }: ImeScrollDemoProps) {
               value={normalValue}
               onChange={e => setNormalValue(e.target.value)}
               placeholder="긴 한글 텍스트를 입력해보세요..."
-              className="bd-w-[120px] bd-border-destructive bd-text-sm focus:bd-ring-destructive"
+              className="!bd-w-[120px] bd-border-destructive bd-text-sm focus:bd-ring-destructive"
             />
             <button
               onClick={() => {
@@ -160,7 +160,7 @@ function ImeScrollDemo({ initialText = '' }: ImeScrollDemoProps) {
               onKeyDown={imeScrollHandlers.onKeyDown}
               onInput={imeScrollHandlers.onInput}
               placeholder="긴 한글 텍스트를 입력해보세요..."
-              className="bd-w-[120px] bd-border-green-500 bd-text-sm focus:bd-ring-green-600"
+              className="!bd-w-[120px] bd-border-green-500 bd-text-sm focus:bd-ring-green-600"
             />
             <button
               onClick={() => {
@@ -181,7 +181,7 @@ function ImeScrollDemo({ initialText = '' }: ImeScrollDemoProps) {
         </h6>
         <ul className="bd-space-y-1 bd-text-xs bd-text-muted-foreground">
           <li>1. 위 두 input 필드에 긴 한글 텍스트를 입력하세요</li>
-          <li>2. 텍스트가 120px를 넘어갈 때까지 입력하세요</li>
+          <li>2. 텍스트가 인풋 너비를 넘어갈 때까지 입력하세요</li>
           <li>
             3. 한글 조합 중에{' '}
             <strong className="bd-text-foreground">공백</strong>을 눌러보세요
