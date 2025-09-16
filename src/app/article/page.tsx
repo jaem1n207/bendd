@@ -10,8 +10,8 @@ export async function generateMetadata(
   const previousImages = (await parent).openGraph?.images || [];
 
   return {
-    title: '피드',
-    description: '작성한 글들을 모아놓은 공간입니다.',
+    title: '기술 이야기',
+    description: '경험과 지식을 공유하는 공간입니다.',
     alternates: {
       canonical: `${siteMetadata.siteUrl}/article`,
       languages: {
@@ -22,7 +22,7 @@ export async function generateMetadata(
     openGraph: {
       type: 'website',
       url: `${siteMetadata.siteUrl}/article`,
-      siteName: `${siteMetadata.author}의 피드`,
+      siteName: `${siteMetadata.author}의 경험과 지식 공유 공간`,
       images: [...previousImages],
     },
   };
