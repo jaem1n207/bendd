@@ -16,6 +16,9 @@ const nextConfig = {
       '@shikijs/twoslash',
       'rehype-mermaid',
       'mermaid-isomorphic',
+      'mermaid',
+      'playwright',
+      'playwright-core',
     ],
     typedRoutes: true,
   },
@@ -33,6 +36,19 @@ const nextConfig = {
   images: {
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Vercel 배포 환경에서 mermaid 관련 패키지들을 외부 의존성으로 처리
+      config.externals = config.externals || [];
+      config.externals.push({
+        mermaid: 'commonjs mermaid',
+        'mermaid-isomorphic': 'commonjs mermaid-isomorphic',
+        playwright: 'commonjs playwright',
+        'playwright-core': 'commonjs playwright-core',
+      });
+    }
+    return config;
   },
 };
 
