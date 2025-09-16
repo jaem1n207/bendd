@@ -107,7 +107,7 @@
       )
       pre
   ) {
-  @apply !bd-rounded-t-none !bd-mt-0;
+  @apply !bd-rounded-t-none !bd-mt-0 bd-border-border bd-border-solid bd-border bd-rounded-lg;
 }
 
 .container :global(figure[data-rehype-pretty-code-figure] pre),
