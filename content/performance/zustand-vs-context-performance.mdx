@@ -1,0 +1,542 @@
+---
+title: 'Zustand vs Context API: 올바른 선택과 사용법'
+summary: '상태 관리 도구의 본질 이해하기'
+description: 'Zustand와 React Context API의 본질적 차이점을 이해하고, 언제 어떤 도구를 사용해야 하는지 알아봅니다. 실제 성능 측정 데이터와 함께 각 도구의 올바른 사용법과 결합 패턴까지 완벽 가이드를 제공합니다.'
+category: 'performance'
+publishedAt: '2024-04-30'
+---
+
+## 왜 zustand를 사용했을까요?
+
+React는 기본적으로 컴포넌트 트리 전체에 데이터를 제공할 수 있는 `Context API`를 제공합니다. 이 API는 앱의 크기가 크지 않다면 매우 편하고 유용합니다. 하지만 앱이 커진다면 성능 문제가 발생할 수 있습니다. context 값에 변경 사항이 있을 때마다 useContext가 다시 렌더링합니다. 중요한 건 값의 일부가 렌더에 사용되지 않아도 발생하는 것입니다. 이는 [의도된 것](https://github.com/facebook/react/issues/14110)이며 만약 useContext가 조건부로 리렌더링을 트리거한다면 재사용할 수 없는 hook이 됩니다.
+
+useContext 훅의 리렌더링을 방지할 수 있는 세 가지 방법이 있습니다.
+
+간단한 예를 들어보겠습니다. `바르셀로나`와 `레알 마드리드`의 팀 멤버를 가진 객체가 있습니다:
+
+```tsx
+const initialFirstTeamMembers = {
+  barca: ['messi', 'suarez', 'neymar'],
+  madrid: ['ronaldo', 'bale', 'benzema'],
+};
+```
+
+useReducer 훅에 전달한 reducer를 정의합니다:
+
+```tsx title="통합 reducer (최적화 전)"
+const reducer = (
+  state: typeof initialFirstTeamMembers,
+  action: Action
+): State => {
+  switch (action.type) {
+    case 'add':
+      return {
+        ...state,
+        [action.team]: [...state[action.team], action.player], // [!code highlight]
+      };
+    case 'remove':
+      return {
+        ...state,
+        [action.team]: state[action.team].filter( // [!code highlight]
+          player => player !== action.player
+        ),
+      };
+    default:
+      return state;
+  }
+};
+```
+
+Context Provider는 다음과 같습니다:
+
+```tsx title="단일 Context Provider (최적화 전)"
+const FirstTeamMembersContext = createContext(undefined);
+
+const useFirstTeamMembers = () => {
+  const context = useContext(FirstTeamMembersContext);
+
+  if (context === undefined) {
+    throw new Error(
+      'useFirstTeamMembers must be used within a FirstTeamMembersProvider'
+    );
+  }
+
+  return context;
+};
+
+const FirstTeamMembersProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <FirstTeamMembersContext.Provider value={value}> {/* [!code highlight] */}
+      <Barca />
+      <Madrid />
+    </FirstTeamMembersContext.Provider>
+  );
+};
+```
+
+`Barca` 컴포넌트는 다음과 같이 구현됩니다:
+
+```tsx title="Barca 컴포넌트 (최적화 전)"
+export const Barca = () => {
+  const [state, dispatch] = useFirstTeamMembers(); // [!code highlight]
+
+  return (
+    <>
+      <h3>Barcelona</h3>
+      <ul>
+        {state.barca.map(player => (
+          <li key={player}>
+            {player}
+            <button
+              onClick={() =>
+                dispatch({ type: 'remove', team: 'barca', player }) // [!code highlight]
+              }
+            >
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+};
+```
+
+`Madrid` 컴포넌트도 이와 유사합니다.
+
+`madrid`의 멤버가 변경되면 `Barca`도 리렌더링되어 이전과 동일한 출력이 생성됩니다. 만약 리렌더링할 컴포넌트가 많을 경우 속도가 느려질 수 있습니다. 이 문제는 [gaearon이 제시](https://github.com/facebook/react/issues/15156#issuecomment-474590693)한 것처럼 다음 세 가지 방법으로 해결할 수 있습니다.
+
+## Context API 최적화 방법
+
+### 1. 컨텍스트를 분할합니다
+
+가장 권장되는 방법입니다. 위 예제를 아래처럼 분할합니다:
+
+```tsx
+const initialBarcaState: { barca: Members } = {
+  barca: ['messi', 'suarez', 'neymar'],
+};
+
+const initialMadridState: { madrid: Members } = {
+  madrid: ['ronaldo', 'bale', 'modric'],
+};
+```
+
+그리고 두 개의 reducer와 context를 사용하도록 변경합니다:
+
+<MagicMove
+  lang="typescript"
+  codeSnippets={[
+    {
+      title: "1단계: 기본 타입과 Context 정의",
+      description: "분할된 Context를 위한 기본 타입들을 정의합니다",
+      content: `import {
+  createContext,
+  Dispatch,
+  useContext,
+  useReducer,
+  type ReactNode,
+} from 'react';
+
+type Action =
+  | { type: 'add'; player: string }
+  | { type: 'remove'; player: string };
+
+type Members = string[];
+
+// 각 팀별로 독립적인 Context 생성
+const BarcaTeamMembersContext = createContext<
+  [Members, Dispatch<Action>] | undefined
+>(undefined);
+
+const MadridTeamMembersContext = createContext<
+  [Members, Dispatch<Action>] | undefined
+>(undefined);`
+    },
+    {
+      title: "2단계: 독립적인 초기 상태 정의",
+      description: "각 팀별로 분리된 초기 상태를 정의합니다",
+      content: `// 이전: 하나의 통합 상태
+// const initialFirstTeamMembers = {
+//   barca: ['messi', 'suarez', 'neymar'],
+//   madrid: ['ronaldo', 'bale', 'modric'],
+// };
+
+// 이후: 팀별로 분리된 상태
+const initialBarcaState: { barca: Members } = {
+  barca: ['messi', 'suarez', 'neymar'],
+};
+
+const initialMadridState: { madrid: Members } = {
+  madrid: ['ronaldo', 'bale', 'modric'],
+};`
+    },
+    {
+      title: "3단계: 팀별 독립 Reducer 구현",
+      description: "각 팀만의 상태를 관리하는 독립적인 reducer를 구현합니다",
+      content: `const barcaReducer = (state: typeof initialBarcaState, action: Action) => {
+  switch (action.type) {
+    case 'add':
+      return { barca: [...state.barca, action.player] };
+    case 'remove':
+      return {
+        barca: state.barca.filter(player => player !== action.player),
+      };
+    default:
+      return state;
+  }
+};
+
+const madridReducer = (state: typeof initialMadridState, action: Action) => {
+  switch (action.type) {
+    case 'add':
+      return { madrid: [...state.madrid, action.player] };
+    case 'remove':
+      return {
+        madrid: state.madrid.filter(player => player !== action.player),
+      };
+    default:
+      return state;
+  }
+};`
+    },
+    {
+      title: "4단계: 커스텀 훅으로 안전한 접근",
+      description: "타입 안전성과 에러 처리를 포함한 커스텀 훅을 구현합니다",
+      content: `export const useBarcaTeamMembers = () => {
+  const context = useContext(BarcaTeamMembersContext);
+  if (!context) {
+    throw new Error(
+      'useBarcaTeamMembers must be used within a BarcaTeamMembersProvider'
+    );
+  }
+  return context;
+};
+
+export const useMadridTeamMembers = () => {
+  const context = useContext(MadridTeamMembersContext);
+  if (!context) {
+    throw new Error(
+      'useMadridTeamMembers must be used within a MadridTeamMembersProvider'
+    );
+  }
+  return context;
+};`
+    },
+    {
+      title: "5단계: 독립적인 Provider 컴포넌트",
+      description: "각 팀별로 독립적인 Provider를 구현합니다",
+      content: `export const BarcaTeamMembersProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  const [state, dispatch] = useReducer(barcaReducer, initialBarcaState);
+
+  return (
+    <BarcaTeamMembersContext.Provider value={[state.barca, dispatch]}>
+      {children}
+    </BarcaTeamMembersContext.Provider>
+  );
+};
+
+export const MadridTeamMembersProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  const [state, dispatch] = useReducer(madridReducer, initialMadridState);
+
+  return (
+    <MadridTeamMembersContext.Provider value={[state.madrid, dispatch]}>
+      {children}
+    </MadridTeamMembersContext.Provider>
+  );
+};`
+    },
+    {
+      title: "6단계: 통합 Provider로 조합",
+      description: "개별 Provider들을 조합하여 하나의 통합 Provider를 만듭니다",
+      content: `export const FirstTeamMembersProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  return (
+    <BarcaTeamMembersProvider>
+      <MadridTeamMembersProvider>
+        {children}
+      </MadridTeamMembersProvider>
+    </BarcaTeamMembersProvider>
+  );
+};
+
+// 이제 각 팀의 상태가 독립적으로 관리되어
+// Barca 상태 변경 시 Madrid 컴포넌트는 리렌더링되지 않습니다!`
+    }
+  ]}
+/>
+
+`Barca` 컴포넌트를 수정하겠습니다:
+
+```tsx title="Barca 컴포넌트 (최적화 후)"
+import { useBarcaTeamMembers } from './TeamProvider';
+
+export const Barca = () => {
+  const [state, dispatch] = useBarcaTeamMembers(); // [!code highlight]
+
+  return (
+    <>
+      <h3>Barcelona</h3>
+      <ul>
+        {state.map(player => ( // [!code highlight]
+          <li key={player}>
+            {player}
+            <button onClick={() => dispatch({ type: 'remove', player })}> {/* [!code highlight] */}
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+};
+```
+
+`Madrid` 컴포넌트도 유사하게 수정하면 됩니다. 이제 Barca 멤버를 변경하면 `Barca` 컴포넌트만 리렌더링됩니다(아래에서 최적화 전/후에 대한 성능 비교를 다룹니다). 그러나 단일 상태로 유지해야 하는 경우에는 이 방법을 사용할 수 없습니다.
+
+### 2. React.memo와 컴포넌트 분할
+
+두 번재 방법은 컴포넌트를 둘로 나누고 그 사이에 `React.memo`를 사용하는 것입니다. 이 방법도 관용적으로 사용되며 처음 예제에서 Context를 변경할 필요가 없습니다. 여전히 외부 컴포넌트를 리렌더링하지만 복잡한 로직은 React.memo를 사용한 내부 컴포넌트에 있으므로 성능상 문제가 발생하지 않습니다.
+
+### 3. useMemo로 최적화
+
+세 번째 방법은 `useMemo` 훅으로 컴포넌트를 감싸고 종속성을 지정해 단일 컴포넌트로 유지하는 방법입니다. 컴포넌트는 여전히 리렌더되지만 종속성으로 지정한 값이 동일하다면 자식 컴포넌트는 리렌더되지 않습니다. 하지만 이 방법엔 훅을 쓸 수 없다는 제한 사항이 존재하므로 되도록 권장하진 않습니다.
+
+자세히 알고 싶다면 [Preventing rerenders with React.memo and useContext hook.](https://github.com/facebook/react/issues/15156#issuecomment-474590693) 토론에서 확인해주세요.
+
+## 성능 측정 비교
+
+이제 최적화 전/후 렌더링 성능을 비교해보겠습니다. 성능 비교는 다음과 같이 진행했습니다:
+
+- 비교 대상은 처음 예제와 Context를 분할한 예제입니다.
+- 렌더링 성능 비교를 위해 `Barca`와 `Madrid` 컴포넌트는 15,000개의 빈 div 컴포넌트를 자식으로 렌더링합니다.
+- m1 Pro 맥북, 크롬 브라우저, 시크릿 모드에서 진행했습니다.
+
+위 컴포넌트를 렌더링하면 아래와 같은 화면이 표시됩니다.
+
+![바르셀로나와 레알 마드리드 팀 멤버 목록을 보여주는 렌더링 화면 스크린샷](/images/perfect-dark-mode/render-view.webp)
+
+messi(barca) > suarez(barca) > ronaldo(madrid) > neymar(barca) 순서대로 `dispatch` 함수를 호출하고 FlameGraph에 전달해 성능을 측정합니다(react-developer-tools 확장 프로그램을 이용했습니다).
+
+### Context API 기본 성능
+
+처음 예제의 FlameGraph부터 보겠습니다.
+
+![Context API 사용 시 불필요한 리렌더링이 발생하는 것을 보여주는 FlameGraph gif, 92.5ms의 렌더링 시간 기록](/images/perfect-dark-mode/trigger-render-context-flame.gif)
+
+위의 그래프 차트를 보면 messi(barca) 멤버를 제거하면 `Madrid` 컴포넌트는 다시 렌더링 되지 않길 원하지만 `Barca`와 `Madrid` 컴포넌트 모두 리렌더링되었습니다. 렌더링에 소요된 시간은 **92.5ms**입니다. 만약 복잡한 로직을 처리한다면 렌더링 속도가 훨씬 느려질 것입니다. Context API가 앱이 커지면 문제가 발생할 수 있는 이유입니다.
+
+### Context 분할 최적화 성능
+
+이제 첫 번째 방법으로 최적화한 예제의 FlameGraph를 보겠습니다.
+
+![Context를 분할한 후 필요한 컴포넌트만 리렌더링되는 것을 보여주는 FlameGraph gif, 41.6ms로 55% 성능 개선](/images/perfect-dark-mode/split-context-flame.gif)
+
+최적화 후의 차트를 보면 리렌더링이 필요한 컴포넌트만 렌더링 큐에 들어가 실행된 것을 확인할 수 있습니다. 렌더링에 소요된 시간도 **41.6ms**로 최적화 전에 비하면 약 **55% 빨라졌습니다**.
+
+하지만 Context API는 위 첫 번째 최적화 예제 코드에서 볼 수 있듯 성능 작성할 코드가 적지 않습니다. Context를 이용해 작업하다 앱이 커지면 `Provider` 간의 암시적인 종속성도 생길 수 있고, 스토리북 및 단위 테스트에 대해서도 Context Provider 종속성이 발생합니다. 이는 개발자 경험에 좋지 않죠.
+
+## Zustand와 Context API: 언제, 왜 사용해야 할까?
+
+사실 zustand와 Context API는 **다른 목적**을 가진 도구예요. 단순히 '전역 상태 관리'라는 말로 묶어서 비교하기에는 각각의 본질이 다르거든요.
+
+### Context API의 진정한 역할
+
+Context API는 사실 **상태 관리 도구가 아니에요**. 더 정확히는 **의존성 주입(Dependency Injection)** 도구죠.
+
+```tsx title="Context API의 본래 목적"
+// ❌ 이렇게 사용하면 성능 문제 발생
+const GlobalStateContext = createContext({ 
+  user: null, 
+  theme: 'light', 
+  notifications: [] // [!code error]
+});
+
+// ✅ 이렇게 사용하는 게 맞아요
+const ThemeContext = createContext('light'); // [!code highlight]
+const UserServiceContext = createContext(userService); // [!code highlight]
+```
+
+[React 팀도 Context API를 복합 컴포넌트 간의 의존성 관리용으로 사용하라고 권장](https://twitter.com/sebmarkbage/status/1219836431972978689)해요 (예: List > ListItem 관계).
+
+### Zustand의 전역 상태 문제점
+
+zustand는 강력하지만, **글로벌 싱글톤**이라는 한계가 있어요:
+
+```tsx title="zustand의 한계점들"
+// 문제 1: props로 초기화가 어려움
+const useCounterStore = create(() => ({
+  count: 0, // 이 값을 props로 받으려면? // [!code error]
+}));
+
+// 문제 2: 테스트 격리가 어려움  
+// 각 테스트마다 독립적인 store 인스턴스가 필요한데... // [!code error]
+
+// 문제 3: 컴포넌트 재사용성 저하
+// 같은 컴포넌트를 여러 번 사용할 때 각각 다른 상태를 가져야 한다면? // [!code error]
+```
+
+### 두 기술의 결합: 최고의 해결책
+
+[TkDodo의 접근법](https://tkdodo.eu/blog/zustand-and-react-context)을 따라 **zustand store를 Context로 제공**하는 방식이 최적이에요:
+
+```tsx title="zustand + Context 결합 패턴"
+// 1. zustand store 팩토리 함수 생성
+const createThemeStore = (initialTheme: Theme) => 
+  create<ThemeState>()((set) => ({
+    theme: initialTheme, // props로 초기화 가능! // [!code highlight]
+    toggleTheme: () => set(state => ({ 
+      theme: state.theme === 'dark' ? 'light' : 'dark' 
+    })),
+  }));
+
+// 2. Context로 store 인스턴스 제공
+const ThemeStoreContext = createContext<ReturnType<typeof createThemeStore> | null>(null);
+
+export const ThemeProvider = ({ children, initialTheme = 'system' }) => {
+  const store = useMemo(() => createThemeStore(initialTheme), [initialTheme]); // [!code highlight]
+  
+  return (
+    <ThemeStoreContext.Provider value={store}>
+      {children}
+    </ThemeStoreContext.Provider>
+  );
+};
+
+// 3. 커스텀 훅으로 안전하게 접근
+export const useThemeStore = () => {
+  const store = useContext(ThemeStoreContext);
+  if (!store) throw new Error('ThemeProvider가 필요합니다'); // [!code highlight]
+  return store;
+};
+```
+
+### 언제 어떤 걸 사용해야 할까?
+
+| 상황 | 권장 도구 | 이유 |
+|------|----------|------|
+| **진짜 전역 상태** (사용자 정보, 테마) | zustand 단독 | 모든 곳에서 접근 필요 |
+| **컴포넌트 트리 상태** (폼, 모달) | zustand + Context | props 초기화, 재사용성 |
+| **의존성 주입** (서비스, 설정) | Context API | 본래 목적에 맞음 |
+| **단순한 값 전달** (테마 문자열) | Context API | 간단하고 충분함 |
+
+`zustand`를 사용하면 리렌더링 문제를 몇 줄 안 되는 코드로 해결할 수 있습니다. 하지만 상황에 맞는 올바른 선택이 더 중요해요.
+
+```tsx title="zustand로 간단하게 해결"
+export const useBarcaTeamStore = create<BarcaState>(set => ({
+  barca: ['messi', 'suarez', 'neymar'],
+  addPlayer: player => set(state => ({ barca: [...state.barca, player] })), // [!code highlight]
+  removePlayer: player =>
+    set(state => ({ barca: state.barca.filter(p => p !== player) })), // [!code highlight]
+}));
+
+export const useMadridTeamStore = create<MadridState>(set => ({
+  madrid: ['ronaldo', 'bale', 'modric'],
+  addPlayer: player => set(state => ({ madrid: [...state.madrid, player] })), // [!code highlight]
+  removePlayer: player =>
+    set(state => ({ madrid: state.madrid.filter(p => p !== player) })), // [!code highlight]
+}));
+```
+
+Provider로 감쌀 필요도 없습니다. 단순히 store를 만드는 함수를 호출해 상태의 초기값과 이를 변경하는 함수를 정의하면 됩니다. 그리고 `Barca` 컴포넌트를 아래처럼 수정해줍니다:
+
+```tsx title="zustand 사용 Barca 컴포넌트"
+export const Barca = () => {
+  const { barca, removePlayer } = useBarcaTeamStore(); // [!code highlight]
+
+  return (
+    <>
+      <h3>Barcelona</h3>
+      <ul>
+        {barca.map(player => (
+          <li key={player}>
+            {player}
+            <button onClick={() => removePlayer(player)}>Remove</button> {/* [!code highlight] */}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+};
+```
+
+`Madrid` 컴포넌트도 유사하게 수정합니다. 이제 FlameGraph를 보겠습니다:
+
+![zustand 사용 시 효율적인 리렌더링을 보여주는 FlameGraph gif, 필요한 컴포넌트만 업데이트됨](/images/perfect-dark-mode/zustand-flame.gif)
+
+리렌더링이 필요한 컴포넌트만 렌더링 큐에 들어가 실행된 것을 확인할 수 있습니다.
+
+## 실전 적용: 우리 프로젝트에서는 왜 zustand를?
+
+다크 모드 구현에서 zustand를 선택한 이유를 다시 정리해보면:
+
+### 1. 전역 상태가 필요했기 때문
+
+테마 설정은 **모든 컴포넌트에서 접근**해야 하는 진짜 전역 상태예요. 헤더, 사이드바, 본문, 푸터까지 모든 곳에서 테마 정보가 필요하죠.
+
+### 2. 간단한 API와 뛰어난 성능
+
+```tsx title="zustand로 간단하게 해결"
+// Context API 분할: 50+ 줄의 복잡한 코드
+// zustand: 10줄로 해결
+const useThemeStore = create<ThemeState>()(
+  persist( // [!code highlight]
+    (set, get) => ({
+      theme: 'system',
+      toggleTheme: () => {
+        const { theme, isSystemDark } = get();
+        set({ theme: theme === 'system' ? (isSystemDark ? 'light' : 'dark') : 'system' }); // [!code highlight]
+      },
+    }),
+    { name: 'theme' } // [!code highlight]
+  )
+);
+```
+
+### 3. localStorage 통합의 용이함
+
+`persist` 미들웨어로 localStorage 연동이 한 줄이면 끝이에요. Context API로는 이런 편의성을 얻기 어렵죠.
+
+### 언제 다른 선택을 해야 할까?
+
+하지만 모든 상황에서 zustand가 정답은 아니에요:
+
+- **테스트 격리가 중요한 프로젝트**: zustand + Context 패턴
+- **컴포넌트별 독립적인 상태**: 로컬 state나 zustand + Context 
+- **단순한 prop drilling 해결**: Context API만으로 충분
+
+## 결론
+
+이처럼 zustand와 Context API는 각자의 영역이 있어요. 우리 다크 모드 프로젝트에서는 **전역 상태 + 간단한 API + localStorage 통합**이 필요했기 때문에 zustand가 최적의 선택이었습니다.
+
+<Callout type="info" emoji="💡">
+**핵심은 도구의 본질을 이해하는 것**: Context API는 의존성 주입 도구, zustand는 상태 관리 도구. 목적에 맞는 도구를 선택하고, 필요하다면 둘을 결합해서 사용하세요!
+</Callout>
+
+## 성능 요약
+
+| 구현 방법 | 렌더링 시간 | 성능 개선 | 코드 복잡도 |
+|----------|------------|----------|------------|
+| Context API (기본) | 92.5ms | - | 보통 |
+| Context 분할 | 41.6ms | 55% 개선 | 높음 |
+| Zustand | 유사한 성능 | 55% 개선 | 낮음 |
+
+## 참고 자료
+
+- [Preventing rerenders with React.memo and useContext hook](https://github.com/facebook/react/issues/15156#issuecomment-474590693)
+- [React Context API 성능 최적화](https://github.com/facebook/react/issues/14110)
+- [Zustand and React Context - TkDodo](https://tkdodo.eu/blog/zustand-and-react-context) - zustand와 Context의 올바른 사용법
+- [Zustand 공식 문서](https://docs.pmnd.rs/zustand)
+- [React Context API 공식 문서](https://react.dev/reference/react/createContext)
