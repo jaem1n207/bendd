@@ -109,25 +109,6 @@ PUT /users/1
 
 ## 한눈에 보는 PUT vs PATCH
 
-```mermaid
-graph LR
-    subgraph "PUT 요청"
-        A1["기존 리소스<br/>name: 이재민<br/>email: old@ex.com<br/>phone: 010-1234"] 
-        B1["요청 데이터<br/>email: new@ex.com"]
-        C1["결과<br/>email: new@ex.com<br/>(다른 필드 삭제됨)"]
-        A1 -->|전체 교체| B1
-        B1 --> C1
-    end
-    
-    subgraph "PATCH 요청"
-        A2["기존 리소스<br/>name: 이재민<br/>email: old@ex.com<br/>phone: 010-1234"]
-        B2["요청 데이터<br/>email: new@ex.com"]
-        C2["결과<br/>name: 이재민<br/>email: new@ex.com<br/>phone: 010-1234"]
-        A2 -->|부분 수정| B2
-        B2 --> C2
-    end
-```
-
 | 구분 | PUT | PATCH |
 |------|-----|-------|
 | **수정 방식** | 전체 리소스 교체 | 일부 필드만 수정 |

@@ -12,7 +12,6 @@ import {
 import { rendererRich, transformerTwoslash } from '@shikijs/twoslash';
 import { MDXRemote, type MDXRemoteProps } from 'next-mdx-remote/rsc';
 import type { AnchorHTMLAttributes, DetailedHTMLProps } from 'react';
-import rehypeMermaid from 'rehype-mermaid';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
@@ -68,12 +67,6 @@ export function CustomMDX({ source }: { source: string }) {
           mdxOptions: {
             remarkPlugins: [remarkGfm, smartypants],
             rehypePlugins: [
-              [
-                rehypeMermaid,
-                {
-                  strategy: 'img-svg',
-                },
-              ],
               [
                 rehypePrettyCode,
                 {

@@ -12,7 +12,7 @@ const nextConfig = {
     },
   },
   experimental: {
-    serverComponentsExternalPackages: ['@shikijs/twoslash', 'rehype-mermaid'],
+    serverComponentsExternalPackages: ['@shikijs/twoslash'],
     typedRoutes: true,
   },
   headers() {
