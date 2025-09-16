@@ -382,3 +382,40 @@
   border-left: 3px solid var(--twoslash-tag-annotate-color);
   color: var(--twoslash-tag-annotate-color);
 }
+
+/* Table styles */
+.container :global(table) {
+  @apply bd-w-full bd-my-6 bd-border-collapse;
+  border-spacing: 0;
+}
+
+.container :global(table thead) {
+  @apply bd-border-b bd-border-border;
+}
+
+.container :global(table th) {
+  @apply bd-border-b bd-border-border bd-px-4 bd-py-3 bd-text-left bd-font-semibold bd-text-foreground;
+  background-color: hsl(var(--muted));
+}
+
+.container :global(table td) {
+  @apply bd-border-b bd-border-border bd-px-4 bd-py-3 bd-text-foreground;
+}
+
+.container :global(table th:first-child),
+.container :global(table td:first-child) {
+  @apply bd-pl-4;
+}
+
+.container :global(table th:last-child),
+.container :global(table td:last-child) {
+  @apply bd-pr-4;
+}
+
+.container :global(table tbody tr:hover) {
+  @apply bd-bg-muted/50;
+}
+
+.container :global(table tbody tr:last-child td) {
+  @apply bd-border-b-0;
+}

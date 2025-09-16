@@ -15,6 +15,7 @@ import type { AnchorHTMLAttributes, DetailedHTMLProps } from 'react';
 import rehypeMermaid from 'rehype-mermaid';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
+import remarkGfm from 'remark-gfm';
 import smartypants from 'remark-smartypants';
 
 import { MDXCustomLink } from './components/a/custom-link';
@@ -65,7 +66,7 @@ export function CustomMDX({ source }: { source: string }) {
         source={source}
         options={{
           mdxOptions: {
-            remarkPlugins: [smartypants],
+            remarkPlugins: [remarkGfm, smartypants],
             rehypePlugins: [
               [
                 rehypeMermaid,
