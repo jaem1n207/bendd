@@ -50,7 +50,6 @@ export function StepInfo({ className }: { className?: string }) {
   return (
     <MotionConfig
       transition={{
-        duration: 0.4,
         type: 'spring',
         bounce: 0.15,
       }}
