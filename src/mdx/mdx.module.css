@@ -55,7 +55,7 @@
 }
 
 .container :global(pre [data-line]) {
-  @apply bd-px-1 bd-border-l-2 bd-border-l-transparent;
+  @apply bd-px-4 bd-border-l-2 bd-border-l-transparent;
 }
 
 .container :global(pre.has-focused-lines [data-line]:not(.has-focus)) {
