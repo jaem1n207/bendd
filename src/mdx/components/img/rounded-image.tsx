@@ -17,6 +17,22 @@ export function MDXRoundedImage({
     throw new Error('src is required for RoundedImage');
   }
 
+  // SVG data URI인지 확인
+  const isSvgDataUri = src.startsWith('data:image/svg+xml');
+  
+  if (isSvgDataUri) {
+    // SVG data URI는 일반 img 태그로 처리
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        alt={alt}
+        src={src}
+        className={cn('bd-mx-auto bd-rounded-lg bd-max-w-full bd-h-auto', className)}
+        {...props}
+      />
+    );
+  }
+
   return (
     <Image
       alt={alt}
