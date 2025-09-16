@@ -19,7 +19,7 @@ export function MDXRoundedImage({
 
   // SVG data URI인지 확인
   const isSvgDataUri = src.startsWith('data:image/svg+xml');
-  
+
   if (isSvgDataUri) {
     // SVG data URI는 일반 img 태그로 처리
     return (
@@ -27,7 +27,10 @@ export function MDXRoundedImage({
       <img
         alt={alt}
         src={src}
-        className={cn('bd-mx-auto bd-rounded-lg bd-max-w-full bd-h-auto', className)}
+        className={cn(
+          'bd-mx-auto bd-rounded-lg bd-max-w-full bd-h-auto',
+          className
+        )}
         {...props}
       />
     );

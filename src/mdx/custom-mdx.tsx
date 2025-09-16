@@ -72,7 +72,7 @@ export function CustomMDX({ source }: { source: string }) {
                 rehypeMermaid,
                 {
                   strategy: 'img-svg',
-                }
+                },
               ],
               [
                 rehypePrettyCode,
