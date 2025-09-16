@@ -16,8 +16,6 @@ const nextConfig = {
       '@shikijs/twoslash',
       'rehype-mermaid',
       'mermaid-isomorphic',
-      'playwright',
-      'playwright-core',
     ],
     typedRoutes: true,
   },
