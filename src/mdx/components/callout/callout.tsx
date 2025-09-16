@@ -61,7 +61,9 @@ function Callout({
       >
         {emoji}
       </div>
-      <div className="bd-w-full bd-min-w-0 bd-leading-7">{children}</div>
+      <div className="bd-w-full bd-min-w-0 bd-leading-7 [&>p]:!bd-my-0">
+        {children}
+      </div>
     </div>
   );
 }
