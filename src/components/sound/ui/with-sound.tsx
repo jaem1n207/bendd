@@ -21,7 +21,6 @@ export function WithSound({ children, assetPath }: WithSoundProps) {
   const processChild = (child: ReactNode): ReactNode => {
     if (isValidElement(child)) {
       return cloneElement(child, {
-        // @ts-expect-error
         onClick: () => {
           if (child.props.onClick) {
             child.props.onClick();
