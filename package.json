@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^14.2.32",
-    "@playwright/test": "^1.44.1",
+    "@playwright/test": "^1.55.0",
     "@shikijs/transformers": "^1.10.3",
     "@shikijs/twoslash": "^1.10.3",
     "@tailwindcss/typography": "^0.5.16",
