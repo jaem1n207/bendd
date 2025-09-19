@@ -53,7 +53,7 @@
     "@playwright/test": "^1.55.0",
     "@shikijs/transformers": "^1.10.3",
     "@shikijs/twoslash": "^1.10.3",
-    "@tailwindcss/typography": "^0.5.16",
+    "@tailwindcss/typography": "^0.5.18",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^20.19.17",
     "@types/react": "^18.3.24",
