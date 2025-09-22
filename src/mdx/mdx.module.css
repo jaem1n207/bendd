@@ -75,6 +75,10 @@
   border: 1px solid var(--twoslash-highlighted-border);
 }
 
+.container :global(.highlighted + .highlighted) {
+  border: none;
+}
+
 .container :global([data-highlighted-chars]) {
   @apply bd-bg-zinc-600/50 bd-rounded;
   box-shadow: 0 0 0 4px rgb(82 82 91 / 0.5);

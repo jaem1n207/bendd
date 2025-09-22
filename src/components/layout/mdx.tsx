@@ -1,5 +1,4 @@
 import { CornerUpLeft } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import type { BlogPosting, WithContext } from 'schema-dts';
 
@@ -7,20 +6,9 @@ import { Giscus } from '@/components/comments/giscus';
 import { Typography } from '@/components/ui/typography';
 import { siteMetadata } from '@/lib/site-metadata';
 import { cn } from '@/lib/utils';
-import { SkeletonTableOfContents } from '@/mdx/common/table-of-contents/skeleton-table-of-contents';
+import { ClientTableOfContents } from '@/components/layout/client-table-of-contents';
 import { CustomMDX } from '@/mdx/custom-mdx';
 import { type Article, formatDate } from '@/mdx/mdx';
-
-const TableOfContents = dynamic(
-  () =>
-    import('@/mdx/common/table-of-contents/table-of-contents').then(
-      mod => mod.TableOfContents
-    ),
-  {
-    ssr: false,
-    loading: SkeletonTableOfContents,
-  }
-);
 
 interface MdxLayoutProps {
   post: Article;
@@ -70,7 +58,7 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
             <CornerUpLeft className="bd-size-4" />
             {type.charAt(0).toUpperCase() + type.slice(1)}
           </Link>
-          <TableOfContents />
+          <ClientTableOfContents />
         </div>
         <Typography variant="h2">{title}</Typography>
         <Typography

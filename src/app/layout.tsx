@@ -9,23 +9,13 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { siteMetadata } from '@/lib/site-metadata';
 import { cn } from '@/lib/utils';
+import { BrowserDetector } from '@/components/browser-detector';
 
 import '../globals.css';
 import '../theme-switch-effect.css';
 
-const Signature = dynamic(
-  () => import('../components/signature').then(mod => mod.Signature),
-  {
-    ssr: false,
-  }
-);
-
-const BrowserDetector = dynamic(
-  () =>
-    import('../components/browser-detector').then(mod => mod.BrowserDetector),
-  {
-    ssr: false,
-  }
+const Signature = dynamic(() =>
+  import('../components/signature').then(mod => mod.Signature)
 );
 
 const fontSans = FontSans({
