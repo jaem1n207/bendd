@@ -9,7 +9,7 @@
     // Configuration for testing
     {
       "files": ["**/*.test.ts", "**/*.test.tsx"],
-      "plugins": ["vitest", "testing-library"]
+      "plugins": ["@vitest", "testing-library"]
     },
     // Configuration for e2e testing (Playwright)
     {
