@@ -45,7 +45,7 @@
     "tailwindcss-animate": "^1.0.7",
     "use-sound": "^4.0.4",
     "zod": "^3.25.76",
-    "zod-validation-error": "^3.3.0",
+    "zod-validation-error": "^3.5.3",
     "zustand": "^4.5.7"
   },
   "devDependencies": {
