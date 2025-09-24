@@ -3,16 +3,16 @@ import { forwardRef, type AnchorHTMLAttributes, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
-const linkVariants = cva('bd-select-none bd-transition-colors', {
+const linkVariants = cva('bd:select-none bd:transition-colors', {
   variants: {
     variant: {
-      default: 'bd-text-muted-foreground hover:bd-text-primary',
-      primary: 'bd-text-primary hover:bd-text-primary/90',
-      icon: 'bd-opacity-75 hover:bd-text-primary/90 hover:bd-opacity-100',
+      default: 'bd:text-muted-foreground bd:hover:text-primary',
+      primary: 'bd:text-primary bd:hover:text-primary/90',
+      icon: 'bd:opacity-75 bd:hover:text-primary/90 bd:hover:opacity-100',
     },
     affects: {
       default: '',
-      mdx: 'bd-text-sm bd-decoration-1 bd-underline-offset-4',
+      mdx: 'bd:text-sm bd:decoration-1 bd:underline-offset-4',
     },
   },
   defaultVariants: {
@@ -67,11 +67,11 @@ export const ExternalLink = forwardRef<HTMLAnchorElement, LinkProps>(
       <a
         className={cn(
           {
-            'bd-space-x-1 bd-leading-tight': prefixEl || suffixEl,
+            'bd:space-x-1 bd:leading-tight': prefixEl || suffixEl,
           },
           linkVariants({ variant, affects }),
           {
-            'bd-pointer-events-none bd-opacity-50': disabled,
+            'bd:pointer-events-none bd:opacity-50': disabled,
           },
           className
         )}

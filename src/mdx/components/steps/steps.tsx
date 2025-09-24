@@ -4,8 +4,6 @@ import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import styles from './steps.module.css';
 
-type StepsProps = z.infer<typeof StepsSchema>;
-
 const StepsSchema = z.object({
   children: z
     .custom<ReactNode>(v => isValidElement(v) || typeof v === 'string')
@@ -17,12 +15,14 @@ const StepsSchema = z.object({
   className: z.string().optional(),
 });
 
+type StepsProps = z.infer<typeof StepsSchema>;
+
 export function MDXSteps({ children, className }: StepsProps) {
   return (
     <div
       className={cn(
         styles.container,
-        'bendd-steps bd-ml-4 bd-mb-12 bd-border-l bd-border-border bd-pl-6',
+        'bendd-steps bd:ml-4 bd:mb-12 bd:border-l bd:border bd:pl-6',
         '[counter-reset:step]',
         className
       )}

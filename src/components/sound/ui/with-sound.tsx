@@ -20,10 +20,11 @@ export function WithSound({ children, assetPath }: WithSoundProps) {
 
   const processChild = (child: ReactNode): ReactNode => {
     if (isValidElement(child)) {
-      return cloneElement(child, {
+      const childProps = child.props as Record<string, any>;
+      return cloneElement(child as React.ReactElement<any>, {
         onClick: () => {
-          if (child.props.onClick) {
-            child.props.onClick();
+          if (childProps.onClick) {
+            childProps.onClick();
           }
           playClickSound();
         },

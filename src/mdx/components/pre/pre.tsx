@@ -9,12 +9,12 @@ export function MDXPre({ children, ...props }: HTMLAttributes<HTMLPreElement>) {
   const preRef = useRef<HTMLPreElement | null>(null);
 
   return (
-    <div className="bd-relative">
+    <div className="bd:relative">
       <pre
         ref={preRef}
         className={cn(
-          'bd-my-0 bd-overflow-x-auto bd-rounded-lg bd-border bd-border-solid bd-border-border bd-px-0 bd-py-3',
-          'contrast-more:bd-border-current contrast-more:dark:bd-border-current'
+          'bd:my-0 bd:overflow-x-auto bd:rounded-lg bd:border-solid bd:border bd:px-0 bd:py-3',
+          'bd:contrast-more:border-current bd:contrast-more:dark:border-current'
         )}
         {...props}
         tabIndex={-1}
@@ -22,7 +22,7 @@ export function MDXPre({ children, ...props }: HTMLAttributes<HTMLPreElement>) {
       >
         {children}
       </pre>
-      <div className="bd-absolute bd-right-0 bd-top-0 bd-m-2.5 bd-flex bd-gap-1 bd-opacity-0 bd-transition focus-within:bd-opacity-100 [div:hover>&]:bd-opacity-100">
+      <div className="bd:absolute bd:right-0 bd:top-0 bd:m-2.5 bd:flex bd:gap-1 bd:opacity-0 bd:transition bd:focus-within:opacity-100 bd:[div:hover>&]:opacity-100">
         <CopyToClipboard
           getValue={() =>
             preRef.current?.querySelector('code')?.textContent ?? ''

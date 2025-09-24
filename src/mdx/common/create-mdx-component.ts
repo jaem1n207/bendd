@@ -13,7 +13,7 @@ export function createMDXComponent<T extends z.ZodType>(
       Component.displayName || Component.name || 'Unknown Component Name';
     validateProps(schema, props, componentName);
 
-    return createElement(Component, props);
+    return createElement(Component as React.FC<any>, props as any);
   };
 
   return MDXComponent;

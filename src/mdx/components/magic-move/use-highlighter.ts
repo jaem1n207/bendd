@@ -22,8 +22,8 @@ export function useHighlighter(): HighlighterCore | undefined {
           import('shiki/langs/yaml.mjs'),
           import('shiki/langs/svelte.mjs'),
         ],
-        loadWasm: getWasm,
-      });
+        ...getWasm,
+      } as any);
       setHighlighter(newHighlighter);
     }
 

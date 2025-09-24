@@ -118,7 +118,7 @@ export function useActiveAnchor(
     function activateLink(hash: string | null) {
       if (containerRef.current) {
         const links = containerRef.current.querySelectorAll('a');
-        links.forEach(link => link.classList.remove('!bd-text-foreground'));
+        links.forEach(link => link.classList.remove('bd:!text-foreground'));
 
         if (hash != null) {
           const activeLink =
@@ -126,7 +126,7 @@ export function useActiveAnchor(
               `a[href="${decodeURIComponent(hash)}"]`
             );
           if (activeLink) {
-            activeLink.classList.add('!bd-text-foreground');
+            activeLink.classList.add('bd:!text-foreground');
             if (markerRef.current) {
               markerRef.current.style.top = `${activeLink.offsetTop + 4}px`;
               markerRef.current.style.opacity = '1';

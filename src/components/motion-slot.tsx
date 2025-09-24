@@ -28,12 +28,13 @@ export const MotionSlot = ({ children }: MotionSlotProps) => {
 
   const processChild = (child: ReactNode): ReactNode => {
     if (isValidElement(child) && isMotionComponent(child.type)) {
-      const props = Object.keys(child.props).reduce(
+      const childProps = child.props as Record<string, any>;
+      const props = Object.keys(childProps).reduce(
         (acc: Record<string, any>, key) => {
           if (shouldRemoveProp(key) && prefersReducedMotion) {
             acc[key] = undefined;
           } else {
-            acc[key] = child.props[key];
+            acc[key] = childProps[key];
           }
           return acc;
         },

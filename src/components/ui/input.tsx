@@ -2,21 +2,20 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
-  ({ className, type, ...props }, ref) => {
-    return (
-      <input
-        type={type}
-        className={cn(
-          'bd-flex bd-h-10 bd-w-full bd-rounded-md bd-border bd-border-input bd-bg-background bd-px-3 bd-py-2 bd-text-base bd-ring-offset-background file:bd-border-0 file:bd-bg-transparent file:bd-text-sm file:bd-font-medium file:bd-text-foreground placeholder:bd-text-muted-foreground focus-visible:bd-outline-none focus-visible:bd-ring-2 focus-visible:bd-ring-ring focus-visible:bd-ring-offset-2 disabled:bd-cursor-not-allowed disabled:bd-opacity-50 md:bd-text-sm',
-          className
-        )}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
-Input.displayName = 'Input';
+function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
+  return (
+    <input
+      type={type}
+      data-slot="input"
+      className={cn(
+        'bd:file:text-foreground bd:placeholder:text-muted-foreground bd:selection:bg-primary bd:selection:text-primary-foreground bd:dark:bg-input/30 bd:border-input bd:h-9 bd:w-full bd:min-w-0 bd:rounded-md bd:border bd:bg-transparent bd:px-3 bd:py-1 bd:text-base bd:shadow-xs bd:transition-[color,box-shadow] bd:outline-none bd:file:inline-flex bd:file:h-7 bd:file:border-0 bd:file:bg-transparent bd:file:text-sm bd:file:font-medium bd:disabled:pointer-events-none bd:disabled:cursor-not-allowed bd:disabled:opacity-50 bd:md:text-sm',
+        'bd:focus-visible:border-ring bd:focus-visible:ring-ring/50 bd:focus-visible:ring-[3px]',
+        'bd:aria-invalid:ring-destructive/20 bd:dark:aria-invalid:ring-destructive/40 bd:aria-invalid:border-destructive',
+        className
+      )}
+      {...props}
+    />
+  );
+}
 
 export { Input };

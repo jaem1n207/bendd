@@ -78,24 +78,24 @@ function ShuffleLettersDemo({
     fps <= 60;
 
   return (
-    <div className="bd-mt-6 bd-flex bd-flex-col bd-items-center bd-gap-4 bd-rounded-lg bd-border bd-border-gray-200 bd-bg-secondary bd-p-6">
-      <div className="bd-mb-4 bd-text-center">
-        <h3 className="bd-mb-2 bd-text-xl bd-font-bold">
+    <div className="bd:mt-6 bd:flex bd:flex-col bd:items-center bd:gap-4 bd:rounded-lg bd:border bd:bg-secondary bd:p-6">
+      <div className="bd:mb-4 bd:text-center">
+        <h3 className="bd:mb-2 bd:text-xl bd:font-bold">
           Shuffle Letters Playground
         </h3>
-        <p className="bd-text-sm bd-text-secondary-foreground dark:bd-text-secondary-foreground">
+        <p className="bd:text-sm bd:text-secondary-foreground bd:dark:text-secondary-foreground">
           `iterations`와 `fps` 값을 조정하여 애니메이션 효과를 실험해보세요
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="bd-w-full bd-max-w-md bd-space-y-4"
+        className="bd:w-full bd:max-w-md bd:space-y-4"
       >
         <div>
           <label
             htmlFor="text"
-            className="bd-mb-2 bd-block bd-text-sm bd-font-medium"
+            className="bd:mb-2 bd:block bd:text-sm bd:font-medium"
           >
             텍스트
           </label>
@@ -108,11 +108,11 @@ function ShuffleLettersDemo({
           />
         </div>
 
-        <div className="bd-flex bd-gap-4">
-          <div className="bd-flex-1">
+        <div className="bd:flex bd:gap-4">
+          <div className="bd:flex-1">
             <label
               htmlFor="iterations"
-              className="bd-mb-2 bd-block bd-text-sm bd-font-medium"
+              className="bd:mb-2 bd:block bd:text-sm bd:font-medium"
             >
               iterations (1-50)
             </label>
@@ -126,10 +126,10 @@ function ShuffleLettersDemo({
               required
             />
           </div>
-          <div className="bd-flex-1">
+          <div className="bd:flex-1">
             <label
               htmlFor="fps"
-              className="bd-mb-2 bd-block bd-text-sm bd-font-medium"
+              className="bd:mb-2 bd:block bd:text-sm bd:font-medium"
             >
               fps (1-60)
             </label>
@@ -148,25 +148,25 @@ function ShuffleLettersDemo({
         <Button
           type="submit"
           disabled={!isValid || isAnimating}
-          className="bd-w-full"
+          className="bd:w-full"
         >
           {isAnimating ? 'Shuffling...' : 'Shuffle'}
         </Button>
       </form>
 
-      <div className="bd-w-full bd-max-w-md bd-rounded-lg bd-border bd-border-gray-200 bd-bg-white bd-p-4 dark:bd-border-gray-600 dark:bd-bg-gray-800">
-        <h4 className="bd-mb-3 bd-text-center bd-text-lg bd-font-semibold">
+      <div className="bd:w-full bd:max-w-md bd:rounded-lg bd:border bd:bg-white bd:p-4 bd:dark:border-gray-600 bd:dark:bg-gray-800">
+        <h4 className="bd:mb-3 bd:text-center bd:text-lg bd:font-semibold">
           결과
         </h4>
         <div
           ref={animatedTextRef}
-          className="bd-min-h-8 bd-py-2 bd-text-center bd-text-lg bd-font-medium"
+          className="bd:min-h-8 bd:py-2 bd:text-center bd:text-lg bd:font-medium"
         >
           {text || ''}
         </div>
       </div>
 
-      <div className="bd-w-full bd-max-w-md bd-space-y-1 bd-text-xs bd-text-gray-500 dark:bd-text-gray-400">
+      <div className="bd:w-full bd:max-w-md bd:space-y-1 bd:text-xs bd:text-gray-500 bd:dark:text-gray-400">
         <p>
           • 텍스트를 입력하고 옵션을 조정한 후 &quot;Shuffle&quot; 버튼을
           클릭하세요

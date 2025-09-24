@@ -8,7 +8,7 @@ export default defineConfig({
     // 각 테스트가 끝날 때마다 @testing-library가 정리하기 위해 필요합니다.
     // 설정하지 않으면 `Found multiple elements with ~` 오류가 발생합니다.
     globals: true,
-    include: ['src/**/*.spec.{ts,tsx}'],
+    include: ['src/**/*.{spec,test}.{ts,tsx}'],
     exclude: ['**/*.d.ts'],
     reporters: ['default'],
     environment: 'jsdom',

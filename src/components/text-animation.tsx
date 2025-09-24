@@ -29,7 +29,7 @@ export const TextAnimation = ({ texts, className }: TextAnimationProps) => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -25 }}
           transition={{ type: 'spring', duration: 0.5, bounce: 0 }}
-          className="bd-text-lg bd-font-semibold bd-leading-7"
+          className="bd:text-lg bd:font-semibold bd:leading-7"
         >
           {texts[currentIndex]}
         </motion.p>

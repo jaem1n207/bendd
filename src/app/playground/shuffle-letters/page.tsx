@@ -63,23 +63,23 @@ export default function ShuffleLettersDemo() {
     fps <= 60;
 
   return (
-    <div className="bd-flex bd-flex-col bd-items-center bd-gap-4 bd-p-4">
-      <h1 className="bd-text-2xl bd-font-bold">Shuffle Letters Playground</h1>
-      <p className="bd-text-center">
+    <div className="bd:flex bd:flex-col bd:items-center bd:gap-4 bd:p-4">
+      <h1 className="bd:text-2xl bd:font-bold">Shuffle Letters Playground</h1>
+      <p className="bd:text-center">
         Rauno의 프로젝트 페이지 렌더링 애니메이션을 구현하는 데 사용되는
         문자열을 섞는 데모입니다.
       </p>
 
       <form
         onSubmit={handleSubmit}
-        className="bd-w-full bd-max-w-md bd-rounded-lg bd-p-6 bd-shadow-md"
+        className="bd:w-full bd:max-w-md bd:rounded-lg bd:p-6 bd:shadow-md"
       >
-        <h2 className="bd-mb-4 bd-text-xl bd-font-semibold">옵션</h2>
+        <h2 className="bd:mb-4 bd:text-xl bd:font-semibold">옵션</h2>
 
-        <div className="bd-mb-4">
+        <div className="bd:mb-4">
           <label
             htmlFor="text"
-            className="bd-mb-2 bd-block bd-text-sm bd-font-medium"
+            className="bd:mb-2 bd:block bd:text-sm bd:font-medium"
           >
             text
           </label>
@@ -88,16 +88,16 @@ export default function ShuffleLettersDemo() {
             type="text"
             value={text}
             onChange={e => setText(e.target.value)}
-            className="bd-w-full bd-rounded-md bd-border bd-border-gray-300 bd-px-3 bd-py-2"
+            className="bd:w-full bd:rounded-md bd:border bd:border-gray-300 bd:px-3 bd:py-2"
             required
           />
         </div>
 
-        <div className="bd-mb-4 bd-flex bd-gap-4">
-          <div className="bd-flex-1">
+        <div className="bd:mb-4 bd:flex bd:gap-4">
+          <div className="bd:flex-1">
             <label
               htmlFor="iterations"
-              className="bd-mb-2 bd-block bd-text-sm bd-font-medium"
+              className="bd:mb-2 bd:block bd:text-sm bd:font-medium"
             >
               iterations
             </label>
@@ -108,14 +108,14 @@ export default function ShuffleLettersDemo() {
               onChange={e => setIterations(Number(e.target.value))}
               min="1"
               max="50"
-              className="bd-w-full bd-rounded-md bd-border bd-border-gray-300 bd-px-3 bd-py-2"
+              className="bd:w-full bd:rounded-md bd:border bd:border-gray-300 bd:px-3 bd:py-2"
               required
             />
           </div>
-          <div className="bd-flex-1">
+          <div className="bd:flex-1">
             <label
               htmlFor="fps"
-              className="bd-mb-2 bd-block bd-text-sm bd-font-medium"
+              className="bd:mb-2 bd:block bd:text-sm bd:font-medium"
             >
               fps
             </label>
@@ -126,7 +126,7 @@ export default function ShuffleLettersDemo() {
               onChange={e => setFps(Number(e.target.value))}
               min="1"
               max="60"
-              className="bd-w-full bd-rounded-md bd-border bd-border-gray-300 bd-px-3 bd-py-2"
+              className="bd:w-full bd:rounded-md bd:border bd:border-gray-300 bd:px-3 bd:py-2"
               required
             />
           </div>
@@ -135,25 +135,25 @@ export default function ShuffleLettersDemo() {
         <Button
           type="submit"
           disabled={!isValid || isAnimating}
-          className="bd-w-full"
+          className="bd:w-full"
         >
           {isAnimating ? 'Shuffling...' : 'Shuffle'}
         </Button>
       </form>
 
-      <div className="bd-w-full bd-max-w-md bd-rounded-lg bd-p-6 bd-shadow-md">
-        <h2 className="bd-mb-4 bd-text-xl bd-font-semibold">결과</h2>
+      <div className="bd:w-full bd:max-w-md bd:rounded-lg bd:p-6 bd:shadow-md">
+        <h2 className="bd:mb-4 bd:text-xl bd:font-semibold">결과</h2>
         <div
           ref={animatedTextRef}
-          className="bd-min-h-8 bd-text-center bd-text-lg bd-font-medium"
+          className="bd:min-h-8 bd:text-center bd:text-lg bd:font-medium"
         >
           {text}
         </div>
       </div>
 
-      <div className="bd-mt-4 bd-w-full bd-max-w-md bd-rounded-lg bd-bg-gray-100 bd-p-4">
-        <h3 className="bd-mb-2 bd-text-lg bd-font-semibold">Help</h3>
-        <ul className="bd-list-disc bd-space-y-1 bd-pl-5">
+      <div className="bd:mt-4 bd:w-full bd:max-w-md bd:rounded-lg bd:bg-gray-100 bd:p-4">
+        <h3 className="bd:mb-2 bd:text-lg bd:font-semibold">Help</h3>
+        <ul className="bd:list-disc bd:space-y-1 bd:pl-5">
           <li>&quot;text&quot; 필드에 원하는 텍스트를 입력합니다.</li>
           <li>iterations(1~50)와 초당 fps(1~60)를 설정합니다.</li>
           <li>애니메이션을 시작하려면 &quot;Shuffle&quot;을 클릭합니다.</li>

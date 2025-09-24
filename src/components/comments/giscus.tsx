@@ -35,5 +35,5 @@ export function Giscus() {
     ref.current.appendChild(script);
   }, [theme]);
 
-  return <section className="bd-min-h-96 bd-w-full" ref={ref} />;
+  return <section className="bd:min-h-96 bd:w-full" ref={ref} />;
 }

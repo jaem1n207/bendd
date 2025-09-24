@@ -8,12 +8,13 @@ import { createCraftMDXProcessor } from '@/mdx/mdx';
 export async function generateStaticParams() {
   const processor = createCraftMDXProcessor();
 
-  return processor.map(article => article.slug);
+  return processor.map(article => ({ slug: article.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const processor = createCraftMDXProcessor();
-  const post = processor.getArticleBySlug(params.slug);
+  const post = processor.getArticleBySlug(slug);
 
   if (!post) {
     notFound();
@@ -34,16 +35,16 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
     title,
     description,
     alternates: {
-      canonical: `${siteMetadata.siteUrl}/craft/${post.slug}`,
+      canonical: `${siteMetadata.siteUrl}/craft/${slug}`,
       languages: {
-        ko: `${siteMetadata.siteUrl}/craft/${post.slug}`,
-        ['x-default']: `${siteMetadata.siteUrl}/craft/${post.slug}`,
+        ko: `${siteMetadata.siteUrl}/craft/${slug}`,
+        ['x-default']: `${siteMetadata.siteUrl}/craft/${slug}`,
       },
     },
     openGraph: {
       type: 'article',
       publishedTime,
-      url: `${siteMetadata.siteUrl}/craft/${post.slug}`,
+      url: `${siteMetadata.siteUrl}/craft/${slug}`,
       images: [
         {
           url: ogImage,
@@ -57,9 +58,10 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   } satisfies Metadata;
 }
 
-export default function CraftPage({ params }: { params: { slug: string } }) {
+export default async function CraftPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const processor = createCraftMDXProcessor();
-  const post = processor.getArticleBySlug(params.slug);
+  const post = processor.getArticleBySlug(slug);
 
   if (!post) {
     notFound();

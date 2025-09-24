@@ -15,7 +15,7 @@ export const useSoundStore = create<SoundState>()(
       },
     }),
     {
-      name: 'bd-sound-enabled',
+      name: 'bd:sound-enabled',
     }
   )
 );

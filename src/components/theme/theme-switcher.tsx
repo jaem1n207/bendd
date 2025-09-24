@@ -51,17 +51,17 @@ export function ThemeSwitcher() {
     <button
       ref={buttonRef}
       title="Toggle Theme"
-      className="bd-relative bd-flex bd-size-full bd-items-center bd-justify-center bd-text-gray-950 bd-transition-transform hover:bd-scale-105"
+      className="bd:relative bd:flex bd:size-full bd:items-center bd:justify-center bd:text-gray-950 bd:transition-transform bd:hover:scale-105"
       onClick={handleToggleTheme}
     >
       <ClientGate>
         {isDarkTheme ? (
-          <Sun className="bd-size-1/2" />
+          <Sun className="bd:size-1/2" />
         ) : (
-          <Moon className="bd-size-1/2" />
+          <Moon className="bd:size-1/2" />
         )}
       </ClientGate>
-      <span className="bd-sr-only">테마 전환</span>
+      <span className="bd:sr-only">테마 전환</span>
     </button>
   );
 }

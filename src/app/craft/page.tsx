@@ -38,8 +38,8 @@ export default function CraftPage() {
     });
 
   return (
-    <main className="bd-relative bd-mx-auto bd-my-0 bd-min-h-screen bd-max-w-4xl bd-overflow-y-auto bd-px-6 bd-pt-10 sm:bd-py-32">
-      <div className="bd-mt-8 bd-flex bd-flex-col bd-gap-7">
+    <main className="bd:relative bd:mx-auto bd:my-0 bd:min-h-screen bd:max-w-4xl bd:overflow-y-auto bd:px-6 bd:pt-10 bd:sm:py-32">
+      <div className="bd:mt-8 bd:flex bd:flex-col bd:gap-7">
         {formattedArticleInfo.map((article, index) => (
           <ArticleItem key={article.href} {...article} index={index} />
         ))}

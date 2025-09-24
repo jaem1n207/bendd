@@ -28,7 +28,7 @@ export function StepSelect() {
       value={currentStep.toString()}
       onValueChange={value => setCurrentStep(Number(value))}
     >
-      <SelectTrigger className="bd-mr-1 bd-flex-1">
+      <SelectTrigger className="bd:mr-1 bd:flex-1">
         <SelectValue placeholder="단계 선택" />
       </SelectTrigger>
       <SelectContent>
@@ -57,11 +57,11 @@ export function StepInfo({ className }: { className?: string }) {
       <motion.div
         animate={{ height: bounds.height }}
         className={cn(
-          'bd-relative bd-overflow-hidden bd-rounded-md bd-border bd-border-border bd-bg-background bd-shadow-inner',
+          'bd:relative bd:overflow-hidden bd:rounded-md bd:border bd:bg-background bd:shadow-inner',
           className
         )}
       >
-        <div ref={ref} className="bd-px-4 bd-py-2">
+        <div ref={ref} className="bd:px-4 bd:py-2">
           <AnimatePresence mode="popLayout" initial={false} custom={direction}>
             {/* 애니메이션 중 변경된 요소가 컴포넌트 트리에 여전히 존재하는지 액세스 가능하도록 */}
             <StepInfoContent />
@@ -90,10 +90,10 @@ function StepInfoContent() {
       exit="exit"
       custom={direction}
     >
-      <Typography variant="p" affects="large" asChild className="bd-mb-2">
+      <Typography variant="large" asChild className="bd:mb-2">
         <p>{stepData.title}</p>
       </Typography>
-      <Typography variant="p" asChild>
+      <Typography variant="p">
         <p>{stepData.description}</p>
       </Typography>
     </motion.div>
@@ -120,7 +120,7 @@ export function StepContent<T>({
   if (!stepData) return null;
 
   return (
-    <div className={cn('bd-mt-4', className)}>{render(stepData.content)}</div>
+    <div className={cn('bd:mt-4', className)}>{render(stepData.content)}</div>
   );
 }
 
@@ -133,7 +133,7 @@ export function StepActions({ className }: { className?: string }) {
   return (
     <motion.div
       layout
-      className={cn('bd-flex bd-items-center bd-space-x-2', className)}
+      className={cn('bd:flex bd:items-center bd:space-x-2', className)}
     >
       <Button
         size="icon"
@@ -141,9 +141,9 @@ export function StepActions({ className }: { className?: string }) {
         onClick={previousStep}
         disabled={currentStep === 0}
       >
-        <ChevronLeft className="bd-size-4" />
+        <ChevronLeft className="bd:size-4" />
       </Button>
-      <span className="bd-text-sm">
+      <span className="bd:text-sm">
         {currentStep + 1} / {stepsData.length}
       </span>
       <Button
@@ -152,7 +152,7 @@ export function StepActions({ className }: { className?: string }) {
         onClick={nextStep}
         disabled={currentStep === stepsData.length - 1}
       >
-        <ChevronRight className="bd-size-4" />
+        <ChevronRight className="bd:size-4" />
       </Button>
     </motion.div>
   );
