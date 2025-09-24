@@ -23,7 +23,7 @@ const validateMetadata = (metadata: Metadata): Metadata => {
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('front matter 유효성 검사에 실패했어요:');
-      error.errors.forEach(err => {
+      error.issues.forEach(err => {
         console.error(`- ${err.path.join('.')}: ${err.message}`);
       });
     }
@@ -72,84 +72,8 @@ const readMDXFile = (filePath: string): Article => {
   return { metadata: validatedMetadata, slug, content };
 };
 
-export const formatDate = ({
-  date,
-  includeRelative = false,
-}: {
-  date: string;
-  includeRelative?: boolean;
-}) => {
-  const currentDate = new Date();
-  const targetDate = new Date(date.includes('T') ? date : `${date}T00:00:00`);
-
-  const diffInMs = currentDate.getTime() - targetDate.getTime();
-  const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-
-  let relativeDate: string;
-
-  // 1분 미만
-  if (diffInMinutes < 1) {
-    relativeDate = '방금 전';
-  }
-  // 1시간 미만
-  else if (diffInMinutes < 60) {
-    relativeDate = `${diffInMinutes}분 전`;
-  }
-  // 24시간 미만
-  else if (diffInHours < 24) {
-    relativeDate = `${diffInHours}시간 전`;
-  }
-  // 1일
-  else if (diffInDays === 1) {
-    relativeDate = '하루 전';
-  }
-  // 7일 미만
-  else if (diffInDays < 7) {
-    relativeDate = `${diffInDays}일 전`;
-  }
-  // 4주 미만
-  else if (diffInDays < 28) {
-    const weeks = Math.floor(diffInDays / 7);
-    relativeDate = weeks === 1 ? '일주일 전' : `${weeks}주 전`;
-  }
-  // 월/년 계산
-  else {
-    // 정확한 월 계산
-    let years = currentDate.getFullYear() - targetDate.getFullYear();
-    let months = currentDate.getMonth() - targetDate.getMonth();
-
-    // 일자까지 고려한 정확한 월 계산
-    if (currentDate.getDate() < targetDate.getDate()) {
-      months--;
-    }
-
-    // 음수 월을 년에서 차감
-    if (months < 0) {
-      years--;
-      months += 12;
-    }
-
-    const totalMonths = years * 12 + months;
-
-    if (totalMonths < 12) {
-      relativeDate = `${totalMonths}개월 전`;
-    } else if (months === 0) {
-      relativeDate = `${years}년 전`;
-    } else {
-      relativeDate = `${years}년 ${months}개월 전`;
-    }
-  }
-
-  const fullDate = targetDate.toLocaleString('ko-KR', {
-    year: '2-digit',
-    month: '2-digit',
-    day: '2-digit',
-  });
-
-  return includeRelative ? `${fullDate} (${relativeDate})` : fullDate;
-};
+import { createDate, formatDate as formatDateUtil } from '../lib/date-utils';
+export { formatDate } from '../lib/date-utils';
 
 class MDXProcessor {
   private readonly articles: ReadonlyArray<Article>;
@@ -182,20 +106,24 @@ class MDXProcessor {
 
   sortByDateDesc(): MDXProcessor {
     const sortOperation = (articles: ReadonlyArray<Article>) =>
-      [...articles].sort(
-        (a, b) =>
-          new Date(b.metadata.publishedAt).getTime() -
-          new Date(a.metadata.publishedAt).getTime()
+      articles.slice().sort(
+        (a, b) => {
+          const dateA = createDate(a.metadata.publishedAt);
+          const dateB = createDate(b.metadata.publishedAt);
+          return dateB.valueOf() - dateA.valueOf();
+        }
       );
     return new MDXProcessor(this.articles, [...this.operations, sortOperation]);
   }
 
   sortByDateAsc(): MDXProcessor {
     const sortOperation = (articles: ReadonlyArray<Article>) =>
-      [...articles].sort(
-        (a, b) =>
-          new Date(a.metadata.publishedAt).getTime() -
-          new Date(b.metadata.publishedAt).getTime()
+      articles.slice().sort(
+        (a, b) => {
+          const dateA = createDate(a.metadata.publishedAt);
+          const dateB = createDate(b.metadata.publishedAt);
+          return dateA.valueOf() - dateB.valueOf();
+        }
       );
     return new MDXProcessor(this.articles, [...this.operations, sortOperation]);
   }
@@ -207,8 +135,8 @@ class MDXProcessor {
       name: article.metadata.title,
       summary: article.metadata.summary,
       href: `/article/${article.slug}` as Route<''>,
-      publishedAt: formatDate({
-        date: article.metadata.publishedAt,
+      publishedAt: formatDateUtil(article.metadata.publishedAt, {
+        locale: 'ko',
         includeRelative: options.includeRelativeDate,
       }),
       ...(options.includeSummary && { summary: article.metadata.summary }),
@@ -222,8 +150,8 @@ class MDXProcessor {
       name: article.metadata.title,
       summary: article.metadata.summary,
       href: `/craft/${article.slug}` as Route<''>,
-      publishedAt: formatDate({
-        date: article.metadata.publishedAt,
+      publishedAt: formatDateUtil(article.metadata.publishedAt, {
+        locale: 'ko',
         includeRelative: options.includeRelativeDate,
       }),
       ...(options.includeSummary && { summary: article.metadata.summary }),

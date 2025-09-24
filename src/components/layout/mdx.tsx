@@ -37,7 +37,7 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
   };
 
   return (
-    <main className="bd-relative bd-mx-auto bd-my-0 bd-min-h-screen bd-max-w-2xl bd-overflow-hidden bd-px-6 bd-py-32">
+    <main className="bd:relative bd:mx-auto bd:my-0 bd:min-h-screen bd:max-w-2xl bd:overflow-hidden bd:px-6 bd:py-32">
       <section id="BenddDoc">
         <script
           type="application/ld+json"
@@ -46,48 +46,37 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
             __html: JSON.stringify(jsonLd),
           }}
         />
-        <div className="bd-fixed bd-bottom-0 bd-left-5 bd-top-24 bd-hidden bd-overflow-hidden lg:bd-block">
+        <div className="bd:fixed bd:bottom-0 bd:left-5 bd:top-24 bd:hidden bd:overflow-hidden bd:lg:block">
           <Link
             href={`/${type}`}
             className={cn(
-              'bd-flex bd-itesm-center bd-gap-x-1 bd-w-fit bd-leading-5 bd-text-sm',
-              'bd-p-1 -bd-m-1',
-              'bd-text-muted-foreground bd-transition-colors hover:bd-text-primary'
+              'bd:flex bd:items-center bd:gap-x-1 bd:w-fit bd:leading-5 bd:text-sm',
+              'bd:p-1 bd:-m-1',
+              'bd:text-muted-foreground bd:transition-colors bd:hover:text-primary'
             )}
           >
-            <CornerUpLeft className="bd-size-4" />
+            <CornerUpLeft className="bd:size-4" />
             {type.charAt(0).toUpperCase() + type.slice(1)}
           </Link>
           <ClientTableOfContents />
         </div>
-        <Typography variant="h2">{title}</Typography>
+        <Typography variant="h1">{title}</Typography>
         <Typography
           variant="p"
-          className="!bd-mt-2 bd-text-muted-foreground/80"
-          asChild
+          className="bd:!mt-2 bd:text-muted-foreground/80"
         >
-          <p>
-            {formatDate({
-              date: publishedAt,
-              includeRelative: true,
-            })}
-          </p>
+          {formatDate(publishedAt, {
+            locale: 'ko',
+            includeRelative: true,
+          })}
         </Typography>
-        <Typography
-          variant="blockquote"
-          className="bd-mt-6 bd-break-keep"
-          asChild
-        >
-          <blockquote>
-            <p>
-              <strong>TL;DR</strong>: {description}
-            </p>
-          </blockquote>
+        <Typography variant="blockquote" className="bd:mt-6 bd:break-keep">
+          <strong>TL;DR</strong>: {description}
         </Typography>
         <article
           className={cn(
-            'bd-prose bd-prose-slate bd-mb-24 dark:bd-prose-invert md:bd-mb-40',
-            type === 'article' ? 'bd-mt-16 md:bd-mt-24' : 'bd-mt-40 md:bd-mt-52'
+            'bd:prose bd:prose-slate bd:mb-24 bd:dark:prose-invert bd:md:mb-40',
+            type === 'article' ? 'bd:mt-16 bd:md:mt-24' : 'bd:mt-40 bd:md:mt-52'
           )}
         >
           <CustomMDX source={post.content} />
