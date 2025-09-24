@@ -39,7 +39,7 @@ This is a personal blog/portfolio built with Next.js 14 (App Router) featuring K
 
 The codebase follows a domain-driven structure:
 
-- **UI Components**: `src/components/ui/` - shadcn/ui components with `bd-` prefix
+- **UI Components**: `src/components/ui/` - shadcn/ui components with `bd:` prefix
 - **Domain Components**: `src/components/{domain}/` - Feature-specific components organized by domain (navigation, theme, sound, article, etc.)
 - **Layout Components**: Shared layouts in `src/components/layout/`
 
@@ -90,7 +90,7 @@ src/components/{domain}/
 
 ### Styling System
 
-- **Framework**: Tailwind CSS with custom prefix `bd-`
+- **Framework**: Tailwind CSS with custom prefix `bd:`
 - **Components**: shadcn/ui components configured in `components.json`
 - **Fonts**: Inter (sans) and Fira Mono (mono) from Google Fonts
 - **Theme**: CSS variables with dark/light mode support
