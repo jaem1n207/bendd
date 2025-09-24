@@ -8,7 +8,7 @@
     "css": "@/globals.css",
     "baseColor": "slate",
     "cssVariables": true,
-    "prefix": "bd-"
+    "prefix": "bd"
   },
   "aliases": {
     "components": "@/components",

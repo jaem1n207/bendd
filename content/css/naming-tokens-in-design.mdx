@@ -324,18 +324,18 @@ import { cva } from 'class-variance-authority';
 
 const buttonVariants = cva(
   // 기본 토큰들
-  'bd-inline-flex bd-items-center bd-justify-center bd-rounded-md',
+  'bd:inline-flex bd:items-center bd:justify-center bd:rounded-md',
   {
     variants: { // [!code focus]
       variant: { // [!code focus]
-        primary: 'bd-bg-primary bd-text-primary-foreground', // [!code focus]
-        secondary: 'bd-bg-secondary bd-text-secondary-foreground', // [!code focus]
-        outline: 'bd-border bd-border-input bd-bg-background', // [!code focus]
+        primary: 'bd:bg-primary bd:text-primary-foreground', // [!code focus]
+        secondary: 'bd:bg-secondary bd:text-secondary-foreground', // [!code focus]
+        outline: 'bd:border bd:border-input bd:bg-background', // [!code focus]
       }, // [!code focus]
       size: { // [!code focus]
-        sm: 'bd-h-9 bd-px-3', // [!code focus]
-        md: 'bd-h-10 bd-px-4', // [!code focus]
-        lg: 'bd-h-11 bd-px-8', // [!code focus]
+        sm: 'bd:h-9 bd:px-3', // [!code focus]
+        md: 'bd:h-10 bd:px-4', // [!code focus]
+        lg: 'bd:h-11 bd:px-8', // [!code focus]
       }, // [!code focus]
     }, // [!code focus]
     defaultVariants: { // [!code focus]
