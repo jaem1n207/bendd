@@ -11,7 +11,11 @@ export async function generateStaticParams() {
   return processor.map(article => ({ slug: article.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const processor = createMDXProcessor();
   const post = processor.getArticleBySlug(slug);
@@ -58,7 +62,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   } satisfies Metadata;
 }
 
-export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ArticlePage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const processor = createMDXProcessor();
   const post = processor.getArticleBySlug(slug);

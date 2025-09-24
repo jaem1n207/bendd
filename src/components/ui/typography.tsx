@@ -7,11 +7,11 @@ export const typographyVariants = cva(null, {
   variants: {
     variant: {
       h1: 'bd:scroll-m-20 bd:text-4xl bd:font-extrabold bd:tracking-tight bd:lg:text-5xl',
-      h2: 'bd:scroll-m-20 bd:border-b bd:py-2 bd:text-3xl bd:font-semibold bd:tracking-tight bd:first:mt-0',
+      h2: 'bd:scroll-m-20 bd:py-2 bd:text-3xl bd:font-semibold bd:tracking-tight bd:first:mt-0',
       h3: 'bd:scroll-m-20 bd:text-2xl bd:font-semibold bd:tracking-tight',
       h4: 'bd:scroll-m-20 bd:text-xl bd:font-semibold bd:tracking-tight',
       h5: 'bd:text-lg bd:font-semibold bd:lg:text-xl',
-      p: 'bd:leading-7 bd:[&:not(:first-child)]:mt-6',
+      p: 'bd:leading-7',
       lead: 'bd:text-xl bd:text-muted-foreground',
       large: 'bd:text-lg bd:font-semibold',
       small: 'bd:text-sm bd:font-medium bd:leading-none',
@@ -27,7 +27,7 @@ export const typographyVariants = cva(null, {
     affects: {
       default: '',
       primary: 'bd:text-primary',
-      muted: 'bd:text-muted-foreground',
+      muted: 'bd:text-muted-foreground bd:text-sm bd:leading-7',
     },
   },
   defaultVariants: {

@@ -1,5 +1,9 @@
 @reference "../globals.css";
 
+.container :global(a) {
+  @apply bd:no-underline;
+}
+
 .container :global(a > code) {
   text-decoration: none !important;
   text-decoration-style: unset !important;

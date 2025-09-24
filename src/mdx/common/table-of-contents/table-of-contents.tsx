@@ -24,7 +24,7 @@ export function TableOfContents() {
   }, []);
 
   return (
-    <nav className="toc-navbar">
+    <nav className="toc-navbar bd:mt-6">
       <div
         ref={markerRef}
         className={cn(

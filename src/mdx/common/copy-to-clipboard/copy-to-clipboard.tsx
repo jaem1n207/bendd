@@ -72,7 +72,7 @@ function ClipBoard({ className, ...props }: SVGProps<SVGSVGElement>) {
       xmlns="http://www.w3.org/2000/svg"
       className={cn(
         'bd:overflow-visible',
-        '[--bg:canvas] bd:[--control:canvas]',
+        'bd:[--control:canvas] [--bg:canvas]',
         '[&>path]:(transform-box:fill-box) [&>path]:origin-center',
         className
       )}

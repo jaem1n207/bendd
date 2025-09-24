@@ -3,10 +3,10 @@ import Link from 'next/link';
 import type { BlogPosting, WithContext } from 'schema-dts';
 
 import { Giscus } from '@/components/comments/giscus';
+import { ClientTableOfContents } from '@/components/layout/client-table-of-contents';
 import { Typography } from '@/components/ui/typography';
 import { siteMetadata } from '@/lib/site-metadata';
 import { cn } from '@/lib/utils';
-import { ClientTableOfContents } from '@/components/layout/client-table-of-contents';
 import { CustomMDX } from '@/mdx/custom-mdx';
 import { type Article, formatDate } from '@/mdx/mdx';
 
@@ -60,7 +60,9 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
           </Link>
           <ClientTableOfContents />
         </div>
-        <Typography variant="h1">{title}</Typography>
+        <Typography variant="h2" asChild>
+          <h1>{title}</h1>
+        </Typography>
         <Typography
           variant="p"
           className="bd:!mt-2 bd:text-muted-foreground/80"

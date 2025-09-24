@@ -106,25 +106,21 @@ class MDXProcessor {
 
   sortByDateDesc(): MDXProcessor {
     const sortOperation = (articles: ReadonlyArray<Article>) =>
-      articles.slice().sort(
-        (a, b) => {
-          const dateA = createDate(a.metadata.publishedAt);
-          const dateB = createDate(b.metadata.publishedAt);
-          return dateB.valueOf() - dateA.valueOf();
-        }
-      );
+      articles.slice().sort((a, b) => {
+        const dateA = createDate(a.metadata.publishedAt);
+        const dateB = createDate(b.metadata.publishedAt);
+        return dateB.valueOf() - dateA.valueOf();
+      });
     return new MDXProcessor(this.articles, [...this.operations, sortOperation]);
   }
 
   sortByDateAsc(): MDXProcessor {
     const sortOperation = (articles: ReadonlyArray<Article>) =>
-      articles.slice().sort(
-        (a, b) => {
-          const dateA = createDate(a.metadata.publishedAt);
-          const dateB = createDate(b.metadata.publishedAt);
-          return dateA.valueOf() - dateB.valueOf();
-        }
-      );
+      articles.slice().sort((a, b) => {
+        const dateA = createDate(a.metadata.publishedAt);
+        const dateB = createDate(b.metadata.publishedAt);
+        return dateA.valueOf() - dateB.valueOf();
+      });
     return new MDXProcessor(this.articles, [...this.operations, sortOperation]);
   }
 

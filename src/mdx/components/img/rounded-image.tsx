@@ -19,7 +19,8 @@ export function MDXRoundedImage({
   }
 
   // SVG data URI인지 확인
-  const isSvgDataUri = typeof src === 'string' && src.startsWith('data:image/svg+xml');
+  const isSvgDataUri =
+    typeof src === 'string' && src.startsWith('data:image/svg+xml');
   // GIF 이미지인지 확인
   const isGif = typeof src === 'string' && src.endsWith('.gif');
 

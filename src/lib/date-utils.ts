@@ -41,7 +41,8 @@ const formatDateWithLocale = (
   locale: SupportedLocale,
   customFormat?: string
 ): string => {
-  const formatString = customFormat || (locale === KOREAN_LOCALE ? 'YY.MM.DD' : 'MMM DD, YYYY');
+  const formatString =
+    customFormat || (locale === KOREAN_LOCALE ? 'YY.MM.DD' : 'MMM DD, YYYY');
   return date.locale(locale).format(formatString);
 };
 
@@ -123,4 +124,3 @@ export const isValidDate = (dateString: string): boolean => {
     inputDay === parsedDay
   );
 };
-

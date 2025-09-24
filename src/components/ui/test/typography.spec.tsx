@@ -82,11 +82,7 @@ describe('Typography component', () => {
 
   it('should apply additional class names', () => {
     render(
-      <Typography
-        variant="h1"
-        affects="primary"
-        className="custom-class"
-      >
+      <Typography variant="h1" affects="primary" className="custom-class">
         Hello World
       </Typography>
     );
@@ -116,7 +112,11 @@ describe('Typography component', () => {
 
   it('should forward ref to correct element type based on variant', () => {
     const ref = createRef<HTMLElement>();
-    render(<Typography variant="h1" ref={ref}>Hello World</Typography>);
+    render(
+      <Typography variant="h1" ref={ref}>
+        Hello World
+      </Typography>
+    );
     expect(ref.current).toBeInstanceOf(HTMLHeadingElement);
   });
 
