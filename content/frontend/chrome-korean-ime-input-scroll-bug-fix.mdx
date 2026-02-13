@@ -106,10 +106,7 @@ inputElement.addEventListener('keydown', (e) => {
 ```javascript /compositionend/
 inputElement.addEventListener('compositionend', () => {
   isComposing = false;
-
-  if (isChromeBrowser() && hasPendingSpace) {
-    hasPendingSpace = false;
-  }
+  hasPendingSpace = false;
 
   // 브라우저 렌더링 완료 후 스크롤 위치 보정
   requestAnimationFrame(() => {
@@ -132,6 +129,7 @@ function ensureCaretVisible() {
     inputElement.scrollLeft = inputElement.scrollWidth; // [!code highlight]
   } else {
     // 그렇지 않으면 현재 커서 위치로 스크롤
+    // setSelectionRange 호출 시 브라우저가 선택 영역을 보이게 스크롤함
     inputElement.setSelectionRange(selectionStart, selectionStart); // [!code highlight]
   }
 }
@@ -169,10 +167,7 @@ function useImeSafeScroll(inputRef: React.RefObject<HTMLInputElement>, value: st
   const onCompositionEnd = () => {
     // [!code highlight]
     isComposingRef.current = false;
-
-    if (isChromeBrowser() && hasPendingSpaceRef.current) {
-      hasPendingSpaceRef.current = false;
-    }
+    hasPendingSpaceRef.current = false;
 
     // 모든 브라우저에서 일관되게 한 번의 requestAnimationFrame 사용
     requestAnimationFrame(ensureCaretVisible);
