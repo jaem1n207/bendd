@@ -190,21 +190,21 @@ createMDXProcessor()
 **생성:**
 
 ```bash
-git worktree add ../crypto-wt-<name> -b <type>/<description> main
+git worktree add ../bendd-wt-<name> -b <type>/<description> main
 # 새 터미널에서:
-cd ../crypto-wt-<name> && pnpm install --frozen-lockfile
+cd ../bendd-wt-<name> && pnpm install --frozen-lockfile
 claude  # Anthropic Claude Code CLI로 독립 인스턴스 실행
 ```
 
 **정리:**
 
 ```bash
-git worktree remove ../crypto-wt-<name>
+git worktree remove ../bendd-wt-<name>
 ```
 
 **규칙:**
 
-- 디렉토리명: `../crypto-wt-<짧은이름>`
+- 디렉토리명: `../bendd-wt-<짧은이름>`
 - 머지 완료된 worktree는 즉시 제거한다
 - Turbo 캐시는 worktree 간 자동 공유된다 (추가 설정 불필요)
 - AGENTS.md, `.claude/skills` 등 모든 설정은 worktree에서 자동 사용 가능하다
