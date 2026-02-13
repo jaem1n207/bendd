@@ -97,6 +97,12 @@ export function CustomMDX({ source }: { source: string }) {
               rehypeSlug,
             ],
           },
+          // CVE-2026-0969: next-mdx-remote 6.0.0부터 blockJS가 기본 true로 변경됨.
+          // MagicMove 등 커스텀 컴포넌트에 JS 표현식(codeSnippets={[...]})을 전달하므로 JS 허용 필요.
+          // 모든 MDX 콘텐츠는 로컬 파일에서만 로드되므로 신뢰할 수 있는 소스임.
+          blockJS: false,
+          // 방어적 보안: eval, Function, process, require 등 위험한 전역 객체 접근 차단 유지.
+          blockDangerousJS: true,
         }}
         components={components}
       />
