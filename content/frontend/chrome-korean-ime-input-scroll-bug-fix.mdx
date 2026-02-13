@@ -142,9 +142,6 @@ function ensureCaretVisible() {
 위 로직을 React Hook으로 합치면 다음과 같아요:
 
 ```typescript
-// [!code word:useImeSafeScroll]
-// [!code word:requestAnimationFrame]
-// [!code word:ensureCaretVisible]
 function useImeSafeScroll(inputRef: React.RefObject<HTMLInputElement>, value: string) {
   const isComposingRef = useRef(false);
   const hasPendingSpaceRef = useRef(false);
@@ -158,11 +155,11 @@ function useImeSafeScroll(inputRef: React.RefObject<HTMLInputElement>, value: st
     if (selectionStart === null) return;
 
     if (selectionStart === element.value.length) {
-      element.scrollLeft = element.scrollWidth; // [!code focus]
+      element.scrollLeft = element.scrollWidth;
     } else {
-      element.setSelectionRange(selectionStart, selectionStart); // [!code focus]
+      element.setSelectionRange(selectionStart, selectionStart);
     }
-  }, [inputRef]); // [!code highlight]
+  }, [inputRef]);
 
   const onCompositionStart = () => {
     isComposingRef.current = true;
@@ -178,14 +175,13 @@ function useImeSafeScroll(inputRef: React.RefObject<HTMLInputElement>, value: st
     }
 
     // 모든 브라우저에서 일관되게 한 번의 requestAnimationFrame 사용
-    requestAnimationFrame(ensureCaretVisible); // [!code focus]
+    requestAnimationFrame(ensureCaretVisible);
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     // [!code highlight]
     if (isComposingRef.current && e.code === 'Space') {
-      // [!code focus]
-      hasPendingSpaceRef.current = true; // [!code focus]
+      hasPendingSpaceRef.current = true;
     }
   };
 
@@ -202,7 +198,7 @@ function useImeSafeScroll(inputRef: React.RefObject<HTMLInputElement>, value: st
     }
   }, [value, ensureCaretVisible]);
 
-  return { onCompositionStart, onCompositionEnd, onKeyDown, onInput }; // [!code highlight]
+  return { onCompositionStart, onCompositionEnd, onKeyDown, onInput };
 }
 ```
 
