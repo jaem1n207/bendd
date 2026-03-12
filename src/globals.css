@@ -51,16 +51,16 @@
     --twoslash-tag-warn-bg: var(--twoslash-warn-bg);
     --twoslash-tag-annotate-color: #1ba673;
     --twoslash-tag-annotate-bg: #1ba67320;
-    --twoslash-popup-bg: #1b1b1f;
-    --twoslash-popup-color: rgba(255, 255, 245, 0.86);
-    --twoslash-docs-color: rgba(255, 255, 245, 0.86);
+    --twoslash-popup-bg: #ffffff;
+    --twoslash-popup-color: #1b1b1f;
+    --twoslash-docs-color: rgba(0, 0, 10, 0.7);
     --twoslash-docs-tag-name: var(--twoslash-unmatched-color);
     --twoslash-code-font: inherit;
     --twoslash-underline-color: #8888;
-    --twoslash-border-color: #3c3f44;
-    --twoslash-cursor-color: #8cccd5;
-    --twoslash-matched-color: #8cccd5;
-    --twoslash-unmatched-color: rgba(235, 235, 245, 0.6);
+    --twoslash-border-color: #e0e0e0;
+    --twoslash-cursor-color: #3794ff;
+    --twoslash-matched-color: #3794ff;
+    --twoslash-unmatched-color: rgba(0, 0, 0, 0.5);
   }
 
   .dark {
@@ -94,6 +94,14 @@
     --gray-800: 0 0% 31%;
     --gray-900: 0 0% 45%;
     --gray-950: 0 0% 49.1%;
+    /* TwoSlash (dark mode overrides) */
+    --twoslash-popup-bg: #1b1b1f;
+    --twoslash-popup-color: rgba(255, 255, 245, 0.86);
+    --twoslash-docs-color: rgba(255, 255, 245, 0.86);
+    --twoslash-border-color: #3c3f44;
+    --twoslash-cursor-color: #8cccd5;
+    --twoslash-matched-color: #8cccd5;
+    --twoslash-unmatched-color: rgba(235, 235, 245, 0.6);
   }
 
   * {

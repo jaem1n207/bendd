@@ -15,13 +15,13 @@ type CalloutType = keyof typeof TypeToEmoji;
 
 const classes: Record<CalloutType, string> = {
   info: cn(
-    'border-blue-100 bg-blue-50 text-blue-800 dark:border-blue-400/30 dark:bg-blue-400/20 dark:text-blue-300'
+    'border-blue-100 bg-blue-50/80 text-blue-800 dark:border-blue-400/30 dark:bg-blue-500/10 dark:text-blue-300'
   ),
   error: cn(
-    'border-red-200 bg-red-100 text-red-900 dark:border-red-200/30 dark:bg-red-900/30 dark:text-red-200'
+    'border-red-200 bg-red-50/80 text-red-900 dark:border-red-200/30 dark:bg-red-500/10 dark:text-red-200'
   ),
   warning: cn(
-    'border-yellow-100 bg-yellow-50 text-yellow-900 dark:border-yellow-200/30 dark:bg-yellow-700/30 dark:text-yellow-200'
+    'border-yellow-100 bg-yellow-50/80 text-yellow-900 dark:border-yellow-200/30 dark:bg-yellow-500/10 dark:text-yellow-200'
   ),
 };
 
@@ -61,9 +61,7 @@ function Callout({
       >
         {emoji}
       </div>
-      <div className="w-full min-w-0 leading-7 [&>p]:!my-0">
-        {children}
-      </div>
+      <div className="w-full min-w-0 leading-7 [&>p]:!my-0">{children}</div>
     </div>
   );
 }
