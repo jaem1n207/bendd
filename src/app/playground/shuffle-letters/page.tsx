@@ -88,7 +88,7 @@ export default function ShuffleLettersDemo() {
             type="text"
             value={text}
             onChange={e => setText(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2"
+            className="w-full rounded-md border border-input px-3 py-2"
             required
           />
         </div>
@@ -108,7 +108,7 @@ export default function ShuffleLettersDemo() {
               onChange={e => setIterations(Number(e.target.value))}
               min="1"
               max="50"
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-input px-3 py-2"
               required
             />
           </div>
@@ -126,7 +126,7 @@ export default function ShuffleLettersDemo() {
               onChange={e => setFps(Number(e.target.value))}
               min="1"
               max="60"
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-input px-3 py-2"
               required
             />
           </div>
@@ -151,7 +151,7 @@ export default function ShuffleLettersDemo() {
         </div>
       </div>
 
-      <div className="mt-4 w-full max-w-md rounded-lg bg-gray-100 p-4">
+      <div className="mt-4 w-full max-w-md rounded-lg bg-muted p-4">
         <h3 className="mb-2 text-lg font-semibold">Help</h3>
         <ul className="list-disc space-y-1 pl-5">
           <li>&quot;text&quot; 필드에 원하는 텍스트를 입력합니다.</li>
