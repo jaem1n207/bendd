@@ -8,12 +8,12 @@ export function useHighlighter(): HighlighterCore | undefined {
     async function initializeHighlighter() {
       const { createHighlighterCore } = await import('shiki');
       const getWasm = await import('shiki/wasm');
-      const [vitesseDark, vitesseLight] = await Promise.all([
+      const [vitesseDark, githubLight] = await Promise.all([
         import('shiki/themes/vitesse-dark.mjs'),
-        import('shiki/themes/vitesse-light.mjs'),
+        import('shiki/themes/github-light.mjs'),
       ]);
       const newHighlighter = await createHighlighterCore({
-        themes: [vitesseDark, vitesseLight],
+        themes: [vitesseDark, githubLight],
         langs: [
           import('shiki/langs/typescript.mjs'),
           import('shiki/langs/javascript.mjs'),

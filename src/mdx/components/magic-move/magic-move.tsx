@@ -61,7 +61,7 @@ function MagicMoveContent({
             )}
             code={content.content}
             lang={lang}
-            theme={resolvedTheme === 'dark' ? 'vitesse-dark' : 'vitesse-light'}
+            theme={resolvedTheme === 'dark' ? 'vitesse-dark' : 'github-light'}
             highlighter={highlighter}
             options={{
               duration: 750,
