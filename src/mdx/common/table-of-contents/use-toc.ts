@@ -118,7 +118,7 @@ export function useActiveAnchor(
     function activateLink(hash: string | null) {
       if (containerRef.current) {
         const links = containerRef.current.querySelectorAll('a');
-        links.forEach(link => link.classList.remove('!text-foreground'));
+        links.forEach(link => { link.classList.remove('!text-foreground'); });
 
         if (hash != null) {
           const activeLink =
