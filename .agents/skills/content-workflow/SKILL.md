@@ -8,8 +8,7 @@ description: |
   Triggers on: MDXProcessor, getArticles, formatForDisplay, sortByDateDesc,
   filterByCategory, generateStaticParams, article route, craft route,
   content pipeline, static generation.
-  NOT for writing MDX content (use mdx-authoring). NOT for styling (use
-  tailwind-bd-prefix).
+  NOT for writing MDX content (use mdx-authoring).
 ---
 
 # Content Workflow

@@ -6,8 +6,7 @@ description: |
   modifying frontmatter, or working with the MDX rendering pipeline.
   Triggers on: MDX, frontmatter, article, craft, Callout, Steps, MagicMove,
   content creation, blog post, createMDXComponent, Zod schema validation.
-  NOT for Tailwind styling (use tailwind-bd-prefix) or component directory
-  structure (use component-creation).
+  NOT for component directory structure (use component-creation).
 ---
 
 # MDX Authoring
@@ -95,7 +94,7 @@ Use absolute paths from `public/`.
 2. Define Zod schema for props
 3. Wrap with `createMDXComponent(Component, Schema)`
 4. Register the exported component in `src/mdx/custom-mdx.tsx` components object
-5. Use `bd-` prefix for ALL Tailwind classes in the component JSX
+5. Use standard Tailwind utility classes in the component JSX
 
 ```typescript
 import { z } from 'zod';
@@ -107,7 +106,7 @@ const MySchema = z.object({
 });
 
 function MyComponent({ variant, children }: z.infer<typeof MySchema>) {
-  return <div className="bd-rounded-lg bd-p-4">{children}</div>;
+  return <div className="rounded-lg p-4">{children}</div>;
 }
 
 export const MDXMyComponent = createMDXComponent(MyComponent, MySchema);
