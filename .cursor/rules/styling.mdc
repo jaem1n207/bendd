@@ -5,29 +5,21 @@ globs: "src/components/**,tailwind.config.ts,src/globals.css,src/app/**/*.css,co
 
 # Styling Rules
 
-## Tailwind bd- Prefix (MANDATORY)
+## Tailwind Utilities
 
-Every Tailwind utility class requires the `bd-` prefix. This is configured in `tailwind.config.ts`.
+Standard Tailwind utility classes are used without any prefix:
 
 ```tsx
-// Correct
-<div className="bd-flex bd-items-center bd-gap-2 bd-bg-background bd-text-foreground">
-
-// Wrong — classes will NOT apply
 <div className="flex items-center gap-2 bg-background text-foreground">
 ```
 
-### Variants with prefix
+Variants follow standard Tailwind patterns:
 
 ```tsx
-// Correct: variant BEFORE prefix
-"hover:bd-bg-primary/90"
-"dark:bd-text-foreground"
-"md:bd-grid-cols-2"
-"focus-visible:bd-ring-2"
-
-// Wrong: prefix before variant
-"bd-hover:bg-primary/90"
+"hover:bg-primary/90"
+"dark:text-foreground"
+"md:grid-cols-2"
+"focus-visible:ring-2"
 ```
 
 ## CSS Variables (HSL Format)
@@ -48,7 +40,7 @@ When adding custom colors:
 ## shadcn/ui Components
 
 - Located in `src/components/ui/` (flat structure, no subdirectories)
-- Install: `pnpm dlx shadcn-ui add <component>` (auto-applies bd- prefix via `components.json`)
+- Install: `pnpm dlx shadcn-ui add <component>`
 - Use `cn()` from `@/lib/utils` for conditional class merging
 
 ## Domain Component Structure

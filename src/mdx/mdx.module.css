@@ -6,35 +6,35 @@
 }
 
 .container :global(p > code) {
-  @apply bd-border-gray-500 bd-text-sm bd-font-normal bd-bg-gray-200 bd-border bd-px-1 bd-py-0.5 bd-rounded-sm bd-break-words;
+  @apply border-gray-500 text-sm font-normal bg-gray-200 border px-1 py-0.5 rounded-sm break-words;
 }
 
 .container :global(.header-anchor::after) {
   content: '#';
-  @apply bd-invisible bd-relative bd-ml-2 bd-text-gray-900;
+  @apply invisible relative ml-2 text-gray-900;
 }
 
 .container :global(.header-anchor:hover::after) {
-  @apply bd-visible;
+  @apply visible;
 }
 
 .container :global(pre > code) {
   counter-reset: line !important;
-  @apply bd-font-mono;
+  @apply font-mono;
 }
 
 .container :global(figcaption) {
-  @apply bd-text-center bd-max-w-2xl;
+  @apply text-center max-w-2xl;
 }
 
 .container :global(code[data-theme*=' ']) {
-  @apply bd-pl-1.5 bd-pr-0.5;
+  @apply pl-1.5 pr-0.5;
 }
 
 .container :global(code[data-theme*=' ']),
 .container :global(code[data-theme*=' '] span) {
   color: var(--shiki-light);
-  @apply bd-rounded-[4px];
+  @apply rounded-[4px];
 }
 
 @media (prefers-color-scheme: dark) {
@@ -51,11 +51,11 @@
 .container :global(code[data-line-numbers] > [data-line]::before) {
   counter-increment: line;
   content: counter(line);
-  @apply bd-inline-block bd-w-4 bd-mr-4 bd-text-right;
+  @apply inline-block w-4 mr-4 text-right;
 }
 
 .container :global(pre [data-line]) {
-  @apply bd-px-4 bd-border-l-2 bd-border-l-transparent;
+  @apply px-4 border-l-2 border-l-transparent;
 }
 
 .container :global(pre.has-focused-lines [data-line]:not(.has-focus)) {
@@ -63,7 +63,7 @@
   transition:
     filter 0.35s,
     opacity 0.35s;
-  @apply bd-opacity-40;
+  @apply opacity-40;
 }
 .container :global(pre.has-focused-lines:hover [data-line]:not(.has-focus)) {
   filter: blur(0);
@@ -76,28 +76,28 @@
 }
 
 .container :global([data-highlighted-chars]) {
-  @apply bd-bg-zinc-600/50 bd-rounded;
+  @apply bg-zinc-600/50 rounded;
   box-shadow: 0 0 0 4px rgb(82 82 91 / 0.5);
 }
 
 .container :global([data-chars-id]) {
-  @apply bd-shadow-none bd-p-1 bd-border-b-2;
+  @apply shadow-none p-1 border-b-2;
 }
 
 .container :global([data-chars-id='v']) {
-  @apply !bd-text-pink-300 bd-bg-rose-800/50 bd-border-b-pink-600 bd-font-bold;
+  @apply !text-pink-300 bg-rose-800/50 border-b-pink-600 font-bold;
 }
 
 .container :global([data-chars-id='s']) {
-  @apply !bd-text-yellow-300 bd-bg-yellow-800/50 bd-border-b-yellow-600 bd-font-bold;
+  @apply !text-yellow-300 bg-yellow-800/50 border-b-yellow-600 font-bold;
 }
 
 .container :global([data-chars-id='i']) {
-  @apply !bd-text-purple-200 bd-bg-purple-800/50 bd-border-b-purple-600 bd-font-bold;
+  @apply !text-purple-200 bg-purple-800/50 border-b-purple-600 font-bold;
 }
 
 .container :global([data-rehype-pretty-code-title]) {
-  @apply bd-border bd-border-border bd-bg-gray-100 bd-text-primary bd-rounded-t-lg bd-py-2 bd-px-3 bd-font-semibold bd-text-sm;
+  @apply border border-border bg-gray-100 text-primary rounded-t-lg py-2 px-3 font-semibold text-sm;
 }
 
 .container
@@ -107,18 +107,18 @@
       )
       pre
   ) {
-  @apply !bd-rounded-t-none !bd-mt-0 bd-border-border bd-border-solid bd-border bd-rounded-lg;
+  @apply !rounded-t-none !mt-0 border-border border-solid border rounded-lg;
 }
 
 .container :global(figure[data-rehype-pretty-code-figure] pre),
 .container :global(pre.shiki-magic-move-container) {
-  @apply bd-bg-gray-400 dark:!bd-bg-background;
+  @apply bg-gray-400 dark:!bg-background;
 }
 
 .container :global(pre),
 .container :global(code),
 .container :global(figure) {
-  @apply bd-overflow-x-auto;
+  @apply overflow-x-auto;
 }
 
 /* based on twoslash rich renderer style */
@@ -205,20 +205,20 @@
   color: var(--twoslash-docs-color);
   font-size: 0.9em;
   border-top: 1px solid var(--twoslash-border-color);
-  @apply bd-font-sans;
+  @apply font-sans;
 }
 
 .container :global(.twoslash .twoslash-popup-error) {
   color: var(--twoslash-error-color);
   background-color: var(--twoslash-error-bg);
   font-size: 0.9em;
-  @apply bd-font-sans;
+  @apply font-sans;
 }
 
 .container :global(.twoslash .twoslash-popup-docs-tags) {
   display: flex;
   flex-direction: column;
-  @apply bd-font-sans;
+  @apply font-sans;
 }
 
 .container :global(.twoslash .twoslash-popup-docs-tags),
@@ -385,37 +385,37 @@
 
 /* Table styles */
 .container :global(table) {
-  @apply bd-w-full bd-my-6 bd-border-collapse;
+  @apply w-full my-6 border-collapse;
   border-spacing: 0;
 }
 
 .container :global(table thead) {
-  @apply bd-border-b bd-border-border;
+  @apply border-b border-border;
 }
 
 .container :global(table th) {
-  @apply bd-border-b bd-border-border bd-px-4 bd-py-3 bd-text-left bd-font-semibold bd-text-foreground;
+  @apply border-b border-border px-4 py-3 text-left font-semibold text-foreground;
   background-color: hsl(var(--muted));
 }
 
 .container :global(table td) {
-  @apply bd-border-b bd-border-border bd-px-4 bd-py-3 bd-text-foreground;
+  @apply border-b border-border px-4 py-3 text-foreground;
 }
 
 .container :global(table th:first-child),
 .container :global(table td:first-child) {
-  @apply bd-pl-4;
+  @apply pl-4;
 }
 
 .container :global(table th:last-child),
 .container :global(table td:last-child) {
-  @apply bd-pr-4;
+  @apply pr-4;
 }
 
 .container :global(table tbody tr:hover) {
-  @apply bd-bg-muted/50;
+  @apply bg-muted/50;
 }
 
 .container :global(table tbody tr:last-child td) {
-  @apply bd-border-b-0;
+  @apply border-b-0;
 }

@@ -19,7 +19,7 @@ const MySchema = z.object({
 });
 
 function MyComponent({ title, variant }: z.infer<typeof MySchema>) {
-  return <div className="bd-...">{title}</div>;
+  return <div className="...">{title}</div>;
 }
 
 export const MDXMyComponent = createMDXComponent(MyComponent, MySchema);

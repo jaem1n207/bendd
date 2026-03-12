@@ -22,7 +22,7 @@ export function MDXSteps({ children, className }: StepsProps) {
     <div
       className={cn(
         styles.container,
-        'bendd-steps bd-ml-4 bd-mb-12 bd-border-l bd-border-border bd-pl-6',
+        'bendd-steps ml-4 mb-12 border-l border-border pl-6',
         '[counter-reset:step]',
         className
       )}

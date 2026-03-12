@@ -13,14 +13,14 @@ describe('typography component', () => {
   it('should apply the correct variant classes', () => {
     render(<Typography affects="primary">Hello World</Typography>);
     const heading = screen.getByRole('heading');
-    expect(heading.className).toContain('bd-text-primary');
+    expect(heading.className).toContain('text-primary');
   });
   it('should apply the correct size classes', () => {
     render(<Typography variant="h2">Hello World</Typography>);
     const heading = screen.getByRole('heading');
     expect(heading.tagName).toBe('H1');
     expect(heading.className).toContain(
-      'bd-scroll-m-20 bd-text-3xl bd-font-semibold bd-tracking-tight md:bd-text-4xl'
+      'scroll-m-20 text-3xl font-semibold tracking-tight md:text-4xl'
     );
   });
   it('should render as a child component with a custom tag', () => {
@@ -37,14 +37,14 @@ describe('typography component', () => {
       <Typography
         variant="h1"
         affects="primary"
-        className="bd-text-center bd-text-secondary"
+        className="text-center text-secondary"
       >
         Hello World
       </Typography>
     );
     const heading = screen.getByRole('heading');
     expect(heading.className).toContain(
-      'bd-scroll-m-20 bd-text-4xl bd-font-extrabold bd-tracking-tight md:bd-text-5xl bd-text-primary bd-text-center bd-text-secondary'
+      'scroll-m-20 text-4xl font-extrabold tracking-tight md:text-5xl text-primary text-center text-secondary'
     );
   });
   it('should forward a ref to the DOM element', () => {

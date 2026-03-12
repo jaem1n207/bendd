@@ -5,26 +5,26 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'bd-inline-flex bd-items-center bd-justify-center bd-whitespace-nowrap bd-rounded-md bd-text-sm bd-font-medium bd-ring-offset-background bd-transition-colors focus-visible:bd-outline-none focus-visible:bd-ring-2 focus-visible:bd-ring-ring focus-visible:bd-ring-offset-2 disabled:bd-pointer-events-none disabled:bd-opacity-50',
+  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
         default:
-          'bd-bg-primary bd-text-primary-foreground hover:bd-bg-primary/90',
+          'bg-primary text-primary-foreground hover:bg-primary/90',
         destructive:
-          'bd-bg-destructive bd-text-destructive-foreground hover:bd-bg-destructive/90',
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline:
-          'bd-border bd-border-input bd-bg-background hover:bd-bg-accent hover:bd-text-accent-foreground',
+          'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
         secondary:
-          'bd-bg-secondary bd-text-secondary-foreground hover:bd-bg-secondary/80',
-        ghost: 'hover:bd-bg-accent hover:bd-text-accent-foreground',
-        link: 'bd-text-primary bd-underline-offset-4 hover:bd-underline',
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'hover:bg-accent hover:text-accent-foreground',
+        link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
-        default: 'bd-h-10 bd-px-4 bd-py-2',
-        sm: 'bd-h-9 bd-rounded-md bd-px-3',
-        lg: 'bd-h-11 bd-rounded-md bd-px-8',
-        icon: 'bd-h-10 bd-w-10',
+        default: 'h-10 px-4 py-2',
+        sm: 'h-9 rounded-md px-3',
+        lg: 'h-11 rounded-md px-8',
+        icon: 'h-10 w-10',
       },
     },
     defaultVariants: {

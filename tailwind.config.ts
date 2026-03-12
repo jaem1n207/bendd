@@ -9,7 +9,7 @@ const config = {
     './public/**/*.svg',
     './craft/**/*.mdx',
   ],
-  prefix: 'bd-',
+  prefix: '',
   future: {
     hoverOnlyWhenSupported: true,
   },

@@ -7,14 +7,13 @@
 
 These rules are non-negotiable. Violating them causes build failures or broken behavior.
 
-1. **Tailwind `bd-` prefix**: ALL utility classes require `bd-` prefix (e.g., `bd-flex bd-gap-2`, NOT `flex gap-2`)
-2. **MDX validation**: ALL MDX components MUST use `createMDXComponent` wrapper + Zod schema
-3. **Frontmatter limits**: title <= 38 chars, summary <= 40 chars, description <= 150 chars
-4. **Package manager**: `pnpm` ONLY — npm/yarn cause lockfile conflicts
-5. **Import alias**: `@/` ONLY — no relative imports (`../`)
-6. **Barrel exports**: Import domain components via `index.ts` only, never from subdirectories
-7. **CSS variables**: HSL format (`hsl(var(--name))`), not hex/RGB
-8. **Commits**: Conventional Commits + Korean messages (`feat(scope): 한국어 설명`)
+1. **MDX validation**: ALL MDX components MUST use `createMDXComponent` wrapper + Zod schema
+2. **Frontmatter limits**: title <= 38 chars, summary <= 40 chars, description <= 150 chars
+3. **Package manager**: `pnpm` ONLY — npm/yarn cause lockfile conflicts
+4. **Import alias**: `@/` ONLY — no relative imports (`../`)
+5. **Barrel exports**: Import domain components via `index.ts` only, never from subdirectories
+6. **CSS variables**: HSL format (`hsl(var(--name))`), not hex/RGB
+7. **Commits**: Conventional Commits + Korean messages (`feat(scope): 한국어 설명`)
 
 ## Content System
 
@@ -28,7 +27,7 @@ Same frontmatter schema, different display formatters and route prefixes.
 ## Key Patterns
 
 - **MDXProcessor**: Immutable chaining with lazy evaluation — operations queue until `getArticles()` / `formatForDisplay()` / `map()`
-- **Zustand persist**: localStorage with `bd-` prefixed keys (e.g., `bd-sound-enabled`)
+- **Zustand persist**: localStorage with named keys (e.g., `sound-enabled`)
 - **Theme sync**: `useThemeManager` syncs next-themes with giscus iframe via `postMessage`
 - **Dynamic imports**: Client-only components need `dynamic(() => import(...), { ssr: false })` in Server Component layouts
 - **OG images**: Dynamically generated at `/api/og` (Edge Runtime), not static files
@@ -66,10 +65,10 @@ Pre-commit hook runs `pnpm check-types` on TS/TSX + `prettier --write` on MD/MDX
 
 ## Docs Index
 
-| Document                                     | Contents                                                              |
-| -------------------------------------------- | --------------------------------------------------------------------- |
-| [docs/architecture.md](docs/architecture.md) | Content system, layer dependencies, routing, security headers         |
-| [docs/conventions.md](docs/conventions.md)   | Naming rules, file structure, MDX patterns, CSS, commits              |
-| [docs/pitfalls.md](docs/pitfalls.md)         | 20 common agent mistakes with correct/incorrect examples              |
-| [docs/decisions.md](docs/decisions.md)       | ADR-lite: why we chose specific patterns (bd- prefix, Zod, HSL, etc.) |
-| [docs/commands.md](docs/commands.md)         | Dev commands, test runners, build workflow                            |
+| Document                                     | Contents                                                      |
+| -------------------------------------------- | ------------------------------------------------------------- |
+| [docs/architecture.md](docs/architecture.md) | Content system, layer dependencies, routing, security headers |
+| [docs/conventions.md](docs/conventions.md)   | Naming rules, file structure, MDX patterns, CSS, commits      |
+| [docs/pitfalls.md](docs/pitfalls.md)         | 20 common agent mistakes with correct/incorrect examples      |
+| [docs/decisions.md](docs/decisions.md)       | ADR-lite: why we chose specific patterns (Zod, HSL, etc.)     |
+| [docs/commands.md](docs/commands.md)         | Dev commands, test runners, build workflow                    |

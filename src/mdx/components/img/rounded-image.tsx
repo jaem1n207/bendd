@@ -28,7 +28,7 @@ export function MDXRoundedImage({
         alt={alt}
         src={src}
         className={cn(
-          'bd-mx-auto bd-rounded-lg bd-max-w-full bd-h-auto',
+          'mx-auto rounded-lg max-w-full h-auto',
           className
         )}
         {...props}
@@ -44,7 +44,7 @@ export function MDXRoundedImage({
       height={768}
       sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
       quality={80}
-      className={cn('bd-rounded-lg bd-object-cover', className)}
+      className={cn('rounded-lg object-cover', className)}
       {...props}
     />
   );

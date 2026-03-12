@@ -30,14 +30,14 @@ export function MainNavigationItem({
       <Link
         href={slug}
         aria-label={name}
-        className="bd-flex bd-size-full bd-items-center bd-justify-center"
+        className="flex size-full items-center justify-center"
       >
-        <div className="bd-absolute -bd-top-[1px] -bd-z-10 bd-size-full bd-rounded-full bd-opacity-80 dark:bd-bg-navigation-item-top-highlight" />
+        <div className="absolute -top-[1px] -z-10 size-full rounded-full opacity-80 dark:bg-navigation-item-top-highlight" />
         {icon}
         <div
           className={cn(
-            'bd-absolute -bd-bottom-1.5 bd-left-[calc(50%-0.125rem)] bd-size-1 bd-rounded-full bd-bg-gray-800',
-            isActive ? 'bd-opacity-100' : 'bd-opacity-0'
+            'absolute -bottom-1.5 left-[calc(50%-0.125rem)] size-1 rounded-full bg-gray-800',
+            isActive ? 'opacity-100' : 'opacity-0'
           )}
         />
       </Link>
@@ -62,9 +62,9 @@ export function SocialNavigationItem({
       <ExternalLink
         href={href}
         aria-label={name}
-        className="bd-flex bd-size-full bd-items-center bd-justify-center"
+        className="flex size-full items-center justify-center"
       >
-        <div className="bd-absolute -bd-top-[1px] -bd-z-10 bd-size-full bd-rounded-full bd-opacity-80 dark:bd-bg-navigation-item-top-highlight" />
+        <div className="absolute -top-[1px] -z-10 size-full rounded-full opacity-80 dark:bg-navigation-item-top-highlight" />
         {icon}
       </ExternalLink>
     </NavigationItemTooltip>
@@ -83,8 +83,8 @@ export function SettingNavigationItem({
 }: SettingNavigationItemProps) {
   return (
     <NavigationItemTooltip content={name} name={name} {...motionProps}>
-      <div className="bd-flex bd-size-full bd-items-center bd-justify-center">
-        <div className="bd-absolute -bd-top-[1px] -bd-z-10 bd-size-full bd-rounded-full bd-opacity-80 dark:bd-bg-navigation-item-top-highlight" />
+      <div className="flex size-full items-center justify-center">
+        <div className="absolute -top-[1px] -z-10 size-full rounded-full opacity-80 dark:bg-navigation-item-top-highlight" />
         {children}
       </div>
     </NavigationItemTooltip>

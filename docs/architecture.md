@@ -70,7 +70,7 @@ src/components/{domain}/model/    <- 직접 import 금지
 ### Zustand 패턴
 
 - `persist` 미들웨어 사용 (localStorage)
-- storage key에 `bd-` prefix: 예) `bd-sound-enabled`
+- storage key: 예) `sound-enabled`
 - 새 스토어 생성 시 동일 패턴을 따른다
 
 ### next-themes + giscus 동기화

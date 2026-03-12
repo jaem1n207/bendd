@@ -4,26 +4,18 @@
 
 ## Tailwind CSS
 
-### bd- prefix 필수
+### 표준 Tailwind 유틸리티
 
-모든 Tailwind 유틸리티 클래스에 `bd-` prefix를 사용한다 (`tailwind.config.ts`의 `prefix: 'bd-'`).
+Tailwind 유틸리티 클래스를 prefix 없이 그대로 사용한다:
 
 ```tsx
-// 올바름
-<div className="bd-flex bd-items-center bd-gap-2 bd-text-foreground">
-
-// 잘못됨 - prefix 누락
 <div className="flex items-center gap-2 text-foreground">
 ```
 
-반응형, 상태, 다크모드 변형도 prefix 뒤에 온다:
+반응형, 상태, 다크모드 변형:
 
 ```tsx
-// 올바름
-'hover:bd-bg-primary/90 dark:bd-text-foreground md:bd-grid-cols-2';
-
-// 잘못됨
-'bd-hover:bg-primary/90 bd-dark:text-foreground';
+'hover:bg-primary/90 dark:text-foreground md:grid-cols-2';
 ```
 
 ### CSS 변수와 HSL
@@ -42,14 +34,14 @@
 
 ```tsx
 // Tailwind에서 사용
-'bd-bg-background'; // hsl(var(--background)) 으로 매핑
+'bg-background'; // hsl(var(--background)) 으로 매핑
 
 // 커스텀 색상이 필요하면 globals.css에 CSS 변수를 추가한다
 ```
 
 ### shadcn/ui 컴포넌트
 
-`components.json`에 `prefix: "bd-"` 설정이 되어 있다. `pnpm dlx shadcn-ui add` 로 설치하면 자동으로 bd- prefix가 적용된다.
+`pnpm dlx shadcn-ui add` 로 설치하면 프로젝트 설정에 맞게 컴포넌트가 생성된다.
 
 ## Import 규칙
 
@@ -116,7 +108,7 @@ const MySchema = z.object({
 });
 
 function MyComponent({ title, variant }: z.infer<typeof MySchema>) {
-  return <div className="bd-...">{title}</div>;
+  return <div className="...">{title}</div>;
 }
 
 export const MDXMyComponent = createMDXComponent(MyComponent, MySchema);

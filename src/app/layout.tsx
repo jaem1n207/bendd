@@ -92,18 +92,18 @@ export default function RootLayout({
       lang={siteMetadata.language}
       suppressHydrationWarning
       className={cn(
-        'bd-bg-background bd-text-foreground',
+        'bg-background text-foreground',
         fontSans.variable,
         fontMono.variable
       )}
       dir="ltr"
     >
-      <body className="bd-antialiased">
+      <body className="antialiased">
         <BrowserDetector />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
-          storageKey="bd-theme"
+          storageKey="theme"
           enableSystem
           disableTransitionOnChange
         >
@@ -112,9 +112,9 @@ export default function RootLayout({
             {children}
             <footer
               aria-labelledby="footer-navigation"
-              className="bd-fixed -bd-bottom-2 bd-left-1/2 bd-z-10 bd-flex bd-h-14 bd-w-4/5 -bd-translate-x-1/2 -bd-translate-y-1/2 bd-transform bd-items-end bd-rounded-full bd-border bd-border-solid bd-border-input bd-bg-gray-100 bd-px-2 bd-shadow-sm bd-shadow-secondary xs:bd-w-auto"
+              className="fixed -bottom-2 left-1/2 z-10 flex h-14 w-4/5 -translate-x-1/2 -translate-y-1/2 transform items-end rounded-full border border-solid border-input bg-gray-100 px-2 shadow-sm shadow-secondary xs:w-auto"
             >
-              <h2 id="footer-navigation" className="bd-sr-only">
+              <h2 id="footer-navigation" className="sr-only">
                 Footer navigation
               </h2>
               <Navigation />

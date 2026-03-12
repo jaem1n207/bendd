@@ -77,30 +77,30 @@ export function ArticleItem({
         ref={itemRef}
         href={href}
         className={cn(
-          'bd-relative bd-block bd-w-[calc(100%+1rem)] bd-overflow-hidden bd-rounded-xl bd-px-3 bd-py-4 hover:bd-bg-gray-300 sm:bd-flex sm:bd-items-center sm:bd-gap-3'
+          'relative block w-[calc(100%+1rem)] overflow-hidden rounded-xl px-3 py-4 hover:bg-gray-300 sm:flex sm:items-center sm:gap-3'
         )}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
         <motion.h2
           ref={nameRef}
-          className="bd-overflow-hidden bd-whitespace-nowrap bd-text-sm bd-font-medium md:bd-text-base"
+          className="overflow-hidden whitespace-nowrap text-sm font-medium md:text-base"
         >
           {name}
         </motion.h2>
         <motion.span
           ref={summaryRef}
-          className="-bd-ml-1.5 bd-hidden bd-overflow-hidden bd-whitespace-nowrap bd-text-sm bd-text-muted-foreground/90 sm:bd-inline-block"
+          className="-ml-1.5 hidden overflow-hidden whitespace-nowrap text-sm text-muted-foreground/90 sm:inline-block"
         >
           {summary}
         </motion.span>
         <motion.div
           ref={lineRef}
-          className="bd-hidden bd-h-px bd-origin-left bd-bg-gray-700 sm:bd-inline-block sm:bd-flex-1"
+          className="hidden h-px origin-left bg-gray-700 sm:inline-block sm:flex-1"
         />
         <motion.span
           ref={publishedAtRef}
-          className="bd-text-sm bd-tabular-nums bd-text-muted-foreground/70"
+          className="text-sm tabular-nums text-muted-foreground/70"
         >
           {publishedAt}
         </motion.span>

@@ -6,25 +6,25 @@ import { forwardRef, type HTMLAttributes } from 'react';
 export const typographyVariants = cva(null, {
   variants: {
     variant: {
-      h1: 'bd-scroll-m-20 bd-text-4xl bd-font-extrabold bd-tracking-tight md:bd-text-5xl',
-      h2: 'bd-scroll-m-20 bd-text-3xl bd-font-semibold bd-tracking-tight md:bd-text-4xl',
-      h3: 'bd-scroll-m-20 bd-text-2xl bd-font-semibold bd-tracking-tight md:bd-text-3xl',
-      h4: 'bd-scroll-m-20 bd-text-xl bd-font-semibold md:bd-text-2xl',
-      h5: 'bd-text-lg bd-font-semibold md:bd-text-xl',
-      p: 'bd-leading-7 [&:not(:first-child)]:bd-mt-6',
+      h1: 'scroll-m-20 text-4xl font-extrabold tracking-tight md:text-5xl',
+      h2: 'scroll-m-20 text-3xl font-semibold tracking-tight md:text-4xl',
+      h3: 'scroll-m-20 text-2xl font-semibold tracking-tight md:text-3xl',
+      h4: 'scroll-m-20 text-xl font-semibold md:text-2xl',
+      h5: 'text-lg font-semibold md:text-xl',
+      p: 'leading-7 [&:not(:first-child)]:mt-6',
       blockquote:
-        '-bd-ml-4 bd-border-l-4 bd-px-4 bd-py-2 bd-text-base bd-text-muted-foreground',
+        '-ml-4 border-l-4 px-4 py-2 text-base text-muted-foreground',
     },
     affects: {
       default: '',
-      primary: 'bd-text-primary',
-      lead: 'bd-text-xl bd-text-muted-foreground',
-      large: 'bd-text-lg bd-font-semibold',
-      small: 'bd-text-sm bd-font-medium bd-leading-none',
-      muted: 'bd-text-sm bd-text-muted-foreground',
+      primary: 'text-primary',
+      lead: 'text-xl text-muted-foreground',
+      large: 'text-lg font-semibold',
+      small: 'text-sm font-medium leading-none',
+      muted: 'text-sm text-muted-foreground',
     },
     prose: {
-      removePMargin: '[&:not(:first-child)]:!bd-mt-0',
+      removePMargin: '[&:not(:first-child)]:!mt-0',
     },
   },
   defaultVariants: {

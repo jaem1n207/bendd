@@ -38,8 +38,8 @@ export default function CraftPage() {
     });
 
   return (
-    <main className="bd-relative bd-mx-auto bd-my-0 bd-min-h-screen bd-max-w-4xl bd-overflow-y-auto bd-px-6 bd-pt-10 sm:bd-py-32">
-      <div className="bd-mt-8 bd-flex bd-flex-col bd-gap-7">
+    <main className="relative mx-auto my-0 min-h-screen max-w-4xl overflow-y-auto px-6 pt-10 sm:py-32">
+      <div className="mt-8 flex flex-col gap-7">
         {formattedArticleInfo.map((article, index) => (
           <ArticleItem key={article.href} {...article} index={index} />
         ))}
