@@ -78,6 +78,8 @@ function MagicMoveContent({
     [highlighter, lang, resolvedTheme]
   );
 
+  if (!resolvedTheme) return null;
+
   const stepData = stepsData[deferredCurrentStep] as StepData<CodeSnippet>;
 
   if (!stepData) return null;
