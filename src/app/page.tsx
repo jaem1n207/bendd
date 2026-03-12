@@ -46,31 +46,85 @@ export default function Home() {
           >
             <span>프로젝트</span>
           </Typography>
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://chromewebstore.google.com/detail/synchronize-tab-scrolling/phceoocamipnafpgnchbfhkdlbleeafc"
-            className="-bd-mx-3 bd-flex bd-flex-col bd-gap-1 bd-rounded-md bd-px-3 bd-transition-colors hover:bd-bg-gray-400 focus-visible:bd-outline-none focus-visible:bd-ring-2 focus-visible:bd-ring-ring focus-visible:bd-ring-offset-2 dark:hover:bd-bg-gray-200 sm:bd-py-3"
-          >
-            <Typography
-              variant="p"
-              affects="small"
-              prose="removePMargin"
-              asChild
+          <div className="-bd-mx-3">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://jaem1n207.github.io/synchronize-tab-scrolling/"
+              className="bd-group bd-flex bd-flex-col bd-gap-2 bd-rounded-xl bd-p-3 bd-transition-colors hover:bd-bg-gray-400 focus-visible:bd-outline-none focus-visible:bd-ring-2 focus-visible:bd-ring-ring focus-visible:bd-ring-offset-2 dark:hover:bd-bg-gray-200"
             >
-              <span>Synchronize Tab Scrolling</span>
-            </Typography>
-            <Typography
-              variant="p"
-              affects="muted"
-              prose="removePMargin"
-              asChild
-            >
-              <span>
-                여러 탭 간 스크롤을 동기화하는 브라우저 확장 프로그램입니다.
+              <div className="bd-flex bd-items-center bd-gap-2">
+                <Typography
+                  variant="p"
+                  affects="small"
+                  prose="removePMargin"
+                  asChild
+                >
+                  <span>Synchronize Tab Scrolling</span>
+                </Typography>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="bd-text-muted-foreground bd-transition-transform group-hover:-bd-translate-y-0.5 group-hover:bd-translate-x-0.5"
+                  aria-hidden="true"
+                >
+                  <path d="m7 17 10-10" />
+                  <path d="M7 7h10v10" />
+                </svg>
+              </div>
+              <Typography
+                variant="p"
+                affects="muted"
+                prose="removePMargin"
+                asChild
+              >
+                <span className="bd-break-keep">
+                  여러 탭의 스크롤을 실시간으로 동기화하는 오픈소스 브라우저
+                  확장 프로그램입니다. 번역본 비교, 코드 리뷰, 문서 대조 등 탭을
+                  나란히 놓고 비교하는 작업에 유용합니다.
+                </span>
+              </Typography>
+              <div className="bd-flex bd-flex-wrap bd-items-center bd-gap-1.5">
+                <span className="bd-rounded-md bd-bg-gray-300 bd-px-2 bd-py-0.5 bd-text-xs bd-text-muted-foreground">
+                  Chrome
+                </span>
+                <span className="bd-rounded-md bd-bg-gray-300 bd-px-2 bd-py-0.5 bd-text-xs bd-text-muted-foreground">
+                  Firefox
+                </span>
+                <span className="bd-rounded-md bd-bg-gray-300 bd-px-2 bd-py-0.5 bd-text-xs bd-text-muted-foreground">
+                  Edge
+                </span>
+              </div>
+            </a>
+            <div className="bd-flex bd-items-center bd-gap-3 bd-px-3 bd-pt-2 bd-text-sm">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://chromewebstore.google.com/detail/synchronize-tab-scrolling/phceoocamipnafpgnchbfhkdlbleeafc"
+                className="bd-select-none bd-text-muted-foreground bd-transition-colors hover:bd-text-primary"
+              >
+                Web Store
+              </a>
+              <span className="bd-text-muted-foreground" aria-hidden="true">
+                ·
               </span>
-            </Typography>
-          </a>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://github.com/jaem1n207/synchronize-tab-scrolling"
+                className="bd-select-none bd-text-muted-foreground bd-transition-colors hover:bd-text-primary"
+              >
+                GitHub
+              </a>
+            </div>
+          </div>
         </div>
 
         <div className="bd-mt-16 sm:bd-mt-24">
