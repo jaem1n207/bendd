@@ -21,7 +21,7 @@ export function TableOfContents() {
   }, []);
 
   return (
-    <nav className="toc-navbar">
+    <nav className="toc-navbar flex-1 min-h-0 flex flex-col">
       <div
         ref={markerRef}
         className={cn(
@@ -35,7 +35,7 @@ export function TableOfContents() {
       <ul
         ref={containerRef}
         className={cn(
-          'h-full overflow-y-auto mt-1 rounded-sm font-sans'
+          'flex-1 min-h-0 overflow-y-auto mt-1 rounded-sm font-sans'
         )}
       >
         {renderItems(toc)}

@@ -63,7 +63,7 @@ export default function ShuffleLettersDemo() {
     fps <= 60;
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4">
+    <main className="flex flex-col items-center gap-4 p-4">
       <h1 className="text-2xl font-bold">Shuffle Letters Playground</h1>
       <p className="text-center">
         Rauno의 프로젝트 페이지 렌더링 애니메이션을 구현하는 데 사용되는
@@ -162,6 +162,6 @@ export default function ShuffleLettersDemo() {
           </li>
         </ul>
       </div>
-    </div>
+    </main>
   );
 }

@@ -39,7 +39,7 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
     description: summary,
     image: image
       ? `${siteMetadata.siteUrl}${image}`
-      : `/api/og?title=${encodeURIComponent(title)}`,
+      : `${siteMetadata.siteUrl}/api/og?title=${encodeURIComponent(title)}`,
     url: `${siteMetadata.siteUrl}/${type}/${post.slug}`,
     author: {
       '@type': 'Person',
@@ -58,7 +58,7 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
             __html: JSON.stringify(jsonLd),
           }}
         />
-        <div className="fixed bottom-0 left-5 top-24 hidden overflow-hidden lg:block">
+        <div className="fixed bottom-16 left-5 top-24 hidden flex-col overflow-hidden lg:flex">
           <Link
             href={`/${type}`}
             className={cn(

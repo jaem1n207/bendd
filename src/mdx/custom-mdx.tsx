@@ -9,7 +9,6 @@ import {
   transformerNotationWordHighlight,
   transformerRenderWhitespace,
 } from '@shikijs/transformers';
-import { rendererRich, transformerTwoslash } from '@shikijs/twoslash';
 import { MDXRemote, type MDXRemoteProps } from 'next-mdx-remote/rsc';
 import type { AnchorHTMLAttributes, DetailedHTMLProps } from 'react';
 import rehypePrettyCode from 'rehype-pretty-code';
@@ -28,6 +27,7 @@ import { MDXShuffleLettersDemo } from './components/shuffle-letters-demo/shuffle
 import { MDXSteps } from './components/steps/steps';
 import { MDXAutoplayVideo, MDXPreLoadVideo } from './components/video/video';
 
+import { ensureLocalStorage } from './lib/ensure-local-storage';
 import styles from './mdx.module.css';
 
 const components: MDXRemoteProps['components'] = {
@@ -58,7 +58,24 @@ const components: MDXRemoteProps['components'] = {
   ImeScrollDemo: MDXImeScrollDemo,
 };
 
-export function CustomMDX({ source }: { source: string }) {
+async function loadTwoslashTransformer() {
+  ensureLocalStorage();
+
+  const { transformerTwoslash, rendererRich } = await import(
+    '@shikijs/twoslash'
+  );
+  return transformerTwoslash({
+    renderer: rendererRich(),
+    explicitTrigger: true,
+    onTwoslashError: (error, code) => {
+      console.error(error, code);
+    },
+  });
+}
+
+export async function CustomMDX({ source }: { source: string }) {
+  const twoslash = await loadTwoslashTransformer();
+
   return (
     <div className={styles.container}>
       <MDXRemote
@@ -72,13 +89,7 @@ export function CustomMDX({ source }: { source: string }) {
                 {
                   theme: 'vitesse-dark',
                   transformers: [
-                    transformerTwoslash({
-                      renderer: rendererRich(),
-                      explicitTrigger: true,
-                      onTwoslashError: (error, code) => {
-                        console.error(error, code);
-                      },
-                    }),
+                    twoslash,
                     transformerNotationHighlight(),
                     transformerNotationFocus({
                       classActivePre: 'has-focused-lines',
