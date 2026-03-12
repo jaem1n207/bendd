@@ -115,10 +115,10 @@ export function useActiveAnchor(
   markerRef: RefObject<HTMLElement>
 ) {
   useEffect(() => {
-    function activateLink(hash: string | null) {
-      if (containerRef.current) {
-        const links = containerRef.current.querySelectorAll('a');
-        links.forEach(link => link.classList.remove('!bd-text-foreground'));
+     function activateLink(hash: string | null) {
+       if (containerRef.current) {
+         const links = containerRef.current.querySelectorAll('a');
+         links.forEach(link => { link.classList.remove('!bd-text-foreground'); });
 
         if (hash != null) {
           const activeLink =

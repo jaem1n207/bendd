@@ -67,7 +67,7 @@ export const ExternalLink = forwardRef<HTMLAnchorElement, LinkProps>(
       <a
         className={cn(
           {
-            'bd-space-x-1 bd-leading-tight': prefixEl || suffixEl,
+            'bd-inline-flex bd-items-center bd-gap-1 bd-leading-tight': prefixEl || suffixEl,
           },
           linkVariants({ variant, affects }),
           {
