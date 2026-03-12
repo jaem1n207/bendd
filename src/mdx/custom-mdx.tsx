@@ -9,7 +9,6 @@ import {
   transformerNotationWordHighlight,
   transformerRenderWhitespace,
 } from '@shikijs/transformers';
-import { rendererRich, transformerTwoslash } from '@shikijs/twoslash';
 import { MDXRemote, type MDXRemoteProps } from 'next-mdx-remote/rsc';
 import type { AnchorHTMLAttributes, DetailedHTMLProps } from 'react';
 import rehypePrettyCode from 'rehype-pretty-code';
@@ -58,7 +57,39 @@ const components: MDXRemoteProps['components'] = {
   ImeScrollDemo: MDXImeScrollDemo,
 };
 
-export function CustomMDX({ source }: { source: string }) {
+// @shikijs/twoslash → @typescript/vfs가 모듈 로드 시 localStorage.getItem을 호출하여
+// SSR에서 TypeError가 발생하므로, 동적 import 전에 폴리필을 적용합니다.
+async function loadTwoslashTransformer() {
+  if (typeof globalThis.localStorage?.getItem !== 'function') {
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {},
+        clear: () => {},
+        length: 0,
+        key: () => null,
+      },
+      writable: true,
+      configurable: true,
+    });
+  }
+
+  const { transformerTwoslash, rendererRich } = await import(
+    '@shikijs/twoslash'
+  );
+  return transformerTwoslash({
+    renderer: rendererRich(),
+    explicitTrigger: true,
+    onTwoslashError: (error, code) => {
+      console.error(error, code);
+    },
+  });
+}
+
+export async function CustomMDX({ source }: { source: string }) {
+  const twoslash = await loadTwoslashTransformer();
+
   return (
     <div className={styles.container}>
       <MDXRemote
@@ -72,13 +103,7 @@ export function CustomMDX({ source }: { source: string }) {
                 {
                   theme: 'vitesse-dark',
                   transformers: [
-                    transformerTwoslash({
-                      renderer: rendererRich(),
-                      explicitTrigger: true,
-                      onTwoslashError: (error, code) => {
-                        console.error(error, code);
-                      },
-                    }),
+                    twoslash,
                     transformerNotationHighlight(),
                     transformerNotationFocus({
                       classActivePre: 'has-focused-lines',
