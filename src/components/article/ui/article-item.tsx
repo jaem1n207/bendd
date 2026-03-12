@@ -90,7 +90,7 @@ export function ArticleItem({
         </motion.h2>
         <motion.span
           ref={summaryRef}
-          className="-ml-1.5 hidden overflow-hidden whitespace-nowrap text-sm text-muted-foreground/90 sm:inline-block"
+          className="-ml-1.5 hidden overflow-hidden whitespace-nowrap text-sm text-muted-foreground sm:inline-block"
         >
           {summary}
         </motion.span>
@@ -100,7 +100,7 @@ export function ArticleItem({
         />
         <motion.span
           ref={publishedAtRef}
-          className="text-sm tabular-nums text-muted-foreground/70"
+          className="text-sm tabular-nums text-muted-foreground"
         >
           {publishedAt}
         </motion.span>

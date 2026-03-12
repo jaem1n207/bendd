@@ -92,13 +92,13 @@ export default function Home() {
                 </span>
               </Typography>
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-muted-foreground">
+                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
                   Chrome
                 </span>
-                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-muted-foreground">
+                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
                   Firefox
                 </span>
-                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-muted-foreground">
+                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
                   Edge
                 </span>
               </div>
