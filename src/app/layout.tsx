@@ -112,7 +112,7 @@ export default function RootLayout({
             {children}
             <footer
               aria-labelledby="footer-navigation"
-              className="fixed -bottom-2 left-1/2 z-10 flex h-14 w-4/5 -translate-x-1/2 -translate-y-1/2 transform items-end rounded-full border border-solid border-input bg-gray-100 px-2 shadow-sm shadow-secondary xs:w-auto"
+              className="fixed -bottom-2 left-1/2 z-10 flex h-14 w-4/5 -translate-x-1/2 -translate-y-1/2 transform items-end rounded-full border border-solid border-input bg-background px-2 shadow-sm shadow-secondary xs:w-auto"
             >
               <h2 id="footer-navigation" className="sr-only">
                 Footer navigation
