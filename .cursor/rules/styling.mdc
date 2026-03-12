@@ -40,7 +40,7 @@ When adding custom colors:
 ## shadcn/ui Components
 
 - Located in `src/components/ui/` (flat structure, no subdirectories)
-- Install: `pnpm dlx shadcn-ui add <component>`
+- Install: `pnpm dlx shadcn@latest add <component>`
 - Use `cn()` from `@/lib/utils` for conditional class merging
 
 ## Domain Component Structure

@@ -41,7 +41,7 @@ Tailwind 유틸리티 클래스를 prefix 없이 그대로 사용한다:
 
 ### shadcn/ui 컴포넌트
 
-`pnpm dlx shadcn-ui add` 로 설치하면 프로젝트 설정에 맞게 컴포넌트가 생성된다.
+`pnpm dlx shadcn@latest add` 로 설치하면 프로젝트 설정에 맞게 컴포넌트가 생성된다.
 
 ## Import 규칙
 

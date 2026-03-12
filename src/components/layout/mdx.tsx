@@ -62,7 +62,7 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
           <Link
             href={`/${type}`}
             className={cn(
-              'flex itesm-center gap-x-1 w-fit leading-5 text-sm',
+              'flex items-center gap-x-1 w-fit leading-5 text-sm',
               'p-1 -m-1',
               'text-muted-foreground transition-colors hover:text-primary'
             )}
