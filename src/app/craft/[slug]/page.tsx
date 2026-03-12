@@ -47,12 +47,21 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
       images: [
         {
           url: ogImage,
+          width: 1200,
+          height: 630,
+          type: 'image/png',
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      images: [ogImage],
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+        },
+      ],
     },
   } satisfies Metadata;
 }

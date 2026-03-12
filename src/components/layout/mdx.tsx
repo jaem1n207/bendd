@@ -39,7 +39,7 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
     description: summary,
     image: image
       ? `${siteMetadata.siteUrl}${image}`
-      : `/api/og?title=${encodeURIComponent(title)}`,
+      : `${siteMetadata.siteUrl}/api/og?title=${encodeURIComponent(title)}`,
     url: `${siteMetadata.siteUrl}/${type}/${post.slug}`,
     author: {
       '@type': 'Person',
