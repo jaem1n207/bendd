@@ -130,6 +130,7 @@ function ImeScrollDemo({ initialText = '' }: ImeScrollDemoProps) {
               className="!w-[120px] border-destructive text-sm focus:ring-destructive"
             />
             <button
+              type="button"
               onClick={() => {
                 setNormalValue(sampleText);
                 normalInputRef.current?.focus();
@@ -163,6 +164,7 @@ function ImeScrollDemo({ initialText = '' }: ImeScrollDemoProps) {
               className="!w-[120px] border-green-500 text-sm focus:ring-green-600"
             />
             <button
+              type="button"
               onClick={() => {
                 setFixedValue(sampleText);
                 fixedInputRef.current?.focus();
