@@ -25,6 +25,9 @@ export async function GET(req: NextRequest): Promise<Response | ImageResponse> {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            width: 1200,
+            height: 630,
+            backgroundColor: isLight ? 'white' : 'black',
           }}
         >
           {isLight ? <LightSvg /> : <DarkSvg />}
@@ -32,15 +35,15 @@ export async function GET(req: NextRequest): Promise<Response | ImageResponse> {
             style={{
               position: 'absolute',
               fontFamily: 'Inter',
-              fontSize: '48px',
+              fontSize: '56px',
               fontWeight: '600',
               letterSpacing: '-0.04em',
               color: isLight ? 'black' : 'white',
-              top: '250px',
+              top: '365px',
               left: '50%',
               transform: 'translateX(-50%)',
               whiteSpace: 'pre-wrap',
-              maxWidth: '750px',
+              maxWidth: '1000px',
               textAlign: 'center',
               wordWrap: 'break-word',
               overflowWrap: 'break-word',
@@ -51,8 +54,8 @@ export async function GET(req: NextRequest): Promise<Response | ImageResponse> {
         </div>
       ),
       {
-        width: 843,
-        height: 441,
+        width: 1200,
+        height: 630,
         fonts: [
           {
             name: 'Inter',
@@ -77,9 +80,9 @@ function LightSvg(): ReactElement {
   return (
     <svg
       fill="none"
-      height="441"
+      height="630"
       viewBox="0 0 843 441"
-      width="843"
+      width="1200"
       xmlns="http://www.w3.org/2000/svg"
     >
       <g clipPath="url(#clip0_5_3)">
@@ -382,9 +385,9 @@ function DarkSvg(): ReactElement {
   return (
     <svg
       fill="none"
-      height="441"
+      height="630"
       viewBox="0 0 843 441"
-      width="843"
+      width="1200"
       xmlns="http://www.w3.org/2000/svg"
     >
       <g clipPath="url(#clip0_1_4)">
