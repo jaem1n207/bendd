@@ -27,6 +27,7 @@ import { MDXShuffleLettersDemo } from './components/shuffle-letters-demo/shuffle
 import { MDXSteps } from './components/steps/steps';
 import { MDXAutoplayVideo, MDXPreLoadVideo } from './components/video/video';
 
+import { ensureLocalStorage } from './lib/ensure-local-storage';
 import styles from './mdx.module.css';
 
 const components: MDXRemoteProps['components'] = {
@@ -57,23 +58,8 @@ const components: MDXRemoteProps['components'] = {
   ImeScrollDemo: MDXImeScrollDemo,
 };
 
-// @shikijs/twoslash → @typescript/vfs가 모듈 로드 시 localStorage.getItem을 호출하여
-// SSR에서 TypeError가 발생하므로, 동적 import 전에 폴리필을 적용합니다.
 async function loadTwoslashTransformer() {
-  if (typeof globalThis.localStorage?.getItem !== 'function') {
-    Object.defineProperty(globalThis, 'localStorage', {
-      value: {
-        getItem: () => null,
-        setItem: () => {},
-        removeItem: () => {},
-        clear: () => {},
-        length: 0,
-        key: () => null,
-      },
-      writable: true,
-      configurable: true,
-    });
-  }
+  ensureLocalStorage();
 
   const { transformerTwoslash, rendererRich } = await import(
     '@shikijs/twoslash'
