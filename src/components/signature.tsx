@@ -5,7 +5,7 @@ export function Signature() {
   return (
     <Link
       href="/"
-      className="bd-absolute bd-left-0 bd-top-0 bd-z-10 bd-m-5 bd-inline-block bd-size-12 bd-select-none lg:bd-fixed"
+      className="absolute left-0 top-0 z-10 m-5 inline-block size-12 select-none lg:fixed"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -21,7 +21,7 @@ export function Signature() {
           fill="none"
           strokeDasharray={28.13859748840332}
           strokeDashoffset={28.13859748840332}
-          className="bd-animate-signature"
+          className="animate-signature"
         />
       </svg>
     </Link>

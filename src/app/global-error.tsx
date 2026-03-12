@@ -21,13 +21,13 @@ export default function GlobalError({
   return (
     <html>
       <body>
-        <section className="bd-flex bd-h-screen bd-flex-col bd-items-center bd-justify-center bd-space-y-4">
-          <div className="bd-relative bd-size-96">
+        <section className="flex h-screen flex-col items-center justify-center space-y-4">
+          <div className="relative size-96">
             <Image
               src="/rabbit.svg"
               alt="primary character"
               draggable={false}
-              className="dark:bd-invert"
+              className="dark:invert"
               fill
               priority
             />

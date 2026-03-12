@@ -49,7 +49,7 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
   };
 
   return (
-    <main className="bd-relative bd-mx-auto bd-my-0 bd-min-h-screen bd-max-w-2xl bd-overflow-hidden bd-px-6 bd-py-32">
+    <main className="relative mx-auto my-0 min-h-screen max-w-2xl overflow-hidden px-6 py-32">
       <section id="BenddDoc">
         <script
           type="application/ld+json"
@@ -58,16 +58,16 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
             __html: JSON.stringify(jsonLd),
           }}
         />
-        <div className="bd-fixed bd-bottom-0 bd-left-5 bd-top-24 bd-hidden bd-overflow-hidden lg:bd-block">
+        <div className="fixed bottom-0 left-5 top-24 hidden overflow-hidden lg:block">
           <Link
             href={`/${type}`}
             className={cn(
-              'bd-flex bd-itesm-center bd-gap-x-1 bd-w-fit bd-leading-5 bd-text-sm',
-              'bd-p-1 -bd-m-1',
-              'bd-text-muted-foreground bd-transition-colors hover:bd-text-primary'
+              'flex items-center gap-x-1 w-fit leading-5 text-sm',
+              'p-1 -m-1',
+              'text-muted-foreground transition-colors hover:text-primary'
             )}
           >
-            <CornerUpLeft className="bd-size-4" />
+            <CornerUpLeft className="size-4" />
             {type.charAt(0).toUpperCase() + type.slice(1)}
           </Link>
           <TableOfContents />
@@ -75,7 +75,7 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
         <Typography variant="h2">{title}</Typography>
         <Typography
           variant="p"
-          className="!bd-mt-2 bd-text-muted-foreground/80"
+          className="!mt-2 text-muted-foreground/80"
           asChild
         >
           <p>
@@ -87,7 +87,7 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
         </Typography>
         <Typography
           variant="blockquote"
-          className="bd-mt-6 bd-break-keep"
+          className="mt-6 break-keep"
           asChild
         >
           <blockquote>
@@ -98,8 +98,8 @@ export function MdxLayout({ post, type }: MdxLayoutProps) {
         </Typography>
         <article
           className={cn(
-            'bd-prose bd-prose-slate bd-mb-24 dark:bd-prose-invert md:bd-mb-40',
-            type === 'article' ? 'bd-mt-16 md:bd-mt-24' : 'bd-mt-40 md:bd-mt-52'
+            'prose prose-slate mb-24 dark:prose-invert md:mb-40',
+            type === 'article' ? 'mt-16 md:mt-24' : 'mt-40 md:mt-52'
           )}
         >
           <CustomMDX source={post.content} />

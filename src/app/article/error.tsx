@@ -20,8 +20,8 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="bd-flex bd-h-dvh bd-flex-col bd-items-center bd-justify-center bd-space-y-4 bd-py-6 bd-text-center">
-      <Typography variant="h2" asChild className="bd-mb-4">
+    <main className="flex h-dvh flex-col items-center justify-center space-y-4 py-6 text-center">
+      <Typography variant="h2" asChild className="mb-4">
         <h2>현재 서비스 개선 중이에요.</h2>
       </Typography>
       <Typography variant="p" affects="large" asChild>

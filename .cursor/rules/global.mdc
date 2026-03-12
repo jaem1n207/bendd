@@ -10,22 +10,17 @@ See [AGENTS.md](../../AGENTS.md) for the full canonical reference and [docs/](..
 
 ## Critical Rules (Non-Negotiable)
 
-1. **Tailwind `bd-` prefix**: ALL utility classes require `bd-` prefix
-   - `bd-flex bd-gap-2 bd-text-foreground` (correct)
-   - `flex gap-2 text-foreground` (wrong — will not work)
-   - Variants: `hover:bd-bg-primary dark:bd-text-foreground md:bd-grid-cols-2`
+1. **Package manager**: `pnpm` ONLY — `npm install` / `yarn add` cause lockfile conflicts
 
-2. **Package manager**: `pnpm` ONLY — `npm install` / `yarn add` cause lockfile conflicts
-
-3. **Import alias**: `@/` ONLY — no relative imports (`../`)
+2. **Import alias**: `@/` ONLY — no relative imports (`../`)
    - `import { cn } from '@/lib/utils'` (correct)
    - `import { cn } from '../../lib/utils'` (wrong)
 
-4. **Barrel exports**: Import domain components via `index.ts` only
+3. **Barrel exports**: Import domain components via `index.ts` only
    - `import { SoundSwitcher } from '@/components/sound'` (correct)
    - `import { SoundSwitcher } from '@/components/sound/ui/sound-switcher'` (wrong)
 
-5. **Commits**: Conventional Commits + Korean messages
+4. **Commits**: Conventional Commits + Korean messages
    - `feat(article): 블로그 글 검색 기능 추가` (correct)
 
 ## Content System
@@ -49,7 +44,7 @@ src/components/{domain}/
 ## Key Patterns
 
 - MDXProcessor uses immutable chaining with lazy evaluation
-- Zustand stores use `persist` middleware with `bd-` prefixed storage keys
+- Zustand stores use `persist` middleware with named storage keys
 - Theme changes must sync with giscus via `postMessage` (see `useThemeManager`)
 - Client-only components need `dynamic(() => import(...), { ssr: false })`
 - CSS variables use HSL format: `hsl(var(--name))`

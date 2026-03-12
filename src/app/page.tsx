@@ -2,8 +2,8 @@ import { Typography } from '@/components/ui/typography';
 
 export default function Home() {
   return (
-    <div className="bd-relative bd-mx-auto bd-min-h-screen bd-max-w-2xl bd-overflow-hidden bd-px-6 bd-py-24 sm:bd-pb-16 sm:bd-pt-32 ">
-      <header className="bd-mb-32 bd-flex bd-flex-col">
+    <div className="relative mx-auto min-h-screen max-w-2xl overflow-hidden px-6 py-24 sm:pb-16 sm:pt-32 ">
+      <header className="mb-32 flex flex-col">
         <Typography variant="h5" asChild>
           <h1>이재민</h1>
         </Typography>
@@ -12,17 +12,17 @@ export default function Home() {
         </Typography>
       </header>
       <main>
-        <div className="bd-mt-16 sm:bd-mt-24">
+        <div className="mt-16 sm:mt-24">
           <Typography
             variant="p"
             affects="large"
-            className="bd-mb-5 bd-block"
+            className="mb-5 block"
             asChild
           >
             <span>소개</span>
           </Typography>
           <Typography variant="p" affects="muted" asChild>
-            <p className="bd-break-keep">
+            <p className="break-keep">
               누군가에게는 사소해 보일 수 있는 애니메이션과 마이크로 인터랙션이
               유려한 사용자 경험의 핵심을 만듭니다.
               <br />
@@ -37,23 +37,23 @@ export default function Home() {
           </Typography>
         </div>
 
-        <div className="bd-mt-16 sm:bd-mt-24">
+        <div className="mt-16 sm:mt-24">
           <Typography
             variant="p"
             affects="large"
-            className="bd-mb-5 bd-block"
+            className="mb-5 block"
             asChild
           >
             <span>프로젝트</span>
           </Typography>
-          <div className="-bd-mx-3">
+          <div className="-mx-3">
             <a
               target="_blank"
               rel="noopener noreferrer"
               href="https://jaem1n207.github.io/synchronize-tab-scrolling/"
-              className="bd-group bd-flex bd-flex-col bd-gap-2 bd-rounded-xl bd-p-3 bd-transition-colors hover:bd-bg-gray-400 focus-visible:bd-outline-none focus-visible:bd-ring-2 focus-visible:bd-ring-ring focus-visible:bd-ring-offset-2 dark:hover:bd-bg-gray-200"
+              className="group flex flex-col gap-2 rounded-xl p-3 transition-colors hover:bg-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:hover:bg-gray-200"
             >
-              <div className="bd-flex bd-items-center bd-gap-2">
+              <div className="flex items-center gap-2">
                 <Typography
                   variant="p"
                   affects="small"
@@ -72,7 +72,7 @@ export default function Home() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="bd-text-muted-foreground bd-transition-transform group-hover:-bd-translate-y-0.5 group-hover:bd-translate-x-0.5"
+                  className="text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                   aria-hidden="true"
                 >
                   <path d="m7 17 10-10" />
@@ -85,41 +85,41 @@ export default function Home() {
                 prose="removePMargin"
                 asChild
               >
-                <span className="bd-break-keep">
+                <span className="break-keep">
                   여러 탭의 스크롤을 실시간으로 동기화하는 오픈소스 브라우저
                   확장 프로그램입니다. 번역본 비교, 코드 리뷰, 문서 대조 등 탭을
                   나란히 놓고 비교하는 작업에 유용합니다.
                 </span>
               </Typography>
-              <div className="bd-flex bd-flex-wrap bd-items-center bd-gap-1.5">
-                <span className="bd-rounded-md bd-bg-gray-300 bd-px-2 bd-py-0.5 bd-text-xs bd-text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-muted-foreground">
                   Chrome
                 </span>
-                <span className="bd-rounded-md bd-bg-gray-300 bd-px-2 bd-py-0.5 bd-text-xs bd-text-muted-foreground">
+                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-muted-foreground">
                   Firefox
                 </span>
-                <span className="bd-rounded-md bd-bg-gray-300 bd-px-2 bd-py-0.5 bd-text-xs bd-text-muted-foreground">
+                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-muted-foreground">
                   Edge
                 </span>
               </div>
             </a>
-            <div className="bd-flex bd-items-center bd-gap-3 bd-px-3 bd-pt-2 bd-text-sm">
+            <div className="flex items-center gap-3 px-3 pt-2 text-sm">
               <a
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://chromewebstore.google.com/detail/synchronize-tab-scrolling/phceoocamipnafpgnchbfhkdlbleeafc"
-                className="bd-select-none bd-text-muted-foreground bd-transition-colors hover:bd-text-primary"
+                className="select-none text-muted-foreground transition-colors hover:text-primary"
               >
                 Web Store
               </a>
-              <span className="bd-text-muted-foreground" aria-hidden="true">
+              <span className="text-muted-foreground" aria-hidden="true">
                 ·
               </span>
               <a
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://github.com/jaem1n207/synchronize-tab-scrolling"
-                className="bd-select-none bd-text-muted-foreground bd-transition-colors hover:bd-text-primary"
+                className="select-none text-muted-foreground transition-colors hover:text-primary"
               >
                 GitHub
               </a>
@@ -127,11 +127,11 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="bd-mt-16 sm:bd-mt-24">
+        <div className="mt-16 sm:mt-24">
           <Typography
             variant="p"
             affects="large"
-            className="bd-mb-5 bd-block"
+            className="mb-5 block"
             asChild
           >
             <span>기여</span>
@@ -140,7 +140,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
             href="https://github.com/shuding/nextra/pull/2746"
-            className="-bd-mx-3 bd-flex bd-flex-col bd-gap-1 bd-rounded-md bd-px-3 bd-transition-colors hover:bd-bg-gray-400 focus-visible:bd-outline-none focus-visible:bd-ring-2 focus-visible:bd-ring-ring focus-visible:bd-ring-offset-2 dark:hover:bd-bg-gray-200 sm:bd-py-3"
+            className="-mx-3 flex flex-col gap-1 rounded-md px-3 transition-colors hover:bg-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:hover:bg-gray-200 sm:py-3"
           >
             <Typography
               variant="p"

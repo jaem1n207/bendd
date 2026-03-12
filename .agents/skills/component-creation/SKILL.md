@@ -64,7 +64,7 @@ import { Button } from '../ui/button';
 
 ## Zustand Stores
 
-Stores use `persist` middleware with `bd-` prefixed storage keys:
+Stores use `persist` middleware with named storage keys:
 
 ```typescript
 // src/components/sound/model/sound-store.ts
@@ -85,13 +85,13 @@ export const useSoundStore = create<SoundState>()(
       },
     }),
     {
-      name: 'bd-sound-enabled', // MUST use bd- prefix
+      name: 'sound-enabled',
     }
   )
 );
 ```
 
-Storage key format: `bd-{feature-name}`.
+Storage key format: `{feature-name}`.
 
 ## Client Components in Server Component Layouts
 
@@ -144,6 +144,6 @@ When creating a new domain component:
 2. Add `index.ts` with public exports
 3. Place React components in `ui/`
 4. Place hooks and stores in `model/`
-5. Storage keys use `bd-` prefix
+5. Storage keys use descriptive names
 6. All imports use `@/` alias
 7. Dynamic import for client-only components in Server Components

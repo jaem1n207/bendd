@@ -25,17 +25,17 @@ export function TableOfContents() {
       <div
         ref={markerRef}
         className={cn(
-          'bd-absolute -bd-left-px bd-top-10 bd-z-0 bd-h-3 bd-w-0.5 bd-rounded-sm bd-bg-primary bd-opacity-0',
-          'bd-transition-[opacity,top,background-color] motion-reduce:bd-transition-none motion-reduce:hover:bd-transition-none'
+          'absolute -left-px top-10 z-0 h-3 w-0.5 rounded-sm bg-primary opacity-0',
+          'transition-[opacity,top,background-color] motion-reduce:transition-none motion-reduce:hover:transition-none'
         )}
       />
-      <Typography variant="p" affects="small" asChild className="!bd-leading-8">
+      <Typography variant="p" affects="small" asChild className="!leading-8">
         <p>On this page</p>
       </Typography>
       <ul
         ref={containerRef}
         className={cn(
-          'bd-h-full bd-overflow-y-auto bd-mt-1 bd-rounded-sm bd-font-sans'
+          'h-full overflow-y-auto mt-1 rounded-sm font-sans'
         )}
       >
         {renderItems(toc)}
@@ -46,18 +46,18 @@ export function TableOfContents() {
 
 function renderItems(items: MenuItem[]) {
   return items.map(item => (
-    <li key={item.link} className="bd-py-1">
+    <li key={item.link} className="py-1">
       <Link
         href={item.link as Route<''>}
         className={cn(
-          'bd-block bd-text-sm bd-font-medium bd-transition-colors hover:bd-text-foreground bd-truncate',
-          'bd-text-muted-foreground/70'
+          'block text-sm font-medium transition-colors hover:text-foreground truncate',
+          'text-muted-foreground/70'
         )}
       >
         {item.title}
       </Link>
       {item.children && item.children.length > 0 && (
-        <ul className="bd-ml-4 bd-mt-1">{renderItems(item.children)}</ul>
+        <ul className="ml-4 mt-1">{renderItems(item.children)}</ul>
       )}
     </li>
   ));

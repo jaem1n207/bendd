@@ -24,7 +24,7 @@ import {
 export function Navigation() {
   return (
     <>
-      <div className="dark:bd-absolute dark:-bd-top-px dark:-bd-z-10 dark:bd-h-px dark:bd-w-[95%] dark:bd-bg-navigation-highlight dark:bd-opacity-20" />
+      <div className="dark:absolute dark:-top-px dark:-z-10 dark:h-px dark:w-[95%] dark:bg-navigation-highlight dark:opacity-20" />
       <NavigationAnimateTrigger>
         {mainItems.map(item => {
           if (item.disabled) {
@@ -60,7 +60,7 @@ export function Navigation() {
   );
 }
 
-const navigationItemSvg = cva('bd-size-1/2 bd-text-gray-950');
+const navigationItemSvg = cva('size-1/2 text-gray-950');
 
 const mainItems = [
   {
@@ -119,7 +119,7 @@ function StyledSeparator() {
   return (
     <Separator
       orientation="vertical"
-      className="bd-mx-2 !bd-h-9"
+      className="mx-2 !h-9"
       style={{
         maskImage:
           'linear-gradient(0deg, transparent, rgb(255, 255, 255) 16px, rgb(255, 255, 255) calc(100% - 16px), transparent)',
