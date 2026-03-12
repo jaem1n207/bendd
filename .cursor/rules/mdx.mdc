@@ -1,0 +1,65 @@
+---
+description: "Rules for MDX components and content files. Apply when working with MDX content, custom components, or frontmatter."
+globs: "src/mdx/**,content/**,craft/**"
+---
+
+# MDX Component & Content Rules
+
+## MDX Component Pattern (MANDATORY)
+
+Every MDX component MUST use `createMDXComponent` wrapper with Zod schema:
+
+```tsx
+import { z } from 'zod';
+import { createMDXComponent } from '../../common/create-mdx-component';
+
+const MySchema = z.object({
+  title: z.string(),
+  variant: z.enum(['a', 'b']).optional().default('a'),
+});
+
+function MyComponent({ title, variant }: z.infer<typeof MySchema>) {
+  return <div className="bd-...">{title}</div>;
+}
+
+export const MDXMyComponent = createMDXComponent(MyComponent, MySchema);
+```
+
+After creating a component, register it in `src/mdx/custom-mdx.tsx` components object.
+
+## MDX Component Directory
+
+```
+src/mdx/components/{name}/
+├── {name}.tsx              # Main component (with createMDXComponent)
+├── {name}.module.css       # Optional CSS module
+└── use-{hook}.ts           # Optional custom hook
+```
+
+## Frontmatter Schema
+
+```yaml
+---
+title: 'Max 38 characters'
+summary: 'Max 40 characters'
+description: 'Max 150 characters for SEO'
+category: 'react'
+publishedAt: '2024-04-30'
+image: '/optional.png'
+---
+```
+
+Zod validation runs at build time — exceeding limits causes build failure.
+
+## Security (DO NOT CHANGE)
+
+In `src/mdx/custom-mdx.tsx`:
+- `blockJS: false` — needed for components like MagicMove
+- `blockDangerousJS: true` — blocks eval/Function/process/require (CVE-2026-0969)
+
+## Content Directories
+
+- `content/` → blog articles → uses `createMDXProcessor()` → routes to `/article/[slug]`
+- `craft/` → experimental → uses `createCraftMDXProcessor()` → routes to `/craft/[slug]`
+
+Do NOT mix content between these directories.

@@ -40,3 +40,34 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# AI agent local configs
+CLAUDE.local.md
+.claude/CLAUDE.local.md
+.claude/settings.local.json
+.opencode/
+
+# AI agent tool symlinks (created by npx skills add)
+# Canonical source: .agents/skills/ — these are auto-generated symlinks
+skills-lock.json
+/skills/
+.agent/
+.codebuddy/
+.commandcode/
+.continue/
+.crush/
+.factory/
+.goose/
+.kilocode/
+.kiro/
+.mcpjam/
+.mux/
+.neovate/
+.openhands/
+.pi/
+.qoder/
+.qwen/
+.roo/
+.trae/
+.windsurf/
+.zencoder/

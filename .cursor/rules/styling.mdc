@@ -1,0 +1,66 @@
+---
+description: "Tailwind CSS and component styling rules. Apply when modifying styles, creating components, or working with the design system."
+globs: "src/components/**,tailwind.config.ts,src/globals.css,src/app/**/*.css,components.json"
+---
+
+# Styling Rules
+
+## Tailwind bd- Prefix (MANDATORY)
+
+Every Tailwind utility class requires the `bd-` prefix. This is configured in `tailwind.config.ts`.
+
+```tsx
+// Correct
+<div className="bd-flex bd-items-center bd-gap-2 bd-bg-background bd-text-foreground">
+
+// Wrong — classes will NOT apply
+<div className="flex items-center gap-2 bg-background text-foreground">
+```
+
+### Variants with prefix
+
+```tsx
+// Correct: variant BEFORE prefix
+"hover:bd-bg-primary/90"
+"dark:bd-text-foreground"
+"md:bd-grid-cols-2"
+"focus-visible:bd-ring-2"
+
+// Wrong: prefix before variant
+"bd-hover:bg-primary/90"
+```
+
+## CSS Variables (HSL Format)
+
+Colors are defined as HSL values in `src/globals.css`:
+
+```css
+:root { --background: 0 0% 100%; }
+.dark { --background: 0 0% 3.9%; }
+```
+
+Used in Tailwind as `hsl(var(--name))`. Do NOT use hex (#fff) or RGB directly.
+
+When adding custom colors:
+1. Define CSS variable in `src/globals.css` (both `:root` and `.dark`)
+2. Map in `tailwind.config.ts` under `theme.extend.colors`
+
+## shadcn/ui Components
+
+- Located in `src/components/ui/` (flat structure, no subdirectories)
+- Install: `pnpm dlx shadcn-ui add <component>` (auto-applies bd- prefix via `components.json`)
+- Use `cn()` from `@/lib/utils` for conditional class merging
+
+## Domain Component Structure
+
+```
+src/components/{domain}/
+├── index.ts    # Barrel export — ONLY public API
+├── ui/         # React components
+├── model/      # Hooks, stores
+├── types/      # .d.ts files
+├── consts/     # Constants
+└── lib/        # Utilities
+```
+
+Import from domain root only: `import { X } from '@/components/{domain}'`
