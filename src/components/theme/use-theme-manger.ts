@@ -7,8 +7,12 @@ export function useThemeManager() {
   const isDarkTheme = resolvedTheme === 'dark';
 
   useEffect(() => {
-    track('preferred_theme', {
-      theme: resolvedTheme ?? 'system',
+    const rIC =
+      globalThis.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 0));
+    const idleId = rIC(() => {
+      track('preferred_theme', {
+        theme: resolvedTheme ?? 'system',
+      });
     });
 
     // 테마가 변경되면 giscus iframe을 찾아서 테마 변경을 요청합니다.
@@ -20,6 +24,11 @@ export function useThemeManager() {
       { giscus: { setConfig: { theme: isDarkTheme ? 'dark' : 'light' } } },
       'https://giscus.app'
     );
+
+    const cIC = globalThis.cancelIdleCallback ?? clearTimeout;
+    return () => {
+      cIC(idleId as number);
+    };
   }, [resolvedTheme, isDarkTheme]);
 
   const toggleTheme = () => {

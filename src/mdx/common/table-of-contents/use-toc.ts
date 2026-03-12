@@ -95,19 +95,8 @@ function getScrollOffset(): number {
 }
 
 function getAbsoluteTop(element: HTMLElement): number {
-  let offsetTop = 0;
-  while (element !== document.body) {
-    if (element === null) {
-      // 자식 요소가 다음과 같은 경우:
-      // - DOM에 연결되지 않음 (display: none)
-      // - fixed position으로 설정됨 (스크롤 불가능)
-      // - body 또는 html 요소 (offsetParent: null)
-      return NaN;
-    }
-    offsetTop += element.offsetTop;
-    element = element.offsetParent as HTMLElement;
-  }
-  return offsetTop;
+  if (!element.isConnected) return NaN;
+  return element.getBoundingClientRect().top + window.scrollY;
 }
 
 export function useActiveAnchor(
@@ -115,10 +104,29 @@ export function useActiveAnchor(
   markerRef: RefObject<HTMLElement>
 ) {
   useEffect(() => {
+    // 이전 활성 해시를 추적하여 불필요한 DOM 업데이트 방지
+    let prevActiveHash: string | null | undefined;
+    // TOC 링크 요소 캐시 (매 스크롤마다 querySelectorAll 호출 방지)
+    let cachedLinks: NodeListOf<HTMLAnchorElement> | null = null;
+
+    function getLinks(): NodeListOf<HTMLAnchorElement> {
+      if (!cachedLinks && containerRef.current) {
+        cachedLinks = containerRef.current.querySelectorAll('a');
+      }
+      return cachedLinks!;
+    }
+
     function activateLink(hash: string | null) {
+      if (hash === prevActiveHash) return;
+      prevActiveHash = hash;
+
       if (containerRef.current) {
-        const links = containerRef.current.querySelectorAll('a');
-        links.forEach(link => { link.classList.remove('!text-foreground'); });
+        const links = getLinks();
+        if (links) {
+          links.forEach(link => {
+            link.classList.remove('!text-foreground');
+          });
+        }
 
         if (hash != null) {
           const activeLink =
@@ -184,10 +192,11 @@ export function useActiveAnchor(
 
     const onScroll = throttleAndDebounce(setActiveLink, 100);
     requestAnimationFrame(setActiveLink);
-    window.addEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', onScroll);
+      cachedLinks = null;
     };
   }, [containerRef, markerRef]);
 }

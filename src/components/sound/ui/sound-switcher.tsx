@@ -17,8 +17,10 @@ export function SoundSwitcher() {
   const handleSoundToggle = () => {
     isSoundEnabled ? playMuteSound() : playUnmuteSound();
     toggleSoundEnabled();
-    track('toggle_sound', {
-      enabled: !isSoundEnabled,
+    const rIC =
+      globalThis.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 0));
+    rIC(() => {
+      track('toggle_sound', { enabled: !isSoundEnabled });
     });
   };
 
