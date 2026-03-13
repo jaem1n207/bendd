@@ -56,3 +56,9 @@
 - **맥락**: 유닛 테스트와 E2E 테스트의 실행 환경과 목적이 다름
 - **결정**: Vitest로 유닛 테스트 (jsdom), Playwright로 E2E 테스트 (실제 브라우저)
 - **근거**: Vitest는 빠른 피드백 루프, Playwright는 실제 사용자 시나리오 (SEO 메타데이터, 헤더 설정 등) 검증. 각 도구의 강점을 활용
+
+## D10: TOC 링크 캐시 제거
+
+- **맥락**: `useActiveAnchor` 훅에서 `querySelectorAll('a')` 결과를 static `NodeListOf`로 캐싱했으나, 페이지 새로고침 후 스크롤 시 다중 하이라이트 버그 발생
+- **결정**: static NodeList 캐시를 제거하고 `activateLink` 호출 시마다 라이브 DOM 조회. `requestAnimationFrame` cleanup 추가
+- **근거**: `querySelectorAll`은 static 스냅샷을 반환하므로 React 리렌더링 후 새 DOM 노드를 반영하지 못한다. `prevActiveHash` dedup이 해시 변경 시에만 `activateLink`를 실행하므로 매번 조회해도 성능 영향이 무시 가능하다 (TOC 링크 5~15개, 해시 변경 시에만 호출). 캐싱의 미세한 성능 이점보다 정확성이 더 중요하다
