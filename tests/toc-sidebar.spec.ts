@@ -64,6 +64,78 @@ test.describe('Table of Contents sidebar', () => {
   });
 });
 
+test.describe('TOC highlight after page refresh', () => {
+  test('should highlight only one TOC item after refresh and scroll', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/article/naming-tokens-in-design');
+
+    const tocNav = page.locator('nav.toc-navbar');
+    await expect(tocNav).toBeVisible();
+
+    await page.reload();
+    await page.locator('nav.toc-navbar ul a').first().waitFor();
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+
+    await expect(
+      page.locator('nav.toc-navbar ul a.\\!text-foreground')
+    ).toHaveCount(1);
+  });
+
+  test('should maintain single highlight while scrolling after refresh', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/article/naming-tokens-in-design');
+
+    await page.reload();
+    await page.locator('nav.toc-navbar ul a').first().waitFor();
+
+    const scrollPositions = [300, 600, 1200, 1800];
+    for (const pos of scrollPositions) {
+      await page.evaluate(y => window.scrollTo(0, y), pos);
+
+      await expect(
+        page.locator('nav.toc-navbar ul a.\\!text-foreground')
+      ).toHaveCount(1);
+    }
+  });
+});
+
+test.describe('TOC highlight restored on refresh without scroll', () => {
+  test('should show highlight immediately after refresh at mid-page position', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/article/naming-tokens-in-design');
+
+    const tocNav = page.locator('nav.toc-navbar');
+    const highlightedLink = page.locator(
+      'nav.toc-navbar ul a.\\!text-foreground'
+    );
+
+    await expect(tocNav).toBeVisible();
+
+    await page.evaluate(() => window.scrollTo(0, 600));
+    await expect(highlightedLink).toHaveCount(1);
+    const activeHrefBeforeReload = await highlightedLink
+      .first()
+      .getAttribute('href');
+    expect(activeHrefBeforeReload).not.toBeNull();
+
+    await page.reload();
+    await page.locator('nav.toc-navbar ul a').first().waitFor();
+
+    await expect(highlightedLink).toHaveCount(1);
+    await expect(highlightedLink.first()).toHaveAttribute(
+      'href',
+      activeHrefBeforeReload!
+    );
+  });
+});
+
 test.describe('TOC sidebar on craft pages', () => {
   test('should show back link to craft list', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });

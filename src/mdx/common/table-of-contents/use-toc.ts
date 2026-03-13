@@ -101,32 +101,25 @@ function getAbsoluteTop(element: HTMLElement): number {
 
 export function useActiveAnchor(
   containerRef: RefObject<HTMLElement>,
-  markerRef: RefObject<HTMLElement>
+  markerRef: RefObject<HTMLElement>,
+  linkCount = 0
 ) {
   useEffect(() => {
-    // 이전 활성 해시를 추적하여 불필요한 DOM 업데이트 방지
-    let prevActiveHash: string | null | undefined;
-    // TOC 링크 요소 캐시 (매 스크롤마다 querySelectorAll 호출 방지)
-    let cachedLinks: NodeListOf<HTMLAnchorElement> | null = null;
+    if (!linkCount) return;
 
-    function getLinks(): NodeListOf<HTMLAnchorElement> | null {
-      if (!cachedLinks && containerRef.current) {
-        cachedLinks = containerRef.current.querySelectorAll('a');
-      }
-      return cachedLinks;
-    }
+    let prevActiveHash: string | null | undefined;
 
     function activateLink(hash: string | null) {
       if (hash === prevActiveHash) return;
       prevActiveHash = hash;
 
       if (containerRef.current) {
-        const links = getLinks();
-        if (links) {
-          links.forEach(link => {
-            link.classList.remove('!text-foreground');
-          });
-        }
+        // 캐싱 금지: static NodeList는 React 리렌더링 후 stale 참조를 유발한다
+        const links =
+          containerRef.current.querySelectorAll<HTMLAnchorElement>('a');
+        links.forEach(link => {
+          link.classList.remove('!text-foreground');
+        });
 
         if (hash != null) {
           const activeLink =
@@ -191,12 +184,12 @@ export function useActiveAnchor(
     }
 
     const onScroll = throttleAndDebounce(setActiveLink, 100);
-    requestAnimationFrame(setActiveLink);
+    const rafId = requestAnimationFrame(setActiveLink);
     window.addEventListener('scroll', onScroll, { passive: true });
 
     return () => {
+      cancelAnimationFrame(rafId);
       window.removeEventListener('scroll', onScroll);
-      cachedLinks = null;
     };
-  }, [containerRef, markerRef]);
+  }, [containerRef, markerRef, linkCount]);
 }

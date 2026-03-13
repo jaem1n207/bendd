@@ -151,3 +151,24 @@ rIC(() => {
 // 잘못됨
 track('event_name', { data });
 ```
+
+## P22: querySelectorAll 결과를 스크롤 핸들러에서 캐싱
+
+`querySelectorAll`은 **static NodeList**를 반환한다. React가 리렌더링하여 DOM 노드를 추가/교체하면 캐시된 NodeList는 stale 참조를 유지하고 새 노드를 포함하지 않는다. 특히 `ssr: false` 동적 임포트 컴포넌트에서 초기 마운트 시 빈 NodeList가 캐시되면, 이후 React가 렌더링한 새 요소에 대해 `classList.remove`가 동작하지 않아 클래스가 누적된다.
+
+```typescript
+// 올바름 — prevActiveHash dedup이 있으므로 해시 변경 시에만 실행됨
+function activateLink(hash: string | null) {
+  if (hash === prevActiveHash) return;
+  const links = container.querySelectorAll<HTMLAnchorElement>('a');
+  links.forEach(link => link.classList.remove('active'));
+  // ...
+}
+
+// 잘못됨 — static NodeList를 캐시하면 React 리렌더링 후 stale 참조
+let cachedLinks: NodeListOf<HTMLAnchorElement> | null = null;
+function getLinks() {
+  if (!cachedLinks) cachedLinks = container.querySelectorAll('a');
+  return cachedLinks;
+}
+```
