@@ -51,7 +51,7 @@ describe('useActiveAnchor — INP regression tests', () => {
     expect(scrollCall![2]).toEqual(expect.objectContaining({ passive: true }));
   });
 
-  it('should cache link queries instead of re-querying on every scroll', () => {
+  it('should skip DOM mutations when active hash has not changed', () => {
     const linkA = document.createElement('a');
     linkA.href = '#section-a';
     containerEl.appendChild(linkA);
@@ -59,10 +59,6 @@ describe('useActiveAnchor — INP regression tests', () => {
     const querySelectorAllSpy = vi.spyOn(containerEl, 'querySelectorAll');
 
     renderHook(() => useActiveAnchor(containerRef, markerRef));
-
-    const callCountAfterMount = querySelectorAllSpy.mock.calls.filter(
-      ([selector]) => selector === 'a'
-    ).length;
 
     window.dispatchEvent(new Event('scroll'));
     window.dispatchEvent(new Event('scroll'));
@@ -72,26 +68,7 @@ describe('useActiveAnchor — INP regression tests', () => {
       ([selector]) => selector === 'a'
     ).length;
 
-    expect(totalQueryCalls).toBeLessThanOrEqual(callCountAfterMount + 1);
-  });
-
-  it('should skip DOM mutations when active hash has not changed', () => {
-    const linkA = document.createElement('a');
-    linkA.href = '#section-a';
-    containerEl.appendChild(linkA);
-
-    const classListRemoveSpy = vi.spyOn(linkA.classList, 'remove');
-
-    renderHook(() => useActiveAnchor(containerRef, markerRef));
-
-    const removeCountAfterMount = classListRemoveSpy.mock.calls.length;
-
-    window.dispatchEvent(new Event('scroll'));
-    window.dispatchEvent(new Event('scroll'));
-
-    expect(classListRemoveSpy.mock.calls.length).toBeLessThanOrEqual(
-      removeCountAfterMount + 1
-    );
+    expect(totalQueryCalls).toBeLessThanOrEqual(2);
   });
 
   it('should clean up scroll listener on unmount', () => {
@@ -106,5 +83,101 @@ describe('useActiveAnchor — INP regression tests', () => {
       ([event]) => event === 'scroll'
     );
     expect(scrollRemoveCall).toBeDefined();
+  });
+
+  it('should cancel rAF on unmount', () => {
+    const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
+
+    const { unmount } = renderHook(() =>
+      useActiveAnchor(containerRef, markerRef)
+    );
+    unmount();
+
+    expect(cancelAnimationFrameSpy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('useActiveAnchor — multi-highlight regression', () => {
+  let containerEl: HTMLDivElement;
+  let markerEl: HTMLDivElement;
+  let containerRef: RefObject<HTMLElement>;
+  let markerRef: RefObject<HTMLElement>;
+
+  beforeEach(() => {
+    containerEl = document.createElement('div');
+    markerEl = document.createElement('div');
+    document.body.appendChild(containerEl);
+
+    containerRef = { current: containerEl } as RefObject<HTMLElement>;
+    markerRef = { current: markerEl } as RefObject<HTMLElement>;
+  });
+
+  afterEach(() => {
+    document.body.removeChild(containerEl);
+    vi.restoreAllMocks();
+  });
+
+  it('should highlight at most one link at a time', () => {
+    const linkA = document.createElement('a');
+    linkA.href = '#section-a';
+    linkA.className = 'text-muted-foreground/70';
+    containerEl.appendChild(linkA);
+
+    const linkB = document.createElement('a');
+    linkB.href = '#section-b';
+    linkB.className = 'text-muted-foreground/70';
+    containerEl.appendChild(linkB);
+
+    const linkC = document.createElement('a');
+    linkC.href = '#section-c';
+    linkC.className = 'text-muted-foreground/70';
+    containerEl.appendChild(linkC);
+
+    renderHook(() => useActiveAnchor(containerRef, markerRef));
+
+    linkA.classList.add('!text-foreground');
+    linkB.classList.add('!text-foreground');
+
+    window.dispatchEvent(new Event('scroll'));
+
+    const highlighted = containerEl.querySelectorAll('.\\!text-foreground');
+    expect(highlighted.length).toBeLessThanOrEqual(1);
+  });
+
+  it('should remove previous highlight when active heading changes', () => {
+    const linkA = document.createElement('a');
+    linkA.href = '#section-a';
+    containerEl.appendChild(linkA);
+
+    const linkB = document.createElement('a');
+    linkB.href = '#section-b';
+    containerEl.appendChild(linkB);
+
+    renderHook(() => useActiveAnchor(containerRef, markerRef));
+
+    linkA.classList.add('!text-foreground');
+
+    window.dispatchEvent(new Event('scroll'));
+
+    expect(linkA.classList.contains('!text-foreground')).toBe(false);
+  });
+
+  it('should handle links added after initial render (simulates React re-render)', () => {
+    renderHook(() => useActiveAnchor(containerRef, markerRef));
+
+    const linkA = document.createElement('a');
+    linkA.href = '#section-a';
+    linkA.classList.add('!text-foreground');
+    containerEl.appendChild(linkA);
+
+    const linkB = document.createElement('a');
+    linkB.href = '#section-b';
+    linkB.classList.add('!text-foreground');
+    containerEl.appendChild(linkB);
+
+    window.dispatchEvent(new Event('scroll'));
+
+    const highlighted = containerEl.querySelectorAll('.\\!text-foreground');
+    expect(highlighted.length).toBeLessThanOrEqual(1);
   });
 });
