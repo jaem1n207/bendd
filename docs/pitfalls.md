@@ -125,3 +125,29 @@ pre-commit hook에서 lint-staged는 **타입 체크**(`pnpm check-types`)와 **
 ## P19: 비활성 라우트 활성화
 
 `/photo` 라우트는 코드에 존재하지만 네비게이션에서 의도적으로 숨겨져 있다. 이 라우트를 노출시키려면 네비게이션 아이템 설정을 먼저 확인한다.
+
+## P20: 스크롤 리스너 passive 옵션 누락
+
+`window.addEventListener('scroll', handler)`에 `{ passive: true }` 옵션을 설정하지 않으면 브라우저가 JS 실행을 기다린 후 스크롤하여 INP가 악화된다. TOC 스크롤 핸들러에서 이 문제가 발생했다. 새 스크롤/터치 리스너 추가 시 반드시 `{ passive: true }`를 포함한다.
+
+```typescript
+// 올바름
+window.addEventListener('scroll', handler, { passive: true });
+// 잘못됨
+window.addEventListener('scroll', handler);
+```
+
+## P21: Analytics track() 동기 호출
+
+`@vercel/analytics`의 `track()` 함수를 이벤트 핸들러나 useEffect에서 직접 호출하면 메인 스레드를 차단한다. `requestIdleCallback`으로 감싸서 유휴 시간에 실행한다.
+
+```typescript
+// 올바름
+const rIC =
+  globalThis.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 0));
+rIC(() => {
+  track('event_name', { data });
+});
+// 잘못됨
+track('event_name', { data });
+```

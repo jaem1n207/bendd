@@ -87,7 +87,10 @@ export async function CustomMDX({ source }: { source: string }) {
               [
                 rehypePrettyCode,
                 {
-                  theme: 'vitesse-dark',
+                  theme: {
+                    light: 'github-light',
+                    dark: 'vitesse-dark',
+                  },
                   transformers: [
                     twoslash,
                     transformerNotationHighlight(),

@@ -6,7 +6,7 @@
 }
 
 .container :global(p > code) {
-  @apply border-gray-500 text-sm font-normal bg-gray-200 border px-1 py-0.5 rounded-sm break-words;
+  @apply border-gray-600 text-sm font-normal bg-gray-400 border px-1 py-0.5 rounded-sm break-words;
 }
 
 .container :global(.header-anchor::after) {
@@ -37,11 +37,9 @@
   @apply rounded-[4px];
 }
 
-@media (prefers-color-scheme: dark) {
-  .container :global(code[data-theme*=' ']),
-  .container :global(code[data-theme*=' '] span) {
-    color: var(--shiki-dark);
-  }
+:global(html.dark) .container :global(code[data-theme*=' ']),
+:global(html.dark) .container :global(code[data-theme*=' '] span) {
+  color: var(--shiki-dark);
 }
 
 .container :global(code[data-line-numbers]) {
@@ -97,7 +95,7 @@
 }
 
 .container :global([data-rehype-pretty-code-title]) {
-  @apply border border-border bg-gray-100 text-primary rounded-t-lg py-2 px-3 font-semibold text-sm;
+  @apply border border-border bg-gray-300 text-primary rounded-t-lg py-2 px-3 font-semibold text-sm;
 }
 
 .container
@@ -112,7 +110,7 @@
 
 .container :global(figure[data-rehype-pretty-code-figure] pre),
 .container :global(pre.shiki-magic-move-container) {
-  @apply bg-gray-400 dark:!bg-background;
+  @apply bg-gray-300 dark:!bg-gray-200;
 }
 
 .container :global(pre),

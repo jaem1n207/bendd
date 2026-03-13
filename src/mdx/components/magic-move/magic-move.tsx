@@ -2,6 +2,7 @@
 
 import { useCallback, useDeferredValue, useState } from 'react';
 import { ShikiMagicMove } from 'shiki-magic-move/react';
+import { useTheme } from 'next-themes';
 import { z } from 'zod';
 
 import { cn } from '@/lib/utils';
@@ -47,6 +48,7 @@ function MagicMoveContent({
 }) {
   const { stepsData, currentStep } = useStepContentStore(state => state);
   const deferredCurrentStep = useDeferredValue(currentStep);
+  const { resolvedTheme } = useTheme();
 
   const renderContent = useCallback(
     (content: CodeSnippet) => {
@@ -59,7 +61,7 @@ function MagicMoveContent({
             )}
             code={content.content}
             lang={lang}
-            theme="vitesse-dark"
+            theme={resolvedTheme === 'dark' ? 'vitesse-dark' : 'github-light'}
             highlighter={highlighter}
             options={{
               duration: 750,
@@ -73,8 +75,10 @@ function MagicMoveContent({
         </div>
       );
     },
-    [highlighter, lang]
+    [highlighter, lang, resolvedTheme]
   );
+
+  if (!resolvedTheme) return null;
 
   const stepData = stepsData[deferredCurrentStep] as StepData<CodeSnippet>;
 

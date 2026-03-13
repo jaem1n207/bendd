@@ -69,6 +69,7 @@ Pre-commit hook runs `pnpm check-types` on TS/TSX + `prettier --write` on MD/MDX
 | -------------------------------------------- | ------------------------------------------------------------- |
 | [docs/architecture.md](docs/architecture.md) | Content system, layer dependencies, routing, security headers |
 | [docs/conventions.md](docs/conventions.md)   | Naming rules, file structure, MDX patterns, CSS, commits      |
-| [docs/pitfalls.md](docs/pitfalls.md)         | 20 common agent mistakes with correct/incorrect examples      |
+| [docs/pitfalls.md](docs/pitfalls.md)         | 21 common agent mistakes with correct/incorrect examples      |
 | [docs/decisions.md](docs/decisions.md)       | ADR-lite: why we chose specific patterns (Zod, HSL, etc.)     |
 | [docs/commands.md](docs/commands.md)         | Dev commands, test runners, build workflow                    |
+| [docs/design-docs/](docs/design-docs/)       | Design documents for specific technical decisions             |

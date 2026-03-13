@@ -3,7 +3,7 @@
 
   &::before {
     @apply absolute size-8;
-    @apply border-4 border-border bg-gray-100 dark:bg-muted;
+    @apply border-4 border-border bg-gray-300 dark:bg-muted;
     @apply rounded-full text-muted-foreground text-base text-center -indent-px;
     @apply mt-0.5 -ml-10;
     content: counter(step);
