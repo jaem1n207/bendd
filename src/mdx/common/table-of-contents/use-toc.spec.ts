@@ -133,7 +133,7 @@ describe('useActiveAnchor — multi-highlight regression', () => {
     vi.restoreAllMocks();
   });
 
-  it('should highlight at most one link at a time', () => {
+  it('should highlight at most one link at a time', async () => {
     const linkA = document.createElement('a');
     linkA.href = '#section-a';
     linkA.className = 'text-muted-foreground/70';
@@ -158,11 +158,13 @@ describe('useActiveAnchor — multi-highlight regression', () => {
 
     window.dispatchEvent(new Event('scroll'));
 
-    const highlighted = containerEl.querySelectorAll('.\\!text-foreground');
-    expect(highlighted.length).toBeLessThanOrEqual(1);
+    await vi.waitFor(() => {
+      const highlighted = containerEl.querySelectorAll('.\\!text-foreground');
+      expect(highlighted.length).toBeLessThanOrEqual(1);
+    });
   });
 
-  it('should remove previous highlight when active heading changes', () => {
+  it('should remove previous highlight when active heading changes', async () => {
     const linkA = document.createElement('a');
     linkA.href = '#section-a';
     containerEl.appendChild(linkA);
@@ -179,7 +181,9 @@ describe('useActiveAnchor — multi-highlight regression', () => {
 
     window.dispatchEvent(new Event('scroll'));
 
-    expect(linkA.classList.contains('!text-foreground')).toBe(false);
+    await vi.waitFor(() => {
+      expect(linkA.classList.contains('!text-foreground')).toBe(false);
+    });
   });
 
   it('should re-initialize when linkCount changes (simulates TOC render)', () => {
