@@ -64,6 +64,52 @@ test.describe('Table of Contents sidebar', () => {
   });
 });
 
+test.describe('TOC highlight after page refresh', () => {
+  test('should highlight only one TOC item after refresh and scroll', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/article/naming-tokens-in-design');
+
+    const tocNav = page.locator('nav.toc-navbar');
+    await expect(tocNav).toBeVisible();
+
+    await page.reload();
+    await page.locator('nav.toc-navbar ul a').first().waitFor();
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(300);
+
+    const highlightedCount = await page
+      .locator('nav.toc-navbar ul a.\\!text-foreground')
+      .count();
+
+    expect(highlightedCount).toBeLessThanOrEqual(1);
+  });
+
+  test('should maintain single highlight while scrolling after refresh', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/article/naming-tokens-in-design');
+
+    await page.reload();
+    await page.locator('nav.toc-navbar ul a').first().waitFor();
+
+    const scrollPositions = [300, 600, 1200, 1800];
+    for (const pos of scrollPositions) {
+      await page.evaluate(y => window.scrollTo(0, y), pos);
+      await page.waitForTimeout(200);
+
+      const count = await page
+        .locator('nav.toc-navbar ul a.\\!text-foreground')
+        .count();
+
+      expect(count).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
 test.describe('TOC sidebar on craft pages', () => {
   test('should show back link to craft list', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
