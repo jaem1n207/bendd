@@ -78,13 +78,12 @@ test.describe('TOC highlight after page refresh', () => {
     await page.locator('nav.toc-navbar ul a').first().waitFor();
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(300);
 
-    const highlightedCount = await page
-      .locator('nav.toc-navbar ul a.\\!text-foreground')
-      .count();
-
-    expect(highlightedCount).toBeLessThanOrEqual(1);
+    await expect
+      .poll(async () =>
+        page.locator('nav.toc-navbar ul a.\\!text-foreground').count()
+      )
+      .toBeLessThanOrEqual(1);
   });
 
   test('should maintain single highlight while scrolling after refresh', async ({
@@ -99,13 +98,12 @@ test.describe('TOC highlight after page refresh', () => {
     const scrollPositions = [300, 600, 1200, 1800];
     for (const pos of scrollPositions) {
       await page.evaluate(y => window.scrollTo(0, y), pos);
-      await page.waitForTimeout(200);
 
-      const count = await page
-        .locator('nav.toc-navbar ul a.\\!text-foreground')
-        .count();
-
-      expect(count).toBeLessThanOrEqual(1);
+      await expect
+        .poll(async () =>
+          page.locator('nav.toc-navbar ul a.\\!text-foreground').count()
+        )
+        .toBeLessThanOrEqual(1);
     }
   });
 });
@@ -125,14 +123,12 @@ test.describe('TOC highlight restored on refresh without scroll', () => {
     await expect(tocNav).toBeVisible();
 
     await page.evaluate(() => window.scrollTo(0, 600));
-    await page.waitForTimeout(300);
-    expect(await highlightedLink.count()).toBe(1);
+    await expect(highlightedLink).toHaveCount(1);
 
     await page.reload({ waitUntil: 'networkidle' });
     await page.locator('nav.toc-navbar ul a').first().waitFor();
-    await page.waitForTimeout(500);
 
-    expect(await highlightedLink.count()).toBe(1);
+    await expect(highlightedLink).toHaveCount(1);
   });
 });
 
