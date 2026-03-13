@@ -79,11 +79,9 @@ test.describe('TOC highlight after page refresh', () => {
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
-    await expect
-      .poll(async () =>
-        page.locator('nav.toc-navbar ul a.\\!text-foreground').count()
-      )
-      .toBeLessThanOrEqual(1);
+    await expect(
+      page.locator('nav.toc-navbar ul a.\\!text-foreground')
+    ).toHaveCount(1);
   });
 
   test('should maintain single highlight while scrolling after refresh', async ({
@@ -99,11 +97,9 @@ test.describe('TOC highlight after page refresh', () => {
     for (const pos of scrollPositions) {
       await page.evaluate(y => window.scrollTo(0, y), pos);
 
-      await expect
-        .poll(async () =>
-          page.locator('nav.toc-navbar ul a.\\!text-foreground').count()
-        )
-        .toBeLessThanOrEqual(1);
+      await expect(
+        page.locator('nav.toc-navbar ul a.\\!text-foreground')
+      ).toHaveCount(1);
     }
   });
 });
