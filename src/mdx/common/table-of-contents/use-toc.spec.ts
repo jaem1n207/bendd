@@ -202,4 +202,40 @@ describe('useActiveAnchor — multi-highlight regression', () => {
     ).length;
     expect(scrollCallsAfter).toBe(1);
   });
+
+  it('should clean up previous effect when linkCount changes', () => {
+    const removeListenerSpy = vi.spyOn(window, 'removeEventListener');
+    const cancelRafSpy = vi.spyOn(window, 'cancelAnimationFrame');
+
+    const { rerender } = renderHook(
+      ({ count }) => useActiveAnchor(containerRef, markerRef, count),
+      { initialProps: { count: 3 } }
+    );
+
+    removeListenerSpy.mockClear();
+    cancelRafSpy.mockClear();
+
+    rerender({ count: 5 });
+
+    const scrollRemoves = removeListenerSpy.mock.calls.filter(
+      ([type]) => type === 'scroll'
+    );
+    expect(scrollRemoves.length).toBe(1);
+    expect(cancelRafSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should schedule rAF on linkCount change for immediate highlight', () => {
+    const rafSpy = vi.spyOn(window, 'requestAnimationFrame');
+
+    const { rerender } = renderHook(
+      ({ count }) => useActiveAnchor(containerRef, markerRef, count),
+      { initialProps: { count: 0 } }
+    );
+
+    const rafBefore = rafSpy.mock.calls.length;
+
+    rerender({ count: 3 });
+
+    expect(rafSpy.mock.calls.length).toBe(rafBefore + 1);
+  });
 });
