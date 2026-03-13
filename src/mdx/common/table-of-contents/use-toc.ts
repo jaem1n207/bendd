@@ -109,11 +109,11 @@ export function useActiveAnchor(
     // TOC 링크 요소 캐시 (매 스크롤마다 querySelectorAll 호출 방지)
     let cachedLinks: NodeListOf<HTMLAnchorElement> | null = null;
 
-    function getLinks(): NodeListOf<HTMLAnchorElement> {
+    function getLinks(): NodeListOf<HTMLAnchorElement> | null {
       if (!cachedLinks && containerRef.current) {
         cachedLinks = containerRef.current.querySelectorAll('a');
       }
-      return cachedLinks!;
+      return cachedLinks;
     }
 
     function activateLink(hash: string | null) {

@@ -54,7 +54,6 @@ describe('useActiveAnchor — INP regression tests', () => {
   it('should cache link queries instead of re-querying on every scroll', () => {
     const linkA = document.createElement('a');
     linkA.href = '#section-a';
-    linkA.setAttribute('href', '#section-a');
     containerEl.appendChild(linkA);
 
     const querySelectorAllSpy = vi.spyOn(containerEl, 'querySelectorAll');
@@ -79,7 +78,6 @@ describe('useActiveAnchor — INP regression tests', () => {
   it('should skip DOM mutations when active hash has not changed', () => {
     const linkA = document.createElement('a');
     linkA.href = '#section-a';
-    linkA.setAttribute('href', '#section-a');
     containerEl.appendChild(linkA);
 
     const classListRemoveSpy = vi.spyOn(linkA.classList, 'remove');

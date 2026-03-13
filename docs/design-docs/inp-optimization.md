@@ -90,15 +90,15 @@ rIC(() => {
 });
 ```
 
-Safari는 `requestIdleCallback`을 지원하지 않으므로 `setTimeout(cb, 0)` 폴백을 사용한다.
+`requestIdleCallback`을 지원하지 않는 환경에서는 `setTimeout(cb, 0)` 폴백을 사용한다.
 
 ## 변경 파일
 
-| 파일                                          | 변경 내용                                                     |
-| --------------------------------------------- | ------------------------------------------------------------- |
-| `src/mdx/common/table-of-contents/use-toc.ts` | `getAbsoluteTop` 단순화, 링크 캐싱, 해시 디핑, passive 리스너 |
-| `src/components/theme/use-theme-manger.ts`    | `track()` → `requestIdleCallback` 래핑, cleanup 추가          |
-| `src/components/sound/ui/sound-switcher.tsx`  | `track()` → `requestIdleCallback` 래핑                        |
+| 파일                                          | 변경 내용                                                          |
+| --------------------------------------------- | ------------------------------------------------------------------ |
+| `src/mdx/common/table-of-contents/use-toc.ts` | `getAbsoluteTop` 단순화, 링크 캐싱, 해시 변경 감지, passive 리스너 |
+| `src/components/theme/use-theme-manger.ts`    | `track()` → `requestIdleCallback` 래핑, cleanup 추가               |
+| `src/components/sound/ui/sound-switcher.tsx`  | `track()` → `requestIdleCallback` 래핑                             |
 
 ## 회귀 테스트
 
@@ -120,4 +120,4 @@ Safari는 `requestIdleCallback`을 지원하지 않으므로 `setTimeout(cb, 0)`
 ## 설계 제약
 
 - **IntersectionObserver 사용 금지**: TOC에서 IntersectionObserver API를 의도적으로 제거한 이력이 있다 (관련 글: "TOC에서 InterSectionObserver API를 제거한 이유"). 스크롤 기반 접근을 유지한다.
-- **throttle 주기 100ms 유지**: 현재 `throttleAndDebounce(setActiveLink, 100)`의 주기를 유지한다. 해시 디핑으로 불필요한 DOM 업데이트가 이미 제거되었으므로 주기 증가는 불필요하다.
+- **throttle 주기 100ms 유지**: 현재 `throttleAndDebounce(setActiveLink, 100)`의 주기를 유지한다. 해시 변경 감지로 불필요한 DOM 업데이트가 이미 제거되었으므로 주기 증가는 불필요하다.
