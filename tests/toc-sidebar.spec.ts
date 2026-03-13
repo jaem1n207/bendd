@@ -124,11 +124,19 @@ test.describe('TOC highlight restored on refresh without scroll', () => {
 
     await page.evaluate(() => window.scrollTo(0, 600));
     await expect(highlightedLink).toHaveCount(1);
+    const activeHrefBeforeReload = await highlightedLink
+      .first()
+      .getAttribute('href');
+    expect(activeHrefBeforeReload).not.toBeNull();
 
-    await page.reload({ waitUntil: 'networkidle' });
+    await page.reload();
     await page.locator('nav.toc-navbar ul a').first().waitFor();
 
     await expect(highlightedLink).toHaveCount(1);
+    await expect(highlightedLink.first()).toHaveAttribute(
+      'href',
+      activeHrefBeforeReload!
+    );
   });
 });
 
