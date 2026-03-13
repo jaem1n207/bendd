@@ -110,6 +110,32 @@ test.describe('TOC highlight after page refresh', () => {
   });
 });
 
+test.describe('TOC highlight restored on refresh without scroll', () => {
+  test('should show highlight immediately after refresh at mid-page position', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/article/naming-tokens-in-design');
+
+    const tocNav = page.locator('nav.toc-navbar');
+    const highlightedLink = page.locator(
+      'nav.toc-navbar ul a.\\!text-foreground'
+    );
+
+    await expect(tocNav).toBeVisible();
+
+    await page.evaluate(() => window.scrollTo(0, 600));
+    await page.waitForTimeout(300);
+    expect(await highlightedLink.count()).toBe(1);
+
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.locator('nav.toc-navbar ul a').first().waitFor();
+    await page.waitForTimeout(500);
+
+    expect(await highlightedLink.count()).toBe(1);
+  });
+});
+
 test.describe('TOC sidebar on craft pages', () => {
   test('should show back link to craft list', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
