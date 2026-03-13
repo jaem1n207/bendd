@@ -172,3 +172,28 @@ function getLinks() {
   return cachedLinks;
 }
 ```
+
+## P23: Vercel INTERNAL_UNEXPECTED_ERROR 디버깅
+
+Vercel 배포가 `INTERNAL_UNEXPECTED_ERROR`와 함께 500을 반환하면 코드 버그가 아닌 **Vercel 인프라 일시적 장애**일 수 있다. 다음 순서로 진단한다:
+
+1. **로컬 빌드+서빙 확인**: `pnpm build && pnpm start`로 로컬에서 동일 페이지 접근. 200이면 코드 문제 아님
+2. **변경 파일 분석**: 클라이언트 전용 변경인데 서버 500이면 인프라 가능성 높음
+3. **함수 로그 확인**: `vercel logs <url>` — 로그가 비어있으면 함수 실행 전 크래시
+4. **이전 커밋 배포**: `git checkout <prev-sha> && vercel --prod --yes` — 이전 커밋도 500이면 코드 무관
+5. **재배포 대기**: Vercel 인프라 문제는 수 분~수십 분 내 자동 복구되는 경우가 많음
+
+```bash
+# 진단 명령어
+curl -sI https://bendd.me/article/some-slug | grep x-vercel-error
+# INTERNAL_UNEXPECTED_ERROR → 인프라 문제 가능성
+
+# 로컬 검증
+pnpm build && pnpm start
+# localhost:3000에서 200이면 코드 문제 아님
+
+# 재배포
+vercel --prod --yes
+```
+
+**주의**: `x-vercel-error: INTERNAL_UNEXPECTED_ERROR`는 Next.js 애플리케이션 에러가 아니라 Vercel 플랫폼 수준 에러다. 코드 변경으로 해결하려 하지 않는다.
