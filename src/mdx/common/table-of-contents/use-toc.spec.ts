@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useActiveAnchor } from './use-toc';
 
+const ACTIVE_LINK_COUNT = 3;
+
 describe('useActiveAnchor — INP regression tests', () => {
   let containerEl: HTMLDivElement;
   let markerEl: HTMLDivElement;
@@ -41,7 +43,9 @@ describe('useActiveAnchor — INP regression tests', () => {
   });
 
   it('should register scroll listener with passive: true', () => {
-    renderHook(() => useActiveAnchor(containerRef, markerRef));
+    renderHook(() =>
+      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
+    );
 
     const scrollCall = addEventListenerCalls.find(
       ([type]) => type === 'scroll'
@@ -51,6 +55,16 @@ describe('useActiveAnchor — INP regression tests', () => {
     expect(scrollCall![2]).toEqual(expect.objectContaining({ passive: true }));
   });
 
+  it('should not set up listeners when linkCount is 0', () => {
+    renderHook(() => useActiveAnchor(containerRef, markerRef, 0));
+
+    const scrollCall = addEventListenerCalls.find(
+      ([type]) => type === 'scroll'
+    );
+
+    expect(scrollCall).toBeUndefined();
+  });
+
   it('should skip DOM mutations when active hash has not changed', () => {
     const linkA = document.createElement('a');
     linkA.href = '#section-a';
@@ -58,7 +72,9 @@ describe('useActiveAnchor — INP regression tests', () => {
 
     const querySelectorAllSpy = vi.spyOn(containerEl, 'querySelectorAll');
 
-    renderHook(() => useActiveAnchor(containerRef, markerRef));
+    renderHook(() =>
+      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
+    );
 
     window.dispatchEvent(new Event('scroll'));
     window.dispatchEvent(new Event('scroll'));
@@ -75,7 +91,7 @@ describe('useActiveAnchor — INP regression tests', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
     const { unmount } = renderHook(() =>
-      useActiveAnchor(containerRef, markerRef)
+      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
     );
     unmount();
 
@@ -89,7 +105,7 @@ describe('useActiveAnchor — INP regression tests', () => {
     const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
 
     const { unmount } = renderHook(() =>
-      useActiveAnchor(containerRef, markerRef)
+      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
     );
     unmount();
 
@@ -133,7 +149,9 @@ describe('useActiveAnchor — multi-highlight regression', () => {
     linkC.className = 'text-muted-foreground/70';
     containerEl.appendChild(linkC);
 
-    renderHook(() => useActiveAnchor(containerRef, markerRef));
+    renderHook(() =>
+      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
+    );
 
     linkA.classList.add('!text-foreground');
     linkB.classList.add('!text-foreground');
@@ -153,7 +171,9 @@ describe('useActiveAnchor — multi-highlight regression', () => {
     linkB.href = '#section-b';
     containerEl.appendChild(linkB);
 
-    renderHook(() => useActiveAnchor(containerRef, markerRef));
+    renderHook(() =>
+      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
+    );
 
     linkA.classList.add('!text-foreground');
 
@@ -162,22 +182,24 @@ describe('useActiveAnchor — multi-highlight regression', () => {
     expect(linkA.classList.contains('!text-foreground')).toBe(false);
   });
 
-  it('should handle links added after initial render (simulates React re-render)', () => {
-    renderHook(() => useActiveAnchor(containerRef, markerRef));
+  it('should re-initialize when linkCount changes (simulates TOC render)', () => {
+    const addScrollSpy = vi.spyOn(window, 'addEventListener');
 
-    const linkA = document.createElement('a');
-    linkA.href = '#section-a';
-    linkA.classList.add('!text-foreground');
-    containerEl.appendChild(linkA);
+    const { rerender } = renderHook(
+      ({ count }) => useActiveAnchor(containerRef, markerRef, count),
+      { initialProps: { count: 0 } }
+    );
 
-    const linkB = document.createElement('a');
-    linkB.href = '#section-b';
-    linkB.classList.add('!text-foreground');
-    containerEl.appendChild(linkB);
+    const scrollCallsBefore = addScrollSpy.mock.calls.filter(
+      ([type]) => type === 'scroll'
+    ).length;
+    expect(scrollCallsBefore).toBe(0);
 
-    window.dispatchEvent(new Event('scroll'));
+    rerender({ count: 5 });
 
-    const highlighted = containerEl.querySelectorAll('.\\!text-foreground');
-    expect(highlighted.length).toBeLessThanOrEqual(1);
+    const scrollCallsAfter = addScrollSpy.mock.calls.filter(
+      ([type]) => type === 'scroll'
+    ).length;
+    expect(scrollCallsAfter).toBe(1);
   });
 });
