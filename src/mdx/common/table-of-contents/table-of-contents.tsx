@@ -14,7 +14,7 @@ export function TableOfContents() {
   const containerRef = useRef<HTMLUListElement>(null);
   const markerRef = useRef<HTMLDivElement>(null);
 
-  useActiveAnchor(containerRef, markerRef);
+  useActiveAnchor(containerRef, markerRef, toc.length);
 
   useEffect(() => {
     setToc(getHeaders([2, 4]));

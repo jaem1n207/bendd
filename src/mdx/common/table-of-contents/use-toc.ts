@@ -101,10 +101,12 @@ function getAbsoluteTop(element: HTMLElement): number {
 
 export function useActiveAnchor(
   containerRef: RefObject<HTMLElement>,
-  markerRef: RefObject<HTMLElement>
+  markerRef: RefObject<HTMLElement>,
+  linkCount = 0
 ) {
   useEffect(() => {
-    // 이전 활성 해시를 추적하여 불필요한 DOM 업데이트 방지
+    if (!linkCount) return;
+
     let prevActiveHash: string | null | undefined;
 
     function activateLink(hash: string | null) {
@@ -189,5 +191,5 @@ export function useActiveAnchor(
       cancelAnimationFrame(rafId);
       window.removeEventListener('scroll', onScroll);
     };
-  }, [containerRef, markerRef]);
+  }, [containerRef, markerRef, linkCount]);
 }
