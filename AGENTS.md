@@ -14,6 +14,8 @@ These rules are non-negotiable. Violating them causes build failures or broken b
 5. **Barrel exports**: Import domain components via `index.ts` only, never from subdirectories
 6. **CSS variables**: HSL format (`hsl(var(--name))`), not hex/RGB
 7. **Commits**: Conventional Commits + Korean messages (`feat(scope): 한국어 설명`)
+8. **PR Assignees**: PR 생성 시 반드시 `jaem1n207`을 Assignees로 등록 (`gh pr create` 시 `--assignee jaem1n207`)
+9. **PR 후 브랜치 정리**: PR 병합 후 반드시 원격/로컬 브랜치를 삭제 (`gh pr merge --delete-branch`, 로컬: `git branch -d <branch>`)
 
 ## Content System
 

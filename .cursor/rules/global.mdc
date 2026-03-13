@@ -23,6 +23,12 @@ See [AGENTS.md](../../AGENTS.md) for the full canonical reference and [docs/](..
 4. **Commits**: Conventional Commits + Korean messages
    - `feat(article): 블로그 글 검색 기능 추가` (correct)
 
+5. **PR Assignees**: PR 생성 시 반드시 `jaem1n207`을 Assignees로 등록
+   - `gh pr create --assignee jaem1n207` (correct)
+
+6. **PR 후 브랜치 정리**: PR 병합 후 반드시 원격/로컬 브랜치를 삭제
+   - `gh pr merge --squash --delete-branch` → `git checkout main && git pull origin main`
+
 ## Content System
 
 - `content/` → blog articles → `/article/[slug]` (use `createMDXProcessor()`)
