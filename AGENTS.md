@@ -17,6 +17,54 @@ These rules are non-negotiable. Violating them causes build failures or broken b
 8. **PR Assignees**: PR 생성 시 반드시 `jaem1n207`을 Assignees로 등록 (`gh pr create` 시 `--assignee jaem1n207`)
 9. **PR 후 브랜치 정리**: PR 병합 후 반드시 원격/로컬 브랜치를 삭제 (`gh pr merge --delete-branch`, 로컬: `git branch -d <branch>`)
 
+## Structure
+
+```
+bendd/
+├── content/                # Blog articles (MDX) → /article/[slug]
+├── craft/                  # Experimental content (MDX) → /craft/[slug]
+├── docs/                   # Architecture & convention docs (this index references them)
+├── tests/                  # Playwright E2E tests (separate from unit tests)
+├── html/                   # Static HTML assets (OG image backgrounds)
+├── public/                 # Images, sounds, videos
+└── src/
+    ├── app/                # Next.js App Router (no nested layouts)
+    │   ├── api/og/         # Dynamic OG image gen (Edge Runtime)
+    │   ├── api/feed/       # RSS feed (rewritten from /rss.xml by middleware)
+    │   ├── article/[slug]/ # Blog article pages (SSG via generateStaticParams)
+    │   ├── craft/[slug]/   # Craft pages (SSG via generateStaticParams)
+    │   └── playground/     # Interactive demos (hidden from bots via middleware)
+    ├── components/         # Domain-based components (barrel export pattern)
+    │   ├── article/        #   Article list/item display
+    │   ├── comments/       #   Giscus integration
+    │   ├── navigation/     #   Site navigation
+    │   ├── sound/          #   Sound toggle (Zustand + persist)
+    │   ├── theme/          #   Theme switching + giscus sync
+    │   └── ui/             #   shadcn/ui primitives (flat, no barrel)
+    ├── hooks/              # Global hooks
+    ├── lib/                # Global utilities (cn, constants)
+    └── mdx/                # MDX processing system (see src/mdx/AGENTS.md)
+        ├── common/         #   Shared MDX infra (createMDXComponent, TOC, copy-to-clipboard)
+        ├── components/     #   13 custom MDX components
+        └── lib/            #   MDX utilities
+```
+
+## Where to Look
+
+| Task                 | Location                                 | Notes                                                         |
+| -------------------- | ---------------------------------------- | ------------------------------------------------------------- |
+| Add blog article     | `content/{category}/`                    | Must pass `MetadataSchema` validation                         |
+| Add craft content    | `craft/`                                 | Uses `createCraftMDXProcessor` (no relative dates)            |
+| New MDX component    | `src/mdx/components/{name}/`             | Register in `src/mdx/custom-mdx.tsx`                          |
+| New domain component | `src/components/{domain}/`               | Must have `index.ts` barrel export                            |
+| Add shadcn component | `src/components/ui/`                     | `pnpm dlx shadcn@latest add <name>`                           |
+| Modify routing       | `src/app/`                               | Check `src/middleware.ts` for rewrites                        |
+| Change colors        | `src/globals.css` + `tailwind.config.ts` | HSL in both `:root` and `.dark`                               |
+| Security headers     | `next.config.mjs`                        | CSP allowlist — update when adding external services          |
+| Unit test            | Co-locate as `*.spec.{ts,tsx}` in `src/` | Vitest + jsdom                                                |
+| E2E test             | `tests/*.spec.ts`                        | Playwright, needs `pnpm build && pnpm start` first            |
+| OG image             | `src/app/api/og/route.tsx`               | Edge Runtime, 658 lines — reads `Sec-CH-Prefers-Color-Scheme` |
+
 ## Content System
 
 | Directory  | Route             | Processor                   | Purpose              |
@@ -34,6 +82,21 @@ Same frontmatter schema, different display formatters and route prefixes.
 - **Dynamic imports**: Client-only components need `dynamic(() => import(...), { ssr: false })` in Server Component layouts
 - **OG images**: Dynamically generated at `/api/og` (Edge Runtime), not static files
 - **MDX security**: `blockJS: false` + `blockDangerousJS: true` (CVE-2026-0969) — do not change
+- **Middleware**: `/rss.xml` → rewrites to `/api/feed`; `/playground/*` → returns 404 to bots
+- **No nested layouts**: All routes share single root layout
+
+## Code Map
+
+| Symbol                    | Type       | Location                                      | Role                                                          |
+| ------------------------- | ---------- | --------------------------------------------- | ------------------------------------------------------------- |
+| `MDXProcessor`            | Class      | `src/mdx/mdx.ts`                              | Immutable chaining processor — core of content pipeline       |
+| `createMDXProcessor`      | Factory    | `src/mdx/mdx.ts:273`                          | Creates processor for `content/` articles                     |
+| `createCraftMDXProcessor` | Factory    | `src/mdx/mdx.ts:276`                          | Creates processor for `craft/` content                        |
+| `MetadataSchema`          | Zod schema | `src/mdx/mdx.ts:8`                            | Frontmatter validation (title/summary/description limits)     |
+| `createMDXComponent`      | Wrapper    | `src/mdx/common/create-mdx-component.ts`      | Props validation via Zod for all MDX components               |
+| `CustomMDX`               | Component  | `src/mdx/custom-mdx.tsx:76`                   | MDX renderer — plugin chain + component registry              |
+| `components`              | Registry   | `src/mdx/custom-mdx.tsx:33`                   | Maps MDX tags → React components (13 entries)                 |
+| `useActiveAnchor`         | Hook       | `src/mdx/common/table-of-contents/use-toc.ts` | TOC scroll sync — passive listeners, no static NodeList cache |
 
 ## Component Structure
 
@@ -49,6 +112,16 @@ src/components/{domain}/
 
 MDX components: `src/mdx/components/{name}/{name}.tsx` — register in `src/mdx/custom-mdx.tsx`.
 
+## Anti-Patterns (This Project)
+
+- `as any` / `@ts-ignore` — only 1 justified `@ts-expect-error` in `with-sound.tsx` (cloneElement typing)
+- Hex/RGB colors — use HSL CSS variables only
+- `npm install` / `yarn add` — pnpm only
+- Static `NodeList` caching in scroll handlers — always query live DOM (P22)
+- Synchronous `track()` calls — wrap in `requestIdleCallback` (P21)
+- Scroll listeners without `{ passive: true }` — always include (P20)
+- Missing `createMDXComponent` wrapper — every MDX component must use it (P1)
+
 ## Development Commands
 
 ```bash
@@ -63,7 +136,11 @@ pnpm check-types  # TypeScript type check
 pnpm build-stats  # Bundle analyzer
 ```
 
-Pre-commit hook runs `pnpm check-types` on TS/TSX + `prettier --write` on MD/MDX.
+Pre-commit hook runs `pnpm check-types` on TS/TSX + `prettier --write` on MD/MDX. ESLint NOT in pre-commit — run `pnpm lint:fix` manually.
+
+## Deployment
+
+Vercel-only. No GitHub Actions CI. Pipeline: `git push` → Vercel auto-deploys (`pnpm install` → `pnpm build`). `INTERNAL_UNEXPECTED_ERROR` on Vercel = likely infra issue, not code — verify with `pnpm build && pnpm start` locally first (P23).
 
 ## Docs Index
 
@@ -75,3 +152,9 @@ Pre-commit hook runs `pnpm check-types` on TS/TSX + `prettier --write` on MD/MDX
 | [docs/decisions.md](docs/decisions.md)       | ADR-lite: why we chose specific patterns (Zod, HSL, etc.)     |
 | [docs/commands.md](docs/commands.md)         | Dev commands, test runners, build workflow                    |
 | [docs/design-docs/](docs/design-docs/)       | Design documents for specific technical decisions             |
+
+## Subdirectory Knowledge
+
+| Path       | AGENTS.md                              | Focus                                                     |
+| ---------- | -------------------------------------- | --------------------------------------------------------- |
+| `src/mdx/` | [src/mdx/AGENTS.md](src/mdx/AGENTS.md) | MDX processor internals, component registry, plugin chain |
