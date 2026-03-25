@@ -1,0 +1,387 @@
+---
+title: 'Compacting 이후 AI 품질 저하 해결 가이드'
+summary: 'AI 에이전트 컨텍스트 관리 완벽 해부'
+description: 'AI 코딩 에이전트의 "Compacting conversation..." 이후 답변 품질이 떨어지는 원인을 분석하고, 훅 시스템으로 해결하는 방법을 OMO와 OMC의 실제 코드로 설명해요.'
+category: 'frontend'
+publishedAt: '2026-03-26'
+---
+
+Claude Code를 오래 쓰다 보면 "Compacting conversation..."이 뜨는 순간이 와요. 그 뒤부터 "아까 말한 그 함수 수정해줘" 하면 전혀 다른 파일을 건드리거나, TODO 목록을 통째로 잊어버리는 일이 생기죠.
+
+이 글에서는 왜 이런 일이 발생하는지 원인을 분석하고, [OMO(oh-my-openagent)](https://github.com/code-yeongyu/oh-my-openagent)와 [OMC(oh-my-claudecode)](https://github.com/yeachan-heo/oh-my-claudecode)가 이 문제를 어떻게 해결했는지 **실제 구현 코드**와 함께 살펴볼 거예요. 읽고 나면 다음을 이해할 수 있어요:
+
+- Compacting 이후 답변 품질이 떨어지는 **구조적 원인**
+- `/compact`과 자동 압축의 **결정적 차이**
+- 훅(Hook) 시스템으로 상태를 보존하고 복원하는 **구체적인 방법**
+- OMO가 요약 프롬프트를 직접 제어하는 **근본적 해법**
+
+---
+
+## 왜 Compacting 이후 답변이 이상해지는가
+
+### 컨텍스트 윈도우의 한계
+
+AI 코딩 에이전트는 [컨텍스트 윈도우(Context Window)](https://docs.anthropic.com/en/docs/build-with-claude/context-windows)라는 정해진 크기의 메모리 안에서 동작해요. Claude Code의 경우 기본 200K 토큰이에요. 코딩 작업 한 세션이면 쉽게 넘길 수 있는 양이죠.
+
+컨텍스트 윈도우가 꽉 차면 Claude Code는 자동으로 대화를 **요약 압축(Compaction)** 해요. 원본 대화를 삭제하고 요약본만 남기는 거예요. 문제는 이 과정에서 다음이 뭉개진다는 거예요:
+
+- **도구 호출 결과** — 파일 읽기, grep 결과, 빌드 로그 등
+- **작업 중인 파일 목록**과 수정 내역
+- **TODO 진행 상황**
+- **사용자가 명시한 제약조건**의 원문
+
+### `/compact`과 자동 압축의 결정적 차이
+
+[Claude Code의 Hooks 공식 문서](https://code.claude.com/docs/en/hooks)에서 `PreCompact` 훅의 입력 스키마를 보면, `/compact`과 자동 압축 사이에 중요한 차이가 있어요:
+
+```json title="/compact 실행 시 (수동)"
+{
+  "trigger": "manual",
+  "custom_instructions": "TODO 목록과 파일 경로를 보존해줘" // [!code highlight]
+}
+```
+
+```json title="자동 압축 시 (컨텍스트 100% 도달)"
+{
+  "trigger": "auto",
+  "custom_instructions": "" // [!code error]
+}
+```
+
+`/compact`은 `custom_instructions` 필드로 **요약 과정에 보존 지시를 줄 수 있어요.** 반면 자동 압축은 이 필드가 항상 비어있어요.
+
+<Callout type="warning">
+자동 압축이 터지면 "뭘 보존하라"는 지시 없이 요약이 진행돼요. 그래서 **자동 압축(100%)이 터지기 전에 `/compact`을 먼저 실행하는 게 핵심**이에요.
+</Callout>
+
+---
+
+## 해결 접근법
+
+<Steps>
+
+<div>
+
+### 자동 압축 전에 수동 압축을 유도해요
+
+컨텍스트가 100%에 도달해서 자동 압축이 터지면, 보존 지시를 줄 수 없어요. 컨텍스트 사용률을 모니터링하다가 **75~85% 시점에 `/compact`을 먼저 실행하도록 유도**하는 게 첫 번째 단계예요.
+
+Claude Code의 [Stop 훅](https://code.claude.com/docs/en/hooks)은 `exit 2`로 Claude가 멈추는 걸 차단할 수 있어요. "먼저 `/compact`을 실행하세요"라는 메시지와 함께 Stop을 차단하면, Claude는 `/compact` 없이는 멈출 수 없게 돼요.
+
+</div>
+
+<div>
+
+### 압축 직전에 핵심 상태를 파일로 저장해요
+
+`/compact`이 실행되면 [`PreCompact`](https://code.claude.com/docs/en/hooks) 훅이 발생해요. 이 시점에 잃어버리면 안 되는 상태를 **디스크 파일로 저장**하는 거예요. 활성 모드, TODO 진행 상황, 프로젝트 메모리 같은 정보를 JSON 파일로 체크포인트해요.
+
+</div>
+
+<div>
+
+### 압축 후 새 컨텍스트에서 파일의 상태를 복원해요
+
+압축이 완료되면 새 컨텍스트 윈도우가 열리면서 [`SessionStart`](https://code.claude.com/docs/en/hooks) 훅이 발생해요. `matcher: "compact"`로 설정하면 **압축 직후에만** 실행돼요. 이 훅에서 디스크에 저장해둔 상태를 `additionalContext`로 주입하면, 새 컨텍스트에 핵심 맥락이 원문 그대로 전달돼요.
+
+</div>
+
+</Steps>
+
+---
+
+## 구현 살펴보기: 자동 압축을 피하는 방법
+
+위의 세 단계를 실제로 어떻게 구현하는지, OMC(oh-my-claudecode)의 코드를 기준으로 살펴볼게요.
+
+### 75%에서 Stop을 차단해요
+
+Claude가 작업을 끝내고 멈추려 할 때, 컨텍스트 사용률이 75% 이상이면 Stop을 차단하고 `/compact`을 먼저 실행하라고 강제해요:
+
+```javascript title="context-guard-stop.mjs"
+const THRESHOLD = parseInt(
+  process.env.OMC_CONTEXT_GUARD_THRESHOLD || '75', 10 // [!code highlight]
+);
+const CRITICAL_THRESHOLD = 95; // [!code highlight]
+const MAX_BLOCKS = 2; // [!code highlight]
+```
+
+> [OMC `scripts/context-guard-stop.mjs` L28-L30](https://github.com/yeachan-heo/oh-my-claudecode/blob/275272679a878809686cb7977c7e2f9a22db4037/scripts/context-guard-stop.mjs#L28-L30)
+
+- `THRESHOLD = 75`: 컨텍스트 75% 이상이면 Stop 차단
+- `CRITICAL_THRESHOLD = 95`: 95% 이상은 차단하지 않아요. 차단하면 압축 자체가 실행될 수 없어서 데드락이 걸리거든요.
+- `MAX_BLOCKS = 2`: 세션당 최대 2회만 차단해요. 무한 차단을 방지하는 안전장치예요.
+
+컨텍스트 사용률은 JSONL 트랜스크립트 파일의 마지막 4096바이트에서 `input_tokens / context_window`로 추정해요:
+
+```javascript title="context-guard-stop.mjs — 컨텍스트 비율 추정"
+const tail = readTail(transcriptPath, 4096);
+const windowMatch = tail.match(/"context_window"\s*:\s*(\d+)/g);
+const tokensMatch = tail.match(/"input_tokens"\s*:\s*(\d+)/g);
+// ...
+const pct = Math.round((inputTokens / contextWindow) * 100); // [!code focus]
+```
+
+> [OMC `scripts/context-guard-stop.mjs` L136-L169](https://github.com/yeachan-heo/oh-my-claudecode/blob/275272679a878809686cb7977c7e2f9a22db4037/scripts/context-guard-stop.mjs#L136-L169)
+
+### 85%에서 경고 메시지를 주입해요
+
+도구 실행 후마다 누적 토큰을 추정하고, 85%에 도달하면 Claude에게 "지금 `/compact`을 실행하세요"라는 경고를 주입해요:
+
+```typescript title="preemptive-compaction/constants.ts"
+export const DEFAULT_THRESHOLD = 0.85; // [!code highlight]
+export const CRITICAL_THRESHOLD = 0.95; // [!code highlight]
+export const MIN_TOKENS_FOR_COMPACTION = 50_000;
+export const COMPACTION_COOLDOWN_MS = 60_000; // 경고 간 1분 쿨다운
+export const MAX_WARNINGS = 3; // 세션당 최대 3회
+export const CHARS_PER_TOKEN = 4; // 문자→토큰 변환 계수
+```
+
+> [OMC `src/hooks/preemptive-compaction/constants.ts` L12-L17](https://github.com/yeachan-heo/oh-my-claudecode/blob/275272679a878809686cb7977c7e2f9a22db4037/src/hooks/preemptive-compaction/constants.ts#L12-L17)
+
+토큰 추정 방식은 `누적 출력 문자 수 ÷ 4`예요. 정확하진 않지만, 비용 없이 실시간으로 추정하기엔 충분해요.
+
+<Callout type="info">
+여러 서브에이전트가 동시에 완료될 때 경고가 중복 발생하는 것을 **500ms 디바운스**로 방지해요. ([소스 코드](https://github.com/yeachan-heo/oh-my-claudecode/blob/275272679a878809686cb7977c7e2f9a22db4037/src/hooks/preemptive-compaction/index.ts#L44))
+</Callout>
+
+---
+
+## 구현 살펴보기: 상태 저장과 복원
+
+### PreCompact 훅에서 체크포인트를 파일로 저장해요
+
+`/compact`이 실행되거나 자동 압축이 트리거되면 `PreCompact` 훅이 발생해요. 이 시점에 `.omc/state/checkpoints/checkpoint-{타임스탬프}.json` 파일을 생성하고 현재 상태를 저장해요:
+
+```typescript title="pre-compact/index.ts — 체크포인트 생성"
+function createCompactCheckpoint(state: CompactState): Checkpoint {
+  return {
+    timestamp: new Date().toISOString(),
+    session_id: state.sessionId,
+    active_modes: state.activeModes, // [!code highlight]
+    todo_summary: state.todoSummary, // [!code highlight]
+    wisdom: state.exportedWisdom,
+    background_jobs: state.backgroundJobs, // [!code highlight]
+  };
+}
+```
+
+> [OMC `src/hooks/pre-compact/index.ts` L321-L341](https://github.com/yeachan-heo/oh-my-claudecode/blob/275272679a878809686cb7977c7e2f9a22db4037/src/hooks/pre-compact/index.ts#L321-L341)
+
+저장되는 핵심 내용:
+
+- **`active_modes`**: autopilot 단계, ralph 반복 횟수 등 현재 실행 중인 모드 상태
+- **`todo_summary`**: pending/in_progress/completed 카운트와 각 항목
+- **`background_jobs`**: 백그라운드에서 실행 중인 작업 목록
+
+별도로 프로젝트 메모리(기술 스택, 사용자 지시사항)도 보존해요:
+
+> [OMC `src/hooks/project-memory/pre-compact.ts` L29-L74](https://github.com/yeachan-heo/oh-my-claudecode/blob/275272679a878809686cb7977c7e2f9a22db4037/src/hooks/project-memory/pre-compact.ts#L29-L74)
+
+<Callout type="warning">
+`PreCompact` 훅의 `systemMessage` 출력은 **사용자에게 보여지는 경고 메시지**예요. 요약 프롬프트에 주입되는 게 아니에요. 공식 문서에도 "PreCompact — No decision control. Used for side effects like logging or cleanup"이라고 명시되어 있어요. **실제 상태 보존은 디스크 파일 저장 → SessionStart 복원 경로로 이루어져요.**
+</Callout>
+
+### SessionStart 훅에서 상태를 복원해요
+
+압축이 완료되면 새 컨텍스트 윈도우가 열리면서 `SessionStart` 훅이 발생해요. `matcher: "compact"`로 설정하면 압축 직후에만 실행돼요.
+
+이 훅에서 디스크에 저장해둔 상태를 읽어 `additionalContext`로 주입해요:
+
+```javascript title="session-start.mjs — 상태 복원 (일부)"
+// ultrawork 모드 상태 복원
+const uwState = readJSON(ultraworkStatePath); // [!code focus]
+if (uwState?.prompt) {
+  parts.push(`[Ultrawork] prompt: ${uwState.prompt}`);
+}
+
+// TODO 목록 복원
+const todos = readJSON(todosPath); // [!code focus]
+const pending = todos?.filter(t => t.status !== 'completed');
+if (pending?.length) {
+  parts.push(`[Pending TODOs] ${formatTodos(pending)}`);
+}
+
+// 프로젝트 메모리 복원
+const memory = readJSON(projectMemoryPath); // [!code focus]
+if (memory?.directives?.length) {
+  parts.push(`[Project Memory] ${formatMemory(memory)}`);
+}
+```
+
+> [OMC `scripts/session-start.mjs` L412-L526](https://github.com/yeachan-heo/oh-my-claudecode/blob/275272679a878809686cb7977c7e2f9a22db4037/scripts/session-start.mjs#L412-L526)
+
+복원되는 상태:
+
+| 대상 | 파일 위치 | 내용 |
+|---|---|---|
+| 활성 모드 | `.omc/state/sessions/{sessionId}/*-state.json` | autopilot 단계, ralph 반복 횟수 |
+| 미완료 TODO | `.claude/todos.json` | pending/in_progress 항목 |
+| 프로젝트 메모리 | `.omc/project-memory.json` | 기술 스택, 사용자 지시사항 |
+| 노트패드 | `.omc/notepad.md` `## Priority Context` | 사용자가 기록한 핵심 정보 |
+
+<Callout type="info">
+`SessionStart`의 `additionalContext`는 새 컨텍스트 윈도우가 열린 **이후에** 주입돼요. 요약 모델을 거치지 않으니 의역이나 누락 없이 원문 그대로 전달돼요. 이것이 `PreCompact`의 `systemMessage`보다 신뢰할 수 있는 이유예요.
+</Callout>
+
+---
+
+## 한 단계 더: 요약 프롬프트를 직접 제어하는 방법
+
+지금까지 살펴본 OMC의 접근법은 **압축 전후를 관리하는 방식**이에요. "요약이 어떻게 되든, 디스크에 저장한 상태를 나중에 복원한다"는 전략이죠.
+
+[OMO(oh-my-openagent)](https://github.com/code-yeongyu/oh-my-openagent)는 여기서 한 단계 더 나아가요. **요약 과정 자체에 개입**해요.
+
+### 요약 프롬프트에 직접 텍스트를 주입해요
+
+OMO는 [OpenCode](https://github.com/opencode-ai/opencode) 위에서 동작해요. OpenCode는 `experimental.session.compacting`이라는 플러그인 훅을 제공하는데, 이 훅에서 `output.context.push()`로 **요약 모델의 프롬프트에 직접 텍스트를 주입**할 수 있어요:
+
+```typescript title="index.ts — 압축 훅 등록"
+"experimental.session.compacting": async (_input, output) => {
+  await hooks.compactionContextInjector?.capture(_input.sessionID)
+  await hooks.compactionTodoPreserver?.capture(_input.sessionID)
+
+  if (hooks.compactionContextInjector) {
+    output.context.push( // [!code focus]
+      hooks.compactionContextInjector.inject(_input.sessionID) // [!code focus]
+    ) // [!code focus]
+  }
+}
+```
+
+> [OMO `src/index.ts` L94-L107](https://github.com/code-yeongyu/oh-my-openagent/blob/c4aa380855266644e9951cf3a6255d8ad4608d5e/src/index.ts#L94-L107)
+
+`output.context.push()`가 핵심이에요. 이 한 줄이 요약 모델에게 "이 텍스트를 참고해서 요약해"라고 지시하는 거예요.
+
+### 8개 섹션 구조로 요약을 강제해요
+
+주입되는 텍스트는 요약 모델에게 **8개 섹션 구조**로 정리하라고 강제하는 프롬프트예요:
+
+| # | 섹션 | 핵심 규칙 |
+|---|---|---|
+| 1 | **사용자 요청 원문** | 원문 그대로 보존. 의역 금지 |
+| 2 | **최종 목표** | 전체 작업의 종착점 |
+| 3 | **완료된 작업** | 수정된 파일명, 구현된 기능 |
+| 4 | **남은 작업** | 아직 안 한 것 |
+| 5 | **활성 작업 컨텍스트** | 편집 중인 파일, 런타임 상태 |
+| 6 | **명시적 제약조건** | 사용자가 말한 것**만** 원문 인용 |
+| 7 | **에이전트 검증 상태** | 검증 진행 상황, 이전 거절 이력 |
+| 8 | **위임된 에이전트 세션** | 세션 ID → 새로 생성하지 않고 **재개** |
+
+> [OMO `compaction-context-prompt.ts` L6-L56](https://github.com/code-yeongyu/oh-my-openagent/blob/c4aa380855266644e9951cf3a6255d8ad4608d5e/src/hooks/compaction-context-injector/compaction-context-prompt.ts#L6-L56)
+
+6번 섹션이 특히 중요해요. 압축 과정에서 AI가 존재하지 않는 제약조건을 만들어내면(hallucination), 이후 작업이 불필요하게 제한돼요. "사용자가 명시적으로 말한 것만, 원문으로 인용하라"는 규칙이 이를 방지해요.
+
+### 78%에서 자동으로 압축을 트리거해요
+
+OMC는 Claude에게 `/compact`을 실행하라고 **부탁**하는 것이 최선이었어요. OMO는 `session.summarize()` API를 직접 호출해서 **코드에서 압축을 즉시 실행**할 수 있어요:
+
+```typescript title="preemptive-compaction.ts"
+const PREEMPTIVE_COMPACTION_THRESHOLD = 0.78; // [!code highlight]
+
+// ...
+const usageRatio = totalInputTokens / actualLimit;
+if (usageRatio < PREEMPTIVE_COMPACTION_THRESHOLD) return;
+
+await ctx.client.session.summarize(/* ... */); // [!code focus]
+```
+
+> [OMO `src/hooks/preemptive-compaction.ts` L12](https://github.com/code-yeongyu/oh-my-openagent/blob/c4aa380855266644e9951cf3a6255d8ad4608d5e/src/hooks/preemptive-compaction.ts#L12)
+
+### 압축 후 품질 저하를 자동으로 감지해요
+
+OMO는 압축 후 **5개 응답을 모니터링**해요. 3개 이상 텍스트가 없는 응답(모델이 무한 루프에 빠진 징후)이 감지되면 자동으로 재압축을 트리거해요:
+
+```typescript title="preemptive-compaction-degradation-monitor.ts"
+const POST_COMPACTION_MONITOR_COUNT = 5; // [!code highlight]
+const POST_COMPACTION_NO_TEXT_THRESHOLD = 3; // [!code highlight]
+```
+
+> [OMO `preemptive-compaction-degradation-monitor.ts` L7](https://github.com/code-yeongyu/oh-my-openagent/blob/c4aa380855266644e9951cf3a6255d8ad4608d5e/src/hooks/preemptive-compaction-degradation-monitor.ts#L7)
+
+60초 쿨다운으로 무한 재압축 루프를 방지해요.
+
+> [OMO `compaction-context-injector/constants.ts` L3](https://github.com/code-yeongyu/oh-my-openagent/blob/c4aa380855266644e9951cf3a6255d8ad4608d5e/src/hooks/compaction-context-injector/constants.ts#L3)
+
+### 70%에서 모델의 "자발적 품질 저하"를 차단해요
+
+모델은 컨텍스트가 차오르면 스스로 답변을 축약하려는 경향이 있어요. OMO는 70% 시점에 도구 출력에 "아직 컨텍스트 여유가 있으니 품질을 떨어뜨리지 마세요"라는 지시를 주입해서 이를 차단해요:
+
+```typescript title="context-window-monitor.ts"
+const CONTEXT_WARNING_THRESHOLD = 0.70; // [!code highlight]
+```
+
+> [OMO `src/hooks/context-window-monitor.ts` L8](https://github.com/code-yeongyu/oh-my-openagent/blob/c4aa380855266644e9951cf3a6255d8ad4608d5e/src/hooks/context-window-monitor.ts#L8)
+
+---
+
+## 왜 Claude Code에서는 OMO 방식이 불가능한가
+
+OMO의 핵심 기능들이 Claude Code에서 불가능한 이유는 **런타임이 노출하는 제어권이 다르기 때문**이에요.
+
+| 능력 | OMO (OpenCode) | OMC (Claude Code) |
+|---|---|---|
+| 요약 프롬프트 수정 | `output.context.push()` | 불가능 |
+| 프로그래밍적 압축 트리거 | `session.summarize()` | 불가능 (간접 유도만 가능) |
+| 요약 모델 변경 | `resolveCompactionModel()` | 불가능 |
+| 품질 저하 감지 → 재압축 | 가능 (API 의존) | 불가능 |
+
+[Claude Code Hooks 공식 문서](https://code.claude.com/docs/en/hooks)에 `PreCompact`와 `PostCompact` 모두 "No decision control. Used for side effects like logging or cleanup"이라고 명시되어 있어요. 압축 과정에 개입하거나 차단할 수 없는 거예요.
+
+비유하면 이래요:
+
+- **OMO**는 요리사(요약 모델)에게 **레시피를 직접 건네줄 수 있는 주방장**이에요. "이 8가지 섹션으로 정리해"라고 지시할 수 있어요.
+- **OMC**는 요리사가 요리하기 직전에 재료를 정리해두고, 요리가 끝난 직후에 빠진 재료를 보충하는 **보조 셰프**예요. 요리 과정 자체에는 개입할 수 없지만, 준비와 마무리로 결과물의 품질을 끌어올려요.
+
+---
+
+## 전체 방어 타임라인
+
+```md
+70%   [OMO] 도구 출력에 "품질 떨어뜨리지 마" 주입
+           └─ context-window-monitor.ts
+
+75%   [OMC] Stop 차단 → /compact 강제 유도
+           └─ context-guard-stop.mjs (exit 2)
+
+78%   [OMO] session.summarize() 자동 호출 → 선제적 압축 실행
+           └─ preemptive-compaction.ts
+
+80%   [OMC] HUD 상태바에 시각 경고 표시
+           └─ context-warning.ts
+
+85%   [OMC] PostToolUse 경고 메시지 주입
+           └─ preemptive-compaction/constants.ts
+
+95%   [OMC+OMO] 긴급 압축 또는 세션 핸드오프 강제
+
+100%  [Claude Code 기본] 자동 압축 (custom_instructions 없음)
+```
+
+---
+
+## 번외: 직접 구현하기 어렵다면
+
+이 글에서 설명한 접근법을 직접 구현할 수도 있지만, 이미 잘 만들어진 도구를 활용할 수도 있어요.
+
+### Claude Code를 쓴다면: OMC
+
+```bash
+npx oh-my-claudecode@latest setup
+```
+
+이 한 줄로 위에서 설명한 Stop 차단, PostToolUse 경고, PreCompact 체크포인트, SessionStart 복원 훅이 모두 설정돼요.
+
+> [OMC GitHub 저장소](https://github.com/yeachan-heo/oh-my-claudecode)
+
+### OpenCode를 쓴다면: OMO
+
+OpenCode를 사용하고 있다면 OMO를 설치해서 요약 프롬프트 제어, 선제적 압축 트리거, 품질 저하 감지까지 활용할 수 있어요.
+
+> [OMO GitHub 저장소](https://github.com/code-yeongyu/oh-my-openagent)
+
+---
+
+## 정리
+
+AI 코딩 에이전트의 진짜 병목은 모델 성능이 아니라 **컨텍스트 관리**예요. 자동 압축이 터지기 전에 `/compact`을 실행하고, 압축 전에 상태를 파일로 저장하고, 압축 후에 복원하는 것만으로도 체감 품질이 크게 달라져요. OMO처럼 요약 프롬프트 자체를 제어할 수 있다면 더 근본적인 해결이 가능하지만, Claude Code에서는 훅 시스템의 제약 안에서 **파일 기반 체크포인트 + SessionStart 복원**이 가장 신뢰할 수 있는 전략이에요.
