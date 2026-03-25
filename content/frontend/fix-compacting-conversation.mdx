@@ -101,6 +101,38 @@ Claude Code의 [Stop 훅](https://code.claude.com/docs/en/hooks#stop)은 `exit 2
 
 ---
 
+## OMC의 압축 해결 플로우
+
+OMC가 압축 전후에 어떤 훅을 실행하고, 어떤 파일을 생성하고, 어떻게 복원하는지 전체 흐름을 먼저 볼게요:
+
+```md title="OMC 압축 해결 플로우"
+[75%] Stop 훅 실행
+  │   Claude가 멈추려 하면 exit 2로 차단
+  │   → "먼저 /compact을 실행하세요"
+  │
+[85%] PostToolUse 훅 실행
+  │   도구 실행 후 경고 메시지 주입
+  │   → "/compact을 실행하세요"
+  │
+[/compact 실행 또는 자동 압축 트리거]
+  │
+  ├─ PreCompact 훅 실행
+  │   ├─ .omc/state/checkpoints/checkpoint-{timestamp}.json 생성
+  │   └─ .omc/project-memory.json 읽어서 경고 표시
+  │
+  ├─ [Claude Code가 대화를 요약 압축]
+  │
+  └─ SessionStart(compact) 훅 실행
+      ├─ .omc/state/sessions/{id}/*-state.json → 모드 상태 복원
+      ├─ .claude/todos.json → TODO 목록 복원
+      ├─ .omc/project-memory.json → 프로젝트 메모리 복원
+      └─ .omc/notepad.md → 우선 컨텍스트 복원
+          ↓
+      additionalContext로 새 컨텍스트에 원문 주입
+```
+
+이제 각 단계를 코드 레벨에서 살펴볼게요.
+
 ## 구현 살펴보기: 자동 압축을 피하는 방법
 
 위의 세 단계를 실제로 어떻게 구현하는지, OMC(oh-my-claudecode)의 코드를 기준으로 살펴볼게요.
@@ -218,11 +250,33 @@ export async function createCompactCheckpoint(
 
 > [OMC `src/hooks/pre-compact/index.ts` L321-L341](https://github.com/yeachan-heo/oh-my-claudecode/blob/275272679a878809686cb7977c7e2f9a22db4037/src/hooks/pre-compact/index.ts#L321-L341)
 
-저장되는 핵심 내용:
+실제로 생성되는 체크포인트 파일의 예시예요:
 
-- **`active_modes`**: autopilot 단계, ralph 반복 횟수 등 현재 실행 중인 모드 상태
-- **`todo_summary`**: pending/in_progress/completed 카운트
-- **`background_jobs`**: 백그라운드에서 실행 중인 작업 목록 (활성, 최근 완료, 통계)
+```json title=".omc/state/checkpoints/checkpoint-2026-03-26T14:30:00.000Z.json"
+{
+  "created_at": "2026-03-26T14:30:00.000Z",
+  "trigger": "manual",
+  "active_modes": {
+    "autopilot": { "phase": "execution", "originalIdea": "auth 모듈 리팩토링" }, // [!code highlight]
+    "ralph": { "iteration": 3, "prompt": "테스트 커버리지 80% 달성" }
+  },
+  "todo_summary": { // [!code highlight]
+    "pending": 3,
+    "in_progress": 1,
+    "completed": 7
+  },
+  "wisdom_exported": false,
+  "background_jobs": { // [!code highlight]
+    "active": [
+      { "jobId": "j-1", "provider": "codex", "model": "gpt-4.1", "agentRole": "benchmark", "spawnedAt": "..." }
+    ],
+    "recent": [],
+    "stats": { "total": 5, "active": 1, "completed": 4, "failed": 0 }
+  }
+}
+```
+
+이 파일 덕분에 압축 후에도 "autopilot이 execution 단계에 있고, TODO가 3개 남아있고, 백그라운드에서 벤치마크가 돌고 있다"는 맥락이 보존돼요.
 
 별도로 프로젝트 메모리(기술 스택, 사용자 지시사항)도 보존해요:
 
@@ -281,6 +335,28 @@ if (memory?.directives?.length) {
 지금까지 살펴본 OMC의 접근법은 **압축 전후를 관리하는 방식**이에요. 압축 전에 상태를 파일로 저장하고, 압축 후에 복원하는 거죠. 요약 자체는 Claude Code 내부에서 알아서 처리하니, 요약 품질에는 개입할 수 없어요.
 
 그런데 만약 **요약 모델에게 "이렇게 정리해"라고 직접 지시**할 수 있다면 어떨까요? OpenCode용 플러그인인 [OMO(oh-my-openagent)](https://github.com/code-yeongyu/oh-my-openagent)가 바로 이 방식을 사용해요.
+
+```md title="OMO 압축 해결 플로우"
+[70%] context-window-monitor 실행
+  │   도구 출력에 "품질 떨어뜨리지 마" 주입
+  │
+[78%] preemptive-compaction 실행
+  │   session.summarize() API로 압축 자동 트리거
+  │
+  ├─ experimental.session.compacting 훅 실행
+  │   ├─ TODO 리스트 스냅샷 저장 (compactionTodoPreserver)
+  │   ├─ 에이전트 설정 체크포인트 (compactionContextInjector)
+  │   └─ output.context.push()로 8섹션 요약 프롬프트 주입  ← 핵심 차이
+  │
+  ├─ [요약 모델이 8섹션 구조로 요약 생성]
+  │
+  └─ 압축 후 복원
+      ├─ TODO 스냅샷과 비교 → 사라진 항목만 복원
+      ├─ 에이전트 설정 무음 복원 (session.promptAsync)
+      └─ 5개 응답 모니터링 → 품질 저하 감지 시 재압축
+```
+
+OMC와 비교하면, OMO는 **요약 과정 자체에 개입**하는 게 가장 큰 차이예요. 하나씩 살펴볼게요.
 
 ### 요약 프롬프트에 직접 텍스트를 주입해요
 
