@@ -388,8 +388,16 @@
 }
 
 /* Tighten figure + blockquote (code block + permalink) spacing */
+.container :global(figure:has(+ blockquote)) {
+  @apply mb-0;
+}
+
 .container :global(figure + blockquote) {
   @apply -mt-4;
+}
+
+.container :global(blockquote:has(+ figure)) {
+  @apply mb-0;
 }
 
 .container :global(blockquote + figure) {
