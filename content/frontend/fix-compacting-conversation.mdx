@@ -8,7 +8,14 @@ publishedAt: '2026-03-26'
 
 Claude Code를 오래 쓰다 보면 "Compacting conversation..."이 뜨는 순간이 와요. 그 뒤부터 "아까 말한 그 함수 수정해줘" 하면 전혀 다른 파일을 건드리거나, TODO 목록을 통째로 잊어버리는 일이 생기죠.
 
-이 글에서는 왜 이런 일이 발생하는지 원인을 분석하고, **압축 전에 상태를 파일로 저장하고 압축 후에 복원하는 접근법**을 살펴봐요. 이 접근법을 실제로 잘 구현한 두 오픈소스 프로젝트 — Claude Code용 플러그인 [OMC(oh-my-claudecode)](https://github.com/yeachan-heo/oh-my-claudecode)와 OpenCode용 플러그인 [OMO(oh-my-openagent)](https://github.com/code-yeongyu/oh-my-openagent) — 의 **실제 구현 코드**를 함께 분석할 거예요. 읽고 나면 다음을 이해할 수 있어요:
+이 글에서는 왜 이런 일이 발생하는지 원인을 분석하고, **압축 전에 상태를 파일로 저장하고 압축 후에 복원하는 접근법**을 살펴봐요.
+
+이 접근법을 실제로 잘 구현한 두 오픈소스 프로젝트의 **실제 구현 코드**를 함께 분석할 거예요:
+
+- Claude Code용 플러그인 [OMC(oh-my-claudecode)](https://github.com/yeachan-heo/oh-my-claudecode)
+- OpenCode용 플러그인 [OMO(oh-my-openagent)](https://github.com/code-yeongyu/oh-my-openagent)
+
+읽고 나면 다음을 이해할 수 있어요:
 
 - Compacting 이후 답변 품질이 떨어지는 **구조적 원인**
 - `/compact`과 자동 압축의 **결정적 차이**
@@ -119,11 +126,39 @@ const MAX_BLOCKS = 2; // [!code highlight]
 컨텍스트 사용률은 JSONL 트랜스크립트 파일의 마지막 4096바이트에서 `input_tokens / context_window`로 추정해요:
 
 ```javascript title="context-guard-stop.mjs — 컨텍스트 비율 추정"
-const tail = readTail(transcriptPath, 4096);
-const windowMatch = tail.match(/"context_window"\s*:\s*(\d+)/g);
-const tokensMatch = tail.match(/"input_tokens"\s*:\s*(\d+)/g);
-// ...
-const pct = Math.round((inputTokens / contextWindow) * 100); // [!code focus]
+function estimateContextPercent(transcriptPath) {
+  if (!transcriptPath) return 0;
+
+  let fd = -1;
+  try {
+    const stat = statSync(transcriptPath);
+    if (stat.size === 0) return 0;
+
+    fd = openSync(transcriptPath, 'r');
+    const readSize = Math.min(4096, stat.size);
+    const buf = Buffer.alloc(readSize);
+    readSync(fd, buf, 0, readSize, stat.size - readSize); // [!code highlight]
+    closeSync(fd);
+    fd = -1;
+
+    const tail = buf.toString('utf-8');
+
+    const windowMatch = tail.match(/"context_window"\s{0,5}:\s{0,5}(\d+)/g); // [!code focus]
+    const inputMatch = tail.match(/"input_tokens"\s{0,5}:\s{0,5}(\d+)/g); // [!code focus]
+
+    if (!windowMatch || !inputMatch) return 0;
+
+    const lastWindow = parseInt(windowMatch[windowMatch.length - 1].match(/(\d+)/)[1], 10);
+    const lastInput = parseInt(inputMatch[inputMatch.length - 1].match(/(\d+)/)[1], 10);
+
+    if (lastWindow === 0) return 0;
+    return Math.round((lastInput / lastWindow) * 100); // [!code focus]
+  } catch {
+    return 0;
+  } finally {
+    if (fd !== -1) try { closeSync(fd); } catch { /* ignore */ }
+  }
+}
 ```
 
 > [OMC `scripts/context-guard-stop.mjs` L136-L169](https://github.com/yeachan-heo/oh-my-claudecode/blob/275272679a878809686cb7977c7e2f9a22db4037/scripts/context-guard-stop.mjs#L136-L169)
@@ -252,16 +287,22 @@ if (memory?.directives?.length) {
 OMO는 [OpenCode](https://github.com/opencode-ai/opencode) 위에서 동작해요. OpenCode는 `experimental.session.compacting`이라는 플러그인 훅을 제공하는데, 이 훅에서 `output.context.push()`로 **요약 모델의 프롬프트에 직접 텍스트를 주입**할 수 있어요:
 
 ```typescript title="index.ts — 압축 훅 등록"
-"experimental.session.compacting": async (_input, output) => {
+"experimental.session.compacting": async (
+  _input: { sessionID: string },
+  output: { context: string[] },
+): Promise<void> => {
   await hooks.compactionContextInjector?.capture(_input.sessionID)
   await hooks.compactionTodoPreserver?.capture(_input.sessionID)
-
+  await hooks.claudeCodeHooks?.["experimental.session.compacting"]?.(
+    _input,
+    output,
+  )
   if (hooks.compactionContextInjector) {
     output.context.push( // [!code focus]
       hooks.compactionContextInjector.inject(_input.sessionID) // [!code focus]
     ) // [!code focus]
   }
-}
+},
 ```
 
 > [OMO `src/index.ts` L94-L107](https://github.com/code-yeongyu/oh-my-openagent/blob/c4aa380855266644e9951cf3a6255d8ad4608d5e/src/index.ts#L94-L107)

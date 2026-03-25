@@ -381,6 +381,21 @@
   color: var(--twoslash-tag-annotate-color);
 }
 
+/* Tighten p + ul spacing */
+.container :global(p + ul),
+.container :global(p + ol) {
+  @apply -mt-2;
+}
+
+/* Tighten figure + blockquote (code block + permalink) spacing */
+.container :global(figure + blockquote) {
+  @apply -mt-4;
+}
+
+.container :global(blockquote + figure) {
+  @apply -mt-4;
+}
+
 /* Table styles */
 .container :global(table) {
   @apply w-full my-6 border-collapse;
