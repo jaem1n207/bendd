@@ -13,21 +13,53 @@ export function SeriesNavigationTop({
   currentOrder,
 }: SeriesNavigationProps) {
   return (
-    <div
-      className={cn(
-        'mt-6 rounded-lg border border-border/60 bg-muted/30 px-4 py-3'
-      )}
+    <nav
+      aria-label="시리즈 네비게이션"
+      className="mt-6 rounded-lg border border-border/60 bg-muted/30 p-5"
     >
       <Link
         href={`/article/series/${id}` as Route<''>}
-        className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
+        className="mb-4 flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary"
       >
         <BookOpen className="size-4 shrink-0" />
-        <span className="font-medium text-foreground">{name}</span>
-        <span className="tabular-nums">
-          ({currentOrder}/{articles.length})
-        </span>
+        {name} 시리즈
       </Link>
-    </div>
+
+      <ol className="space-y-1.5">
+        {articles.map(article => {
+          const isCurrent = article.order === currentOrder;
+          return (
+            <li key={article.slug}>
+              {isCurrent ? (
+                <span
+                  className={cn(
+                    'flex items-baseline gap-2 rounded-md px-2.5 py-1.5 text-sm',
+                    'bg-primary/10 font-medium text-primary'
+                  )}
+                >
+                  <span className="shrink-0 tabular-nums text-primary/60">
+                    {article.order}.
+                  </span>
+                  {article.title}
+                </span>
+              ) : (
+                <Link
+                  href={article.href}
+                  className={cn(
+                    'flex items-baseline gap-2 rounded-md px-2.5 py-1.5 text-sm',
+                    'text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
+                  )}
+                >
+                  <span className="shrink-0 tabular-nums text-muted-foreground/60">
+                    {article.order}.
+                  </span>
+                  {article.title}
+                </Link>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
   );
 }
