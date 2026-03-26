@@ -19,7 +19,7 @@ export function MDXCustomLink({
   if (href.startsWith('/')) {
     return (
       <Link href={href as Route<''>} {...props}>
-        {props.children}
+        {children}
       </Link>
     );
   }
