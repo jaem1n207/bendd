@@ -17,6 +17,7 @@ export function ArticleItem({
   summary,
   href,
   publishedAt,
+  series,
   index,
 }: ArticleInfo & { index: number }) {
   const itemRef = useRef<HTMLAnchorElement>(null);
@@ -88,6 +89,11 @@ export function ArticleItem({
         >
           {name}
         </motion.h2>
+        {series && (
+          <span className="shrink-0 whitespace-nowrap rounded-full bg-primary/10 px-2 py-0.5 text-xs tabular-nums text-primary">
+            {series.name} #{series.order}
+          </span>
+        )}
         <motion.span
           ref={summaryRef}
           className="-ml-1.5 hidden overflow-hidden whitespace-nowrap text-sm text-muted-foreground sm:inline-block"

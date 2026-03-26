@@ -74,5 +74,10 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
     notFound();
   }
 
-  return <MdxLayout post={post} type="article" />;
+  const seriesInfo =
+    post.metadata.series && post.metadata.seriesOrder
+      ? processor.getSeriesInfo(post.metadata.series, post.metadata.seriesOrder)
+      : undefined;
+
+  return <MdxLayout post={post} type="article" seriesInfo={seriesInfo} />;
 }

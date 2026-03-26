@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { type Route } from 'next';
 
 import type { ArticleInfo } from '../components/article/types/article';
+import { getSeriesConfig } from '../lib/series';
 
 const MetadataSchema = z.object({
   title: z.string().max(38),
@@ -12,10 +13,27 @@ const MetadataSchema = z.object({
   description: z.string().max(150),
   summary: z.string().max(40),
   image: z.string().optional(),
+  series: z.string().optional(),
+  seriesOrder: z.coerce.number().optional(),
 });
 
 type Metadata = z.infer<typeof MetadataSchema>;
 export type Article = { metadata: Metadata; slug: string; content: string };
+
+export type SeriesArticleEntry = {
+  slug: string;
+  title: string;
+  order: number;
+  href: Route<''>;
+};
+
+export type SeriesInfo = {
+  id: string;
+  name: string;
+  description: string;
+  articles: SeriesArticleEntry[];
+  currentOrder: number;
+};
 
 const validateMetadata = (metadata: Metadata): Metadata => {
   try {
@@ -203,6 +221,7 @@ class MDXProcessor {
   formatForDisplay(
     options: { includeSummary?: boolean; includeRelativeDate?: boolean } = {}
   ): ArticleInfo[] {
+    const badges = this.getSeriesBadges();
     return this.applyOperations().map(article => ({
       name: article.metadata.title,
       summary: article.metadata.summary,
@@ -212,6 +231,7 @@ class MDXProcessor {
         includeRelative: options.includeRelativeDate,
       }),
       ...(options.includeSummary && { summary: article.metadata.summary }),
+      ...(badges.has(article.slug) && { series: badges.get(article.slug) }),
     }));
   }
 
@@ -267,6 +287,57 @@ class MDXProcessor {
       ...this.operations,
       filterOperation,
     ]);
+  }
+
+  getSeriesInfo(seriesId: string, currentOrder: number): SeriesInfo | undefined {
+    const config = getSeriesConfig(seriesId);
+    if (!config) return undefined;
+
+    const seriesArticles = this.articles
+      .filter(a => a.metadata.series === seriesId)
+      .sort((a, b) => (a.metadata.seriesOrder ?? 0) - (b.metadata.seriesOrder ?? 0))
+      .map(a => ({
+        slug: a.slug,
+        title: a.metadata.title,
+        order: a.metadata.seriesOrder ?? 0,
+        href: `/article/${a.slug}` as Route<''>,
+      }));
+
+    if (seriesArticles.length === 0) return undefined;
+
+    return {
+      id: seriesId,
+      name: config.name,
+      description: config.description,
+      articles: seriesArticles,
+      currentOrder,
+    };
+  }
+
+  getSeriesBadges(): Map<string, { id: string; name: string; order: number; total: number }> {
+    const seriesMap = new Map<string, Article[]>();
+    for (const article of this.articles) {
+      if (article.metadata.series) {
+        const list = seriesMap.get(article.metadata.series) ?? [];
+        list.push(article);
+        seriesMap.set(article.metadata.series, list);
+      }
+    }
+
+    const badges = new Map<string, { id: string; name: string; order: number; total: number }>();
+    for (const [seriesId, articles] of seriesMap) {
+      const config = getSeriesConfig(seriesId);
+      if (!config) continue;
+      for (const article of articles) {
+        badges.set(article.slug, {
+          id: seriesId,
+          name: config.name,
+          order: article.metadata.seriesOrder ?? 0,
+          total: articles.length,
+        });
+      }
+    }
+    return badges;
   }
 }
 
