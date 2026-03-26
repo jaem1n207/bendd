@@ -200,11 +200,13 @@ class MDXProcessor {
 
   sortByDateDesc(): MDXProcessor {
     const sortOperation = (articles: ReadonlyArray<Article>) =>
-      [...articles].sort(
-        (a, b) =>
+      [...articles].sort((a, b) => {
+        const dateDiff =
           new Date(b.metadata.publishedAt).getTime() -
-          new Date(a.metadata.publishedAt).getTime()
-      );
+          new Date(a.metadata.publishedAt).getTime();
+        if (dateDiff !== 0) return dateDiff;
+        return (b.metadata.seriesOrder ?? 0) - (a.metadata.seriesOrder ?? 0);
+      });
     return new MDXProcessor(this.articles, [...this.operations, sortOperation]);
   }
 
@@ -338,6 +340,23 @@ class MDXProcessor {
       }
     }
     return badges;
+  }
+
+  getSeriesSummaries(): { id: string; config: { name: string; description: string }; articleCount: number }[] {
+    const seriesMap = new Map<string, number>();
+    for (const article of this.articles) {
+      if (article.metadata.series) {
+        seriesMap.set(article.metadata.series, (seriesMap.get(article.metadata.series) ?? 0) + 1);
+      }
+    }
+
+    return [...seriesMap.entries()]
+      .map(([id, count]) => {
+        const config = getSeriesConfig(id);
+        if (!config) return null;
+        return { id, config, articleCount: count };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
   }
 }
 
