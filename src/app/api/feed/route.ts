@@ -1,5 +1,5 @@
 import { siteMetadata } from '@/lib/site-metadata';
-import { createCraftMDXProcessor, createMDXProcessor } from '@/mdx/mdx';
+import { readArticles, readCraftArticles } from '@/mdx/mdx';
 
 type RssItem = {
   title: string;
@@ -19,10 +19,10 @@ type Rss = {
 };
 
 export async function GET() {
-  const processor = createMDXProcessor();
-  const craftProcessor = createCraftMDXProcessor();
+  const articles = readArticles();
+  const crafts = readCraftArticles();
 
-  const items: RssItem[] = processor.map(article => {
+  const items: RssItem[] = articles.map(article => {
     return {
       title: article.metadata.title,
       description: article.metadata.summary,
@@ -32,7 +32,7 @@ export async function GET() {
     };
   });
 
-  const craftItems: RssItem[] = craftProcessor.map(article => {
+  const craftItems: RssItem[] = crafts.map(article => {
     return {
       title: article.metadata.title,
       description: article.metadata.summary,
