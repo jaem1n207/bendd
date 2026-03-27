@@ -41,6 +41,12 @@ export type SeriesInfo = {
   currentOrder: number;
 };
 
+export type SeriesSummary = {
+  id: string;
+  config: { name: string; description: string };
+  articleCount: number;
+};
+
 const validateMetadata = (metadata: Metadata): Metadata => {
   try {
     return MetadataSchema.parse(metadata);
@@ -323,18 +329,21 @@ class MDXProcessor {
     };
   }
 
-  getSeriesBadges(): Map<string, { id: string; name: string; order: number; total: number }> {
-    const seriesMap = new Map<string, Article[]>();
+  private groupBySeries(): Map<string, Article[]> {
+    const map = new Map<string, Article[]>();
     for (const article of this.articles) {
       if (article.metadata.series) {
-        const list = seriesMap.get(article.metadata.series) ?? [];
+        const list = map.get(article.metadata.series) ?? [];
         list.push(article);
-        seriesMap.set(article.metadata.series, list);
+        map.set(article.metadata.series, list);
       }
     }
+    return map;
+  }
 
+  getSeriesBadges(): Map<string, { id: string; name: string; order: number; total: number }> {
     const badges = new Map<string, { id: string; name: string; order: number; total: number }>();
-    for (const [seriesId, articles] of seriesMap) {
+    for (const [seriesId, articles] of this.groupBySeries()) {
       const config = getSeriesConfig(seriesId);
       if (!config) continue;
       for (const article of articles) {
@@ -349,19 +358,12 @@ class MDXProcessor {
     return badges;
   }
 
-  getSeriesSummaries(): { id: string; config: { name: string; description: string }; articleCount: number }[] {
-    const seriesMap = new Map<string, number>();
-    for (const article of this.articles) {
-      if (article.metadata.series) {
-        seriesMap.set(article.metadata.series, (seriesMap.get(article.metadata.series) ?? 0) + 1);
-      }
-    }
-
-    return [...seriesMap.entries()]
-      .map(([id, count]) => {
+  getSeriesSummaries(): SeriesSummary[] {
+    return [...this.groupBySeries().entries()]
+      .map(([id, articles]) => {
         const config = getSeriesConfig(id);
         if (!config) return null;
-        return { id, config, articleCount: count };
+        return { id, config, articleCount: articles.length };
       })
       .filter((item): item is NonNullable<typeof item> => item !== null);
   }

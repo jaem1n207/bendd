@@ -1,18 +1,21 @@
 import type { Metadata } from 'next';
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
 
 import { MdxLayout } from '@/components/layout/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
 import { createMDXProcessor } from '@/mdx/mdx';
 
+const getProcessor = cache(() => createMDXProcessor());
+
 export async function generateStaticParams() {
-  const processor = createMDXProcessor();
+  const processor = getProcessor();
 
   return processor.map(article => article.slug);
 }
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
-  const processor = createMDXProcessor();
+  const processor = getProcessor();
   const post = processor.getArticleBySlug(params.slug);
 
   if (!post) {
@@ -67,7 +70,7 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 }
 
 export default function ArticlePage({ params }: { params: { slug: string } }) {
-  const processor = createMDXProcessor();
+  const processor = getProcessor();
   const post = processor.getArticleBySlug(params.slug);
 
   if (!post) {
