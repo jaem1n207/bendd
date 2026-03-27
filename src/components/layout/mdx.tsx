@@ -1,7 +1,7 @@
 import { CornerUpLeft } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import type { BlogPosting, WithContext } from 'schema-dts';
+import type { BreadcrumbList, BlogPosting, WithContext } from 'schema-dts';
 
 import { Giscus } from '@/components/comments/giscus';
 import {
@@ -35,6 +35,8 @@ interface MdxLayoutProps {
 export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
   const { title, publishedAt, summary, description, image } = post.metadata;
 
+  const typeName = type === 'article' ? '기술 이야기' : '작업 목록';
+
   const jsonLd: WithContext<BlogPosting> = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -53,6 +55,31 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
     },
   };
 
+  const breadcrumbJsonLd: WithContext<BreadcrumbList> = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: siteMetadata.siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: typeName,
+        item: `${siteMetadata.siteUrl}/${type}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: title,
+        item: `${siteMetadata.siteUrl}/${type}/${post.slug}`,
+      },
+    ],
+  };
+
   return (
     <main className="relative mx-auto my-0 min-h-screen max-w-2xl overflow-hidden px-6 py-32">
       <section id="BenddDoc">
@@ -61,6 +88,13 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(jsonLd),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(breadcrumbJsonLd),
           }}
         />
         <div className="fixed bottom-16 left-5 top-24 hidden flex-col overflow-hidden lg:flex">
