@@ -14,7 +14,7 @@ export function SeriesNavigationTop({
 }: SeriesNavigationProps) {
   return (
     <nav
-      aria-label="시리즈 네비게이션"
+      aria-label="시리즈 상단 네비게이션"
       className="mt-6 rounded-lg border border-border/60 bg-muted/30 p-5"
     >
       <Link

@@ -6,16 +6,21 @@ import { type Route } from 'next';
 import type { ArticleInfo } from '@/components/article/types/article';
 import { getSeriesConfig } from '@/lib/series';
 
-const MetadataSchema = z.object({
-  title: z.string().max(38),
-  publishedAt: z.string(),
-  category: z.string(),
-  description: z.string().max(150),
-  summary: z.string().max(40),
-  image: z.string().optional(),
-  series: z.string().optional(),
-  seriesOrder: z.coerce.number().optional(),
-});
+const MetadataSchema = z
+  .object({
+    title: z.string().max(38),
+    publishedAt: z.string(),
+    category: z.string(),
+    description: z.string().max(150),
+    summary: z.string().max(40),
+    image: z.string().optional(),
+    series: z.string().optional(),
+    seriesOrder: z.coerce.number().int().positive().optional(),
+  })
+  .refine(data => !data.series || data.seriesOrder != null, {
+    message: 'series가 설정된 글에는 seriesOrder가 필수입니다.',
+    path: ['seriesOrder'],
+  });
 
 type Metadata = z.infer<typeof MetadataSchema>;
 export type Article = { metadata: Metadata; slug: string; content: string };
