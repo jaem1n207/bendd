@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     absolute: `${siteMetadata.author} - 소프트웨어 엔지니어`,
   },
   description:
-    '애니메이션과 마이크로 인터랙션으로 유려한 사용자 경험을 만드는 소프트웨어 엔지니어 이재민의 블로그입니다.',
+    '작업하며 마주한 문제와 해결 과정을 정리해 공유합니다. 이 글이 누군가에게 도움이 되길 바랍니다.',
   alternates: {
     canonical: siteMetadata.siteUrl,
   },
@@ -22,7 +22,7 @@ const personJsonLd: WithContext<Person> = {
   url: siteMetadata.siteUrl,
   jobTitle: '소프트웨어 엔지니어',
   description:
-    '애니메이션과 마이크로 인터랙션으로 유려한 사용자 경험을 만드는 소프트웨어 엔지니어',
+    '해야 하는 일 속에서 하고 싶은 의미를 찾는 소프트웨어 엔지니어',
   sameAs: [siteMetadata.github, siteMetadata.youtube],
 };
 
