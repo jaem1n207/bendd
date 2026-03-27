@@ -1,18 +1,12 @@
 import { ArrowRight, BookOpen } from 'lucide-react';
-import { type Route } from 'next';
 import Link from 'next/link';
 
+import { seriesRoute } from '@/lib/series';
 import { cn } from '@/lib/utils';
-import { type SeriesConfig } from '@/lib/series';
-
-type SeriesBannerItem = {
-  id: string;
-  config: SeriesConfig;
-  articleCount: number;
-};
+import type { SeriesSummary } from '@/mdx/mdx';
 
 type SeriesBannerProps = {
-  items: SeriesBannerItem[];
+  items: SeriesSummary[];
 };
 
 export function SeriesBanner({ items }: SeriesBannerProps) {
@@ -23,7 +17,7 @@ export function SeriesBanner({ items }: SeriesBannerProps) {
       {items.map(({ id, config, articleCount }) => (
         <Link
           key={id}
-          href={`/article/series/${id}` as Route<''>}
+          href={seriesRoute(id)}
           className={cn(
             'group flex items-center justify-between rounded-xl border border-border/60 px-5 py-4',
             'transition-colors hover:border-primary/40 hover:bg-muted/50'

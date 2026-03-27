@@ -15,3 +15,6 @@ export const getSeriesConfig = (id: string): SeriesConfig | undefined =>
   SERIES[id];
 
 export const getAllSeriesIds = (): string[] => Object.keys(SERIES);
+
+export const seriesRoute = (id: string) =>
+  `/article/series/${id}` as import('next').Route<''>;
