@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 
+import { getAllSeriesIds } from '@/lib/series';
 import { siteMetadata } from '@/lib/site-metadata';
 import { readArticles, readCraftArticles } from '@/mdx/mdx';
 
@@ -19,5 +20,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: article.metadata.publishedAt,
   }));
 
-  return [...routes, ...crafts, ...articles];
+  const series = getAllSeriesIds().map(id => ({
+    url: `${siteMetadata.siteUrl}/article/series/${id}`,
+    lastModified: new Date().toISOString().split('T')[0],
+  }));
+
+  return [...routes, ...crafts, ...articles, ...series];
 }
