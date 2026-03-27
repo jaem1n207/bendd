@@ -5,6 +5,14 @@
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+.sisyphus/*
+!.sisyphus/rules/
+.pnpm-store/
+.omc/
+.claude/
+
+# ide
+.idea/
 
 # testing
 /coverage
