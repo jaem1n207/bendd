@@ -3,8 +3,8 @@ import path from 'node:path';
 import { z } from 'zod';
 import { type Route } from 'next';
 
-import type { ArticleInfo } from '../components/article/types/article';
-import { getSeriesConfig } from '../lib/series';
+import type { ArticleInfo } from '@/components/article/types/article';
+import { getSeriesConfig } from '@/lib/series';
 
 const MetadataSchema = z.object({
   title: z.string().max(38),
@@ -25,6 +25,7 @@ export type SeriesArticleEntry = {
   title: string;
   order: number;
   href: Route<''>;
+  publishedAt: string;
 };
 
 export type SeriesInfo = {
@@ -303,6 +304,7 @@ class MDXProcessor {
         title: a.metadata.title,
         order: a.metadata.seriesOrder ?? 0,
         href: `/article/${a.slug}` as Route<''>,
+        publishedAt: a.metadata.publishedAt,
       }));
 
     if (seriesArticles.length === 0) return undefined;

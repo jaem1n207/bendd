@@ -9,6 +9,7 @@ export type SeriesNavigationProps = {
     title: string;
     order: number;
     href: Route<''>;
+    publishedAt: string;
   }[];
   currentOrder: number;
 };

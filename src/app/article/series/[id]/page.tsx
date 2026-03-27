@@ -75,9 +75,7 @@ export default function SeriesPage({
                   <h3 className="text-base font-medium">{article.title}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {formatDate({
-                      date:
-                        processor.getArticleBySlug(article.slug)?.metadata
-                          .publishedAt ?? '',
+                      date: article.publishedAt,
                       includeRelative: true,
                     })}
                   </p>

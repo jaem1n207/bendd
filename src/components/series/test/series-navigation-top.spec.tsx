@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { type Route } from 'next';
 import { describe, expect, it } from 'vitest';
 
-import { SeriesNavigationTop } from '../ui/series-navigation-top';
+import { SeriesNavigationTop } from '@/components/series';
 
 const defaultProps = {
   id: 'ai-coding-agent',
@@ -14,12 +14,14 @@ const defaultProps = {
       title: 'Compacting 이후 AI 품질 저하 해결 가이드',
       order: 1,
       href: '/article/fix-compacting-conversation' as Route<''>,
+      publishedAt: '2026-03-26',
     },
     {
       slug: 'save-tokens-for-ai-agent',
       title: 'AI 에이전트 토큰 절약 실전 가이드',
       order: 2,
       href: '/article/save-tokens-for-ai-agent' as Route<''>,
+      publishedAt: '2026-03-26',
     },
   ],
   currentOrder: 1,
