@@ -181,196 +181,143 @@ export const formatDate = ({
   return includeRelative ? `${fullDate} (${relativeDate})` : fullDate;
 };
 
-class MDXProcessor {
-  private readonly articles: ReadonlyArray<Article>;
-  private readonly operations: Array<
-    (articles: ReadonlyArray<Article>) => ReadonlyArray<Article>
-  >;
+// --- 데이터 로딩 ---
 
-  private constructor(
-    articles: ReadonlyArray<Article>,
-    operations: Array<
-      (articles: ReadonlyArray<Article>) => ReadonlyArray<Article>
-    > = []
-  ) {
-    this.articles = articles;
-    this.operations = operations;
+export const readArticles = (dir?: string): ReadonlyArray<Article> =>
+  getMDXFiles(dir ?? path.join(process.cwd(), 'content')).map(readMDXFile);
+
+export const readCraftArticles = (): ReadonlyArray<Article> =>
+  getMDXFiles(path.join(process.cwd(), 'craft')).map(readMDXFile);
+
+// --- 조회 ---
+
+export const findBySlug = (
+  articles: ReadonlyArray<Article>,
+  slug: string
+): Article | undefined => articles.find(article => article.slug === slug);
+
+// --- 정렬 ---
+
+export const sortByDateDesc = (
+  articles: ReadonlyArray<Article>
+): ReadonlyArray<Article> =>
+  [...articles].sort((a, b) => {
+    const dateDiff =
+      new Date(b.metadata.publishedAt).getTime() -
+      new Date(a.metadata.publishedAt).getTime();
+    if (dateDiff !== 0) return dateDiff;
+    return (b.metadata.seriesOrder ?? 0) - (a.metadata.seriesOrder ?? 0);
+  });
+
+// --- 시리즈 ---
+
+const groupBySeries = (
+  articles: ReadonlyArray<Article>
+): Map<string, Article[]> => {
+  const map = new Map<string, Article[]>();
+  for (const article of articles) {
+    if (article.metadata.series) {
+      const list = map.get(article.metadata.series) ?? [];
+      list.push(article);
+      map.set(article.metadata.series, list);
+    }
   }
+  return map;
+};
 
-  static fromDirectory(dir: string): MDXProcessor {
-    const mdxFiles = getMDXFiles(dir);
-    const articles = mdxFiles.map(readMDXFile);
-    return new MDXProcessor(articles);
-  }
+export const getSeriesInfo = (
+  articles: ReadonlyArray<Article>,
+  seriesId: string,
+  currentOrder: number
+): SeriesInfo | undefined => {
+  const config = getSeriesConfig(seriesId);
+  if (!config) return undefined;
 
-  private applyOperations(): ReadonlyArray<Article> {
-    return this.operations.reduce(
-      (articles, operation) => operation(articles),
-      this.articles
-    );
-  }
-
-  sortByDateDesc(): MDXProcessor {
-    const sortOperation = (articles: ReadonlyArray<Article>) =>
-      [...articles].sort((a, b) => {
-        const dateDiff =
-          new Date(b.metadata.publishedAt).getTime() -
-          new Date(a.metadata.publishedAt).getTime();
-        if (dateDiff !== 0) return dateDiff;
-        return (b.metadata.seriesOrder ?? 0) - (a.metadata.seriesOrder ?? 0);
-      });
-    return new MDXProcessor(this.articles, [...this.operations, sortOperation]);
-  }
-
-  sortByDateAsc(): MDXProcessor {
-    const sortOperation = (articles: ReadonlyArray<Article>) =>
-      [...articles].sort(
-        (a, b) =>
-          new Date(a.metadata.publishedAt).getTime() -
-          new Date(b.metadata.publishedAt).getTime()
-      );
-    return new MDXProcessor(this.articles, [...this.operations, sortOperation]);
-  }
-
-  formatForDisplay(
-    options: { includeSummary?: boolean; includeRelativeDate?: boolean } = {}
-  ): ArticleInfo[] {
-    const badges = this.getSeriesBadges();
-    return this.applyOperations().map(article => ({
-      name: article.metadata.title,
-      summary: article.metadata.summary,
-      href: `/article/${article.slug}` as Route<''>,
-      publishedAt: formatDate({
-        date: article.metadata.publishedAt,
-        includeRelative: options.includeRelativeDate,
-      }),
-      ...(options.includeSummary && { summary: article.metadata.summary }),
-      ...(badges.has(article.slug) && { series: badges.get(article.slug) }),
+  const seriesArticles = articles
+    .filter(a => a.metadata.series === seriesId)
+    .sort((a, b) => (a.metadata.seriesOrder ?? 0) - (b.metadata.seriesOrder ?? 0))
+    .map(a => ({
+      slug: a.slug,
+      title: a.metadata.title,
+      order: a.metadata.seriesOrder ?? 0,
+      href: `/article/${a.slug}` as Route<''>,
+      publishedAt: a.metadata.publishedAt,
     }));
-  }
 
-  formatForCraftDisplay(
-    options: { includeSummary?: boolean; includeRelativeDate?: boolean } = {}
-  ): ArticleInfo[] {
-    return this.applyOperations().map(article => ({
-      name: article.metadata.title,
-      summary: article.metadata.summary,
-      href: `/craft/${article.slug}` as Route<''>,
-      publishedAt: formatDate({
-        date: article.metadata.publishedAt,
-        includeRelative: options.includeRelativeDate,
-      }),
-      ...(options.includeSummary && { summary: article.metadata.summary }),
-    }));
-  }
+  if (seriesArticles.length === 0) return undefined;
 
-  filterByCategory(category: string): MDXProcessor {
-    const filterOperation = (articles: ReadonlyArray<Article>) =>
-      articles.filter(article => article.metadata.category === category);
-    return new MDXProcessor(this.articles, [
-      ...this.operations,
-      filterOperation,
-    ]);
-  }
+  return {
+    id: seriesId,
+    name: config.name,
+    description: config.description,
+    articles: seriesArticles,
+    currentOrder,
+  };
+};
 
-  limit(count: number): MDXProcessor {
-    const limitOperation = (articles: ReadonlyArray<Article>) =>
-      articles.slice(0, count);
-    return new MDXProcessor(this.articles, [
-      ...this.operations,
-      limitOperation,
-    ]);
-  }
-
-  getArticles(): ReadonlyArray<Article> {
-    return this.applyOperations();
-  }
-
-  getArticleBySlug(slug: string): Article | undefined {
-    return this.applyOperations().find(article => article.slug === slug);
-  }
-
-  map<T>(fn: (article: Article) => T): T[] {
-    return this.applyOperations().map(fn);
-  }
-
-  filter(predicate: (article: Article) => boolean): MDXProcessor {
-    const filterOperation = (articles: ReadonlyArray<Article>) =>
-      articles.filter(predicate);
-    return new MDXProcessor(this.articles, [
-      ...this.operations,
-      filterOperation,
-    ]);
-  }
-
-  getSeriesInfo(seriesId: string, currentOrder: number): SeriesInfo | undefined {
+export const getSeriesBadges = (
+  articles: ReadonlyArray<Article>
+): Map<string, { id: string; name: string; order: number; total: number }> => {
+  const badges = new Map<
+    string,
+    { id: string; name: string; order: number; total: number }
+  >();
+  for (const [seriesId, group] of groupBySeries(articles)) {
     const config = getSeriesConfig(seriesId);
-    if (!config) return undefined;
-
-    const seriesArticles = this.articles
-      .filter(a => a.metadata.series === seriesId)
-      .sort((a, b) => (a.metadata.seriesOrder ?? 0) - (b.metadata.seriesOrder ?? 0))
-      .map(a => ({
-        slug: a.slug,
-        title: a.metadata.title,
-        order: a.metadata.seriesOrder ?? 0,
-        href: `/article/${a.slug}` as Route<''>,
-        publishedAt: a.metadata.publishedAt,
-      }));
-
-    if (seriesArticles.length === 0) return undefined;
-
-    return {
-      id: seriesId,
-      name: config.name,
-      description: config.description,
-      articles: seriesArticles,
-      currentOrder,
-    };
-  }
-
-  private groupBySeries(): Map<string, Article[]> {
-    const map = new Map<string, Article[]>();
-    for (const article of this.articles) {
-      if (article.metadata.series) {
-        const list = map.get(article.metadata.series) ?? [];
-        list.push(article);
-        map.set(article.metadata.series, list);
-      }
+    if (!config) continue;
+    for (const article of group) {
+      badges.set(article.slug, {
+        id: seriesId,
+        name: config.name,
+        order: article.metadata.seriesOrder ?? 0,
+        total: group.length,
+      });
     }
-    return map;
   }
+  return badges;
+};
 
-  getSeriesBadges(): Map<string, { id: string; name: string; order: number; total: number }> {
-    const badges = new Map<string, { id: string; name: string; order: number; total: number }>();
-    for (const [seriesId, articles] of this.groupBySeries()) {
-      const config = getSeriesConfig(seriesId);
-      if (!config) continue;
-      for (const article of articles) {
-        badges.set(article.slug, {
-          id: seriesId,
-          name: config.name,
-          order: article.metadata.seriesOrder ?? 0,
-          total: articles.length,
-        });
-      }
-    }
-    return badges;
-  }
+export const getSeriesSummaries = (
+  articles: ReadonlyArray<Article>
+): SeriesSummary[] =>
+  [...groupBySeries(articles).entries()]
+    .map(([id, group]) => {
+      const config = getSeriesConfig(id);
+      if (!config) return null;
+      return { id, config, articleCount: group.length };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 
-  getSeriesSummaries(): SeriesSummary[] {
-    return [...this.groupBySeries().entries()]
-      .map(([id, articles]) => {
-        const config = getSeriesConfig(id);
-        if (!config) return null;
-        return { id, config, articleCount: articles.length };
-      })
-      .filter((item): item is NonNullable<typeof item> => item !== null);
-  }
-}
+// --- 포맷팅 ---
 
-export const createMDXProcessor = (dir?: string) =>
-  MDXProcessor.fromDirectory(dir ?? path.join(process.cwd(), 'content'));
+export const formatArticlesForDisplay = (
+  displayArticles: ReadonlyArray<Article>,
+  allArticlesForBadges: ReadonlyArray<Article>,
+  options: { includeRelativeDate?: boolean } = {}
+): ArticleInfo[] => {
+  const badges = getSeriesBadges(allArticlesForBadges);
+  return displayArticles.map(article => ({
+    name: article.metadata.title,
+    summary: article.metadata.summary,
+    href: `/article/${article.slug}` as Route<''>,
+    publishedAt: formatDate({
+      date: article.metadata.publishedAt,
+      includeRelative: options.includeRelativeDate,
+    }),
+    ...(badges.has(article.slug) && { series: badges.get(article.slug) }),
+  }));
+};
 
-export const createCraftMDXProcessor = () =>
-  MDXProcessor.fromDirectory(path.join(process.cwd(), 'craft'));
+export const formatCraftsForDisplay = (
+  articles: ReadonlyArray<Article>,
+  options: { includeRelativeDate?: boolean } = {}
+): ArticleInfo[] =>
+  articles.map(article => ({
+    name: article.metadata.title,
+    summary: article.metadata.summary,
+    href: `/craft/${article.slug}` as Route<''>,
+    publishedAt: formatDate({
+      date: article.metadata.publishedAt,
+      includeRelative: options.includeRelativeDate,
+    }),
+  }));
