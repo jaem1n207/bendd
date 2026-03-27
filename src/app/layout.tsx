@@ -3,6 +3,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { Fira_Mono as FontMono, Inter as FontSans } from 'next/font/google';
+import type { WebSite, WithContext } from 'schema-dts';
 
 import { Navigation } from '@/components/navigation';
 import { ThemeProvider } from '@/components/theme';
@@ -83,6 +84,20 @@ export const metadata = {
   },
 } satisfies Metadata;
 
+const websiteJsonLd: WithContext<WebSite> = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: `${siteMetadata.author} - 소프트웨어 엔지니어`,
+  url: siteMetadata.siteUrl,
+  description: siteMetadata.description,
+  inLanguage: 'ko',
+  publisher: {
+    '@type': 'Person',
+    name: siteMetadata.author,
+    url: siteMetadata.siteUrl,
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -100,6 +115,13 @@ export default function RootLayout({
       dir="ltr"
     >
       <body className="antialiased">
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteJsonLd),
+          }}
+        />
         <BrowserDetector />
         <ThemeProvider
           attribute="class"

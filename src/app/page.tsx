@@ -1,8 +1,41 @@
+import type { Metadata } from 'next';
+import type { Person, WithContext } from 'schema-dts';
+
 import { Typography } from '@/components/ui/typography';
+import { siteMetadata } from '@/lib/site-metadata';
+
+export const metadata: Metadata = {
+  title: {
+    absolute: `${siteMetadata.author} - 소프트웨어 엔지니어`,
+  },
+  description:
+    '애니메이션과 마이크로 인터랙션으로 유려한 사용자 경험을 만드는 소프트웨어 엔지니어 이재민의 블로그입니다.',
+  alternates: {
+    canonical: siteMetadata.siteUrl,
+  },
+};
+
+const personJsonLd: WithContext<Person> = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: siteMetadata.author,
+  url: siteMetadata.siteUrl,
+  jobTitle: '소프트웨어 엔지니어',
+  description:
+    '애니메이션과 마이크로 인터랙션으로 유려한 사용자 경험을 만드는 소프트웨어 엔지니어',
+  sameAs: [siteMetadata.github, siteMetadata.youtube],
+};
 
 export default function Home() {
   return (
     <div className="relative mx-auto min-h-screen max-w-2xl overflow-hidden px-6 py-24 sm:pb-16 sm:pt-32 ">
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(personJsonLd),
+        }}
+      />
       <header className="mb-32 flex flex-col">
         <Typography variant="h5" asChild>
           <h1>이재민</h1>
