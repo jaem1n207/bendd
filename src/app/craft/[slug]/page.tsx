@@ -1,19 +1,22 @@
 import type { Metadata } from 'next';
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
 
 import { MdxLayout } from '@/components/layout/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
-import { createCraftMDXProcessor } from '@/mdx/mdx';
+import { findBySlug, readCraftArticles } from '@/mdx/mdx';
+
+const getCraftArticles = cache(() => readCraftArticles());
 
 export async function generateStaticParams() {
-  const processor = createCraftMDXProcessor();
+  const articles = getCraftArticles();
 
-  return processor.map(article => article.slug);
+  return articles.map(article => ({ slug: article.slug }));
 }
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
-  const processor = createCraftMDXProcessor();
-  const post = processor.getArticleBySlug(params.slug);
+  const articles = getCraftArticles();
+  const post = findBySlug(articles, params.slug);
 
   if (!post) {
     notFound();
@@ -67,8 +70,8 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 }
 
 export default function CraftPage({ params }: { params: { slug: string } }) {
-  const processor = createCraftMDXProcessor();
-  const post = processor.getArticleBySlug(params.slug);
+  const articles = getCraftArticles();
+  const post = findBySlug(articles, params.slug);
 
   if (!post) {
     notFound();
