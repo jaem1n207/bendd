@@ -12,12 +12,16 @@ export function SeriesNavigationBottom({
   articles,
   currentOrder,
 }: SeriesNavigationProps) {
-  const prev = articles.find(a => a.order === currentOrder - 1);
-  const next = articles.find(a => a.order === currentOrder + 1);
+  const currentIndex = articles.findIndex(a => a.order === currentOrder);
+  const prev = currentIndex > 0 ? articles[currentIndex - 1] : undefined;
+  const next =
+    currentIndex >= 0 && currentIndex < articles.length - 1
+      ? articles[currentIndex + 1]
+      : undefined;
 
   return (
     <nav
-      aria-label="시리즈 네비게이션"
+      aria-label="시리즈 하단 네비게이션"
       className="mb-16 mt-12 rounded-lg border border-border/60 bg-muted/30 p-5"
     >
       <Link

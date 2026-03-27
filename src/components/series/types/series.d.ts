@@ -1,15 +1,3 @@
-import { type Route } from 'next';
+import type { SeriesInfo } from '@/mdx/mdx';
 
-export type SeriesNavigationProps = {
-  id: string;
-  name: string;
-  description: string;
-  articles: {
-    slug: string;
-    title: string;
-    order: number;
-    href: Route<''>;
-    publishedAt: string;
-  }[];
-  currentOrder: number;
-};
+export type SeriesNavigationProps = SeriesInfo;
