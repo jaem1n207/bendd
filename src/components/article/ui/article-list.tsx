@@ -1,13 +1,20 @@
 import { SeriesBanner } from '@/components/series';
-import { createMDXProcessor } from '@/mdx/mdx';
+import {
+  formatArticlesForDisplay,
+  getSeriesSummaries,
+  readArticles,
+  sortByDateDesc,
+} from '@/mdx/mdx';
 import { ArticleItem } from './article-item';
 
 export function ArticleList() {
-  const processor = createMDXProcessor();
-  const seriesSummaries = processor.getSeriesSummaries();
-  const formattedArticleInfo = processor.sortByDateDesc().formatForDisplay({
-    includeRelativeDate: false,
-  });
+  const articles = readArticles();
+  const seriesSummaries = getSeriesSummaries(articles);
+  const formattedArticleInfo = formatArticlesForDisplay(
+    sortByDateDesc(articles),
+    articles,
+    { includeRelativeDate: false }
+  );
 
   return (
     <div className="relative mx-auto my-0 mt-8 max-w-4xl space-y-1 overflow-y-auto overflow-x-hidden px-2 pb-28 pt-10 sm:px-6 sm:py-32">
