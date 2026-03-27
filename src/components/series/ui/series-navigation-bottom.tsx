@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
 
-import type { SeriesNavigationProps } from '../types/series';
+import type { SeriesNavigationProps } from '@/components/series/types/series';
 
 export function SeriesNavigationBottom({
   id,
