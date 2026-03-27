@@ -2,7 +2,7 @@ import type { Metadata, ResolvingMetadata } from 'next';
 
 import { ArticleItem } from '@/components/article/ui/article-item';
 import { siteMetadata } from '@/lib/site-metadata';
-import { createCraftMDXProcessor } from '@/mdx/mdx';
+import { formatCraftsForDisplay, readCraftArticles, sortByDateDesc } from '@/mdx/mdx';
 
 export async function generateMetadata(
   {},
@@ -30,12 +30,11 @@ export async function generateMetadata(
 }
 
 export default function CraftPage() {
-  const processor = createCraftMDXProcessor();
-  const formattedArticleInfo = processor
-    .sortByDateDesc()
-    .formatForCraftDisplay({
-      includeRelativeDate: false,
-    });
+  const articles = readCraftArticles();
+  const formattedArticleInfo = formatCraftsForDisplay(
+    sortByDateDesc(articles),
+    { includeRelativeDate: false }
+  );
 
   return (
     <main className="relative mx-auto my-0 min-h-screen max-w-4xl overflow-y-auto px-6 pt-10 sm:py-32">
