@@ -7,7 +7,7 @@
 
 ```
 src/mdx/
-├── mdx.ts              # MDXProcessor class + factories (core pipeline)
+├── mdx.ts              # 순수 함수 기반 콘텐츠 API (readArticles, sortByDateDesc, getSeriesInfo 등)
 ├── custom-mdx.tsx      # CustomMDX renderer, component registry, plugin chain
 ├── mdx.module.css      # Container styles
 ├── common/
@@ -61,22 +61,30 @@ src/mdx/
 
 Twoslash is loaded async via `loadTwoslashTransformer()` — needs `ensureLocalStorage()` polyfill because Shiki's twoslash accesses localStorage during SSR.
 
-## MDXProcessor API
+## MDX 함수 API
 
-`mdx.ts` — Immutable chaining, lazy evaluation:
+`mdx.ts` — 순수 함수 기반, 숨겨진 상태 없음:
 
 ```typescript
-// Operations queue until terminal method
-createMDXProcessor()
-  .sortByDateDesc() // queues sort
-  .filterByCategory('react') // queues filter
-  .limit(5) // queues limit
-  .formatForDisplay(); // EXECUTES all queued ops, returns formatted data
+// 데이터 로딩
+const articles = readArticles(); // content/ 디렉토리
+const crafts = readCraftArticles(); // craft/ 디렉토리
 
-// Terminal methods: getArticles(), formatForDisplay(), formatForCraftDisplay(), map()
+// 조회 & 정렬 — 배열을 받아 배열을 반환
+const sorted = sortByDateDesc(articles);
+const post = findBySlug(articles, 'my-slug');
+
+// 포맷팅
+formatArticlesForDisplay(sorted, articles); // ArticleInfo[] (시리즈 배지 포함)
+formatCraftsForDisplay(sorted); // ArticleInfo[] (시리즈 없음)
+
+// 시리즈 — 항상 전체 컬렉션을 명시적으로 전달
+getSeriesInfo(articles, 'ai-coding-agent', 1);
+getSeriesSummaries(articles);
+getSeriesBadges(articles);
 ```
 
-Two factories: `createMDXProcessor()` reads `content/`, `createCraftMDXProcessor()` reads `craft/`. Difference: `formatForDisplay()` includes relative dates, `formatForCraftDisplay()` does not.
+모든 함수가 입력을 명시적으로 받으므로, 어떤 데이터에서 동작하는지 호출부에서 바로 알 수 있다.
 
 ## Table of Contents (complex subsystem)
 

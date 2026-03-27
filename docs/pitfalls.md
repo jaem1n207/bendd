@@ -114,9 +114,9 @@ feat(article): add blog search feature
 
 pre-commit hook에서 lint-staged는 **타입 체크**(`pnpm check-types`)와 **MDX/MD 포맷팅**(`prettier --write`)만 실행한다. ESLint 자동 수정은 포함되지 않으므로 필요시 `pnpm lint:fix`를 수동 실행한다.
 
-## P17: MDXProcessor 즉시 실행 기대
+## P17: (제거됨) MDXProcessor 즉시 실행 기대
 
-체이닝 메서드(`sortByDateDesc`, `limit`)는 연산을 큐에 넣을 뿐 실행하지 않는다. 데이터를 얻으려면 `getArticles()`, `formatForDisplay()`, `map()` 등 터미널 메서드를 호출해야 한다.
+MDXProcessor 클래스가 순수 함수 API로 대체되어 이 함정은 더 이상 해당하지 않는다. 모든 함수가 즉시 실행되며 숨겨진 상태가 없다.
 
 ## P18: use-sound import 경로 수정
 

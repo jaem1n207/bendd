@@ -76,7 +76,7 @@ Same frontmatter schema, different display formatters and route prefixes.
 
 ## Key Patterns
 
-- **MDXProcessor**: Immutable chaining with lazy evaluation — operations queue until `getArticles()` / `formatForDisplay()` / `map()`
+- **MDX 함수 API**: 순수 함수 기반 — `readArticles()` → `sortByDateDesc()` / `findBySlug()` / `getSeriesInfo()` 등 조합
 - **Zustand persist**: localStorage with named keys (e.g., `sound-enabled`)
 - **Theme sync**: `useThemeManager` syncs next-themes with giscus iframe via `postMessage`
 - **Dynamic imports**: Client-only components need `dynamic(() => import(...), { ssr: false })` in Server Component layouts
@@ -87,16 +87,21 @@ Same frontmatter schema, different display formatters and route prefixes.
 
 ## Code Map
 
-| Symbol                    | Type       | Location                                      | Role                                                          |
-| ------------------------- | ---------- | --------------------------------------------- | ------------------------------------------------------------- |
-| `MDXProcessor`            | Class      | `src/mdx/mdx.ts`                              | Immutable chaining processor — core of content pipeline       |
-| `createMDXProcessor`      | Factory    | `src/mdx/mdx.ts:273`                          | Creates processor for `content/` articles                     |
-| `createCraftMDXProcessor` | Factory    | `src/mdx/mdx.ts:276`                          | Creates processor for `craft/` content                        |
-| `MetadataSchema`          | Zod schema | `src/mdx/mdx.ts:8`                            | Frontmatter validation (title/summary/description limits)     |
-| `createMDXComponent`      | Wrapper    | `src/mdx/common/create-mdx-component.ts`      | Props validation via Zod for all MDX components               |
-| `CustomMDX`               | Component  | `src/mdx/custom-mdx.tsx:76`                   | MDX renderer — plugin chain + component registry              |
-| `components`              | Registry   | `src/mdx/custom-mdx.tsx:33`                   | Maps MDX tags → React components (13 entries)                 |
-| `useActiveAnchor`         | Hook       | `src/mdx/common/table-of-contents/use-toc.ts` | TOC scroll sync — passive listeners, no static NodeList cache |
+| Symbol                     | Type       | Location                                      | Role                                                          |
+| -------------------------- | ---------- | --------------------------------------------- | ------------------------------------------------------------- |
+| `readArticles`             | Function   | `src/mdx/mdx.ts`                              | `content/` 디렉토리에서 글 목록 로드                          |
+| `readCraftArticles`        | Function   | `src/mdx/mdx.ts`                              | `craft/` 디렉토리에서 글 목록 로드                            |
+| `findBySlug`               | Function   | `src/mdx/mdx.ts`                              | 슬러그로 단일 글 조회                                         |
+| `sortByDateDesc`           | Function   | `src/mdx/mdx.ts`                              | 날짜 내림차순 정렬                                            |
+| `getSeriesInfo`            | Function   | `src/mdx/mdx.ts`                              | 시리즈 메타데이터 + 글 목록 조회                              |
+| `getSeriesSummaries`       | Function   | `src/mdx/mdx.ts`                              | 전체 시리즈 요약 목록                                         |
+| `formatArticlesForDisplay` | Function   | `src/mdx/mdx.ts`                              | 글 목록을 ArticleInfo[]로 포맷 (시리즈 배지 포함)             |
+| `formatCraftsForDisplay`   | Function   | `src/mdx/mdx.ts`                              | craft 목록을 ArticleInfo[]로 포맷                             |
+| `MetadataSchema`           | Zod schema | `src/mdx/mdx.ts:8`                            | Frontmatter validation (title/summary/description limits)     |
+| `createMDXComponent`       | Wrapper    | `src/mdx/common/create-mdx-component.ts`      | Props validation via Zod for all MDX components               |
+| `CustomMDX`                | Component  | `src/mdx/custom-mdx.tsx:76`                   | MDX renderer — plugin chain + component registry              |
+| `components`               | Registry   | `src/mdx/custom-mdx.tsx:33`                   | Maps MDX tags → React components (13 entries)                 |
+| `useActiveAnchor`          | Hook       | `src/mdx/common/table-of-contents/use-toc.ts` | TOC scroll sync — passive listeners, no static NodeList cache |
 
 ## Component Structure
 
@@ -121,6 +126,7 @@ MDX components: `src/mdx/components/{name}/{name}.tsx` — register in `src/mdx/
 - Synchronous `track()` calls — wrap in `requestIdleCallback` (P21)
 - Scroll listeners without `{ passive: true }` — always include (P20)
 - Missing `createMDXComponent` wrapper — every MDX component must use it (P1)
+- Class-based processors with hidden state — use pure functions (MDXProcessor was removed for this reason)
 
 ## Development Commands
 
