@@ -59,9 +59,9 @@ export default function SeriesPage({
     url: `${siteMetadata.siteUrl}/article/series/${params.id}`,
     mainEntity: {
       '@type': 'ItemList',
-      itemListElement: seriesInfo.articles.map((article, index) => ({
+      itemListElement: seriesInfo.articles.map(article => ({
         '@type': 'ListItem' as const,
-        position: index + 1,
+        position: article.order,
         url: `${siteMetadata.siteUrl}/article/${article.slug}`,
         name: article.title,
       })),
