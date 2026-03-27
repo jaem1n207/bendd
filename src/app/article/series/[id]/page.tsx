@@ -6,7 +6,11 @@ import { Typography } from '@/components/ui/typography';
 import { getAllSeriesIds, getSeriesConfig } from '@/lib/series';
 import { siteMetadata } from '@/lib/site-metadata';
 import { cn } from '@/lib/utils';
-import { createMDXProcessor, formatDate } from '@/mdx/mdx';
+import { cache } from 'react';
+
+import { formatDate, getSeriesInfo, readArticles } from '@/mdx/mdx';
+
+const getArticles = cache(() => readArticles());
 
 export function generateStaticParams() {
   return getAllSeriesIds().map(id => ({ id }));
@@ -43,8 +47,8 @@ export default function SeriesPage({
   const config = getSeriesConfig(params.id);
   if (!config) notFound();
 
-  const processor = createMDXProcessor();
-  const seriesInfo = processor.getSeriesInfo(params.id, -1);
+  const articles = getArticles();
+  const seriesInfo = getSeriesInfo(articles, params.id, -1);
   if (!seriesInfo) notFound();
 
   return (

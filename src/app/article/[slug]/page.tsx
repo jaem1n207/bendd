@@ -4,19 +4,19 @@ import { notFound } from 'next/navigation';
 
 import { MdxLayout } from '@/components/layout/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
-import { createMDXProcessor } from '@/mdx/mdx';
+import { findBySlug, getSeriesInfo, readArticles } from '@/mdx/mdx';
 
-const getProcessor = cache(() => createMDXProcessor());
+const getArticles = cache(() => readArticles());
 
 export async function generateStaticParams() {
-  const processor = getProcessor();
+  const articles = getArticles();
 
-  return processor.map(article => article.slug);
+  return articles.map(article => ({ slug: article.slug }));
 }
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
-  const processor = getProcessor();
-  const post = processor.getArticleBySlug(params.slug);
+  const articles = getArticles();
+  const post = findBySlug(articles, params.slug);
 
   if (!post) {
     notFound();
@@ -70,8 +70,8 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 }
 
 export default function ArticlePage({ params }: { params: { slug: string } }) {
-  const processor = getProcessor();
-  const post = processor.getArticleBySlug(params.slug);
+  const articles = getArticles();
+  const post = findBySlug(articles, params.slug);
 
   if (!post) {
     notFound();
@@ -79,7 +79,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
 
   const seriesInfo =
     post.metadata.series && post.metadata.seriesOrder
-      ? processor.getSeriesInfo(post.metadata.series, post.metadata.seriesOrder)
+      ? getSeriesInfo(articles, post.metadata.series, post.metadata.seriesOrder)
       : undefined;
 
   return <MdxLayout post={post} type="article" seriesInfo={seriesInfo} />;
