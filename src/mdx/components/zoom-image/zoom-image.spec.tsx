@@ -8,17 +8,17 @@ vi.mock('./zoom-image.module.css', () => ({
 
 vi.mock('next/image', () => {
   const { forwardRef } = require('react');
-  return {
-    default: forwardRef(
-      (
-        props: React.ImgHTMLAttributes<HTMLImageElement>,
-        ref: React.Ref<HTMLImageElement>,
-      ) => (
-        // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-        <img ref={ref} {...props} />
-      ),
+  const MockImage = forwardRef(
+    (
+      props: React.ImgHTMLAttributes<HTMLImageElement>,
+      ref: React.Ref<HTMLImageElement>,
+    ) => (
+      // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+      <img ref={ref} {...props} />
     ),
-  };
+  );
+  MockImage.displayName = 'MockImage';
+  return { default: MockImage };
 });
 
 describe('MDXZoomImage', () => {
