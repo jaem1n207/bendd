@@ -38,6 +38,7 @@
     "next-themes": "^0.3.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-medium-image-zoom": "^5.4.1",
     "react-use": "^17.5.0",
     "react-use-measure": "^2.1.1",
     "remark-gfm": "^4.0.1",
