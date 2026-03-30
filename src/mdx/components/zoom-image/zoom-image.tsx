@@ -148,7 +148,7 @@ function ZoomableImage({
         height={768}
         sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
         quality={80}
-        className={cn('cursor-zoom-in rounded-lg object-cover', className)}
+        className={cn('w-full cursor-zoom-in rounded-lg object-cover', className)}
         style={imgStyle}
         onClick={isOpen ? close : open}
         onTransitionEnd={handleTransitionEnd}
