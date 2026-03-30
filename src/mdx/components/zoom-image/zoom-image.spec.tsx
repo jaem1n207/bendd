@@ -69,6 +69,21 @@ describe('MDXZoomImage', () => {
     });
   });
 
+  describe('title이 있는 이미지 (새 탭 열기)', () => {
+    it('Zoom 대신 링크로 렌더링한다', () => {
+      render(
+        <MDXZoomImage src="/wide.png" alt="파노라마" title="전체 크기로 보기" />
+      );
+
+      expect(screen.queryByTestId('zoom-wrapper')).toBeNull();
+      const link = screen.getByAltText('파노라마').closest('a');
+      expect(link).toBeDefined();
+      expect(link!.getAttribute('href')).toBe('/wide.png');
+      expect(link!.getAttribute('target')).toBe('_blank');
+      expect(link!.getAttribute('title')).toBe('전체 크기로 보기');
+    });
+  });
+
   describe('에러 처리', () => {
     it('src가 없으면 에러를 던진다', () => {
       expect(() => {
