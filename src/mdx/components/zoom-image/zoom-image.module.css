@@ -1,35 +1,13 @@
-.thumbnail {
-  display: inline-block;
-}
-
 .overlay {
   position: fixed;
   inset: 0;
   z-index: 50;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+  padding-bottom: 2rem;
   background: hsl(0 0% 0% / 0.85);
   cursor: zoom-out;
-  padding: 2rem;
-}
-
-.figure {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  margin: 0;
-}
-
-.image {
-  max-width: 90vw;
-  max-height: 85vh;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  border-radius: 0.5rem;
-  will-change: transform;
 }
 
 .caption {
@@ -41,11 +19,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .thumbnail,
-  .overlay,
-  .image,
-  .caption {
-    animation: none;
-    transition: none;
+  .overlay {
+    transition: none !important;
   }
 }

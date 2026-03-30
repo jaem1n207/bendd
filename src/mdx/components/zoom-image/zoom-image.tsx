@@ -1,19 +1,17 @@
 'use client';
 
-import { useCallback, useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
-import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
 
 import styles from './zoom-image.module.css';
 
-// ease-out-quint: 스냅감 있는 감속 — 클릭 즉시 반응하고 부드럽게 안착
-const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
-
-const ENTER_DURATION = 0.2;
-const EXIT_DURATION = 0.15; // exit는 20% 빠르게
+// medium-zoom과 동일한 타이밍
+const DURATION = '300ms';
+const EASING = 'cubic-bezier(0.2, 0, 0.2, 1)';
+const TRANSITION = `transform ${DURATION} ${EASING}`;
 
 type ZoomImageProps = Omit<
   JSX.IntrinsicElements['img'],
@@ -57,10 +55,65 @@ function ZoomableImage({
   alt: string;
   className?: string;
 } & Record<string, unknown>) {
+  const imgRef = useRef<HTMLImageElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const layoutId = useId();
+  const [overlayMounted, setOverlayMounted] = useState(false);
+  const [imgStyle, setImgStyle] = useState<React.CSSProperties>({});
 
-  const close = useCallback(() => setIsOpen(false), []);
+  const open = useCallback(() => {
+    const img = imgRef.current;
+    if (!img) return;
+
+    const rect = img.getBoundingClientRect();
+    const viewW = window.innerWidth;
+    const viewH = window.innerHeight;
+    const margin = 48;
+
+    // 뷰포트에 맞추되 원본 크기를 초과하지 않음
+    const naturalW = img.naturalWidth || rect.width;
+    const maxScale = Math.max(naturalW / rect.width, 1);
+    const scaleX = (viewW - margin * 2) / rect.width;
+    const scaleY = (viewH - margin * 2) / rect.height;
+    const scale = Math.min(scaleX, scaleY, maxScale);
+
+    // 현재 중심에서 뷰포트 중심까지의 이동량
+    const tx = viewW / 2 - (rect.left + rect.width / 2);
+    const ty = viewH / 2 - (rect.top + rect.height / 2);
+
+    setOverlayMounted(true);
+    setIsOpen(true);
+
+    // 다음 프레임에서 transform 적용 → CSS transition이 애니메이션 처리
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setImgStyle({
+          transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
+          transition: TRANSITION,
+          zIndex: 51,
+          position: 'relative',
+          cursor: 'zoom-out',
+          willChange: 'transform',
+        });
+      });
+    });
+  }, []);
+
+  const close = useCallback(() => {
+    setIsOpen(false);
+    setImgStyle((prev) => ({
+      ...prev,
+      transform: 'translate(0, 0) scale(1)',
+      cursor: 'zoom-in',
+    }));
+  }, []);
+
+  // transform 전환 완료 후 오버레이 제거 + 인라인 스타일 정리
+  const handleTransitionEnd = useCallback(() => {
+    if (!isOpen) {
+      setOverlayMounted(false);
+      setImgStyle({});
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -88,74 +141,46 @@ function ZoomableImage({
   );
 
   return (
-    <LayoutGroup>
-      <motion.div layoutId={layoutId} className={styles.thumbnail}>
-        <Image
-          alt={alt}
-          src={src}
-          width={1344}
-          height={768}
-          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
-          quality={80}
-          className={cn('cursor-zoom-in rounded-lg object-cover', className)}
-          onClick={() => setIsOpen(true)}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              setIsOpen(true);
-            }
+    <>
+      <Image
+        ref={imgRef}
+        alt={alt}
+        src={src}
+        width={1344}
+        height={768}
+        sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
+        quality={80}
+        className={cn('cursor-zoom-in rounded-lg object-cover', className)}
+        style={imgStyle}
+        onClick={isOpen ? close : open}
+        onTransitionEnd={handleTransitionEnd}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (isOpen) close();
+            else open();
+          }
+        }}
+        {...props}
+      />
+      {overlayMounted && (
+        <div
+          className={styles.overlay}
+          style={{
+            opacity: isOpen ? 1 : 0,
+            transition: `opacity ${DURATION} ${EASING}`,
           }}
-          {...props}
-        />
-      </motion.div>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-label={alt}
-            className={styles.overlay}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: ENTER_DURATION, ease: EASE_OUT }}
-            onClick={close}
-            onWheel={handleWheel}
-          >
-            <figure className={styles.figure}>
-              <motion.div
-                layoutId={layoutId}
-                transition={{
-                  layout: {
-                    duration: ENTER_DURATION,
-                    ease: EASE_OUT,
-                  },
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt={alt} className={styles.image} />
-              </motion.div>
-              {alt && (
-                <motion.figcaption
-                  className={styles.caption}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{
-                    delay: 0.1,
-                    duration: EXIT_DURATION,
-                    ease: EASE_OUT,
-                  }}
-                >
-                  {alt}
-                </motion.figcaption>
-              )}
-            </figure>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </LayoutGroup>
+          onClick={close}
+          onWheel={handleWheel}
+          role="dialog"
+          aria-modal="true"
+          aria-label={alt}
+        >
+          {alt && <span className={styles.caption}>{alt}</span>}
+        </div>
+      )}
+    </>
   );
 }

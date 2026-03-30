@@ -2,62 +2,24 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import { MDXZoomImage } from './zoom-image';
 
-// framer-motion의 motion 컴포넌트를 HTML 요소로 모킹
-function filterDOMProps(props: Record<string, unknown>) {
-  const safe: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(props)) {
-    if (
-      key === 'children' ||
-      key.startsWith('on') ||
-      key === 'className' ||
-      key === 'role' ||
-      key === 'src' ||
-      key === 'alt' ||
-      key.startsWith('aria-') ||
-      key.startsWith('data-')
-    ) {
-      safe[key] = value;
-    }
-  }
-  return safe;
-}
+vi.mock('./zoom-image.module.css', () => ({
+  default: { overlay: 'overlay', caption: 'caption' },
+}));
 
-vi.mock('framer-motion', () => {
-  const createMotionComponent = (Tag: string) => {
-    const Component = (props: Record<string, unknown>) => {
-      const { children, ...rest } = filterDOMProps(props) as Record<string, unknown> & { children?: React.ReactNode };
-      const El = Tag as React.ElementType;
-      return <El {...rest}>{children}</El>;
-    };
-    Component.displayName = `motion.${Tag}`;
-    return Component;
-  };
-
+vi.mock('next/image', () => {
+  const { forwardRef } = require('react');
   return {
-    motion: {
-      div: createMotionComponent('div'),
-      img: createMotionComponent('img'),
-      figcaption: createMotionComponent('figcaption'),
-    },
-    AnimatePresence: ({ children }: { children: React.ReactNode }) => (
-      <>{children}</>
-    ),
-    LayoutGroup: ({ children }: { children: React.ReactNode }) => (
-      <>{children}</>
+    default: forwardRef(
+      (
+        props: React.ImgHTMLAttributes<HTMLImageElement>,
+        ref: React.Ref<HTMLImageElement>,
+      ) => (
+        // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+        <img ref={ref} {...props} />
+      ),
     ),
   };
 });
-
-vi.mock('./zoom-image.module.css', () => ({
-  default: { overlay: 'overlay', image: 'image' },
-}));
-
-vi.mock('next/image', () => ({
-  default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
-    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-    <img {...props} />
-  ),
-}));
 
 describe('MDXZoomImage', () => {
   describe('일반 이미지', () => {
@@ -68,53 +30,59 @@ describe('MDXZoomImage', () => {
 
     it('alt가 없으면 빈 문자열을 기본값으로 사용한다', () => {
       render(<MDXZoomImage src="/test.png" />);
-      const img = screen.getByAltText('');
-      expect(img.getAttribute('alt')).toBe('');
+      expect(screen.getByAltText('')).toBeDefined();
     });
 
     it('className을 전달한다', () => {
       render(
         <MDXZoomImage src="/test.png" alt="테스트" className="custom-class" />,
       );
-      const img = screen.getByAltText('테스트');
-      expect(img.className).toContain('custom-class');
+      expect(screen.getByAltText('테스트').className).toContain('custom-class');
+    });
+
+    it('cursor-zoom-in 클래스가 적용된다', () => {
+      render(<MDXZoomImage src="/test.png" alt="테스트" />);
+      expect(screen.getByAltText('테스트').className).toContain(
+        'cursor-zoom-in',
+      );
     });
   });
 
   describe('줌 동작', () => {
-    it('클릭하면 줌 오버레이가 열린다', () => {
+    it('클릭하면 오버레이가 마운트된다', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
-      const img = screen.getByAltText('줌 테스트');
 
-      fireEvent.click(img);
+      fireEvent.click(screen.getByAltText('줌 테스트'));
 
-      const dialog = screen.getByRole('dialog');
-      expect(dialog).toBeDefined();
+      expect(screen.getByRole('dialog')).toBeDefined();
     });
 
     it('오버레이 클릭 시 줌이 닫힌다', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+
       fireEvent.click(screen.getByAltText('줌 테스트'));
 
-      const dialog = screen.getByRole('dialog');
-      fireEvent.click(dialog);
+      fireEvent.click(screen.getByRole('dialog'));
+
+      fireEvent.transitionEnd(screen.getByAltText('줌 테스트'));
 
       expect(screen.queryByRole('dialog')).toBeNull();
     });
 
-    it('줌 이미지 클릭 시에도 줌이 닫힌다', () => {
+    it('이미지 클릭으로도 줌이 닫힌다', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+
+      fireEvent.click(screen.getByAltText('줌 테스트'));
       fireEvent.click(screen.getByAltText('줌 테스트'));
 
-      const dialog = screen.getByRole('dialog');
-      // 오버레이(dialog)를 클릭하면 닫힘 — 이미지 클릭도 버블링으로 닫힘
-      fireEvent.click(dialog);
+      fireEvent.transitionEnd(screen.getByAltText('줌 테스트'));
 
       expect(screen.queryByRole('dialog')).toBeNull();
     });
 
     it('줌 열면 alt 텍스트가 캡션으로 표시된다', () => {
       render(<MDXZoomImage src="/test.png" alt="캡션 테스트" />);
+
       fireEvent.click(screen.getByAltText('캡션 테스트'));
 
       expect(screen.getByText('캡션 테스트')).toBeDefined();
@@ -122,9 +90,8 @@ describe('MDXZoomImage', () => {
 
     it('키보드 Enter로 줌을 열 수 있다', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
-      const img = screen.getByAltText('줌 테스트');
 
-      fireEvent.keyDown(img, { key: 'Enter' });
+      fireEvent.keyDown(screen.getByAltText('줌 테스트'), { key: 'Enter' });
 
       expect(screen.getByRole('dialog')).toBeDefined();
     });
@@ -135,7 +102,6 @@ describe('MDXZoomImage', () => {
 
     it('줌 없이 렌더링한다', () => {
       render(<MDXZoomImage src={svgDataUri} alt="SVG" />);
-
       expect(screen.queryByRole('button')).toBeNull();
       expect(screen.getByAltText('SVG')).toBeDefined();
     });
