@@ -16,6 +16,7 @@ export function MDXZoomImage({
   className,
   alt = '',
   src,
+  title,
   ...props
 }: ZoomImageProps) {
   if (!src) {
@@ -36,18 +37,27 @@ export function MDXZoomImage({
     );
   }
 
-  return (
-    <Zoom>
-      <Image
-        alt={alt}
-        src={src}
-        width={1344}
-        height={768}
-        sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
-        quality={80}
-        className={cn('rounded-lg object-cover', className)}
-        {...props}
-      />
-    </Zoom>
+  const image = (
+    <Image
+      alt={alt}
+      src={src}
+      width={1344}
+      height={768}
+      sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
+      quality={80}
+      className={cn('rounded-lg object-cover', className)}
+      {...props}
+    />
   );
+
+  // title이 있으면 새 탭에서 전체 크기로 열기 (파노라마 이미지 등 줌이 비효율적인 경우)
+  if (title) {
+    return (
+      <a href={src} target="_blank" rel="noopener noreferrer" title={title}>
+        {image}
+      </a>
+    );
+  }
+
+  return <Zoom>{image}</Zoom>;
 }
