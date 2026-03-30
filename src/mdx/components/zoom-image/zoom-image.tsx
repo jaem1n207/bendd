@@ -67,14 +67,12 @@ function ZoomableImage({
     const rect = img.getBoundingClientRect();
     const viewW = window.innerWidth;
     const viewH = window.innerHeight;
-    const margin = 48;
+    const margin = 32;
 
-    // 뷰포트에 맞추되 원본 크기를 초과하지 않음
-    const naturalW = img.naturalWidth || rect.width;
-    const maxScale = Math.max(naturalW / rect.width, 1);
+    // 비율 유지하며 뷰포트를 거의 채움
     const scaleX = (viewW - margin * 2) / rect.width;
     const scaleY = (viewH - margin * 2) / rect.height;
-    const scale = Math.min(scaleX, scaleY, maxScale);
+    const scale = Math.min(scaleX, scaleY);
 
     // 현재 중심에서 뷰포트 중심까지의 이동량
     const tx = viewW / 2 - (rect.left + rect.width / 2);
