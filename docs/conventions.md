@@ -125,6 +125,10 @@ src/mdx/components/{name}/
 
 새 컴포넌트를 추가한 후 `src/mdx/custom-mdx.tsx`의 `components` 객체에도 등록해야 한다.
 
+### 이미지 줌
+
+MDX의 모든 `![alt](src)` 이미지는 `MDXZoomImage`로 렌더링된다. 클릭하면 Medium 스타일로 확대되고, 스크롤하면 자동으로 닫힌다. `react-medium-image-zoom` 라이브러리를 사용하며, SVG data URI는 줌 없이 일반 `img`로 렌더링된다.
+
 ## 프론트매터
 
 `src/mdx/mdx.ts`의 `MetadataSchema`가 검증하는 필수 필드와 제한:

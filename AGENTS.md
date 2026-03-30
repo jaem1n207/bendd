@@ -87,21 +87,21 @@ Same frontmatter schema, different display formatters and route prefixes.
 
 ## Code Map
 
-| Symbol                     | Type       | Location                                      | Role                                                          |
-| -------------------------- | ---------- | --------------------------------------------- | ------------------------------------------------------------- |
-| `readArticles`             | Function   | `src/mdx/mdx.ts`                              | `content/` 디렉토리에서 글 목록 로드                          |
-| `readCraftArticles`        | Function   | `src/mdx/mdx.ts`                              | `craft/` 디렉토리에서 글 목록 로드                            |
-| `findBySlug`               | Function   | `src/mdx/mdx.ts`                              | 슬러그로 단일 글 조회                                         |
-| `sortByDateDesc`           | Function   | `src/mdx/mdx.ts`                              | 날짜 내림차순 정렬                                            |
-| `getSeriesInfo`            | Function   | `src/mdx/mdx.ts`                              | 시리즈 메타데이터 + 글 목록 조회                              |
-| `getSeriesSummaries`       | Function   | `src/mdx/mdx.ts`                              | 전체 시리즈 요약 목록                                         |
-| `formatArticlesForDisplay` | Function   | `src/mdx/mdx.ts`                              | 글 목록을 ArticleInfo[]로 포맷 (시리즈 배지 포함)             |
-| `formatCraftsForDisplay`   | Function   | `src/mdx/mdx.ts`                              | craft 목록을 ArticleInfo[]로 포맷                             |
-| `MetadataSchema`           | Zod schema | `src/mdx/mdx.ts:8`                            | Frontmatter validation (title/summary/description limits)     |
-| `createMDXComponent`       | Wrapper    | `src/mdx/common/create-mdx-component.ts`      | Props validation via Zod for all MDX components               |
-| `CustomMDX`                | Component  | `src/mdx/custom-mdx.tsx:76`                   | MDX renderer — plugin chain + component registry              |
-| `components`               | Registry   | `src/mdx/custom-mdx.tsx:33`                   | Maps MDX tags → React components (13 entries)                 |
-| `useActiveAnchor`          | Hook       | `src/mdx/common/table-of-contents/use-toc.ts` | TOC scroll sync — passive listeners, no static NodeList cache |
+| Symbol                     | Type       | Location                                      | Role                                                              |
+| -------------------------- | ---------- | --------------------------------------------- | ----------------------------------------------------------------- |
+| `readArticles`             | Function   | `src/mdx/mdx.ts`                              | `content/` 디렉토리에서 글 목록 로드                              |
+| `readCraftArticles`        | Function   | `src/mdx/mdx.ts`                              | `craft/` 디렉토리에서 글 목록 로드                                |
+| `findBySlug`               | Function   | `src/mdx/mdx.ts`                              | 슬러그로 단일 글 조회                                             |
+| `sortByDateDesc`           | Function   | `src/mdx/mdx.ts`                              | 날짜 내림차순 정렬                                                |
+| `getSeriesInfo`            | Function   | `src/mdx/mdx.ts`                              | 시리즈 메타데이터 + 글 목록 조회                                  |
+| `getSeriesSummaries`       | Function   | `src/mdx/mdx.ts`                              | 전체 시리즈 요약 목록                                             |
+| `formatArticlesForDisplay` | Function   | `src/mdx/mdx.ts`                              | 글 목록을 ArticleInfo[]로 포맷 (시리즈 배지 포함)                 |
+| `formatCraftsForDisplay`   | Function   | `src/mdx/mdx.ts`                              | craft 목록을 ArticleInfo[]로 포맷                                 |
+| `MetadataSchema`           | Zod schema | `src/mdx/mdx.ts:8`                            | Frontmatter validation (title/summary/description limits)         |
+| `createMDXComponent`       | Wrapper    | `src/mdx/common/create-mdx-component.ts`      | Props validation via Zod for all MDX components                   |
+| `CustomMDX`                | Component  | `src/mdx/custom-mdx.tsx:76`                   | MDX renderer — plugin chain + component registry                  |
+| `components`               | Registry   | `src/mdx/custom-mdx.tsx:33`                   | Maps MDX tags → React components (13 entries, img → MDXZoomImage) |
+| `useActiveAnchor`          | Hook       | `src/mdx/common/table-of-contents/use-toc.ts` | TOC scroll sync — passive listeners, no static NodeList cache     |
 
 ## Component Structure
 
