@@ -3,11 +3,17 @@
 import { useCallback, useEffect, useId, useState } from 'react';
 
 import Image from 'next/image';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
 
 import styles from './zoom-image.module.css';
+
+// ease-out-quint: 스냅감 있는 감속 — 클릭 즉시 반응하고 부드럽게 안착
+const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
+
+const ENTER_DURATION = 0.2;
+const EXIT_DURATION = 0.15; // exit는 20% 빠르게
 
 type ZoomImageProps = Omit<
   JSX.IntrinsicElements['img'],
@@ -82,7 +88,7 @@ function ZoomableImage({
   );
 
   return (
-    <>
+    <LayoutGroup>
       <motion.div layoutId={layoutId} className={styles.thumbnail}>
         <Image
           alt={alt}
@@ -114,22 +120,34 @@ function ZoomableImage({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: ENTER_DURATION, ease: EASE_OUT }}
             onClick={close}
             onWheel={handleWheel}
           >
             <figure className={styles.figure}>
-              <motion.div layoutId={layoutId}>
+              <motion.div
+                layoutId={layoutId}
+                transition={{
+                  layout: {
+                    duration: ENTER_DURATION,
+                    ease: EASE_OUT,
+                  },
+                }}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={src} alt={alt} className={styles.image} />
               </motion.div>
               {alt && (
                 <motion.figcaption
                   className={styles.caption}
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  transition={{ delay: 0.15, duration: 0.2 }}
+                  transition={{
+                    delay: 0.1,
+                    duration: EXIT_DURATION,
+                    ease: EASE_OUT,
+                  }}
                 >
                   {alt}
                 </motion.figcaption>
@@ -138,6 +156,6 @@ function ZoomableImage({
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </LayoutGroup>
   );
 }
