@@ -477,7 +477,7 @@ printf "%s ctx:%s%% $%s %s" "$model" "$used" "$cost" "$branch"
 
 ### `/compact` 타이밍
 
-[이전 글](/article/fix-compacting-conversation)에서 다뤘지만, 다시 한번 강조해요. **자동 압축(100%)이 터지기 전에 `/compact`을 직접 실행**하세요. 상태 표시줄이나 `/context` 명령어로 확인한 70–80% 지점에서 실행하면 `custom_instructions`로 보존 지시를 줄 수 있어요.
+[이전 글](/article/fix-compacting-conversation)에서도 다뤘던 내용이에요. **자동 압축(100%)이 발동하기 전에 `/compact`을 직접 실행**하는 게 좋아요. 상태 표시줄이나 `/context` 명령어로 확인한 70–80% 지점에서 실행하면 `custom_instructions`로 보존 지시를 줄 수 있어요.
 
 ```md title="/compact 사용 예시"
 /compact TODO 목록, 수정 중인 파일 경로, 현재 작업 맥락을 보존해줘
