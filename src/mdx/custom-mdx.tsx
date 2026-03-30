@@ -20,7 +20,7 @@ import { MDXCustomLink } from './components/a/custom-link';
 import { MDXCallout } from './components/callout/callout';
 import { MDXHeading } from './components/heading/heading';
 import { MDXImeScrollDemo } from './components/ime-scroll-demo/ime-scroll-demo';
-import { MDXRoundedImage } from './components/img/rounded-image';
+import { MDXZoomImage } from './components/zoom-image/zoom-image';
 import { MDXMagicMove } from './components/magic-move/magic-move';
 import { MDXPre } from './components/pre/pre';
 import { MDXShuffleLettersDemo } from './components/shuffle-letters-demo/shuffle-letters-demo';
@@ -34,7 +34,7 @@ const components: MDXRemoteProps['components'] = {
   h2: props => <MDXHeading level={2} {...props} />,
   h3: props => <MDXHeading level={3} {...props} />,
   h4: props => <MDXHeading level={4} {...props} />,
-  img: MDXRoundedImage,
+  img: MDXZoomImage,
   a: (
     props: DetailedHTMLProps<
       AnchorHTMLAttributes<HTMLAnchorElement>,
