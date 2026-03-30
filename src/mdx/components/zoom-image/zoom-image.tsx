@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -52,6 +52,7 @@ function ZoomableImage({
   className?: string;
 } & Record<string, unknown>) {
   const [isOpen, setIsOpen] = useState(false);
+  const layoutId = useId();
 
   const close = useCallback(() => setIsOpen(false), []);
 
@@ -73,7 +74,6 @@ function ZoomableImage({
 
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
-      // 세로 스크롤 → 줌 닫기, 가로 스크롤 → 파노라마 이미지 탐색
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         close();
       }
@@ -83,25 +83,27 @@ function ZoomableImage({
 
   return (
     <>
-      <Image
-        alt={alt}
-        src={src}
-        width={1344}
-        height={768}
-        sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
-        quality={80}
-        className={cn('cursor-zoom-in rounded-lg object-cover', className)}
-        onClick={() => setIsOpen(true)}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            setIsOpen(true);
-          }
-        }}
-        {...props}
-      />
+      <motion.div layoutId={layoutId} className={styles.thumbnail}>
+        <Image
+          alt={alt}
+          src={src}
+          width={1344}
+          height={768}
+          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
+          quality={80}
+          className={cn('cursor-zoom-in rounded-lg object-cover', className)}
+          onClick={() => setIsOpen(true)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setIsOpen(true);
+            }
+          }}
+          {...props}
+        />
+      </motion.div>
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -112,21 +114,27 @@ function ZoomableImage({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3 }}
             onClick={close}
             onWheel={handleWheel}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <motion.img
-              src={src}
-              alt={alt}
-              className={styles.image}
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              onClick={(e) => e.stopPropagation()}
-            />
+            <figure className={styles.figure}>
+              <motion.div layoutId={layoutId}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt={alt} className={styles.image} />
+              </motion.div>
+              {alt && (
+                <motion.figcaption
+                  className={styles.caption}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: 0.15, duration: 0.2 }}
+                >
+                  {alt}
+                </motion.figcaption>
+              )}
+            </figure>
           </motion.div>
         )}
       </AnimatePresence>

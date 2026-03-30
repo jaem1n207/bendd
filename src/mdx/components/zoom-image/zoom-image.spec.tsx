@@ -2,51 +2,48 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import { MDXZoomImage } from './zoom-image';
 
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({
-      children,
-      ...props
-    }: React.HTMLAttributes<HTMLDivElement> & Record<string, unknown>) => {
-      const safeProps: Record<string, unknown> = {};
-      for (const [key, value] of Object.entries(props)) {
-        if (
-          key.startsWith('on') ||
-          key === 'className' ||
-          key === 'role' ||
-          key.startsWith('aria-') ||
-          key.startsWith('data-')
-        ) {
-          safeProps[key] = value;
-        }
-      }
-      return <div {...(safeProps as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>;
+// framer-motion의 motion 컴포넌트를 HTML 요소로 모킹
+function filterDOMProps(props: Record<string, unknown>) {
+  const safe: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(props)) {
+    if (
+      key === 'children' ||
+      key.startsWith('on') ||
+      key === 'className' ||
+      key === 'role' ||
+      key === 'src' ||
+      key === 'alt' ||
+      key.startsWith('aria-') ||
+      key.startsWith('data-')
+    ) {
+      safe[key] = value;
+    }
+  }
+  return safe;
+}
+
+vi.mock('framer-motion', () => {
+  const createMotionComponent = (Tag: string) => {
+    const Component = (props: Record<string, unknown>) => {
+      const { children, ...rest } = filterDOMProps(props) as Record<string, unknown> & { children?: React.ReactNode };
+      const El = Tag as React.ElementType;
+      return <El {...rest}>{children}</El>;
+    };
+    Component.displayName = `motion.${Tag}`;
+    return Component;
+  };
+
+  return {
+    motion: {
+      div: createMotionComponent('div'),
+      img: createMotionComponent('img'),
+      figcaption: createMotionComponent('figcaption'),
     },
-    img: (
-      props: React.ImgHTMLAttributes<HTMLImageElement> & Record<string, unknown>,
-    ) => {
-      const safeProps: Record<string, unknown> = {};
-      for (const [key, value] of Object.entries(props)) {
-        if (
-          key.startsWith('on') ||
-          key === 'className' ||
-          key === 'src' ||
-          key === 'alt' ||
-          key === 'role' ||
-          key.startsWith('aria-') ||
-          key.startsWith('data-')
-        ) {
-          safeProps[key] = value;
-        }
-      }
-      // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-      return <img {...(safeProps as React.ImgHTMLAttributes<HTMLImageElement>)} />;
-    },
-  },
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => (
-    <>{children}</>
-  ),
-}));
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => (
+      <>{children}</>
+    ),
+  };
+});
 
 vi.mock('./zoom-image.module.css', () => ({
   default: { overlay: 'overlay', image: 'image' },
@@ -102,15 +99,22 @@ describe('MDXZoomImage', () => {
       expect(screen.queryByRole('dialog')).toBeNull();
     });
 
-    it('줌 이미지 클릭 시 오버레이가 닫히지 않는다', () => {
+    it('줌 이미지 클릭 시에도 줌이 닫힌다', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
       fireEvent.click(screen.getByAltText('줌 테스트'));
 
-      const images = screen.getAllByAltText('줌 테스트');
-      const zoomedImg = images[1];
-      fireEvent.click(zoomedImg);
+      const dialog = screen.getByRole('dialog');
+      // 오버레이(dialog)를 클릭하면 닫힘 — 이미지 클릭도 버블링으로 닫힘
+      fireEvent.click(dialog);
 
-      expect(screen.getByRole('dialog')).toBeDefined();
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
+    it('줌 열면 alt 텍스트가 캡션으로 표시된다', () => {
+      render(<MDXZoomImage src="/test.png" alt="캡션 테스트" />);
+      fireEvent.click(screen.getByAltText('캡션 테스트'));
+
+      expect(screen.getByText('캡션 테스트')).toBeDefined();
     });
 
     it('키보드 Enter로 줌을 열 수 있다', () => {

@@ -1,18 +1,40 @@
+.thumbnail {
+  display: contents;
+}
+
 .overlay {
   position: fixed;
   inset: 0;
   z-index: 50;
   display: flex;
-  overflow: auto;
-  background: hsl(0 0% 0% / 0.8);
+  align-items: center;
+  justify-content: center;
+  background: hsl(0 0% 0% / 0.85);
   cursor: zoom-out;
   padding: 2rem;
 }
 
+.figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
+}
+
 .image {
-  margin: auto;
-  min-height: 30vh;
-  max-height: 90vh;
+  max-width: 90vw;
+  max-height: 85vh;
   width: auto;
+  height: auto;
+  object-fit: contain;
   border-radius: 0.5rem;
+}
+
+.caption {
+  color: hsl(0 0% 80%);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+  max-width: 60ch;
 }
