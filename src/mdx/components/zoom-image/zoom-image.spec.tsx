@@ -1,6 +1,18 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 import { MDXZoomImage } from './zoom-image';
+
+// open()의 2-frame rAF를 즉시 실행하여 cloneAnimated=true가 되도록 함
+const originalRAF = globalThis.requestAnimationFrame;
+beforeEach(() => {
+  globalThis.requestAnimationFrame = (cb: FrameRequestCallback) => {
+    cb(0);
+    return 0;
+  };
+});
+afterEach(() => {
+  globalThis.requestAnimationFrame = originalRAF;
+});
 
 vi.mock('./zoom-image.module.css', () => ({
   default: { overlay: 'overlay', caption: 'caption', clone: 'clone' },
@@ -135,6 +147,50 @@ describe('MDXZoomImage', () => {
 
       fireEvent.wheel(screen.getByRole('dialog'), { deltaY: 0, deltaX: 100 });
 
+      expect(screen.getByRole('dialog')).toBeDefined();
+    });
+
+    it('줌 닫힌 후 원본 이미지에 포커스가 복원된다', () => {
+      render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+      const img = screen.getByAltText('줌 테스트');
+
+      fireEvent.click(img);
+      fireEvent.click(screen.getByRole('dialog'));
+      const clone = screen.getAllByAltText('줌 테스트')[1];
+      fireEvent.transitionEnd(clone);
+
+      expect(document.activeElement).toBe(img);
+    });
+
+    it('Escape로 닫은 후 원본 이미지에 포커스가 복원된다', () => {
+      render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+      const img = screen.getByAltText('줌 테스트');
+
+      fireEvent.keyDown(img, { key: 'Enter' });
+      fireEvent.keyDown(document, { key: 'Escape' });
+      const clone = screen.getAllByAltText('줌 테스트')[1];
+      fireEvent.transitionEnd(clone);
+
+      expect(document.activeElement).toBe(img);
+    });
+
+    it('줌인→줌아웃→Space로 다시 줌인할 수 있다', () => {
+      render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+      const img = screen.getByAltText('줌 테스트');
+
+      // 1차 줌인
+      fireEvent.keyDown(img, { key: ' ' });
+      expect(screen.getByRole('dialog')).toBeDefined();
+
+      // 줌아웃
+      fireEvent.keyDown(document, { key: 'Escape' });
+      const clone = screen.getAllByAltText('줌 테스트')[1];
+      fireEvent.transitionEnd(clone);
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(document.activeElement).toBe(img);
+
+      // 2차 줌인 (포커스가 복원되었으므로 Space로 다시 열 수 있어야 함)
+      fireEvent.keyDown(img, { key: ' ' });
       expect(screen.getByRole('dialog')).toBeDefined();
     });
 

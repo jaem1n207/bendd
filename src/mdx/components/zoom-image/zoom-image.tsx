@@ -79,6 +79,7 @@ function ZoomableImage({
 } & Record<string, unknown>) {
   const imgRef = useRef<HTMLImageElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const shouldRestoreFocus = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const [zoomState, setZoomState] = useState<ZoomState | null>(null);
   // 클론 이미지의 transform이 적용됐는지 (2프레임 대기 후)
@@ -120,6 +121,15 @@ function ZoomableImage({
   }, [src, alt]);
 
   const close = useCallback(() => {
+    // 열기 애니메이션이 시작되지 않았으면 즉시 정리 (transitionEnd가 발생하지 않으므로)
+    if (!cloneAnimated) {
+      setIsOpen(false);
+      setCloneAnimated(false);
+      shouldRestoreFocus.current = true;
+      setZoomState(null);
+      return;
+    }
+
     // 스크롤로 닫을 때 원본 이미지의 현재 위치에 맞게 클론 복귀 위치 재계산
     const img = imgRef.current;
     if (img && zoomState) {
@@ -137,18 +147,36 @@ function ZoomableImage({
     }
     setIsOpen(false);
     setCloneAnimated(false);
-  }, [zoomState]);
+  }, [zoomState, cloneAnimated]);
 
-  // 클론의 close transition 완료 후 정리 + 포커스 복원
+  // 클론의 close transition 완료 후 정리
   const handleCloneTransitionEnd = useCallback(() => {
     if (!isOpen) {
+      shouldRestoreFocus.current = true;
       setZoomState(null);
-      // setZoomState(null) 리렌더 후 DOM이 안정된 시점에 포커스 복원
-      requestAnimationFrame(() => {
-        imgRef.current?.focus();
-      });
     }
   }, [isOpen]);
+
+  // zoomState가 null이 된 후 React DOM commit 완료 시점에 포커스 복원
+  useEffect(() => {
+    if (!zoomState && shouldRestoreFocus.current) {
+      shouldRestoreFocus.current = false;
+      imgRef.current?.focus();
+    }
+  }, [zoomState]);
+
+  // transitionEnd가 발생하지 않는 경우를 대비한 안전장치
+  useEffect(() => {
+    if (isOpen || !zoomState) return;
+
+    // 닫기 시작 후 transition 시간 + 여유 시간 내에 transitionEnd가 발생하지 않으면 강제 정리
+    const timer = setTimeout(() => {
+      shouldRestoreFocus.current = true;
+      setZoomState(null);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [isOpen, zoomState]);
 
   useEffect(() => {
     if (!isOpen) return;
