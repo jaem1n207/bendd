@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import Image from 'next/image';
 
@@ -45,6 +46,13 @@ export function MDXZoomImage({
   return <ZoomableImage src={src} alt={alt} className={className} {...props} />;
 }
 
+interface ZoomState {
+  src: string;
+  alt: string;
+  rect: DOMRect;
+  transform: string;
+}
+
 function ZoomableImage({
   src,
   alt,
@@ -57,11 +65,9 @@ function ZoomableImage({
 } & Record<string, unknown>) {
   const imgRef = useRef<HTMLImageElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [overlayMounted, setOverlayMounted] = useState(false);
-  const [imgStyle, setImgStyle] = useState<React.CSSProperties>({});
-  // 이미지가 fixed로 전환될 때 레이아웃 점프 방지용 플레이스홀더
-  const [placeholderStyle, setPlaceholderStyle] =
-    useState<React.CSSProperties>({});
+  const [zoomState, setZoomState] = useState<ZoomState | null>(null);
+  // 클론 이미지의 transform이 적용됐는지 (2프레임 대기 후)
+  const [cloneAnimated, setCloneAnimated] = useState(false);
 
   const open = useCallback(() => {
     const img = imgRef.current;
@@ -72,56 +78,39 @@ function ZoomableImage({
     const viewH = document.documentElement.clientHeight;
     const margin = 32;
 
-    // 비율 유지하며 뷰포트를 최대한 채움
     const scaleX = (viewW - margin * 2) / rect.width;
     const scaleY = (viewH - margin * 2) / rect.height;
     const scale = Math.min(scaleX, scaleY) || 1;
 
-    // translate는 scale보다 먼저 적용됨 (오른쪽→왼쪽)
-    // 실제 이동 = translate * scale, 그래서 scale로 나눔
     const translateX = (-rect.left + (viewW - rect.width) / 2) / scale;
     const translateY = (-rect.top + (viewH - rect.height) / 2) / scale;
 
-    // 레이아웃 점프 방지: 원래 이미지 자리를 예약
-    setPlaceholderStyle({ width: rect.width, height: rect.height });
-    setOverlayMounted(true);
+    setZoomState({
+      src,
+      alt,
+      rect,
+      transform: `scale(${scale}) translate3d(${translateX}px, ${translateY}px, 0)`,
+    });
     setIsOpen(true);
+    setCloneAnimated(false);
 
-    // 다음 프레임: position: fixed로 전환 후 transform 적용
+    // 2프레임 후 transform 적용 → CSS transition 애니메이션
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        setImgStyle({
-          position: 'fixed',
-          top: rect.top,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
-          margin: 0,
-          transform: `scale(${scale}) translate3d(${translateX}px, ${translateY}px, 0)`,
-          transition: TRANSITION,
-          zIndex: 51,
-          cursor: 'zoom-out',
-          willChange: 'transform',
-        });
+        setCloneAnimated(true);
       });
     });
-  }, []);
+  }, [src, alt]);
 
   const close = useCallback(() => {
     setIsOpen(false);
-    setImgStyle((prev) => ({
-      ...prev,
-      transform: 'scale(1) translate3d(0, 0, 0)',
-      cursor: 'zoom-in',
-    }));
+    setCloneAnimated(false);
   }, []);
 
-  // transform 전환 완료 후 정리
-  const handleTransitionEnd = useCallback(() => {
+  // 클론의 close transition 완료 후 정리
+  const handleCloneTransitionEnd = useCallback(() => {
     if (!isOpen) {
-      setOverlayMounted(false);
-      setImgStyle({});
-      setPlaceholderStyle({});
+      setZoomState(null);
     }
   }, [isOpen]);
 
@@ -152,7 +141,6 @@ function ZoomableImage({
 
   return (
     <>
-      <div style={placeholderStyle} />
       <Image
         ref={imgRef}
         alt={alt}
@@ -161,37 +149,61 @@ function ZoomableImage({
         height={768}
         sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
         quality={80}
-        className={cn('w-full cursor-zoom-in rounded-lg object-cover', className)}
-        style={imgStyle}
-        onClick={isOpen ? close : open}
-        onTransitionEnd={handleTransitionEnd}
+        className={cn(
+          'w-full cursor-zoom-in rounded-lg object-cover',
+          className,
+        )}
+        style={zoomState ? { visibility: 'hidden' } : undefined}
+        onClick={open}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            if (isOpen) close();
-            else open();
+            open();
           }
         }}
         {...props}
       />
-      {overlayMounted && (
-        <div
-          className={styles.overlay}
-          style={{
-            opacity: isOpen ? 1 : 0,
-            transition: `opacity ${DURATION} ${EASING}`,
-          }}
-          onClick={close}
-          onWheel={handleWheel}
-          role="dialog"
-          aria-modal="true"
-          aria-label={alt}
-        >
-          {alt && <span className={styles.caption}>{alt}</span>}
-        </div>
-      )}
+      {zoomState &&
+        createPortal(
+          <>
+            <div
+              className={styles.overlay}
+              style={{
+                opacity: isOpen ? 1 : 0,
+                transition: `opacity ${DURATION} ${EASING}`,
+              }}
+              onClick={close}
+              onWheel={handleWheel}
+              role="dialog"
+              aria-modal="true"
+              aria-label={alt}
+            >
+              {alt && <span className={styles.caption}>{alt}</span>}
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={zoomState.src}
+              alt={zoomState.alt}
+              className={styles.clone}
+              style={{
+                top: zoomState.rect.top,
+                left: zoomState.rect.left,
+                width: zoomState.rect.width,
+                height: zoomState.rect.height,
+                transform:
+                  isOpen && cloneAnimated
+                    ? zoomState.transform
+                    : 'scale(1) translate3d(0, 0, 0)',
+                transition: TRANSITION,
+              }}
+              onClick={close}
+              onTransitionEnd={handleCloneTransitionEnd}
+            />
+          </>,
+          document.body,
+        )}
     </>
   );
 }
