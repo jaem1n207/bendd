@@ -78,6 +78,7 @@ function ZoomableImage({
   className?: string;
 } & Record<string, unknown>) {
   const imgRef = useRef<HTMLImageElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [zoomState, setZoomState] = useState<ZoomState | null>(null);
   // 클론 이미지의 transform이 적용됐는지 (2프레임 대기 후)
@@ -109,10 +110,11 @@ function ZoomableImage({
     setIsOpen(true);
     setCloneAnimated(false);
 
-    // 2프레임 후 transform 적용 → CSS transition 애니메이션
+    // 2프레임 후 transform 적용 → CSS transition 애니메이션 + 포커스 이동
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setCloneAnimated(true);
+        overlayRef.current?.focus();
       });
     });
   }, [src, alt]);
@@ -137,10 +139,11 @@ function ZoomableImage({
     setCloneAnimated(false);
   }, [zoomState]);
 
-  // 클론의 close transition 완료 후 정리
+  // 클론의 close transition 완료 후 정리 + 포커스 복원
   const handleCloneTransitionEnd = useCallback(() => {
     if (!isOpen) {
       setZoomState(null);
+      imgRef.current?.focus();
     }
   }, [isOpen]);
 
@@ -186,6 +189,7 @@ function ZoomableImage({
         style={zoomState ? { visibility: 'hidden' } : undefined}
         onClick={open}
         role="button"
+        aria-label={alt ? `${alt} - 클릭하여 확대` : '이미지 클릭하여 확대'}
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -199,6 +203,7 @@ function ZoomableImage({
         createPortal(
           <>
             <div
+              ref={overlayRef}
               className={styles.overlay}
               style={{
                 opacity: isOpen ? 1 : 0,
@@ -208,7 +213,8 @@ function ZoomableImage({
               onWheel={handleWheel}
               role="dialog"
               aria-modal="true"
-              aria-label={alt}
+              aria-label={alt || '이미지 확대 보기'}
+              tabIndex={-1}
             >
               {alt && <span className={styles.caption}>{alt}</span>}
             </div>
