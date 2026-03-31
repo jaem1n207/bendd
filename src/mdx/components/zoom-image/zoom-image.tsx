@@ -59,36 +59,50 @@ function ZoomableImage({
   const [isOpen, setIsOpen] = useState(false);
   const [overlayMounted, setOverlayMounted] = useState(false);
   const [imgStyle, setImgStyle] = useState<React.CSSProperties>({});
+  // 이미지가 fixed로 전환될 때 레이아웃 점프 방지용 플레이스홀더
+  const [placeholderStyle, setPlaceholderStyle] =
+    useState<React.CSSProperties>({});
 
   const open = useCallback(() => {
     const img = imgRef.current;
     if (!img) return;
 
     const rect = img.getBoundingClientRect();
-    const viewW = window.innerWidth;
-    const viewH = window.innerHeight;
+    const { naturalWidth, naturalHeight } = img;
+    const viewW = document.documentElement.clientWidth;
+    const viewH = document.documentElement.clientHeight;
     const margin = 32;
 
-    // 비율 유지하며 뷰포트를 거의 채움
-    const scaleX = (viewW - margin * 2) / rect.width;
-    const scaleY = (viewH - margin * 2) / rect.height;
-    const scale = Math.min(scaleX, scaleY);
+    // medium-zoom 공식: 뷰포트에 맞추되 원본 크기를 초과하지 않음
+    const scaleX =
+      Math.min(naturalWidth || viewW, viewW - margin * 2) / rect.width;
+    const scaleY =
+      Math.min(naturalHeight || viewH, viewH - margin * 2) / rect.height;
+    const scale = Math.min(scaleX, scaleY) || 1;
 
-    // 현재 중심에서 뷰포트 중심까지의 이동량
-    const tx = viewW / 2 - (rect.left + rect.width / 2);
-    const ty = viewH / 2 - (rect.top + rect.height / 2);
+    // translate는 scale보다 먼저 적용됨 (오른쪽→왼쪽)
+    // 실제 이동 = translate * scale, 그래서 scale로 나눔
+    const translateX = (-rect.left + (viewW - rect.width) / 2) / scale;
+    const translateY = (-rect.top + (viewH - rect.height) / 2) / scale;
 
+    // 레이아웃 점프 방지: 원래 이미지 자리를 예약
+    setPlaceholderStyle({ width: rect.width, height: rect.height });
     setOverlayMounted(true);
     setIsOpen(true);
 
-    // 다음 프레임에서 transform 적용 → CSS transition이 애니메이션 처리
+    // 다음 프레임: position: fixed로 전환 후 transform 적용
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setImgStyle({
-          transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
+          position: 'fixed',
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          margin: 0,
+          transform: `scale(${scale}) translate3d(${translateX}px, ${translateY}px, 0)`,
           transition: TRANSITION,
           zIndex: 51,
-          position: 'relative',
           cursor: 'zoom-out',
           willChange: 'transform',
         });
@@ -100,16 +114,17 @@ function ZoomableImage({
     setIsOpen(false);
     setImgStyle((prev) => ({
       ...prev,
-      transform: 'translate(0, 0) scale(1)',
+      transform: 'scale(1) translate3d(0, 0, 0)',
       cursor: 'zoom-in',
     }));
   }, []);
 
-  // transform 전환 완료 후 오버레이 제거 + 인라인 스타일 정리
+  // transform 전환 완료 후 정리
   const handleTransitionEnd = useCallback(() => {
     if (!isOpen) {
       setOverlayMounted(false);
       setImgStyle({});
+      setPlaceholderStyle({});
     }
   }, [isOpen]);
 
@@ -140,6 +155,7 @@ function ZoomableImage({
 
   return (
     <>
+      <div style={placeholderStyle} />
       <Image
         ref={imgRef}
         alt={alt}
