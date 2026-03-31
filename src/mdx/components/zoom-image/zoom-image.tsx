@@ -143,7 +143,10 @@ function ZoomableImage({
   const handleCloneTransitionEnd = useCallback(() => {
     if (!isOpen) {
       setZoomState(null);
-      imgRef.current?.focus();
+      // setZoomState(null) 리렌더 후 DOM이 안정된 시점에 포커스 복원
+      requestAnimationFrame(() => {
+        imgRef.current?.focus();
+      });
     }
   }, [isOpen]);
 
