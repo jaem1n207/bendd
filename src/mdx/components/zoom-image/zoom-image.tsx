@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import Image from 'next/image';
+import { z } from 'zod';
 
 import { cn } from '@/lib/utils';
 
+import { createMDXComponent } from '../../common/create-mdx-component';
 import styles from './zoom-image.module.css';
 
 // medium-zoom과 동일한 타이밍
@@ -14,12 +16,18 @@ const DURATION = '300ms';
 const EASING = 'cubic-bezier(0.2, 0, 0.2, 1)';
 const TRANSITION = `transform ${DURATION} ${EASING}`;
 
+const ZoomImageSchema = z.object({
+  src: z.string().optional(),
+  alt: z.string().optional(),
+  className: z.string().optional(),
+});
+
 type ZoomImageProps = Omit<
   JSX.IntrinsicElements['img'],
   'srcSet' | 'width' | 'height'
 >;
 
-export function MDXZoomImage({
+function MDXZoomImageBase({
   className,
   alt = '',
   src,
@@ -45,6 +53,11 @@ export function MDXZoomImage({
 
   return <ZoomableImage src={src} alt={alt} className={className} {...props} />;
 }
+
+export const MDXZoomImage = createMDXComponent(
+  MDXZoomImageBase,
+  ZoomImageSchema,
+);
 
 interface ZoomState {
   src: string;
