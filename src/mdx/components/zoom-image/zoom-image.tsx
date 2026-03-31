@@ -68,16 +68,13 @@ function ZoomableImage({
     if (!img) return;
 
     const rect = img.getBoundingClientRect();
-    const { naturalWidth, naturalHeight } = img;
     const viewW = document.documentElement.clientWidth;
     const viewH = document.documentElement.clientHeight;
     const margin = 32;
 
-    // medium-zoom 공식: 뷰포트에 맞추되 원본 크기를 초과하지 않음
-    const scaleX =
-      Math.min(naturalWidth || viewW, viewW - margin * 2) / rect.width;
-    const scaleY =
-      Math.min(naturalHeight || viewH, viewH - margin * 2) / rect.height;
+    // 비율 유지하며 뷰포트를 최대한 채움
+    const scaleX = (viewW - margin * 2) / rect.width;
+    const scaleY = (viewH - margin * 2) / rect.height;
     const scale = Math.min(scaleX, scaleY) || 1;
 
     // translate는 scale보다 먼저 적용됨 (오른쪽→왼쪽)
