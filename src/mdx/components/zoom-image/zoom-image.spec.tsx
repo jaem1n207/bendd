@@ -105,6 +105,39 @@ describe('MDXZoomImage', () => {
       expect(screen.getByRole('dialog')).toBeDefined();
     });
 
+    it('Escape로 줌이 닫힌다', () => {
+      render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+      fireEvent.click(screen.getByAltText('줌 테스트'));
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+
+      const clone = screen.getAllByAltText('줌 테스트')[1];
+      fireEvent.transitionEnd(clone);
+
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
+    it('세로 wheel 입력이면 줌이 닫힌다', () => {
+      render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+      fireEvent.click(screen.getByAltText('줌 테스트'));
+
+      fireEvent.wheel(screen.getByRole('dialog'), { deltaY: 100, deltaX: 0 });
+
+      const clone = screen.getAllByAltText('줌 테스트')[1];
+      fireEvent.transitionEnd(clone);
+
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
+    it('가로 wheel 입력이면 줌이 유지된다', () => {
+      render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+      fireEvent.click(screen.getByAltText('줌 테스트'));
+
+      fireEvent.wheel(screen.getByRole('dialog'), { deltaY: 0, deltaX: 100 });
+
+      expect(screen.getByRole('dialog')).toBeDefined();
+    });
+
     it('줌 닫힌 후 원본 이미지가 다시 보인다', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
       const img = screen.getByAltText('줌 테스트');
