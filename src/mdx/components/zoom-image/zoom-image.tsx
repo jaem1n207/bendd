@@ -190,6 +190,7 @@ function ZoomableImage({
     return () => clearTimeout(timer);
   }, [isOpen, zoomState]);
 
+  // 줌 열릴 때 키보드 리스너 등록 + 스크롤 잠금
   useEffect(() => {
     if (!isOpen) return;
 
@@ -202,9 +203,16 @@ function ZoomableImage({
 
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      document.body.style.overflow = '';
+      // overflow 복원은 포탈 언마운트 시점(zoomState=null)에 수행
     };
   }, [isOpen, close]);
+
+  // 포탈이 완전히 언마운트된 후 스크롤 복원 (닫기 transition 완료 후)
+  useEffect(() => {
+    if (!zoomState && !isOpen) {
+      document.body.style.overflow = '';
+    }
+  }, [zoomState, isOpen]);
 
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
