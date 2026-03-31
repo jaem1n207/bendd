@@ -51,6 +51,7 @@ interface ZoomState {
   alt: string;
   rect: DOMRect;
   transform: string;
+  closeTransform: string;
 }
 
 function ZoomableImage({
@@ -90,6 +91,7 @@ function ZoomableImage({
       alt,
       rect,
       transform: `scale(${scale}) translate3d(${translateX}px, ${translateY}px, 0)`,
+      closeTransform: 'scale(1) translate3d(0, 0, 0)',
     });
     setIsOpen(true);
     setCloneAnimated(false);
@@ -103,9 +105,24 @@ function ZoomableImage({
   }, [src, alt]);
 
   const close = useCallback(() => {
+    // 스크롤로 닫을 때 원본 이미지의 현재 위치에 맞게 클론 복귀 위치 재계산
+    const img = imgRef.current;
+    if (img && zoomState) {
+      const newRect = img.getBoundingClientRect();
+      const deltaX = newRect.left - zoomState.rect.left;
+      const deltaY = newRect.top - zoomState.rect.top;
+      setZoomState((prev) =>
+        prev
+          ? {
+              ...prev,
+              closeTransform: `scale(1) translate3d(${deltaX}px, ${deltaY}px, 0)`,
+            }
+          : null,
+      );
+    }
     setIsOpen(false);
     setCloneAnimated(false);
-  }, []);
+  }, [zoomState]);
 
   // 클론의 close transition 완료 후 정리
   const handleCloneTransitionEnd = useCallback(() => {
@@ -195,7 +212,7 @@ function ZoomableImage({
                 transform:
                   isOpen && cloneAnimated
                     ? zoomState.transform
-                    : 'scale(1) translate3d(0, 0, 0)',
+                    : zoomState.closeTransform,
                 transition: TRANSITION,
               }}
               onClick={close}
