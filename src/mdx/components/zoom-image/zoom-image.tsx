@@ -79,9 +79,11 @@ function ZoomableImage({
 } & Record<string, unknown>) {
   const imgRef = useRef<HTMLImageElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const cloneRef = useRef<HTMLImageElement>(null);
   const shouldRestoreFocus = useRef(false);
   const cloneAnimatedRef = useRef(false);
   const isClosingRef = useRef(false);
+  const scrollTrackRAF = useRef<number>(0);
   const [isOpen, setIsOpen] = useState(false);
   const [zoomState, setZoomState] = useState<ZoomState | null>(null);
   // 클론 이미지의 transform이 적용됐는지 (2프레임 대기 후)
@@ -131,6 +133,7 @@ function ZoomableImage({
 
     // 열기 애니메이션이 시작되지 않았으면 즉시 정리 (transitionEnd가 발생하지 않으므로)
     if (!cloneAnimatedRef.current) {
+      document.body.style.overflow = '';
       setIsOpen(false);
       setCloneAnimated(false);
       cloneAnimatedRef.current = false;
@@ -141,21 +144,24 @@ function ZoomableImage({
 
     isClosingRef.current = true;
 
-    // 스크롤로 닫을 때 원본 이미지의 현재 위치에 맞게 클론 복귀 위치 재계산
-    const img = imgRef.current;
-    if (img && zoomState) {
-      const newRect = img.getBoundingClientRect();
-      const deltaX = newRect.left - zoomState.rect.left;
-      const deltaY = newRect.top - zoomState.rect.top;
-      setZoomState((prev) =>
-        prev
-          ? {
-              ...prev,
-              closeTransform: `scale(1) translate3d(${deltaX}px, ${deltaY}px, 0)`,
-            }
-          : null,
-      );
-    }
+    // 스크롤이 즉시 동작하도록 overflow 복원
+    document.body.style.overflow = '';
+
+    // 닫기 transition 동안 원본 이미지 위치를 추적하여 클론 위치 동기화
+    const trackImagePosition = () => {
+      const img = imgRef.current;
+      const clone = cloneRef.current;
+      if (img && clone) {
+        const newRect = img.getBoundingClientRect();
+        clone.style.top = `${newRect.top}px`;
+        clone.style.left = `${newRect.left}px`;
+      }
+      if (isClosingRef.current) {
+        scrollTrackRAF.current = requestAnimationFrame(trackImagePosition);
+      }
+    };
+    scrollTrackRAF.current = requestAnimationFrame(trackImagePosition);
+
     setIsOpen(false);
     setCloneAnimated(false);
     cloneAnimatedRef.current = false;
@@ -164,6 +170,8 @@ function ZoomableImage({
   // 클론의 close transition 완료 후 정리
   const handleCloneTransitionEnd = useCallback(() => {
     if (!isOpen) {
+      isClosingRef.current = false;
+      cancelAnimationFrame(scrollTrackRAF.current);
       shouldRestoreFocus.current = true;
       setZoomState(null);
     }
@@ -181,8 +189,9 @@ function ZoomableImage({
   useEffect(() => {
     if (isOpen || !zoomState) return;
 
-    // 닫기 시작 후 transition 시간 + 여유 시간 내에 transitionEnd가 발생하지 않으면 강제 정리
     const timer = setTimeout(() => {
+      isClosingRef.current = false;
+      cancelAnimationFrame(scrollTrackRAF.current);
       shouldRestoreFocus.current = true;
       setZoomState(null);
     }, 400);
@@ -203,16 +212,8 @@ function ZoomableImage({
 
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      // overflow 복원은 포탈 언마운트 시점(zoomState=null)에 수행
     };
   }, [isOpen, close]);
-
-  // 포탈이 완전히 언마운트된 후 스크롤 복원 (닫기 transition 완료 후)
-  useEffect(() => {
-    if (!zoomState && !isOpen) {
-      document.body.style.overflow = '';
-    }
-  }, [zoomState, isOpen]);
 
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
@@ -271,6 +272,7 @@ function ZoomableImage({
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
+              ref={cloneRef}
               src={zoomState.src}
               alt={zoomState.alt}
               className={styles.clone}

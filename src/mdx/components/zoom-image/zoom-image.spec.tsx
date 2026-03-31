@@ -3,15 +3,21 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MDXZoomImage } from './zoom-image';
 
 // open()의 2-frame rAF를 즉시 실행하여 cloneAnimated=true가 되도록 함
+// close()의 스크롤 추적 rAF 루프는 무한 재귀 방지를 위해 최대 3회 실행
 const originalRAF = globalThis.requestAnimationFrame;
+let rafCallCount = 0;
 beforeEach(() => {
+  rafCallCount = 0;
   globalThis.requestAnimationFrame = (cb: FrameRequestCallback) => {
-    cb(0);
+    if (rafCallCount++ < 10) {
+      cb(0);
+    }
     return 0;
   };
 });
 afterEach(() => {
   globalThis.requestAnimationFrame = originalRAF;
+  rafCallCount = 0;
 });
 
 vi.mock('./zoom-image.module.css', () => ({
