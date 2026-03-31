@@ -80,6 +80,7 @@ function ZoomableImage({
   const imgRef = useRef<HTMLImageElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const shouldRestoreFocus = useRef(false);
+  const cloneAnimatedRef = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const [zoomState, setZoomState] = useState<ZoomState | null>(null);
   // 클론 이미지의 transform이 적용됐는지 (2프레임 대기 후)
@@ -110,10 +111,12 @@ function ZoomableImage({
     });
     setIsOpen(true);
     setCloneAnimated(false);
+    cloneAnimatedRef.current = false;
 
     // 2프레임 후 transform 적용 → CSS transition 애니메이션 + 포커스 이동
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
+        cloneAnimatedRef.current = true;
         setCloneAnimated(true);
         overlayRef.current?.focus();
       });
@@ -122,9 +125,11 @@ function ZoomableImage({
 
   const close = useCallback(() => {
     // 열기 애니메이션이 시작되지 않았으면 즉시 정리 (transitionEnd가 발생하지 않으므로)
-    if (!cloneAnimated) {
+    // ref를 사용하여 stale closure 없이 항상 최신 값을 참조
+    if (!cloneAnimatedRef.current) {
       setIsOpen(false);
       setCloneAnimated(false);
+      cloneAnimatedRef.current = false;
       shouldRestoreFocus.current = true;
       setZoomState(null);
       return;
@@ -147,7 +152,8 @@ function ZoomableImage({
     }
     setIsOpen(false);
     setCloneAnimated(false);
-  }, [zoomState, cloneAnimated]);
+    cloneAnimatedRef.current = false;
+  }, [zoomState]);
 
   // 클론의 close transition 완료 후 정리
   const handleCloneTransitionEnd = useCallback(() => {
@@ -254,6 +260,7 @@ function ZoomableImage({
               src={zoomState.src}
               alt={zoomState.alt}
               className={styles.clone}
+              onWheel={handleWheel}
               style={{
                 top: zoomState.rect.top,
                 left: zoomState.rect.left,
