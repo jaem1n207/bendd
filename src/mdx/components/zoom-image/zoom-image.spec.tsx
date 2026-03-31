@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { MDXZoomImage } from './zoom-image';
 
 vi.mock('./zoom-image.module.css', () => ({
-  default: { overlay: 'overlay', caption: 'caption' },
+  default: { overlay: 'overlay', caption: 'caption', clone: 'clone' },
 }));
 
 vi.mock('next/image', () => {
@@ -49,40 +49,50 @@ describe('MDXZoomImage', () => {
   });
 
   describe('줌 동작', () => {
-    it('클릭하면 오버레이가 마운트된다', () => {
+    it('클릭하면 오버레이와 클론이 렌더링된다', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
-
       fireEvent.click(screen.getByAltText('줌 테스트'));
 
       expect(screen.getByRole('dialog')).toBeDefined();
+      // 원본(hidden) + 클론 = 2개
+      expect(screen.getAllByAltText('줌 테스트')).toHaveLength(2);
+    });
+
+    it('클릭하면 원본 이미지가 visibility: hidden이 된다', () => {
+      render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+      const img = screen.getByAltText('줌 테스트');
+
+      fireEvent.click(img);
+
+      expect(img.style.visibility).toBe('hidden');
     });
 
     it('오버레이 클릭 시 줌이 닫힌다', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
-
       fireEvent.click(screen.getByAltText('줌 테스트'));
 
       fireEvent.click(screen.getByRole('dialog'));
 
-      fireEvent.transitionEnd(screen.getByAltText('줌 테스트'));
+      // 클론의 transitionEnd 시뮬레이션 → 포탈 언마운트
+      const clone = screen.getAllByAltText('줌 테스트')[1];
+      fireEvent.transitionEnd(clone);
 
       expect(screen.queryByRole('dialog')).toBeNull();
     });
 
-    it('이미지 클릭으로도 줌이 닫힌다', () => {
+    it('클론 이미지 클릭으로도 줌이 닫힌다', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
-
-      fireEvent.click(screen.getByAltText('줌 테스트'));
       fireEvent.click(screen.getByAltText('줌 테스트'));
 
-      fireEvent.transitionEnd(screen.getByAltText('줌 테스트'));
+      const clone = screen.getAllByAltText('줌 테스트')[1];
+      fireEvent.click(clone);
+      fireEvent.transitionEnd(clone);
 
       expect(screen.queryByRole('dialog')).toBeNull();
     });
 
     it('줌 열면 alt 텍스트가 캡션으로 표시된다', () => {
       render(<MDXZoomImage src="/test.png" alt="캡션 테스트" />);
-
       fireEvent.click(screen.getByAltText('캡션 테스트'));
 
       expect(screen.getByText('캡션 테스트')).toBeDefined();
@@ -90,10 +100,23 @@ describe('MDXZoomImage', () => {
 
     it('키보드 Enter로 줌을 열 수 있다', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
-
       fireEvent.keyDown(screen.getByAltText('줌 테스트'), { key: 'Enter' });
 
       expect(screen.getByRole('dialog')).toBeDefined();
+    });
+
+    it('줌 닫힌 후 원본 이미지가 다시 보인다', () => {
+      render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+      const img = screen.getByAltText('줌 테스트');
+
+      fireEvent.click(img);
+      expect(img.style.visibility).toBe('hidden');
+
+      fireEvent.click(screen.getByRole('dialog'));
+      const clone = screen.getAllByAltText('줌 테스트')[1];
+      fireEvent.transitionEnd(clone);
+
+      expect(img.style.visibility).not.toBe('hidden');
     });
   });
 

@@ -10,6 +10,14 @@
   cursor: zoom-out;
 }
 
+.clone {
+  position: fixed;
+  z-index: 51;
+  cursor: zoom-out;
+  will-change: transform;
+  border-radius: 0.5rem;
+}
+
 .caption {
   color: hsl(0 0% 80%);
   font-size: 0.875rem;
@@ -19,7 +27,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .overlay {
+  .overlay,
+  .clone {
     transition: none !important;
   }
 }
