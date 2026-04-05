@@ -197,3 +197,15 @@ vercel --prod --yes
 ```
 
 **주의**: `x-vercel-error: INTERNAL_UNEXPECTED_ERROR`는 Next.js 애플리케이션 에러가 아니라 Vercel 플랫폼 수준 에러다. 코드 변경으로 해결하려 하지 않는다.
+
+## P24: focus() 호출 시 스크롤 점프
+
+`element.focus()`의 기본 동작은 대상 요소가 뷰포트 밖에 있으면 **자동으로 스크롤하여 화면에 보이게 한다**. 모달/줌/오버레이를 닫은 후 포커스를 복원할 때, 사용자가 스크롤을 이동한 상태면 원래 요소 위치로 강제 스크롤되어 UX가 깨진다.
+
+```typescript
+// 올바름 — 포커스는 복원하되 스크롤 이동 방지
+element.focus({ preventScroll: true });
+
+// 잘못됨 — 요소가 뷰포트 밖이면 브라우저가 자동 스크롤
+element.focus();
+```
