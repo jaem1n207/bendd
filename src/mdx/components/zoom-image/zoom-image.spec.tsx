@@ -379,6 +379,54 @@ describe('MDXZoomImage', () => {
       expect(screen.getByRole('dialog')).toBeDefined();
     });
 
+    it('포커스 복원 시 preventScroll: true로 호출한다', () => {
+      render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+      const img = screen.getByAltText('줌 테스트');
+      const focusSpy = vi.spyOn(img, 'focus');
+
+      fireEvent.click(img);
+      focusSpy.mockClear();
+
+      fireEvent.click(screen.getByRole('dialog'));
+      const clone = screen.getAllByAltText('줌 테스트')[1];
+      fireEvent.transitionEnd(clone);
+
+      expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+      focusSpy.mockRestore();
+    });
+
+    it('wheel로 닫을 때도 preventScroll: true로 포커스를 복원한다', () => {
+      render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+      const img = screen.getByAltText('줌 테스트');
+      const focusSpy = vi.spyOn(img, 'focus');
+
+      fireEvent.click(img);
+      focusSpy.mockClear();
+
+      fireEvent.wheel(screen.getByRole('dialog'), { deltaY: 100, deltaX: 0 });
+      const clone = screen.getAllByAltText('줌 테스트')[1];
+      fireEvent.transitionEnd(clone);
+
+      expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+      focusSpy.mockRestore();
+    });
+
+    it('Escape로 닫을 때도 preventScroll: true로 포커스를 복원한다', () => {
+      render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
+      const img = screen.getByAltText('줌 테스트');
+      const focusSpy = vi.spyOn(img, 'focus');
+
+      fireEvent.keyDown(img, { key: 'Enter' });
+      focusSpy.mockClear();
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+      const clone = screen.getAllByAltText('줌 테스트')[1];
+      fireEvent.transitionEnd(clone);
+
+      expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+      focusSpy.mockRestore();
+    });
+
     it('줌인→줌아웃→클릭으로 다시 줌인할 수 있다', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
       const img = screen.getByAltText('줌 테스트');
