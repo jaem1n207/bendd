@@ -181,7 +181,7 @@ function ZoomableImage({
   useEffect(() => {
     if (!zoomState && shouldRestoreFocus.current) {
       shouldRestoreFocus.current = false;
-      imgRef.current?.focus();
+      imgRef.current?.focus({ preventScroll: true });
     }
   }, [zoomState]);
 
