@@ -22,10 +22,15 @@ export function registerWebMCPTools(
 
   const controller = new AbortController();
 
-  for (const tool of tools) {
-    navigatorLike.modelContext.registerTool(tool, {
-      signal: controller.signal,
-    });
+  try {
+    for (const tool of tools) {
+      navigatorLike.modelContext.registerTool(tool, {
+        signal: controller.signal,
+      });
+    }
+  } catch (error) {
+    controller.abort();
+    throw error;
   }
 
   return () => {

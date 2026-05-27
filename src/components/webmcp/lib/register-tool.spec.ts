@@ -55,6 +55,29 @@ describe('registerWebMCPTools', () => {
     expect(firstOptions.signal.aborted).toBe(true);
   });
 
+  it('aborts already registered tools when a later registration throws', () => {
+    const registerError = new Error('register failed');
+    const registerTool = vi
+      .fn()
+      .mockImplementationOnce(() => {})
+      .mockImplementationOnce(() => {
+        throw registerError;
+      });
+    const navigatorMock = {
+      modelContext: { registerTool },
+    } as unknown as Navigator;
+    const tools = [createTool('get_site_context'), createTool('navigate_site')];
+
+    expect(() => registerWebMCPTools(tools, navigatorMock)).toThrow(
+      registerError
+    );
+
+    const firstOptions = registerTool.mock.calls[0][1] as {
+      signal: AbortSignal;
+    };
+    expect(firstOptions.signal.aborted).toBe(true);
+  });
+
   it('does nothing and returns a stable cleanup function when unsupported', () => {
     const cleanup = registerWebMCPTools([createTool('get_site_context')], {
       modelContext: undefined,
