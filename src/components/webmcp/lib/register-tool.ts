@@ -3,8 +3,9 @@ import type { AnyWebMCPToolDescriptor } from '@/components/webmcp/types/webmcp';
 const noop = () => {};
 
 export function hasModelContext(
-  navigatorLike: Navigator | undefined =
-    typeof navigator === 'undefined' ? undefined : navigator
+  navigatorLike: Navigator | undefined = typeof navigator === 'undefined'
+    ? undefined
+    : navigator
 ): navigatorLike is Navigator & {
   modelContext: NonNullable<Navigator['modelContext']>;
 } {
@@ -13,8 +14,9 @@ export function hasModelContext(
 
 export function registerWebMCPTools(
   tools: readonly AnyWebMCPToolDescriptor[],
-  navigatorLike: Navigator | undefined =
-    typeof navigator === 'undefined' ? undefined : navigator
+  navigatorLike: Navigator | undefined = typeof navigator === 'undefined'
+    ? undefined
+    : navigator
 ) {
   if (!hasModelContext(navigatorLike)) {
     return noop;

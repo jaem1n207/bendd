@@ -4,7 +4,10 @@ import {
   createToolDescriptor,
   webMCPSchemas,
 } from '@/components/webmcp/lib/schemas';
-import { hasModelContext, registerWebMCPTools } from '@/components/webmcp/lib/register-tool';
+import {
+  hasModelContext,
+  registerWebMCPTools,
+} from '@/components/webmcp/lib/register-tool';
 import type { WebMCPToolDescriptor } from '@/components/webmcp/types/webmcp';
 
 function createTool(name: string): WebMCPToolDescriptor {
