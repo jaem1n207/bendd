@@ -4,6 +4,17 @@ import { shuffleLetters } from '@/components/article/lib/shuffle-letters';
 import { Button } from '@/components/ui/button';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+type ShuffleLettersPayload = {
+  text: string;
+  iterations: number;
+  fps: number;
+};
+
+type AgentSubmitEvent = SubmitEvent & {
+  agentInvoked?: boolean;
+  respondWith?: (promise: Promise<unknown>) => void;
+};
+
 export default function ShuffleLettersDemo() {
   const [text, setText] = useState(
     '한글 English 123456789 @#$%^&*()_+-=[]{}|;:,.<>?'
@@ -29,19 +40,48 @@ export default function ShuffleLettersDemo() {
     }
   }, [text]);
 
+  const startAnimation = useCallback(
+    ({
+      text: nextText,
+      iterations: nextIterations,
+      fps: nextFps,
+    }: ShuffleLettersPayload) => {
+      if (isAnimating || !animatedTextRef.current) return false;
+
+      setText(nextText);
+      setIterations(nextIterations);
+      setFps(nextFps);
+      animatedTextRef.current.textContent = nextText;
+      setIsAnimating(true);
+      clearAnimationRef.current = shuffleLetters(animatedTextRef.current, {
+        iterations: nextIterations,
+        fps: nextFps,
+        onComplete: () => {
+          setIsAnimating(false);
+          clearAnimationRef.current = null;
+        },
+      });
+
+      return true;
+    },
+    [isAnimating]
+  );
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isAnimating) return;
+    const started = startAnimation({ text, iterations, fps });
+    const nativeEvent = e.nativeEvent as AgentSubmitEvent;
 
-    setIsAnimating(true);
-    clearAnimationRef.current = shuffleLetters(animatedTextRef.current!, {
-      iterations,
-      fps,
-      onComplete: () => {
-        setIsAnimating(false);
-        clearAnimationRef.current = null;
-      },
-    });
+    if (nativeEvent.agentInvoked && nativeEvent.respondWith) {
+      nativeEvent.respondWith(
+        Promise.resolve({
+          ok: started,
+          text,
+          iterations,
+          fps,
+        })
+      );
+    }
   };
 
   useEffect(() => {
@@ -54,6 +94,26 @@ export default function ShuffleLettersDemo() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isAnimating, stopAnimation]);
+
+  useEffect(() => {
+    const handleRun = (event: Event) => {
+      const { detail } = event as CustomEvent<ShuffleLettersPayload>;
+      if (!detail) return;
+      startAnimation(detail);
+    };
+
+    const handleStop = () => {
+      stopAnimation();
+    };
+
+    window.addEventListener('webmcp:run-shuffle-letters', handleRun);
+    window.addEventListener('webmcp:stop-shuffle-letters', handleStop);
+
+    return () => {
+      window.removeEventListener('webmcp:run-shuffle-letters', handleRun);
+      window.removeEventListener('webmcp:stop-shuffle-letters', handleStop);
+    };
+  }, [startAnimation, stopAnimation]);
 
   const isValid =
     text.trim() !== '' &&
@@ -71,23 +131,26 @@ export default function ShuffleLettersDemo() {
       </p>
 
       <form
+        aria-label="Shuffle letters playground"
+        toolname="run_shuffle_letters"
+        tooldescription="Runs the shuffle letters animation with visible form values."
+        toolautosubmit=""
         onSubmit={handleSubmit}
         className="w-full max-w-md rounded-lg p-6 shadow-md"
       >
         <h2 className="mb-4 text-xl font-semibold">옵션</h2>
 
         <div className="mb-4">
-          <label
-            htmlFor="text"
-            className="mb-2 block text-sm font-medium"
-          >
+          <label htmlFor="text" className="mb-2 block text-sm font-medium">
             text
           </label>
           <input
             id="text"
+            name="text"
             type="text"
             value={text}
             onChange={e => setText(e.target.value)}
+            toolparamdescription="Text to animate with the shuffle letters effect."
             className="w-full rounded-md border border-input px-3 py-2"
             required
           />
@@ -103,29 +166,30 @@ export default function ShuffleLettersDemo() {
             </label>
             <input
               id="iterations"
+              name="iterations"
               type="number"
               value={iterations}
               onChange={e => setIterations(Number(e.target.value))}
               min="1"
               max="50"
+              toolparamdescription="Number of random character replacements per letter. Use 1 through 50."
               className="w-full rounded-md border border-input px-3 py-2"
               required
             />
           </div>
           <div className="flex-1">
-            <label
-              htmlFor="fps"
-              className="mb-2 block text-sm font-medium"
-            >
+            <label htmlFor="fps" className="mb-2 block text-sm font-medium">
               fps
             </label>
             <input
               id="fps"
+              name="fps"
               type="number"
               value={fps}
               onChange={e => setFps(Number(e.target.value))}
               min="1"
               max="60"
+              toolparamdescription="Animation frames per second. Use 1 through 60."
               className="w-full rounded-md border border-input px-3 py-2"
               required
             />
