@@ -82,7 +82,18 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
 
   return (
     <main className="relative mx-auto my-0 min-h-screen max-w-2xl overflow-hidden px-6 py-32">
-      <section id="BenddDoc">
+      <section
+        id="BenddDoc"
+        data-webmcp-content
+        data-webmcp-content-type={type}
+        data-webmcp-slug={post.slug}
+        data-webmcp-title={title}
+        data-webmcp-published-at={publishedAt}
+        data-webmcp-description={description}
+        data-webmcp-summary={summary}
+        data-webmcp-series-id={seriesInfo?.id}
+        data-webmcp-series-name={seriesInfo?.name}
+      >
         <script
           type="application/ld+json"
           suppressHydrationWarning
@@ -124,11 +135,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
             })}
           </p>
         </Typography>
-        <Typography
-          variant="blockquote"
-          className="mt-6 break-keep"
-          asChild
-        >
+        <Typography variant="blockquote" className="mt-6 break-keep" asChild>
           <blockquote>
             <p>
               <strong>TL;DR</strong>: {description}

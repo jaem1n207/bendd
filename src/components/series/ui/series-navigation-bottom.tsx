@@ -26,6 +26,7 @@ export function SeriesNavigationBottom({
     >
       <Link
         href={seriesRoute(id)}
+        data-webmcp-series-target="series"
         className="mb-4 flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary"
       >
         <BookOpen className="size-4 shrink-0" />
@@ -39,6 +40,7 @@ export function SeriesNavigationBottom({
           {prev ? (
             <Link
               href={prev.href}
+              data-webmcp-series-target="previous"
               className="group flex flex-1 flex-col gap-1 rounded-md p-2 text-sm transition-colors hover:bg-muted"
             >
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -55,6 +57,7 @@ export function SeriesNavigationBottom({
           {next ? (
             <Link
               href={next.href}
+              data-webmcp-series-target="next"
               className="group flex flex-1 flex-col items-end gap-1 rounded-md p-2 text-sm transition-colors hover:bg-muted"
             >
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
