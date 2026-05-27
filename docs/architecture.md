@@ -125,10 +125,12 @@ browser session.
 The WebMCP surface is intentionally limited to safe visible actions:
 
 - internal navigation
+- route/action introspection
 - content metadata search
 - current article/craft context snippets
 - heading scroll
 - code block copy
+- current URL copy
 - theme and sound settings
 - shuffle letters playground execution
 

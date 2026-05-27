@@ -186,8 +186,8 @@ component barrel export rule. Import it as `@/components/webmcp`.
 
 Rules:
 
-- Always feature-detect `navigator.modelContext` before creating schemas,
-  scanning DOM, or registering tools.
+- Always feature-detect `navigator.modelContext` before building tool
+  descriptors, scanning DOM, fetching content, or registering tools.
 - Register tools during idle time through `registerWebMCPTools`.
 - Use `AbortController` cleanup for every registration lifecycle.
 - Keep tool outputs small. Article and craft tools may return metadata,
