@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 type SoundState = {
   isSoundEnabled: boolean;
   toggleSoundEnabled: () => void;
+  setSoundEnabled: (enabled: boolean) => void;
 };
 
 export const useSoundStore = create<SoundState>()(
@@ -12,6 +13,9 @@ export const useSoundStore = create<SoundState>()(
       isSoundEnabled: false,
       toggleSoundEnabled: () => {
         set({ isSoundEnabled: !get().isSoundEnabled });
+      },
+      setSoundEnabled: enabled => {
+        set({ isSoundEnabled: enabled });
       },
     }),
     {
