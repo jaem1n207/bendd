@@ -37,6 +37,16 @@ export type WebMCPToolDescriptor<Input = unknown, Output = unknown> = {
   ) => Output | Promise<Output>;
 };
 
+export type AnyWebMCPToolDescriptor = Omit<
+  WebMCPToolDescriptor<never, unknown>,
+  'execute'
+> & {
+  execute: (
+    input: never,
+    client: WebMCPModelContextClient
+  ) => unknown | Promise<unknown>;
+};
+
 export type WebMCPRegisterOptions = {
   signal?: AbortSignal;
   exposedTo?: readonly string[];
@@ -44,7 +54,7 @@ export type WebMCPRegisterOptions = {
 
 export type WebMCPModelContext = {
   registerTool: (
-    tool: WebMCPToolDescriptor,
+    tool: AnyWebMCPToolDescriptor,
     options?: WebMCPRegisterOptions
   ) => void;
 };

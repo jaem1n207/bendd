@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import {
+  createToolDescriptor,
+  webMCPSchemas,
+} from '@/components/webmcp/lib/schemas';
 import { hasModelContext, registerWebMCPTools } from '@/components/webmcp/lib/register-tool';
 import type { WebMCPToolDescriptor } from '@/components/webmcp/types/webmcp';
 
@@ -80,6 +84,21 @@ describe('registerWebMCPTools', () => {
 
   it('does nothing and returns a stable cleanup function when unsupported', () => {
     const cleanup = registerWebMCPTools([createTool('get_site_context')], {
+      modelContext: undefined,
+    } as unknown as Navigator);
+
+    expect(() => cleanup()).not.toThrow();
+  });
+
+  it('accepts strongly typed tool descriptors from createToolDescriptor', () => {
+    const typedTool = createToolDescriptor<{ enabled: boolean }, string>({
+      name: 'set_sound',
+      description: 'Set sound preference.',
+      inputSchema: webMCPSchemas.setSound,
+      execute: input => (input.enabled ? 'enabled' : 'disabled'),
+    });
+
+    const cleanup = registerWebMCPTools([typedTool], {
       modelContext: undefined,
     } as unknown as Navigator);
 

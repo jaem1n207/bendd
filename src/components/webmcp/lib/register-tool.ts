@@ -1,4 +1,4 @@
-import type { WebMCPToolDescriptor } from '@/components/webmcp/types/webmcp';
+import type { AnyWebMCPToolDescriptor } from '@/components/webmcp/types/webmcp';
 
 const noop = () => {};
 
@@ -12,7 +12,7 @@ export function hasModelContext(
 }
 
 export function registerWebMCPTools(
-  tools: readonly WebMCPToolDescriptor[],
+  tools: readonly AnyWebMCPToolDescriptor[],
   navigatorLike: Navigator | undefined =
     typeof navigator === 'undefined' ? undefined : navigator
 ) {
