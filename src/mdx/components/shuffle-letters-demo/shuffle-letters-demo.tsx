@@ -3,10 +3,9 @@
 import { shuffleLetters } from '@/components/article/lib/shuffle-letters';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { createMDXComponent } from '@/mdx/common/create-mdx-component';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
-
-import { createMDXComponent } from '../../common/create-mdx-component';
 
 const ShuffleLettersDemoSchema = z.object({
   initialText: z.string().optional().default('한글 English 123 @#$%'),
