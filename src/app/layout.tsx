@@ -30,6 +30,13 @@ const BrowserDetector = dynamic(
   }
 );
 
+const WebMCPProvider = dynamic(
+  () => import('@/components/webmcp').then(mod => mod.WebMCPProvider),
+  {
+    ssr: false,
+  }
+);
+
 const fontSans = FontSans({
   subsets: ['latin'],
   display: 'swap',
@@ -130,6 +137,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <WebMCPProvider />
           <TooltipProvider>
             <Signature />
             {children}
