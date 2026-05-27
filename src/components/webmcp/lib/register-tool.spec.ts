@@ -1,3 +1,4 @@
+/* eslint-disable playwright/no-standalone-expect */
 import { describe, expect, it, vi } from 'vitest';
 
 import {
