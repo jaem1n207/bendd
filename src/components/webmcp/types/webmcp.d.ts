@@ -1,0 +1,57 @@
+export type WebMCPJSONSchema = {
+  type: string;
+  properties?: Record<string, WebMCPJSONSchema>;
+  required?: string[];
+  additionalProperties?: boolean;
+  enum?: readonly string[];
+  const?: string | number | boolean;
+  title?: string;
+  description?: string;
+  minimum?: number;
+  maximum?: number;
+  anyOf?: readonly WebMCPJSONSchema[];
+};
+
+export type WebMCPToolAnnotations = {
+  readOnlyHint?: boolean;
+  destructiveHint?: boolean;
+  idempotentHint?: boolean;
+  openWorldHint?: boolean;
+};
+
+export type WebMCPToolDescriptor<Input = unknown, Output = unknown> = {
+  name: string;
+  description: string;
+  inputSchema: WebMCPJSONSchema;
+  annotations?: WebMCPToolAnnotations;
+  execute: (input: Input) => Output | Promise<Output>;
+};
+
+export type WebMCPRegisterOptions = {
+  signal?: AbortSignal;
+};
+
+export type WebMCPModelContext = {
+  registerTool: (
+    tool: WebMCPToolDescriptor,
+    options?: WebMCPRegisterOptions
+  ) => void;
+};
+
+declare global {
+  interface Navigator {
+    modelContext?: WebMCPModelContext;
+  }
+}
+
+declare module 'react' {
+  interface FormHTMLAttributes<T> {
+    toolname?: string;
+    tooldescription?: string;
+    toolautosubmit?: boolean | '';
+  }
+
+  interface HTMLAttributes<T> {
+    toolparamdescription?: string;
+  }
+}
