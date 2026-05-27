@@ -120,7 +120,11 @@ export function getCodeBlockText(index: number, docLike?: Document) {
 
 export function jumpToHeading(headingId: string, docLike?: Document) {
   const doc = getDocument(docLike);
-  const heading = doc.getElementById(headingId);
+  const root = getContentRoot(doc);
+  const heading = [
+    ...(root?.querySelectorAll<HTMLElement>('article h2[id], article h4[id]') ??
+      []),
+  ].find(candidate => candidate.id === headingId);
 
   if (!heading) {
     return {

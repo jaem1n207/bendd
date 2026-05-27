@@ -98,6 +98,21 @@ describe('content-snapshot', () => {
     });
   });
 
+  it('rejects headings outside the marked content article', () => {
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<h2 id="outside">Outside heading</h2>'
+    );
+    const outsideHeading = document.getElementById('outside') as HTMLElement;
+    outsideHeading.scrollIntoView = vi.fn();
+
+    expect(jumpToHeading('outside', document)).toEqual({
+      ok: false,
+      error: 'outside heading을 찾지 못했습니다.',
+    });
+    expect(outsideHeading.scrollIntoView).not.toHaveBeenCalled();
+  });
+
   it('finds series target hrefs from marked links', () => {
     expect(getSeriesTargetHref('series', document)).toEqual({
       ok: true,
