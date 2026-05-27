@@ -21,12 +21,20 @@ export type WebMCPToolAnnotations = {
   untrustedContentHint?: boolean;
 };
 
+export type WebMCPModelContextClient = {
+  requestUserInteraction?: (options?: { message?: string }) => Promise<void>;
+};
+
 export type WebMCPToolDescriptor<Input = unknown, Output = unknown> = {
   name: string;
+  title?: string;
   description: string;
   inputSchema: WebMCPJSONSchema;
   annotations?: WebMCPToolAnnotations;
-  execute: (input: Input) => Output | Promise<Output>;
+  execute: (
+    input: Input,
+    client: WebMCPModelContextClient
+  ) => Output | Promise<Output>;
 };
 
 export type WebMCPRegisterOptions = {

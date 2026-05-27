@@ -1,5 +1,6 @@
 import type {
   WebMCPJSONSchema,
+  WebMCPModelContextClient,
   WebMCPToolAnnotations,
   WebMCPToolDescriptor,
 } from '@/components/webmcp/types/webmcp';
@@ -122,19 +123,25 @@ export const webMCPSchemas = {
 
 export function createToolDescriptor<Input, Output>({
   name,
+  title,
   description,
   inputSchema,
   annotations,
   execute,
 }: {
   name: WebMCPToolName;
+  title?: string;
   description: string;
   inputSchema: WebMCPJSONSchema;
   annotations?: WebMCPToolAnnotations;
-  execute: (input: Input) => Output | Promise<Output>;
+  execute: (
+    input: Input,
+    client: WebMCPModelContextClient
+  ) => Output | Promise<Output>;
 }): WebMCPToolDescriptor<Input, Output> {
   return {
     name,
+    title,
     description,
     inputSchema,
     annotations,
