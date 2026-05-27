@@ -16,6 +16,7 @@ type SnapshotFailure = {
 
 const contentSelector = '[data-webmcp-content]';
 const codeBlockSelector = 'pre[data-webmcp-code-block]';
+const shuffleLettersPathname = '/playground/shuffle-letters';
 
 const baseActions: WebMCPToolName[] = [
   'navigate_site',
@@ -38,6 +39,13 @@ function getDocument(docLike: Document | undefined) {
 
 function getContentRoot(doc: Document) {
   return doc.querySelector<HTMLElement>(contentSelector);
+}
+
+function isShuffleLettersPathname(pathname: string) {
+  return (
+    pathname === shuffleLettersPathname ||
+    pathname === `${shuffleLettersPathname}/`
+  );
 }
 
 export function getCurrentContentContext(docLike?: Document) {
@@ -178,7 +186,7 @@ export function getPageActions(pathname: string, docLike?: Document) {
     actions.add('open_series');
   }
 
-  if (pathname.startsWith('/playground/shuffle-letters')) {
+  if (isShuffleLettersPathname(pathname)) {
     actions.add('run_shuffle_letters');
     actions.add('stop_shuffle_letters');
   }

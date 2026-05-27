@@ -140,4 +140,22 @@ describe('content-snapshot', () => {
       'open_series',
     ]);
   });
+
+  it('lists shuffle actions only on the exact shuffle playground route', () => {
+    expect(getPageActions('/playground/shuffle-letters', document)).toContain(
+      'run_shuffle_letters'
+    );
+    expect(getPageActions('/playground/shuffle-letters', document)).toContain(
+      'stop_shuffle_letters'
+    );
+    expect(getPageActions('/playground/shuffle-letters/', document)).toContain(
+      'run_shuffle_letters'
+    );
+    expect(
+      getPageActions('/playground/shuffle-letters-preview', document)
+    ).not.toContain('run_shuffle_letters');
+    expect(
+      getPageActions('/playground/shuffle-letters-preview', document)
+    ).not.toContain('stop_shuffle_letters');
+  });
 });
