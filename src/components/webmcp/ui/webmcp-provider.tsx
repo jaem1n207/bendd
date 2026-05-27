@@ -17,7 +17,7 @@ const requestIdleFallback = (callback: IdleRequestCallback) =>
   }, 0);
 
 export function WebMCPProvider() {
-  const tools = useWebMCPTools();
+  const buildTools = useWebMCPTools();
 
   useEffect(() => {
     if (!hasModelContext()) {
@@ -29,6 +29,7 @@ export function WebMCPProvider() {
     const cancelIdle = globalThis.cancelIdleCallback ?? window.clearTimeout;
 
     const idleId = requestIdle(() => {
+      const tools = buildTools();
       cleanup = registerWebMCPTools(tools);
     });
 
@@ -36,7 +37,7 @@ export function WebMCPProvider() {
       cancelIdle(idleId);
       cleanup();
     };
-  }, [tools]);
+  }, [buildTools]);
 
   return null;
 }

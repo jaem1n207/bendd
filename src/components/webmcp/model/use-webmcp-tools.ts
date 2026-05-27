@@ -3,7 +3,7 @@
 import { useTheme } from 'next-themes';
 import type { Route } from 'next';
 import { usePathname, useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { useSoundStore } from '@/components/sound';
 import {
@@ -15,6 +15,7 @@ import {
   createLazyContentIndexFetcher,
   createWebMCPHandlers,
 } from '@/components/webmcp/model/tool-handlers';
+import type { AnyWebMCPToolDescriptor } from '@/components/webmcp/types/webmcp';
 
 const fetchContentIndex = createLazyContentIndexFetcher();
 
@@ -25,7 +26,7 @@ export function useWebMCPTools() {
   const isSoundEnabled = useSoundStore(state => state.isSoundEnabled);
   const setSoundEnabled = useSoundStore(state => state.setSoundEnabled);
 
-  return useMemo(() => {
+  return useCallback((): AnyWebMCPToolDescriptor[] => {
     const handlers = createWebMCPHandlers({
       pathname,
       router: {

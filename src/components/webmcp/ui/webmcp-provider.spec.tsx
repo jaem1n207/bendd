@@ -1,22 +1,30 @@
 import { render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { AnyWebMCPToolDescriptor } from '@/components/webmcp/types/webmcp';
+
+const mocks = vi.hoisted(() => ({
+  buildTools: vi.fn((): AnyWebMCPToolDescriptor[] => []),
+}));
+
 vi.mock('@/components/webmcp/model/use-webmcp-tools', () => ({
-  useWebMCPTools: () => [
-    {
-      name: 'get_site_context',
-      description: 'Read site context.',
-      inputSchema: {
-        type: 'object',
-        properties: {},
-        additionalProperties: false,
-      },
-      execute: vi.fn(),
-    },
-  ],
+  useWebMCPTools: () => mocks.buildTools,
 }));
 
 import { WebMCPProvider } from '@/components/webmcp/ui/webmcp-provider';
+
+function createDescriptor(name: string): AnyWebMCPToolDescriptor {
+  return {
+    name,
+    description: `Register ${name}.`,
+    inputSchema: {
+      type: 'object',
+      properties: {},
+      additionalProperties: false,
+    },
+    execute: vi.fn(),
+  };
+}
 
 describe('WebMCPProvider', () => {
   let originalNavigatorDescriptor: PropertyDescriptor | undefined;
@@ -30,6 +38,7 @@ describe('WebMCPProvider', () => {
     );
     originalRequestIdleCallback = globalThis.requestIdleCallback;
     originalCancelIdleCallback = globalThis.cancelIdleCallback;
+    mocks.buildTools.mockReturnValue([createDescriptor('get_site_context')]);
   });
 
   afterEach(() => {
@@ -43,6 +52,8 @@ describe('WebMCPProvider', () => {
 
     globalThis.requestIdleCallback = originalRequestIdleCallback;
     globalThis.cancelIdleCallback = originalCancelIdleCallback;
+    document.body.innerHTML = '';
+    document.body.removeAttribute('data-committed-route');
     vi.clearAllMocks();
   });
 
@@ -107,5 +118,34 @@ describe('WebMCPProvider', () => {
 
     expect(globalThis.cancelIdleCallback).toHaveBeenCalledWith(123);
     expect(registerTool).not.toHaveBeenCalled();
+  });
+
+  it('builds route-filtered tools during idle after the committed DOM is current', () => {
+    const registerTool = vi.fn();
+    const idleCallbacks: IdleRequestCallback[] = [];
+    globalThis.requestIdleCallback = vi.fn((callback: IdleRequestCallback) => {
+      idleCallbacks.push(callback);
+      return idleCallbacks.length;
+    }) as typeof requestIdleCallback;
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: {
+        modelContext: { registerTool },
+      },
+    });
+    document.body.dataset.committedRoute = 'previous';
+    mocks.buildTools.mockImplementation(() => [
+      createDescriptor(
+        `${document.body.dataset.committedRoute ?? 'missing'}_tool`
+      ),
+    ]);
+
+    render(<WebMCPProvider />);
+
+    document.body.dataset.committedRoute = 'current';
+    idleCallbacks[0]({} as IdleDeadline);
+
+    expect(registerTool).toHaveBeenCalledTimes(1);
+    expect(registerTool.mock.calls[0][0].name).toBe('current_tool');
   });
 });
