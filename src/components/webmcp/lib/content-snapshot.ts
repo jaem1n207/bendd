@@ -6,7 +6,7 @@ type SeriesTarget = 'series' | 'previous' | 'next';
 type HeadingSnapshot = {
   id: string;
   title: string;
-  level: 2 | 4;
+  level: 2 | 3 | 4;
 };
 
 type SnapshotFailure = {
@@ -16,6 +16,7 @@ type SnapshotFailure = {
 
 const contentSelector = '[data-webmcp-content]';
 const codeBlockSelector = 'pre[data-webmcp-code-block]';
+const headingSelector = 'article h2[id], article h3[id], article h4[id]';
 const shuffleLettersPathname = '/playground/shuffle-letters';
 
 const baseActions: WebMCPToolName[] = [
@@ -60,13 +61,11 @@ export function getCurrentContentContext(docLike?: Document) {
   }
 
   const article = root.querySelector('article');
-  const headings = [
-    ...root.querySelectorAll<HTMLElement>('article h2[id], article h4[id]'),
-  ]
+  const headings = [...root.querySelectorAll<HTMLElement>(headingSelector)]
     .map(heading => ({
       id: heading.id,
       title: cleanText(heading.textContent),
-      level: Number(heading.tagName.slice(1)) as 2 | 4,
+      level: Number(heading.tagName.slice(1)) as 2 | 3 | 4,
     }))
     .filter((heading): heading is HeadingSnapshot =>
       Boolean(heading.id && heading.title)
@@ -130,8 +129,7 @@ export function jumpToHeading(headingId: string, docLike?: Document) {
   const doc = getDocument(docLike);
   const root = getContentRoot(doc);
   const heading = [
-    ...(root?.querySelectorAll<HTMLElement>('article h2[id], article h4[id]') ??
-      []),
+    ...(root?.querySelectorAll<HTMLElement>(headingSelector) ?? []),
   ].find(candidate => candidate.id === headingId);
 
   if (!heading) {

@@ -172,7 +172,12 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
         return fail('클립보드 API를 사용할 수 없습니다.');
       }
 
-      await deps.clipboard.writeText(href);
+      try {
+        await deps.clipboard.writeText(href);
+      } catch {
+        return fail('현재 URL을 클립보드에 복사하지 못했습니다.');
+      }
+
       return { ok: true, href };
     },
 
@@ -276,7 +281,12 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
         return fail('클립보드 API를 사용할 수 없습니다.');
       }
 
-      await deps.clipboard.writeText(result.text);
+      try {
+        await deps.clipboard.writeText(result.text);
+      } catch {
+        return fail('코드 블록을 클립보드에 복사하지 못했습니다.');
+      }
+
       return {
         ok: true,
         language: result.language,

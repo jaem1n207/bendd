@@ -30,6 +30,7 @@ describe('content-snapshot', () => {
           <article>
             <p>First paragraph that becomes a short excerpt for agent context.</p>
             <h2 id="overview">Overview</h2>
+            <h3 id="usage">Usage</h3>
             <h4 id="details">Details</h4>
             <pre data-webmcp-code-block><code>const value = 1;</code></pre>
           </article>
@@ -56,6 +57,7 @@ describe('content-snapshot', () => {
         'First paragraph that becomes a short excerpt for agent context.',
       headings: [
         { id: 'overview', title: 'Overview', level: 2 },
+        { id: 'usage', title: 'Usage', level: 3 },
         { id: 'details', title: 'Details', level: 4 },
       ],
     });
@@ -93,6 +95,19 @@ describe('content-snapshot', () => {
       title: 'Overview',
     });
     expect(heading.scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+
+    const h3 = document.getElementById('usage') as HTMLElement;
+    h3.scrollIntoView = vi.fn();
+
+    expect(jumpToHeading('usage', document)).toEqual({
+      ok: true,
+      headingId: 'usage',
+      title: 'Usage',
+    });
+    expect(h3.scrollIntoView).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'start',
     });

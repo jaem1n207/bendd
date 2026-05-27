@@ -119,8 +119,8 @@ unless the browser exposes `navigator.modelContext`.
 The provider registers route-relevant tools only during idle time and aborts
 the previous registration on route changes. Content search does not build a
 global index during page load. It fetches `/api/webmcp/content-index` only when
-the `find_content` tool runs, then reuses the in-memory result for the current
-browser session.
+the `find_content` or `open_content` tool runs, then reuses the in-memory result
+for the current browser session.
 
 The WebMCP surface is intentionally limited to safe visible actions:
 

@@ -222,6 +222,22 @@ describe('createWebMCPHandlers', () => {
     });
   });
 
+  it('returns structured failures when clipboard writes reject', async () => {
+    const handlers = createHandlers();
+
+    writeText.mockRejectedValueOnce(new DOMException('Denied'));
+    await expect(handlers.copyCurrentUrl()).resolves.toEqual({
+      ok: false,
+      error: '현재 URL을 클립보드에 복사하지 못했습니다.',
+    });
+
+    writeText.mockRejectedValueOnce(new DOMException('Denied'));
+    await expect(handlers.copyCodeBlock({ index: 0 })).resolves.toEqual({
+      ok: false,
+      error: '코드 블록을 클립보드에 복사하지 못했습니다.',
+    });
+  });
+
   it('returns page actions for the current route', () => {
     const handlers = createHandlers();
 
