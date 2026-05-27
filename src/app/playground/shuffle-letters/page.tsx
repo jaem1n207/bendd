@@ -15,6 +15,38 @@ type AgentSubmitEvent = SubmitEvent & {
   respondWith?: (promise: Promise<unknown>) => void;
 };
 
+function parseShuffleLettersPayload(
+  detail: unknown
+): ShuffleLettersPayload | null {
+  if (typeof detail !== 'object' || detail === null) return null;
+
+  const { text, iterations, fps } = detail as Partial<
+    Record<keyof ShuffleLettersPayload, unknown>
+  >;
+
+  if (typeof text !== 'string' || text.trim() === '') return null;
+  if (
+    typeof iterations !== 'number' ||
+    !Number.isFinite(iterations) ||
+    !Number.isInteger(iterations) ||
+    iterations < 1 ||
+    iterations > 50
+  ) {
+    return null;
+  }
+  if (
+    typeof fps !== 'number' ||
+    !Number.isFinite(fps) ||
+    !Number.isInteger(fps) ||
+    fps < 1 ||
+    fps > 60
+  ) {
+    return null;
+  }
+
+  return { text, iterations, fps };
+}
+
 export default function ShuffleLettersDemo() {
   const [text, setText] = useState(
     '한글 English 123456789 @#$%^&*()_+-=[]{}|;:,.<>?'
@@ -24,21 +56,20 @@ export default function ShuffleLettersDemo() {
   const [isAnimating, setIsAnimating] = useState(false);
   const animatedTextRef = useRef<HTMLDivElement>(null);
   const clearAnimationRef = useRef<(() => void) | null>(null);
+  const intendedDisplayTextRef = useRef(text);
 
   const stopAnimation = useCallback(() => {
     if (clearAnimationRef.current) {
       clearAnimationRef.current();
-      (
-        clearAnimationRef as React.MutableRefObject<(() => void) | null>
-      ).current = null;
+      clearAnimationRef.current = null;
       setIsAnimating(false);
 
       // 즉시 텍스트를 원래 상태로 되돌립니다.
       if (animatedTextRef.current) {
-        animatedTextRef.current.textContent = text;
+        animatedTextRef.current.textContent = intendedDisplayTextRef.current;
       }
     }
-  }, [text]);
+  }, []);
 
   const startAnimation = useCallback(
     ({
@@ -46,8 +77,9 @@ export default function ShuffleLettersDemo() {
       iterations: nextIterations,
       fps: nextFps,
     }: ShuffleLettersPayload) => {
-      if (isAnimating || !animatedTextRef.current) return false;
+      if (clearAnimationRef.current || !animatedTextRef.current) return false;
 
+      intendedDisplayTextRef.current = nextText;
       setText(nextText);
       setIterations(nextIterations);
       setFps(nextFps);
@@ -64,7 +96,7 @@ export default function ShuffleLettersDemo() {
 
       return true;
     },
-    [isAnimating]
+    []
   );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -97,9 +129,10 @@ export default function ShuffleLettersDemo() {
 
   useEffect(() => {
     const handleRun = (event: Event) => {
-      const { detail } = event as CustomEvent<ShuffleLettersPayload>;
-      if (!detail) return;
-      startAnimation(detail);
+      const { detail } = event as CustomEvent<unknown>;
+      const payload = parseShuffleLettersPayload(detail);
+      if (!payload) return;
+      startAnimation(payload);
     };
 
     const handleStop = () => {

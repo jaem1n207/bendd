@@ -111,4 +111,74 @@ describe('MDXShuffleLettersDemo WebMCP integration', () => {
 
     expect(shuffleMocks.stopAnimation).toHaveBeenCalledTimes(1);
   });
+
+  it('ignores duplicate run events while an animation is active', () => {
+    renderShuffleLettersDemo();
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent('webmcp:run-shuffle-letters', {
+          detail: {
+            text: 'First run',
+            iterations: 4,
+            fps: 12,
+          },
+        })
+      );
+      window.dispatchEvent(
+        new CustomEvent('webmcp:run-shuffle-letters', {
+          detail: {
+            text: 'Second run',
+            iterations: 5,
+            fps: 20,
+          },
+        })
+      );
+    });
+
+    expect(shuffleLetters).toHaveBeenCalledTimes(1);
+    expect(screen.getByDisplayValue('First run')).toBeDefined();
+  });
+
+  it.each([
+    ['missing detail', undefined],
+    ['empty text', { text: '   ', iterations: 4, fps: 12 }],
+    ['low iterations', { text: 'Invalid', iterations: 0, fps: 12 }],
+    ['high fps', { text: 'Invalid', iterations: 4, fps: 61 }],
+    ['NaN iterations', { text: 'Invalid', iterations: Number.NaN, fps: 12 }],
+    ['wrong text type', { text: 123, iterations: 4, fps: 12 }],
+    ['wrong iterations type', { text: 'Invalid', iterations: '4', fps: 12 }],
+    ['wrong fps type', { text: 'Invalid', iterations: 4, fps: '12' }],
+  ])('ignores invalid WebMCP run payloads: %s', (_caseName, detail) => {
+    renderShuffleLettersDemo();
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent('webmcp:run-shuffle-letters', {
+          detail,
+        })
+      );
+    });
+
+    expect(shuffleLetters).not.toHaveBeenCalled();
+  });
+
+  it('keeps agent text visible when run and stop are dispatched together', () => {
+    renderShuffleLettersDemo();
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent('webmcp:run-shuffle-letters', {
+          detail: {
+            text: 'Agent text survives stop',
+            iterations: 4,
+            fps: 12,
+          },
+        })
+      );
+      window.dispatchEvent(new CustomEvent('webmcp:stop-shuffle-letters'));
+    });
+
+    expect(screen.getByText('Agent text survives stop')).toBeDefined();
+  });
 });
