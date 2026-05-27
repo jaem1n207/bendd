@@ -10,6 +10,7 @@ export type WebMCPJSONSchema = {
   minimum?: number;
   maximum?: number;
   anyOf?: readonly WebMCPJSONSchema[];
+  oneOf?: readonly WebMCPJSONSchema[];
 };
 
 export type WebMCPToolAnnotations = {
@@ -17,6 +18,7 @@ export type WebMCPToolAnnotations = {
   destructiveHint?: boolean;
   idempotentHint?: boolean;
   openWorldHint?: boolean;
+  untrustedContentHint?: boolean;
 };
 
 export type WebMCPToolDescriptor<Input = unknown, Output = unknown> = {
@@ -29,6 +31,7 @@ export type WebMCPToolDescriptor<Input = unknown, Output = unknown> = {
 
 export type WebMCPRegisterOptions = {
   signal?: AbortSignal;
+  exposedTo?: readonly string[];
 };
 
 export type WebMCPModelContext = {
@@ -52,6 +55,7 @@ declare module 'react' {
   }
 
   interface HTMLAttributes<T> {
+    toolparamtitle?: string;
     toolparamdescription?: string;
   }
 }
