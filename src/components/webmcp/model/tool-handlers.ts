@@ -42,6 +42,7 @@ const destinations = {
   craft: '/craft',
   'shuffle-playground': '/playground/shuffle-letters',
 } as const;
+const shuffleLettersPathname = '/playground/shuffle-letters';
 
 function isRecord(input: unknown): input is Record<string, unknown> {
   return typeof input === 'object' && input !== null;
@@ -92,6 +93,10 @@ function includesText(item: WebMCPContentIndexItem, query: string) {
     .toLowerCase();
 
   return haystack.includes(query.toLowerCase());
+}
+
+function isShuffleLettersPathname(pathname: string) {
+  return pathname.startsWith(shuffleLettersPathname);
 }
 
 export function createLazyContentIndexFetcher(fetcher: typeof fetch = fetch) {
@@ -284,6 +289,10 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
     },
 
     runShuffleLetters(input: unknown) {
+      if (!isShuffleLettersPathname(deps.pathname)) {
+        return fail('shuffle letters 페이지에서만 실행할 수 있습니다.');
+      }
+
       const text = readString(input, 'text')?.trim();
       const iterations = readNumber(input, 'iterations');
       const fps = readNumber(input, 'fps');
@@ -315,6 +324,10 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
     },
 
     stopShuffleLetters() {
+      if (!isShuffleLettersPathname(deps.pathname)) {
+        return fail('shuffle letters 페이지에서만 실행할 수 있습니다.');
+      }
+
       deps.dispatchWindowEvent('webmcp:stop-shuffle-letters');
       return { ok: true };
     },

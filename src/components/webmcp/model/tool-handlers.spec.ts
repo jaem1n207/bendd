@@ -216,7 +216,7 @@ describe('createWebMCPHandlers', () => {
       'https://bendd.me/article/agentic-interfaces'
     );
     expect(writeText).toHaveBeenCalledWith('const value = 1;');
-    expect(handlers.copyCodeBlock({ index: -1 })).resolves.toEqual({
+    await expect(handlers.copyCodeBlock({ index: -1 })).resolves.toEqual({
       ok: false,
       error: 'index는 0 이상의 숫자여야 합니다.',
     });
@@ -283,6 +283,54 @@ describe('createWebMCPHandlers', () => {
     expect(dispatchWindowEvent).toHaveBeenCalledWith(
       'webmcp:stop-shuffle-letters'
     );
+  });
+
+  it('rejects runShuffleLetters outside the shuffle playground without dispatching', () => {
+    const dispatchWindowEvent = vi.fn();
+    const handlers = createWebMCPHandlers({
+      pathname: '/article/agentic-interfaces',
+      router: { push },
+      getTheme: () => 'light',
+      setTheme,
+      getSoundEnabled: () => false,
+      setSoundEnabled,
+      getCurrentHref: () => 'https://bendd.me/article/agentic-interfaces',
+      document,
+      clipboard: { writeText },
+      fetchContentIndex: async () => [],
+      dispatchWindowEvent,
+    });
+
+    expect(
+      handlers.runShuffleLetters({ text: 'Hello', iterations: 8, fps: 30 })
+    ).toEqual({
+      ok: false,
+      error: 'shuffle letters 페이지에서만 실행할 수 있습니다.',
+    });
+    expect(dispatchWindowEvent).not.toHaveBeenCalled();
+  });
+
+  it('rejects stopShuffleLetters outside the shuffle playground without dispatching', () => {
+    const dispatchWindowEvent = vi.fn();
+    const handlers = createWebMCPHandlers({
+      pathname: '/article/agentic-interfaces',
+      router: { push },
+      getTheme: () => 'light',
+      setTheme,
+      getSoundEnabled: () => false,
+      setSoundEnabled,
+      getCurrentHref: () => 'https://bendd.me/article/agentic-interfaces',
+      document,
+      clipboard: { writeText },
+      fetchContentIndex: async () => [],
+      dispatchWindowEvent,
+    });
+
+    expect(handlers.stopShuffleLetters()).toEqual({
+      ok: false,
+      error: 'shuffle letters 페이지에서만 실행할 수 있습니다.',
+    });
+    expect(dispatchWindowEvent).not.toHaveBeenCalled();
   });
 });
 
