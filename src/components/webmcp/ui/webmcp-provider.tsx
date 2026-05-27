@@ -16,6 +16,14 @@ const requestIdleFallback = (callback: IdleRequestCallback) =>
     });
   }, 0);
 
+function getDeclarativeToolNames(doc: Document) {
+  return new Set(
+    [...doc.querySelectorAll<HTMLFormElement>('form[toolname]')]
+      .map(form => form.getAttribute('toolname'))
+      .filter((name): name is string => Boolean(name))
+  );
+}
+
 export function WebMCPProvider() {
   const buildTools = useWebMCPTools();
 
@@ -29,7 +37,10 @@ export function WebMCPProvider() {
     const cancelIdle = globalThis.cancelIdleCallback ?? window.clearTimeout;
 
     const idleId = requestIdle(() => {
-      const tools = buildTools();
+      const declarativeToolNames = getDeclarativeToolNames(document);
+      const tools = buildTools().filter(
+        tool => !declarativeToolNames.has(tool.name)
+      );
       cleanup = registerWebMCPTools(tools);
     });
 

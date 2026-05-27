@@ -148,4 +148,38 @@ describe('WebMCPProvider', () => {
     expect(registerTool).toHaveBeenCalledTimes(1);
     expect(registerTool.mock.calls[0][0].name).toBe('current_tool');
   });
+
+  it('skips imperative tools already exposed by declarative forms', () => {
+    const registerTool = vi.fn(tool => {
+      if (tool.name === 'run_shuffle_letters') {
+        throw new Error('Duplicate tool name');
+      }
+    });
+    const idleCallbacks: IdleRequestCallback[] = [];
+    globalThis.requestIdleCallback = vi.fn((callback: IdleRequestCallback) => {
+      idleCallbacks.push(callback);
+      return idleCallbacks.length;
+    }) as typeof requestIdleCallback;
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: {
+        modelContext: { registerTool },
+      },
+    });
+    document.body.innerHTML = `
+      <form toolname="run_shuffle_letters">
+        <button type="submit">Run</button>
+      </form>
+    `;
+    mocks.buildTools.mockReturnValue([
+      createDescriptor('run_shuffle_letters'),
+      createDescriptor('stop_shuffle_letters'),
+    ]);
+
+    render(<WebMCPProvider />);
+
+    expect(() => idleCallbacks[0]({} as IdleDeadline)).not.toThrow();
+    expect(registerTool).toHaveBeenCalledTimes(1);
+    expect(registerTool.mock.calls[0][0].name).toBe('stop_shuffle_letters');
+  });
 });
