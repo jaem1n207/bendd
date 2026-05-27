@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { hasModelContext, registerWebMCPTools } from './register-tool';
-import type { WebMCPToolDescriptor } from '../types/webmcp';
+import { hasModelContext, registerWebMCPTools } from '@/components/webmcp/lib/register-tool';
+import type { WebMCPToolDescriptor } from '@/components/webmcp/types/webmcp';
 
 function createTool(name: string): WebMCPToolDescriptor {
   return {
