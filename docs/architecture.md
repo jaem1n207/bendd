@@ -109,3 +109,28 @@ src/components/{domain}/model/    <- 직접 import 금지
 - `X-Frame-Options: DENY` (iframe 삽입 차단)
 - `Strict-Transport-Security` (HTTPS 강제)
 - `X-Content-Type-Options: nosniff`
+
+## WebMCP
+
+WebMCP is implemented as a progressive enhancement. The root layout dynamically
+mounts `WebMCPProvider` with `ssr: false`, and the provider exits immediately
+unless the browser exposes `navigator.modelContext`.
+
+The provider registers route-relevant tools only during idle time and aborts
+the previous registration on route changes. Content search does not build a
+global index during page load. It fetches `/api/webmcp/content-index` only when
+the `find_content` tool runs, then reuses the in-memory result for the current
+browser session.
+
+The WebMCP surface is intentionally limited to safe visible actions:
+
+- internal navigation
+- content metadata search
+- current article/craft context snippets
+- heading scroll
+- code block copy
+- theme and sound settings
+- shuffle letters playground execution
+
+External links and `mailto:` links are not opened automatically by WebMCP tools.
+Cross-origin iframes do not receive `allow="tools"`.

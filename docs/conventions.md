@@ -178,3 +178,23 @@ Inter (sans)와 Fira Mono (mono)를 Google Fonts에서 로드한다. CSS 변수�
 - `--font-mono` -> Fira Mono
 
 `display: 'swap'` 설정으로 FOUT를 방지한다. 필요한 weight만 로드한다 (전체 로드 금지).
+
+## WebMCP
+
+WebMCP code lives under `src/components/webmcp/` and follows the domain
+component barrel export rule. Import it as `@/components/webmcp`.
+
+Rules:
+
+- Always feature-detect `navigator.modelContext` before creating schemas,
+  scanning DOM, or registering tools.
+- Register tools during idle time through `registerWebMCPTools`.
+- Use `AbortController` cleanup for every registration lifecycle.
+- Keep tool outputs small. Article and craft tools may return metadata,
+  TL;DR, headings, and short excerpts, but not full MDX bodies.
+- Keep external navigation manual. WebMCP tools may return external URLs but
+  must not automatically open them.
+- Add declarative attributes only to real forms with visible user-facing
+  controls.
+- Use HSL CSS variables for `:tool-form-active` and `:tool-submit-active`
+  styles.
