@@ -1,5 +1,7 @@
 import { createWebMCPContentIndex } from '@/components/webmcp/lib/content-index';
 
+export const dynamic = 'force-static';
+
 export function GET() {
   return Response.json(
     { items: createWebMCPContentIndex() },
