@@ -96,7 +96,10 @@ function includesText(item: WebMCPContentIndexItem, query: string) {
 }
 
 function isShuffleLettersPathname(pathname: string) {
-  return pathname.startsWith(shuffleLettersPathname);
+  return (
+    pathname === shuffleLettersPathname ||
+    pathname === `${shuffleLettersPathname}/`
+  );
 }
 
 export function createLazyContentIndexFetcher(fetcher: typeof fetch = fetch) {

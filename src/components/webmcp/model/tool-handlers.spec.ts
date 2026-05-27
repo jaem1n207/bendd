@@ -310,6 +310,32 @@ describe('createWebMCPHandlers', () => {
     expect(dispatchWindowEvent).not.toHaveBeenCalled();
   });
 
+  it('rejects runShuffleLetters on sibling-prefix paths without dispatching', () => {
+    const dispatchWindowEvent = vi.fn();
+    const handlers = createWebMCPHandlers({
+      pathname: '/playground/shuffle-letters-preview',
+      router: { push },
+      getTheme: () => 'light',
+      setTheme,
+      getSoundEnabled: () => false,
+      setSoundEnabled,
+      getCurrentHref: () =>
+        'https://bendd.me/playground/shuffle-letters-preview',
+      document,
+      clipboard: { writeText },
+      fetchContentIndex: async () => [],
+      dispatchWindowEvent,
+    });
+
+    expect(
+      handlers.runShuffleLetters({ text: 'Hello', iterations: 8, fps: 30 })
+    ).toEqual({
+      ok: false,
+      error: 'shuffle letters 페이지에서만 실행할 수 있습니다.',
+    });
+    expect(dispatchWindowEvent).not.toHaveBeenCalled();
+  });
+
   it('rejects stopShuffleLetters outside the shuffle playground without dispatching', () => {
     const dispatchWindowEvent = vi.fn();
     const handlers = createWebMCPHandlers({
@@ -320,6 +346,30 @@ describe('createWebMCPHandlers', () => {
       getSoundEnabled: () => false,
       setSoundEnabled,
       getCurrentHref: () => 'https://bendd.me/article/agentic-interfaces',
+      document,
+      clipboard: { writeText },
+      fetchContentIndex: async () => [],
+      dispatchWindowEvent,
+    });
+
+    expect(handlers.stopShuffleLetters()).toEqual({
+      ok: false,
+      error: 'shuffle letters 페이지에서만 실행할 수 있습니다.',
+    });
+    expect(dispatchWindowEvent).not.toHaveBeenCalled();
+  });
+
+  it('rejects stopShuffleLetters on sibling-prefix paths without dispatching', () => {
+    const dispatchWindowEvent = vi.fn();
+    const handlers = createWebMCPHandlers({
+      pathname: '/playground/shuffle-letters-preview',
+      router: { push },
+      getTheme: () => 'light',
+      setTheme,
+      getSoundEnabled: () => false,
+      setSoundEnabled,
+      getCurrentHref: () =>
+        'https://bendd.me/playground/shuffle-letters-preview',
       document,
       clipboard: { writeText },
       fetchContentIndex: async () => [],
