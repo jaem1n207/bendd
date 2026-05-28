@@ -72,6 +72,24 @@ describe('content-snapshot', () => {
     });
   });
 
+  it('returns a structured failure when required content metadata is invalid', () => {
+    document.body.innerHTML = `
+      <section
+        data-webmcp-content
+        data-webmcp-content-type="page"
+        data-webmcp-slug=""
+        data-webmcp-title=""
+      >
+        <article><p>Invalid metadata.</p></article>
+      </section>
+    `;
+
+    expect(getCurrentContentContext(document)).toEqual({
+      ok: false,
+      error: 'WebMCP 콘텐츠 메타데이터가 올바르지 않습니다.',
+    });
+  });
+
   it('reads code block text by zero-based index', () => {
     expect(getCodeBlockText(0, document)).toEqual({
       ok: true,
@@ -136,6 +154,18 @@ describe('content-snapshot', () => {
     expect(getSeriesTargetHref('next', document)).toEqual({
       ok: false,
       error: 'next 시리즈 이동 링크를 찾지 못했습니다.',
+    });
+  });
+
+  it('rejects marked series links without hrefs', () => {
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<a data-webmcp-series-target="next">Next</a>'
+    );
+
+    expect(getSeriesTargetHref('next', document)).toEqual({
+      ok: false,
+      error: 'next 시리즈 이동 링크에 href가 없습니다.',
     });
   });
 

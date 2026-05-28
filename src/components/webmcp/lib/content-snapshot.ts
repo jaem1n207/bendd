@@ -49,6 +49,10 @@ function isShuffleLettersPathname(pathname: string) {
   );
 }
 
+function isContentType(value: string | undefined): value is ContentType {
+  return value === 'article' || value === 'craft';
+}
+
 export function getCurrentContentContext(docLike?: Document) {
   const doc = getDocument(docLike);
   const root = getContentRoot(doc);
@@ -57,6 +61,17 @@ export function getCurrentContentContext(docLike?: Document) {
     return {
       ok: false,
       error: '현재 페이지에는 WebMCP 콘텐츠 컨텍스트가 없습니다.',
+    } satisfies SnapshotFailure;
+  }
+
+  const type = root.dataset.webmcpContentType;
+  const slug = root.dataset.webmcpSlug;
+  const title = root.dataset.webmcpTitle;
+
+  if (!isContentType(type) || !slug || !title) {
+    return {
+      ok: false,
+      error: 'WebMCP 콘텐츠 메타데이터가 올바르지 않습니다.',
     } satisfies SnapshotFailure;
   }
 
@@ -79,9 +94,9 @@ export function getCurrentContentContext(docLike?: Document) {
 
   return {
     ok: true,
-    type: root.dataset.webmcpContentType as ContentType,
-    slug: root.dataset.webmcpSlug ?? '',
-    title: root.dataset.webmcpTitle ?? '',
+    type,
+    slug,
+    title,
     publishedAt: root.dataset.webmcpPublishedAt ?? '',
     description: root.dataset.webmcpDescription ?? '',
     summary: root.dataset.webmcpSummary ?? '',
@@ -161,9 +176,18 @@ export function getSeriesTargetHref(target: SeriesTarget, docLike?: Document) {
     } satisfies SnapshotFailure;
   }
 
+  const href = link.getAttribute('href');
+
+  if (!href) {
+    return {
+      ok: false,
+      error: `${target} 시리즈 이동 링크에 href가 없습니다.`,
+    } satisfies SnapshotFailure;
+  }
+
   return {
     ok: true,
-    href: link.getAttribute('href') ?? '',
+    href,
   };
 }
 
