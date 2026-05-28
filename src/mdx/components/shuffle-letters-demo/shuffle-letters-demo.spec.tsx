@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const shuffleMocks = vi.hoisted(() => {
@@ -24,6 +24,32 @@ function renderShuffleLettersDemo() {
       initialFps={40}
     />
   );
+}
+
+function submitFormAsAgent() {
+  const form = screen.getByRole('form', {
+    name: 'Shuffle letters playground',
+  });
+  const respondWith = vi.fn();
+  const event = new Event('submit', {
+    bubbles: true,
+    cancelable: true,
+  });
+
+  Object.defineProperties(event, {
+    agentInvoked: {
+      value: true,
+    },
+    respondWith: {
+      value: respondWith,
+    },
+  });
+
+  act(() => {
+    form.dispatchEvent(event);
+  });
+
+  return respondWith;
 }
 
 describe('MDXShuffleLettersDemo WebMCP integration', () => {
@@ -87,6 +113,58 @@ describe('MDXShuffleLettersDemo WebMCP integration', () => {
         iterations: 9,
         fps: 24,
       })
+    );
+  });
+
+  it('responds with sanitized values when an agent submits the form', async () => {
+    renderShuffleLettersDemo();
+
+    fireEvent.change(screen.getByLabelText('텍스트'), {
+      target: { value: 'Agent submit text' },
+    });
+    fireEvent.change(screen.getByLabelText('iterations (1-50)'), {
+      target: { value: '9' },
+    });
+    fireEvent.change(screen.getByLabelText('fps (1-60)'), {
+      target: { value: '24' },
+    });
+
+    const respondWith = submitFormAsAgent();
+
+    expect(respondWith).toHaveBeenCalledTimes(1);
+    await expect(respondWith.mock.calls[0][0]).resolves.toEqual({
+      ok: true,
+      text: 'Agent submit text',
+      iterations: 9,
+      fps: 24,
+    });
+    expect(screen.getByDisplayValue('Agent submit text')).toBeDefined();
+    expect(shuffleLetters).toHaveBeenCalledWith(
+      expect.any(HTMLDivElement),
+      expect.objectContaining({
+        iterations: 9,
+        fps: 24,
+      })
+    );
+  });
+
+  it('responds with a failure and does not animate invalid agent submits', async () => {
+    renderShuffleLettersDemo();
+
+    fireEvent.change(screen.getByLabelText('텍스트'), {
+      target: { value: '   ' },
+    });
+
+    const respondWith = submitFormAsAgent();
+
+    expect(respondWith).toHaveBeenCalledTimes(1);
+    await expect(respondWith.mock.calls[0][0]).resolves.toEqual({
+      ok: false,
+      error: 'text, iterations, fps 값이 올바르지 않습니다.',
+    });
+    expect(shuffleLetters).not.toHaveBeenCalled();
+    expect((screen.getByLabelText('텍스트') as HTMLInputElement).value).toBe(
+      '   '
     );
   });
 

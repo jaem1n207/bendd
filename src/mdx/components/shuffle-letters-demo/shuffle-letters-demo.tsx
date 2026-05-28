@@ -26,6 +26,11 @@ type AgentSubmitEvent = SubmitEvent & {
   respondWith?: (promise: Promise<unknown>) => void;
 };
 
+const invalidPayloadResponse = {
+  ok: false,
+  error: 'text, iterations, fps 값이 올바르지 않습니다.',
+} as const;
+
 function parseShuffleLettersPayload(
   detail: unknown
 ): ShuffleLettersPayload | null {
@@ -114,17 +119,22 @@ function ShuffleLettersDemo({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const started = startAnimation({ text, iterations, fps });
+    const payload = parseShuffleLettersPayload({ text, iterations, fps });
+    const started = payload ? startAnimation(payload) : false;
     const nativeEvent = e.nativeEvent as AgentSubmitEvent;
 
     if (nativeEvent.agentInvoked && nativeEvent.respondWith) {
       nativeEvent.respondWith(
-        Promise.resolve({
-          ok: started,
-          text,
-          iterations,
-          fps,
-        })
+        Promise.resolve(
+          payload
+            ? {
+                ok: started,
+                text: payload.text,
+                iterations: payload.iterations,
+                fps: payload.fps,
+              }
+            : invalidPayloadResponse
+        )
       );
     }
   };
