@@ -182,4 +182,29 @@ describe('WebMCPProvider', () => {
     expect(registerTool).toHaveBeenCalledTimes(1);
     expect(registerTool.mock.calls[0][0].name).toBe('stop_shuffle_letters');
   });
+
+  it('keeps cleanup safe when tool registration throws during idle', () => {
+    const registerTool = vi.fn(() => {
+      throw new Error('Registration failed');
+    });
+    const idleCallbacks: IdleRequestCallback[] = [];
+    globalThis.requestIdleCallback = vi.fn((callback: IdleRequestCallback) => {
+      idleCallbacks.push(callback);
+      return idleCallbacks.length;
+    }) as typeof requestIdleCallback;
+    globalThis.cancelIdleCallback = vi.fn() as typeof cancelIdleCallback;
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: {
+        modelContext: { registerTool },
+      },
+    });
+    mocks.buildTools.mockReturnValue([createDescriptor('get_site_context')]);
+
+    const { unmount } = render(<WebMCPProvider />);
+
+    expect(() => idleCallbacks[0]({} as IdleDeadline)).not.toThrow();
+    expect(registerTool).toHaveBeenCalledTimes(1);
+    expect(() => unmount()).not.toThrow();
+  });
 });

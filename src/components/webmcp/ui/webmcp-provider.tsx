@@ -37,11 +37,15 @@ export function WebMCPProvider() {
     const cancelIdle = globalThis.cancelIdleCallback ?? window.clearTimeout;
 
     const idleId = requestIdle(() => {
-      const declarativeToolNames = getDeclarativeToolNames(document);
-      const tools = buildTools().filter(
-        tool => !declarativeToolNames.has(tool.name)
-      );
-      cleanup = registerWebMCPTools(tools);
+      try {
+        const declarativeToolNames = getDeclarativeToolNames(document);
+        const tools = buildTools().filter(
+          tool => !declarativeToolNames.has(tool.name)
+        );
+        cleanup = registerWebMCPTools(tools);
+      } catch {
+        cleanup = () => {};
+      }
     });
 
     return () => {
