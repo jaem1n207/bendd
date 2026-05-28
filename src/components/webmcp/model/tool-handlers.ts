@@ -114,7 +114,11 @@ export function createLazyContentIndexFetcher(fetcher: typeof fetch = fetch) {
 
         return response.json();
       })
-      .then((body: { items?: WebMCPContentIndexItem[] }) => body.items ?? []);
+      .then((body: { items?: WebMCPContentIndexItem[] }) => body.items ?? [])
+      .catch(error => {
+        cached = undefined;
+        throw error;
+      });
 
     return cached;
   };

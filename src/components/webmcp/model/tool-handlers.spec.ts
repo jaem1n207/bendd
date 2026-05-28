@@ -427,4 +427,24 @@ describe('createLazyContentIndexFetcher', () => {
       'WebMCP 콘텐츠 인덱스를 불러오지 못했습니다.'
     );
   });
+
+  it('clears a failed fetch so a later call can retry', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ items: [] }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ items: [] }),
+      }) as unknown as typeof fetch;
+    const load = createLazyContentIndexFetcher(fetcher);
+
+    await expect(load()).rejects.toThrow(
+      'WebMCP 콘텐츠 인덱스를 불러오지 못했습니다.'
+    );
+    await expect(load()).resolves.toEqual([]);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
 });
