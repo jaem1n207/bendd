@@ -19,6 +19,7 @@ export function SeriesNavigationTop({
     >
       <Link
         href={seriesRoute(id)}
+        data-webmcp-series-target="series"
         className="mb-4 flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary"
       >
         <BookOpen className="size-4 shrink-0" />

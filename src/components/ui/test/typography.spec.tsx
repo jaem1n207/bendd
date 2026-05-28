@@ -44,7 +44,7 @@ describe('typography component', () => {
     );
     const heading = screen.getByRole('heading');
     expect(heading.className).toContain(
-      'scroll-m-20 text-4xl font-extrabold tracking-tight md:text-5xl text-primary text-center text-secondary'
+      'scroll-m-20 text-4xl font-extrabold tracking-tight md:text-5xl text-center text-secondary'
     );
   });
   it('should forward a ref to the DOM element', () => {

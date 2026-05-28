@@ -10,6 +10,7 @@
 .pnpm-store/
 .omc/
 .claude/
+.worktrees/
 
 # ide
 .idea/

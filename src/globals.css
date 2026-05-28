@@ -114,6 +114,16 @@
     @apply font-bold no-underline;
   }
 
+  form:tool-form-active {
+    outline: hsl(var(--ring)) dashed 1px;
+    outline-offset: 4px;
+  }
+
+  button:tool-submit-active {
+    outline: hsl(var(--primary)) dashed 1px;
+    outline-offset: 2px;
+  }
+
   .browser-icon {
     display: inline-block;
     width: 14px;

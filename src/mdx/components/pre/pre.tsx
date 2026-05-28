@@ -12,6 +12,7 @@ export function MDXPre({ children, ...props }: HTMLAttributes<HTMLPreElement>) {
     <div className="relative">
       <pre
         ref={preRef}
+        data-webmcp-code-block
         className={cn(
           'my-0 overflow-x-auto rounded-lg border border-solid border-border px-0 py-3',
           'contrast-more:border-current contrast-more:dark:border-current'
