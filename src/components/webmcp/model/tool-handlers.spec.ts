@@ -40,6 +40,7 @@ describe('createWebMCPHandlers', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    document.execCommand = vi.fn(() => false);
     document.head.innerHTML = `
       <title>Agentic interfaces</title>
       <link rel="canonical" href="https://bendd.me/article/agentic-interfaces">
@@ -236,6 +237,29 @@ describe('createWebMCPHandlers', () => {
       ok: false,
       error: '코드 블록을 클립보드에 복사하지 못했습니다.',
     });
+  });
+
+  it('falls back to selection copy when the async clipboard is denied', async () => {
+    const handlers = createHandlers();
+
+    writeText.mockRejectedValueOnce(new DOMException('Denied'));
+    vi.mocked(document.execCommand).mockReturnValueOnce(true);
+
+    await expect(handlers.copyCurrentUrl()).resolves.toEqual({
+      ok: true,
+      href: 'https://bendd.me/article/agentic-interfaces',
+    });
+    expect(document.execCommand).toHaveBeenCalledWith('copy');
+
+    writeText.mockRejectedValueOnce(new DOMException('Denied'));
+    vi.mocked(document.execCommand).mockReturnValueOnce(true);
+
+    await expect(handlers.copyCodeBlock({ index: 0 })).resolves.toEqual({
+      ok: true,
+      language: 'ts',
+      characterCount: 16,
+    });
+    expect(document.execCommand).toHaveBeenCalledWith('copy');
   });
 
   it('returns page actions for the current route', () => {

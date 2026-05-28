@@ -102,6 +102,51 @@ function isShuffleLettersPathname(pathname: string) {
   );
 }
 
+function copyTextWithSelection(text: string, doc: Document) {
+  if (!doc.body || typeof doc.execCommand !== 'function') {
+    return false;
+  }
+
+  const textarea = doc.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.top = '0';
+  textarea.style.left = '0';
+  textarea.style.opacity = '0';
+  doc.body.appendChild(textarea);
+
+  try {
+    textarea.focus();
+    textarea.select();
+    return doc.execCommand('copy');
+  } finally {
+    textarea.remove();
+  }
+}
+
+async function writeClipboardText(
+  text: string,
+  {
+    clipboard,
+    document: doc,
+  }: {
+    clipboard?: ClipboardLike;
+    document: Document;
+  }
+) {
+  if (clipboard) {
+    try {
+      await clipboard.writeText(text);
+      return true;
+    } catch {
+      return copyTextWithSelection(text, doc);
+    }
+  }
+
+  return copyTextWithSelection(text, doc);
+}
+
 export function createLazyContentIndexFetcher(fetcher: typeof fetch = fetch) {
   let cached: Promise<WebMCPContentIndexItem[]> | undefined;
 
@@ -172,13 +217,12 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
     async copyCurrentUrl() {
       const href = deps.getCurrentHref();
 
-      if (!deps.clipboard) {
-        return fail('클립보드 API를 사용할 수 없습니다.');
-      }
-
-      try {
-        await deps.clipboard.writeText(href);
-      } catch {
+      if (
+        !(await writeClipboardText(href, {
+          clipboard: deps.clipboard,
+          document: deps.document,
+        }))
+      ) {
         return fail('현재 URL을 클립보드에 복사하지 못했습니다.');
       }
 
@@ -281,13 +325,12 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
         return result;
       }
 
-      if (!deps.clipboard) {
-        return fail('클립보드 API를 사용할 수 없습니다.');
-      }
-
-      try {
-        await deps.clipboard.writeText(result.text);
-      } catch {
+      if (
+        !(await writeClipboardText(result.text, {
+          clipboard: deps.clipboard,
+          document: deps.document,
+        }))
+      ) {
         return fail('코드 블록을 클립보드에 복사하지 못했습니다.');
       }
 
