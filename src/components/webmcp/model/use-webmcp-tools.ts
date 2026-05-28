@@ -19,6 +19,10 @@ import type { AnyWebMCPToolDescriptor } from '@/components/webmcp/types/webmcp';
 
 const fetchContentIndex = createLazyContentIndexFetcher();
 
+export function getVisibleTheme(doc: Document = document) {
+  return doc.documentElement.classList.contains('dark') ? 'dark' : 'light';
+}
+
 export function useWebMCPTools() {
   const pathname = usePathname();
   const router = useRouter();
@@ -34,7 +38,7 @@ export function useWebMCPTools() {
           router.push(href as Route);
         },
       },
-      getTheme: () => (resolvedTheme === 'dark' ? 'dark' : 'light'),
+      getTheme: () => getVisibleTheme(document),
       setTheme,
       getSoundEnabled: () => isSoundEnabled,
       setSoundEnabled,
