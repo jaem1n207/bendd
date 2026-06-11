@@ -24,7 +24,7 @@ const Signature = dynamic(
 
 const BrowserDetector = dynamic(
   () =>
-    import('../components/browser-detector').then(mod => mod.BrowserDetector),
+    import('@/components/browser-detector').then(mod => mod.BrowserDetector),
   {
     ssr: false,
   }
