@@ -62,6 +62,17 @@ describe('shuffleLetters', () => {
     expect(() => shuffleLetters(element, { fps: 61 })).toThrow(RangeError);
   });
 
+  it('should throw error if iterations or fps is not a finite number', () => {
+    // NaN이 통과하면 stepDuration 비교가 항상 false가 되어 rAF 루프가 끝나지 않는다
+    expect(() => shuffleLetters(element, { iterations: NaN })).toThrow(
+      RangeError
+    );
+    expect(() => shuffleLetters(element, { fps: NaN })).toThrow(RangeError);
+    expect(() => shuffleLetters(element, { fps: Infinity })).toThrow(
+      RangeError
+    );
+  });
+
   it('should throw error if first argument is not HTMLElement', () => {
     const invalidElement = 'h1' as unknown as HTMLElement; // 잘못된 타입의 요소
     expect(() => shuffleLetters(invalidElement)).toThrow(TypeError);
