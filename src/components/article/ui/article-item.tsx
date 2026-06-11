@@ -28,47 +28,53 @@ export function ArticleItem({
   const [publishedAtRef, animatePublishedAt] = useAnimate();
 
   useEffect(() => {
-    if (isInView) {
-      const delay = index * 0.15;
-      const duration = 1;
+    if (!isInView) return;
 
-      animateName(nameRef.current, { opacity: [0, 1] }, { duration, delay });
-      if (nameRef.current) {
+    const delay = index * 0.15;
+    const duration = 1;
+    // 언마운트 후에도 셔플 애니메이션이 분리된 DOM을 계속 변경하지 않도록 정리
+    const cancelShuffles: Array<() => void> = [];
+
+    animateName(nameRef.current, { opacity: [0, 1] }, { duration, delay });
+    if (nameRef.current) {
+      cancelShuffles.push(
         shuffleLetters(nameRef.current, {
           iterations: 10,
-        });
-      }
-
-      animateSummary(
-        summaryRef.current,
-        { opacity: [0, 1] },
-        { duration, delay }
+        })
       );
-      if (summaryRef.current) {
+    }
+
+    animateSummary(summaryRef.current, { opacity: [0, 1] }, { duration, delay });
+    if (summaryRef.current) {
+      cancelShuffles.push(
         shuffleLetters(summaryRef.current, {
           iterations: 15,
-        });
-      }
-
-      animateLine(
-        lineRef.current,
-        { scaleX: [0, 1], opacity: [1, 0.5] },
-        {
-          duration,
-          delay,
-          type: 'spring',
-        }
+        })
       );
-
-      animatePublishedAt(
-        publishedAtRef.current,
-        { opacity: [0, 1] },
-        { duration, delay }
-      );
-      if (publishedAtRef.current) {
-        shuffleLetters(publishedAtRef.current);
-      }
     }
+
+    animateLine(
+      lineRef.current,
+      { scaleX: [0, 1], opacity: [1, 0.5] },
+      {
+        duration,
+        delay,
+        type: 'spring',
+      }
+    );
+
+    animatePublishedAt(
+      publishedAtRef.current,
+      { opacity: [0, 1] },
+      { duration, delay }
+    );
+    if (publishedAtRef.current) {
+      cancelShuffles.push(shuffleLetters(publishedAtRef.current));
+    }
+
+    return () => {
+      cancelShuffles.forEach(cancel => cancel());
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInView]);
 

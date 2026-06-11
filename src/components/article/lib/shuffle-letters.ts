@@ -95,14 +95,7 @@ export function shuffleLetters(
 
   element.textContent = '';
 
-  let timeout: NodeJS.Timeout | null = null;
-
-  const shuffle = (start: number): void => {
-    if (start > charsPositions.length) {
-      options.onComplete(element);
-      return;
-    }
-
+  const renderStep = (start: number): void => {
     const shuffledChars = [...charsArray];
     for (let i = Math.max(start, 0); i < charsPositions.length; i++) {
       if (i < start + options.iterations) {
@@ -118,13 +111,42 @@ export function shuffleLetters(
     }
 
     element.textContent = shuffledChars.join('');
-
-    timeout = setTimeout(() => shuffle(start + 1), 1000 / options.fps);
   };
 
-  shuffle(-options.iterations);
+  // setTimeout 체인 대신 rAF 사용: 여러 요소가 동시에 셔플돼도 DOM 변경이
+  // 프레임 경계에 정렬되고, 탭이 백그라운드로 가면 자동으로 일시 정지된다
+  const stepDuration = 1000 / options.fps;
+  let step = -options.iterations;
+  let lastStepTime: number | null = null;
+  let rafId: number | null = null;
+
+  const tick = (now: number): void => {
+    if (lastStepTime === null) lastStepTime = now;
+
+    const elapsed = now - lastStepTime;
+    if (elapsed >= stepDuration) {
+      // 프레임 드랍으로 누락된 step은 건너뛰어 전체 길이를 일정하게 유지
+      step = Math.min(
+        step + Math.floor(elapsed / stepDuration),
+        charsPositions.length
+      );
+      lastStepTime = now - (elapsed % stepDuration);
+      renderStep(step);
+
+      // 마지막 step은 원본 텍스트 전체를 복원한다
+      if (step >= charsPositions.length) {
+        options.onComplete(element);
+        return;
+      }
+    }
+
+    rafId = requestAnimationFrame(tick);
+  };
+
+  renderStep(step);
+  rafId = requestAnimationFrame(tick);
 
   return () => {
-    if (timeout) clearTimeout(timeout);
+    if (rafId !== null) cancelAnimationFrame(rafId);
   };
 }
