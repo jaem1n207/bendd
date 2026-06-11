@@ -173,9 +173,11 @@ export function useActiveAnchor(
       }
 
       // 뷰포트 상단으로부터 마지막 헤더를 찾아 활성화
+      // getScrollOffset은 querySelector + getBoundingClientRect를 수행하므로 루프 밖에서 1회만 측정
+      const scrollOffset = getScrollOffset();
       let activeLink: string | null = null;
       for (const { link, top } of headers) {
-        if (top > scrollY + getScrollOffset()) {
+        if (top > scrollY + scrollOffset) {
           break;
         }
         activeLink = link;
