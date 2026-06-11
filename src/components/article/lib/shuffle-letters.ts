@@ -65,11 +65,16 @@ export function shuffleLetters(
     ...config,
   };
 
-  if (options.iterations < 1 || options.iterations > 50) {
+  // NaN/Infinity가 통과하면 stepDuration이 NaN이 되어 rAF 루프가 종료되지 않는다
+  if (
+    !Number.isFinite(options.iterations) ||
+    options.iterations < 1 ||
+    options.iterations > 50
+  ) {
     throw new RangeError('iterations는 1 이상 50 이하의 값이어야 합니다.');
   }
 
-  if (options.fps < 1 || options.fps > 60) {
+  if (!Number.isFinite(options.fps) || options.fps < 1 || options.fps > 60) {
     throw new RangeError('fps는 1 이상 60 이하의 값이어야 합니다.');
   }
 
