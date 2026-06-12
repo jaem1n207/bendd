@@ -67,7 +67,7 @@ claude  # Anthropic Claude Code CLI로 독립 인스턴스 실행
 6. 피드백 반영 → 재커밋 → push → 모든 리뷰 코멘트에 응답
 7. PR 설명 최신화: `gh pr edit <pr_number> --body "<업데이트된 설명>"`
 8. CI 통과 확인: `gh pr checks <pr_number>`
-9. LGTM 코멘트 추가 → `gh pr merge <pr_number> --squash --delete-branch`
+9. LGTM 코멘트 추가 → `gh pr merge <pr_number> --rebase --delete-branch` (저장소 설정상 squash 머지 비활성)
 10. 로컬 정리: `git checkout main && git pull origin main`
 
 ### 브랜치 네이밍
