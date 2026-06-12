@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { Fira_Mono as FontMono, Inter as FontSans } from 'next/font/google';
 import type { WebSite, WithContext } from 'schema-dts';
 
-import { Navigation } from '@/components/navigation';
+import { Navigation, PathnameHistoryTracker } from '@/components/navigation';
 import { ThemeProvider } from '@/components/theme';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -130,6 +130,7 @@ export default function RootLayout({
           }}
         />
         <BrowserDetector />
+        <PathnameHistoryTracker />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

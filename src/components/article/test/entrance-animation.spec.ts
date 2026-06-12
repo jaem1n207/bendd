@@ -1,47 +1,52 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// 모듈 스코프 Set이 테스트 간에 공유되지 않도록 매번 새로 로드한다
-async function loadFreshModule() {
-  vi.resetModules();
-  return import('../lib/entrance-animation');
-}
+import { getPreviousPathname } from '@/components/navigation';
+import { shouldPlayEntranceAnimation } from '../lib/entrance-animation';
 
-describe('entrance-animation', () => {
+vi.mock('@/components/navigation', () => ({
+  getPreviousPathname: vi.fn(),
+}));
+
+const mockGetPreviousPathname = vi.mocked(getPreviousPathname);
+
+describe('shouldPlayEntranceAnimation', () => {
   beforeEach(() => {
-    vi.resetModules();
+    mockGetPreviousPathname.mockReset();
   });
 
-  it('처음 방문한 경로는 애니메이션을 재생한다', async () => {
-    const { shouldPlayEntranceAnimation } = await loadFreshModule();
+  it('직전 경로가 없으면(새로고침·직접 진입) 재생한다', () => {
+    mockGetPreviousPathname.mockReturnValue(null);
 
     expect(shouldPlayEntranceAnimation('/article')).toBe(true);
   });
 
-  it('재생 기록이 있는 경로는 애니메이션을 생략한다', async () => {
-    const { shouldPlayEntranceAnimation, markEntranceAnimationPlayed } =
-      await loadFreshModule();
-
-    markEntranceAnimationPlayed('/article');
+  it('글 상세에서 목록으로 돌아오면 생략한다', () => {
+    mockGetPreviousPathname.mockReturnValue('/article/some-post');
 
     expect(shouldPlayEntranceAnimation('/article')).toBe(false);
   });
 
-  it('경로별로 독립적으로 기록한다', async () => {
-    const { shouldPlayEntranceAnimation, markEntranceAnimationPlayed } =
-      await loadFreshModule();
+  it('시리즈 등 더 깊은 하위 경로에서 돌아와도 생략한다', () => {
+    mockGetPreviousPathname.mockReturnValue('/article/series/frontend');
 
-    markEntranceAnimationPlayed('/article');
-
-    expect(shouldPlayEntranceAnimation('/craft')).toBe(true);
+    expect(shouldPlayEntranceAnimation('/article')).toBe(false);
   });
 
-  it('같은 경로를 여러 번 기록해도 생략 판정이 유지된다', async () => {
-    const { shouldPlayEntranceAnimation, markEntranceAnimationPlayed } =
-      await loadFreshModule();
+  it('다른 섹션에서 넘어오면 재생한다', () => {
+    mockGetPreviousPathname.mockReturnValue('/craft');
 
-    markEntranceAnimationPlayed('/craft');
-    markEntranceAnimationPlayed('/craft');
+    expect(shouldPlayEntranceAnimation('/article')).toBe(true);
+  });
 
-    expect(shouldPlayEntranceAnimation('/craft')).toBe(false);
+  it('다른 섹션의 상세에서 넘어와도 재생한다', () => {
+    mockGetPreviousPathname.mockReturnValue('/craft/some-work');
+
+    expect(shouldPlayEntranceAnimation('/article')).toBe(true);
+  });
+
+  it('접두사만 같은 형제 경로는 하위 경로로 오인하지 않는다', () => {
+    mockGetPreviousPathname.mockReturnValue('/article-archive');
+
+    expect(shouldPlayEntranceAnimation('/article')).toBe(true);
   });
 });
