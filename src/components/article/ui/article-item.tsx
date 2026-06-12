@@ -2,8 +2,13 @@
 
 import { motion, useAnimate, useInView } from 'framer-motion';
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
+import {
+  markEntranceAnimationPlayed,
+  shouldPlayEntranceAnimation,
+} from '@/components/article/lib/entrance-animation';
 import { shuffleLetters } from '@/components/article/lib/shuffle-letters';
 import { WithSound } from '@/components/sound';
 import { cn } from '@/lib/utils';
@@ -20,6 +25,9 @@ export function ArticleItem({
   series,
   index,
 }: ArticleInfo & { index: number }) {
+  const pathname = usePathname();
+  // 마운트 시점에 한 번만 판정 — 이후 다른 아이템이 기록을 추가해도 영향받지 않는다
+  const [shouldAnimate] = useState(() => shouldPlayEntranceAnimation(pathname));
   const itemRef = useRef<HTMLAnchorElement>(null);
   const isInView = useInView(itemRef, { once: true, margin: '-100px 0px' });
   const [nameRef, animateName] = useAnimate();
@@ -28,7 +36,11 @@ export function ArticleItem({
   const [publishedAtRef, animatePublishedAt] = useAnimate();
 
   useEffect(() => {
-    if (!isInView) return;
+    markEntranceAnimationPlayed(pathname);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!shouldAnimate || !isInView) return;
 
     const delay = index * 0.15;
     const duration = 1;
@@ -76,7 +88,7 @@ export function ArticleItem({
       cancelShuffles.forEach(cancel => cancel());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInView]);
+  }, [isInView, shouldAnimate]);
 
   return (
     <WithSound assetPath="/sounds/stapling.mp3">
@@ -86,7 +98,7 @@ export function ArticleItem({
         className={cn(
           'relative block w-[calc(100%+1rem)] overflow-hidden rounded-xl px-3 py-4 hover:bg-gray-300 sm:flex sm:items-center sm:gap-3'
         )}
-        initial={{ opacity: 0 }}
+        initial={shouldAnimate ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}
       >
         <motion.h2
