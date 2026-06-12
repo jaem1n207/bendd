@@ -5,10 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-import {
-  markEntranceAnimationPlayed,
-  shouldPlayEntranceAnimation,
-} from '@/components/article/lib/entrance-animation';
+import { shouldPlayEntranceAnimation } from '@/components/article/lib/entrance-animation';
 import { shuffleLetters } from '@/components/article/lib/shuffle-letters';
 import { WithSound } from '@/components/sound';
 import { cn } from '@/lib/utils';
@@ -26,7 +23,7 @@ export function ArticleItem({
   index,
 }: ArticleInfo & { index: number }) {
   const pathname = usePathname();
-  // 마운트 시점에 한 번만 판정 — 이후 다른 아이템이 기록을 추가해도 영향받지 않는다
+  // 마운트 시점에 한 번만 판정 — 이후 경로 기록이 갱신돼도 영향받지 않는다
   const [shouldAnimate] = useState(() => shouldPlayEntranceAnimation(pathname));
   const itemRef = useRef<HTMLAnchorElement>(null);
   const isInView = useInView(itemRef, { once: true, margin: '-100px 0px' });
@@ -34,10 +31,6 @@ export function ArticleItem({
   const [summaryRef, animateSummary] = useAnimate();
   const [lineRef, animateLine] = useAnimate();
   const [publishedAtRef, animatePublishedAt] = useAnimate();
-
-  useEffect(() => {
-    markEntranceAnimationPlayed(pathname);
-  }, [pathname]);
 
   useEffect(() => {
     if (!shouldAnimate || !isInView) return;
