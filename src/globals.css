@@ -3,7 +3,10 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  /* .light: 테마 리빌 복제본을 라이트 테마로 칠할 때 사용 (.dark는 아래에 이미 존재).
+     html은 next-themes가 light/dark 클래스를 부여하므로 자연히 함께 매칭된다. */
+  :root,
+  .light {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;

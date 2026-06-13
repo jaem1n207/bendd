@@ -1,50 +1,41 @@
 'use client';
 
 import { Moon, Sun } from 'lucide-react';
-import { flushSync } from 'react-dom';
-import useMeasure from 'react-use-measure';
+import { useRef } from 'react';
 
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 import { ClientGate } from '../client-gate';
+import { canRevealTheme, revealTheme } from './theme-reveal';
 import { useThemeManager } from './use-theme-manger';
 
 export function ThemeSwitcher() {
   const { isDarkTheme, toggleTheme } = useThemeManager();
   const prefersReducedMotion = usePrefersReducedMotion();
-  const [buttonRef, bounds] = useMeasure();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const isRevealingRef = useRef(false);
 
-  const handleToggleTheme = async () => {
-    if (!buttonRef || !document.startViewTransition || prefersReducedMotion) {
+  const handleToggleTheme = () => {
+    if (isRevealingRef.current) return;
+
+    const button = buttonRef.current;
+    if (!button || prefersReducedMotion || !canRevealTheme()) {
       toggleTheme();
       return;
     }
 
-    await document.startViewTransition(() => {
-      flushSync(() => {
-        toggleTheme();
-      });
-    }).ready;
+    const { top, left, width, height } = button.getBoundingClientRect();
 
-    const { top, left, width, height } = bounds;
-    const x = left + width / 2;
-    const y = top + height / 2;
-    const right = window.innerWidth - left;
-    const bottom = window.innerHeight - top;
-    const maxRadius = Math.hypot(Math.max(left, right), Math.max(top, bottom));
-
-    document.documentElement.animate(
-      {
-        clipPath: [
-          `circle(0px at ${x}px ${y}px)`,
-          `circle(${maxRadius}px at ${x}px ${y}px)`,
-        ],
+    // 실제 DOM은 옛 테마 그대로 두고(본문 애니메이션 계속 재생) 새 테마 복제본을
+    // 버튼 위치에서 원형으로 펼친 뒤, 다 덮이면 실제 테마를 커밋한다.
+    isRevealingRef.current = true;
+    revealTheme({
+      origin: { x: left + width / 2, y: top + height / 2 },
+      nextResolvedTheme: isDarkTheme ? 'light' : 'dark',
+      onCommit: toggleTheme,
+      onFinished: () => {
+        isRevealingRef.current = false;
       },
-      {
-        duration: 600,
-        easing: 'ease-in-out',
-        pseudoElement: '::view-transition-new(root)',
-      }
-    );
+    });
   };
 
   return (
