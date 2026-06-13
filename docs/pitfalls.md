@@ -209,3 +209,38 @@ element.focus({ preventScroll: true });
 // 잘못됨 — 요소가 뷰포트 밖이면 브라우저가 자동 스크롤
 element.focus();
 ```
+
+## P25: 테마 전환은 본문 색을 transition하지 말고 오버레이로 가린다
+
+테마 토글에 전환을 입힐 때 시도한 방법들이 차례로 실패했다.
+
+- **View Transition** (`document.startViewTransition()`): 전환 동안 살아있는 DOM을 **정지된 스냅샷**으로 대체한다. 본문 애니메이션(예: 좌상단 서명 스트로크 `dash 4s infinite`)이 전환이 끝나는 순간 그만큼 **건너뛴 채** 나타나 "멈췄다 점프"한다.
+- **DOM 복제본 오버레이**(새 테마 복제본을 원형으로 펼침): `dark:` 리터럴·커스텀 색·그림자가 프로덕션에서 어긋나 **이상하게 칠해진다**(두 테마를 동시에 충실히 그리려면 사실상 스냅샷이 필요하다).
+- **색상 크로스페이드**(`* { transition: color … }`): next-themes의 클래스 적용·React 리렌더가 색 transition을 도중에 **재시작**시켜, 색이 최종값에 도달했다 중간값으로 튀었다 돌아오는 **깜빡임**이 생긴다(특히 서명·framer-motion h2처럼 자체 애니메이션/리렌더가 있는 요소). `*` transition은 페이지 전체를 반복 페인트해 **성능**에도 나쁘다.
+
+해결책은 **본문 색을 transition하지 않는 것**이다(`src/components/theme/theme-transition.ts`). 테마는 한 번의 페인트로 즉시 적용하고, 그 순간을 짧은 **불투명 오버레이**로 가린다. 오버레이는 `opacity`만 애니메이션하므로 GPU 컴포지터에서 처리되어 본문을 다시 페인트하지 않는다(성능 비용 없음). 색 transition이 없으니 깜빡임도 없고, 본문 애니메이션은 오버레이 아래에서 그대로 살아 돌아간다.
+
+```typescript
+// 올바름 — 새 테마 배경색 오버레이로 가린 뒤, 그 아래에서 색을 한 번에 바꾼다
+const overlay = makeOverlay(nextThemeBg); // position:fixed; opacity:0
+overlay
+  .animate([{ opacity: 0 }, { opacity: 1 }], {
+    duration: 150,
+    fill: 'forwards',
+  })
+  .finished.then(() => {
+    applyTheme(); // 오버레이가 불투명한 동안 즉시 적용(색 transition 없음 → 깜빡임 없음)
+    waitForThemeApplied(next, () =>
+      // 새 테마가 페인트된 뒤에야 페이드아웃
+      overlay
+        .animate([{ opacity: 1 }, { opacity: 0 }], { duration: 170 })
+        .finished.then(() => overlay.remove())
+    );
+  });
+```
+
+```typescript
+// 잘못됨 — 본문 색을 직접 transition하면 next-themes/리렌더가 재시작시켜 깜빡인다
+root.classList.add('theme-transition'); // * { transition: color … }
+toggleTheme();
+```

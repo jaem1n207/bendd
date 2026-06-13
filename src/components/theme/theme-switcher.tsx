@@ -1,55 +1,44 @@
 'use client';
 
 import { Moon, Sun } from 'lucide-react';
-import { flushSync } from 'react-dom';
-import useMeasure from 'react-use-measure';
+import { useRef } from 'react';
 
+import { ClientGate } from '@/components/client-gate';
+import { useThemeManager } from '@/components/theme/use-theme-manger';
+import {
+  canTransitionTheme,
+  transitionTheme,
+} from '@/components/theme/theme-transition';
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
-import { ClientGate } from '../client-gate';
-import { useThemeManager } from './use-theme-manger';
 
 export function ThemeSwitcher() {
   const { isDarkTheme, toggleTheme } = useThemeManager();
   const prefersReducedMotion = usePrefersReducedMotion();
-  const [buttonRef, bounds] = useMeasure();
+  const isTransitioningRef = useRef(false);
 
-  const handleToggleTheme = async () => {
-    if (!buttonRef || !document.startViewTransition || prefersReducedMotion) {
+  const handleToggleTheme = () => {
+    if (isTransitioningRef.current) return;
+
+    if (prefersReducedMotion || !canTransitionTheme()) {
       toggleTheme();
       return;
     }
 
-    await document.startViewTransition(() => {
-      flushSync(() => {
-        toggleTheme();
-      });
-    }).ready;
-
-    const { top, left, width, height } = bounds;
-    const x = left + width / 2;
-    const y = top + height / 2;
-    const right = window.innerWidth - left;
-    const bottom = window.innerHeight - top;
-    const maxRadius = Math.hypot(Math.max(left, right), Math.max(top, bottom));
-
-    document.documentElement.animate(
-      {
-        clipPath: [
-          `circle(0px at ${x}px ${y}px)`,
-          `circle(${maxRadius}px at ${x}px ${y}px)`,
-        ],
+    // 테마는 오버레이가 불투명한 순간 즉시 적용되고, opacity 페이드만 보인다.
+    // 본문 색을 transition하지 않으므로 전환 후 색 깜빡임이 없고, GPU 컴포지터에서
+    // 처리돼 성능 영향이 없다. 본문 애니메이션도 오버레이 아래에서 계속 재생된다.
+    isTransitioningRef.current = true;
+    transitionTheme({
+      nextResolvedTheme: isDarkTheme ? 'light' : 'dark',
+      applyTheme: toggleTheme,
+      onDone: () => {
+        isTransitioningRef.current = false;
       },
-      {
-        duration: 600,
-        easing: 'ease-in-out',
-        pseudoElement: '::view-transition-new(root)',
-      }
-    );
+    });
   };
 
   return (
     <button
-      ref={buttonRef}
       title="Toggle Theme"
       className="relative flex size-full items-center justify-center text-gray-950 transition-transform hover:scale-105"
       onClick={handleToggleTheme}
