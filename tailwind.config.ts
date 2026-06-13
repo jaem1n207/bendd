@@ -2,7 +2,10 @@ import type { Config } from 'tailwindcss';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
 const config = {
-  darkMode: ['class', 'html[class~="dark"]'],
+  // html[class~="dark"]가 기본 동작이지만, 테마 전환 리빌에서 만드는 복제본은
+  // html이 아닌 div에 .dark/.light 클래스를 입혀 새 테마로 칠한다. dark: 유틸이
+  // 그 복제본에도 적용되도록 .dark 후손 셀렉터를 추가한다(기존 동작은 그대로 유지).
+  darkMode: ['variant', ['html[class~="dark"] &', '.dark &']],
   content: [
     './src/**/*.{ts,tsx}',
     './content/**/*.mdx',

@@ -209,3 +209,33 @@ element.focus({ preventScroll: true });
 // 잘못됨 — 요소가 뷰포트 밖이면 브라우저가 자동 스크롤
 element.focus();
 ```
+
+## P25: 테마 전환 리빌에 View Transition을 쓰면 본문 애니메이션이 멈춘다
+
+`document.startViewTransition()`은 전환이 진행되는 동안 살아있는 DOM을 **정지된 스냅샷**으로 대체한다. 그래서 본문에서 재생 중이던 애니메이션(예: 좌상단 서명 스트로크 `dash 4s infinite`)은 스냅샷 뒤에서 시간이 계속 흐르다가, 전환이 끝나는 순간 그 시간만큼 **건너뛴 채** 다시 나타나 "멈췄다가 점프"하는 것처럼 보인다. VT로는 본문 애니메이션을 살아있는 채로 둘 방법이 없다(스냅샷은 곧 정지 프레임이다).
+
+따라서 테마 리빌은 VT 대신 **살아있는 DOM 위에 새 테마 복제본을 얹는** 방식으로 구현한다 (`src/components/theme/theme-reveal.ts`):
+
+1. 실제 DOM은 옛 테마 그대로 둔다 → 본문 애니메이션이 끊김 없이 계속 재생된다.
+2. `document.body`를 복제해 새 테마로 칠한 오버레이를 위에 얹고, 토글 버튼에서부터 `clip-path: circle()`로 펼친다. 원 안은 새 테마, 원 밖은 살아있는 옛 테마가 보인다.
+3. 화면을 가득 덮으면 실제 테마를 커밋하고 한 프레임 뒤 오버레이를 제거한다. 실제 DOM은 내내 살아 있었으므로 복귀 시 점프가 없다.
+
+복제본은 `html`이 아닌 `div`에 `.dark`/`.light` 클래스를 입혀 칠한다. 이때 `dark:` 리터럴 유틸리티(`dark:prose-invert` 등)는 기본적으로 `html[class~="dark"]` 기준이라 적용되지 않으므로, `tailwind.config`의 `darkMode`에 `.dark &` 후손 셀렉터를 **추가**해야 복제본이 충실히 칠해진다(라이트 변수는 `globals.css`의 `.light`가 담당).
+
+```typescript
+// 올바름 — 실제 DOM은 살려두고 새 테마 복제본을 원형으로 펼친 뒤 마지막에 커밋
+const overlay = makeThemedClone(document.body, nextTheme); // .dark/.light
+document.body.appendChild(overlay);
+overlay
+  .animate(
+    { clipPath: [`circle(0 at ${x} ${y})`, `circle(${r} at ${x} ${y})`] },
+    opts
+  )
+  .finished.then(() => {
+    commitTheme(); // 오버레이가 화면을 덮은 상태에서 실제 테마 적용
+    requestAnimationFrame(() => overlay.remove());
+  });
+
+// 잘못됨 — VT는 살아있는 DOM을 스냅샷으로 덮어 본문 애니메이션을 정지·점프시킨다
+await document.startViewTransition(() => flushSync(toggle)).ready;
+```
