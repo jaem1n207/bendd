@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
-import type { Person, WithContext } from 'schema-dts';
 
+import { JsonLdScript } from '@/components/structured-data';
 import { Typography } from '@/components/ui/typography';
+import { createHomeGraph } from '@/lib/structured-data';
 import { siteMetadata } from '@/lib/site-metadata';
 
 export const metadata: Metadata = {
@@ -15,27 +16,23 @@ export const metadata: Metadata = {
   },
 };
 
-const personJsonLd: WithContext<Person> = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: siteMetadata.author,
-  url: siteMetadata.siteUrl,
-  jobTitle: '소프트웨어 엔지니어',
+const synchronizeTabScrollingProject = {
+  slug: 'synchronize-tab-scrolling',
+  name: 'Synchronize Tab Scrolling',
   description:
-    '해야 하는 일 속에서 하고 싶은 의미를 찾는 소프트웨어 엔지니어',
-  sameAs: [siteMetadata.github, siteMetadata.youtube],
-};
+    '여러 탭의 스크롤을 실시간으로 동기화하는 오픈소스 브라우저 확장 프로그램입니다.',
+  url: 'https://chromewebstore.google.com/detail/synchronize-tab-scrolling/phceoocamipnafpgnchbfhkdlbleeafc',
+  sameAs: 'https://github.com/jaem1n207/synchronize-tab-scrolling',
+} as const;
+
+const homeJsonLd = createHomeGraph({
+  project: synchronizeTabScrollingProject,
+});
 
 export default function Home() {
   return (
     <div className="relative mx-auto min-h-screen max-w-2xl overflow-hidden px-6 py-24 sm:pb-16 sm:pt-32 ">
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(personJsonLd),
-        }}
-      />
+      <JsonLdScript data={homeJsonLd} />
       <header className="mb-32 flex flex-col">
         <Typography variant="h5" asChild>
           <h1>이재민</h1>
