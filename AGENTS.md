@@ -10,7 +10,7 @@ These rules are non-negotiable. Violating them causes build failures or broken b
 1. **MDX validation**: ALL MDX components MUST use `createMDXComponent` wrapper + Zod schema
 2. **Frontmatter limits**: title <= 38 chars, summary <= 40 chars, description <= 150 chars
 3. **Package manager**: `pnpm` ONLY — npm/yarn cause lockfile conflicts
-4. **Import alias**: `@/` ONLY — no relative imports (`../`)
+4. **Import alias**: `@/` ONLY — no relative imports (`../`, `./`) in `src/**/*.{ts,tsx}`. This also applies to same-directory imports, test files, and barrel exports.
 5. **Barrel exports**: Import domain components via `index.ts` only, never from subdirectories
 6. **CSS variables**: HSL format (`hsl(var(--name))`), not hex/RGB
 7. **Commits**: Conventional Commits + Korean messages (`feat(scope): 한국어 설명`)
@@ -122,6 +122,7 @@ MDX components: `src/mdx/components/{name}/{name}.tsx` — register in `src/mdx/
 - `as any` / `@ts-ignore` — only 1 justified `@ts-expect-error` in `with-sound.tsx` (cloneElement typing)
 - Hex/RGB colors — use HSL CSS variables only
 - `npm install` / `yarn add` — pnpm only
+- Relative TS/TSX imports inside `src/` — use `@/` even for same-directory files, specs, and `index.ts` re-exports
 - Static `NodeList` caching in scroll handlers — always query live DOM (P22)
 - Synchronous `track()` calls — wrap in `requestIdleCallback` (P21)
 - Scroll listeners without `{ passive: true }` — always include (P20)
