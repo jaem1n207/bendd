@@ -5,4 +5,4 @@ export {
   createCraftIndexGraph,
   createHomeGraph,
   createSeriesGraph,
-} from './graphs';
+} from '@/lib/structured-data/graphs';

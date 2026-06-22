@@ -1,6 +1,6 @@
 import type { Article, SeriesInfo } from '@/mdx/mdx';
 
-import { absoluteUrl, blogId, websiteId } from './ids';
+import { absoluteUrl, blogId, websiteId } from '@/lib/structured-data/ids';
 import {
   type HomeProject,
   createBlogNode,
@@ -16,7 +16,7 @@ import {
   createWebPageNode,
   createWebsiteNode,
   reference,
-} from './nodes';
+} from '@/lib/structured-data/nodes';
 
 export const createHomeGraph = ({ project }: { project: HomeProject }) =>
   createGraph([
