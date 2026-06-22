@@ -2,11 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
-import type { CollectionPage, WithContext } from 'schema-dts';
 
+import { JsonLdScript } from '@/components/structured-data';
 import { Typography } from '@/components/ui/typography';
 import { getAllSeriesIds, getSeriesConfig } from '@/lib/series';
 import { siteMetadata } from '@/lib/site-metadata';
+import { createSeriesGraph } from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
 import { formatDate, getSeriesInfo, readArticles } from '@/mdx/mdx';
 
@@ -51,32 +52,11 @@ export default function SeriesPage({
   const seriesInfo = getSeriesInfo(articles, params.id, -1);
   if (!seriesInfo) notFound();
 
-  const collectionJsonLd: WithContext<CollectionPage> = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: `${config.name} 시리즈`,
-    description: config.description,
-    url: `${siteMetadata.siteUrl}/article/series/${params.id}`,
-    mainEntity: {
-      '@type': 'ItemList',
-      itemListElement: seriesInfo.articles.map(article => ({
-        '@type': 'ListItem' as const,
-        position: article.order,
-        url: `${siteMetadata.siteUrl}/article/${article.slug}`,
-        name: article.title,
-      })),
-    },
-  };
+  const collectionJsonLd = createSeriesGraph({ seriesInfo });
 
   return (
     <main className="relative mx-auto my-0 min-h-screen max-w-2xl overflow-hidden px-6 py-32">
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(collectionJsonLd),
-        }}
-      />
+      <JsonLdScript data={collectionJsonLd} />
       <Typography variant="h2">{config.name} 시리즈</Typography>
       <Typography variant="p" className="!mt-2 text-muted-foreground">
         {config.description}
