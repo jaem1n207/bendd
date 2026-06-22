@@ -21,5 +21,10 @@ describe('JsonLdScript', () => {
 
     expect(script?.innerHTML).toContain('\\u003cscript>');
     expect(script?.innerHTML).not.toContain('<script>alert');
+    expect(JSON.parse(script?.innerHTML ?? '{}')).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'Thing',
+      name: '<script>alert("x")</script>',
+    });
   });
 });

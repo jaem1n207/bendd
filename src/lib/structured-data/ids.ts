@@ -11,14 +11,16 @@ export const absoluteUrl = (path = ''): string => {
 };
 
 const rootUrl = () => `${absoluteUrl()}/`;
+const schemaNodeUrl = (path: string) =>
+  stripLeadingSlash(path) ? absoluteUrl(path) : rootUrl();
 
 export const websiteId = () => `${rootUrl()}#website`;
 export const personId = () => `${rootUrl()}#person`;
 export const blogId = () => `${absoluteUrl('/article')}#blog`;
-export const webpageId = (path: string) => `${absoluteUrl(path)}#webpage`;
+export const webpageId = (path: string) => `${schemaNodeUrl(path)}#webpage`;
 export const breadcrumbId = (path: string) =>
-  `${absoluteUrl(path)}#breadcrumb`;
+  `${schemaNodeUrl(path)}#breadcrumb`;
 export const softwareApplicationId = (slug: string) =>
   `${rootUrl()}#software-${slug}`;
 export const blogPostingId = (path: string) =>
-  `${absoluteUrl(path)}#blogposting`;
+  `${schemaNodeUrl(path)}#blogposting`;
