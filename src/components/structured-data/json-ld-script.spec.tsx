@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { JsonLdScript } from './json-ld-script';
 
@@ -26,5 +26,19 @@ describe('JsonLdScript', () => {
       '@type': 'Thing',
       name: '<script>alert("x")</script>',
     });
+  });
+
+  it('throws a clear error when data cannot be serialized', () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    try {
+      expect(() => render(<JsonLdScript data={undefined} />)).toThrow(
+        'JsonLdScript data must be JSON-serializable.'
+      );
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });
