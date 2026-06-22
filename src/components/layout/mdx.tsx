@@ -1,15 +1,18 @@
 import { CornerUpLeft } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import type { BreadcrumbList, BlogPosting, WithContext } from 'schema-dts';
 
 import { Giscus } from '@/components/comments/giscus';
 import {
   SeriesNavigationBottom,
   SeriesNavigationTop,
 } from '@/components/series';
+import { JsonLdScript } from '@/components/structured-data';
 import { Typography } from '@/components/ui/typography';
-import { siteMetadata } from '@/lib/site-metadata';
+import {
+  createArticleDetailGraph,
+  createCraftDetailGraph,
+} from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
 import { SkeletonTableOfContents } from '@/mdx/common/table-of-contents/skeleton-table-of-contents';
 import { CustomMDX } from '@/mdx/custom-mdx';
@@ -33,52 +36,12 @@ interface MdxLayoutProps {
 }
 
 export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
-  const { title, publishedAt, summary, description, image } = post.metadata;
+  const { title, publishedAt, summary, description } = post.metadata;
 
-  const typeName = type === 'article' ? '기술 이야기' : '작업 목록';
-
-  const jsonLd: WithContext<BlogPosting> = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: title,
-    datePublished: new Date(publishedAt).toISOString(),
-    dateModified: new Date(publishedAt).toISOString(),
-    description: summary,
-    image: image
-      ? `${siteMetadata.siteUrl}${image}`
-      : `${siteMetadata.siteUrl}/api/og?title=${encodeURIComponent(title)}`,
-    url: `${siteMetadata.siteUrl}/${type}/${post.slug}`,
-    author: {
-      '@type': 'Person',
-      name: siteMetadata.author,
-      url: siteMetadata.github,
-    },
-  };
-
-  const breadcrumbJsonLd: WithContext<BreadcrumbList> = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: '홈',
-        item: siteMetadata.siteUrl,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: typeName,
-        item: `${siteMetadata.siteUrl}/${type}`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: title,
-        item: `${siteMetadata.siteUrl}/${type}/${post.slug}`,
-      },
-    ],
-  };
+  const detailJsonLd =
+    type === 'article'
+      ? createArticleDetailGraph({ post })
+      : createCraftDetailGraph({ post });
 
   return (
     <main className="relative mx-auto my-0 min-h-screen max-w-2xl overflow-hidden px-6 py-32">
@@ -94,20 +57,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         data-webmcp-series-id={seriesInfo?.id}
         data-webmcp-series-name={seriesInfo?.name}
       >
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(jsonLd),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(breadcrumbJsonLd),
-          }}
-        />
+        <JsonLdScript data={detailJsonLd} />
         <div className="fixed bottom-16 left-5 top-24 hidden flex-col overflow-hidden lg:flex">
           <Link
             href={`/${type}`}
