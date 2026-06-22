@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { JsonLdScript } from './json-ld-script';
+import { JsonLdScript } from '@/components/structured-data/json-ld-script';
 
 describe('JsonLdScript', () => {
   it('serializes JSON-LD and escapes HTML-sensitive angle brackets', () => {

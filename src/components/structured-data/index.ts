@@ -1,1 +1,1 @@
-export { JsonLdScript } from './json-ld-script';
+export { JsonLdScript } from '@/components/structured-data/json-ld-script';
