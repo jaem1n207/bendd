@@ -15,6 +15,7 @@ import {
 describe('structured data ID helpers', () => {
   it('creates stable absolute URLs and schema node IDs', () => {
     expect(absoluteUrl('/article')).toBe('https://bendd.me/article');
+    expect(absoluteUrl('//article')).toBe('https://bendd.me/article');
     expect(absoluteUrl('craft/demo')).toBe('https://bendd.me/craft/demo');
     expect(websiteId()).toBe('https://bendd.me/#website');
     expect(personId()).toBe('https://bendd.me/#person');

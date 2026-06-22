@@ -1,7 +1,7 @@
 import { siteMetadata } from '@/lib/site-metadata';
 
 const stripTrailingSlash = (value: string) => value.replace(/\/$/, '');
-const stripLeadingSlash = (value: string) => value.replace(/^\//, '');
+const stripLeadingSlash = (value: string) => value.replace(/^\/+/, '');
 
 export const absoluteUrl = (path = ''): string => {
   const baseUrl = stripTrailingSlash(siteMetadata.siteUrl);
