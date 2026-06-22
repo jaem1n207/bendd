@@ -1,4 +1,6 @@
 /* eslint-disable playwright/no-standalone-expect */
+import type { Route } from 'next';
+import type { SeriesInfo } from '@/mdx/mdx';
 import type { Graph, Thing } from 'schema-dts';
 import { describe, expect, it } from 'vitest';
 
@@ -6,7 +8,9 @@ import {
   createArticleDetailGraph,
   createArticleIndexGraph,
   createCraftDetailGraph,
+  createCraftIndexGraph,
   createHomeGraph,
+  createSeriesGraph,
 } from './graphs';
 import {
   absoluteUrl,
@@ -49,6 +53,29 @@ const article = {
     summary: 'JSON-LD 개선',
   },
 };
+
+const seriesInfo = {
+  id: 'ai-coding-agent',
+  name: 'AI Coding Agent',
+  description: 'AI 코딩 에이전트 활용 방법을 다루는 시리즈',
+  currentOrder: 1,
+  articles: [
+    {
+      slug: 'agent-second',
+      title: '두 번째 글',
+      order: 2,
+      href: '/article/agent-second' as Route<''>,
+      publishedAt: '2026-06-22',
+    },
+    {
+      slug: 'agent-first',
+      title: '첫 번째 글',
+      order: 1,
+      href: '/article/agent-first' as Route<''>,
+      publishedAt: '2026-06-21',
+    },
+  ],
+} satisfies SeriesInfo;
 
 describe('structured data ID helpers', () => {
   it('creates stable absolute URLs and schema node IDs', () => {
@@ -143,6 +170,60 @@ describe('structured data graphs', () => {
           position: 1,
           url: 'https://bendd.me/article/structured-data',
           name: '구조화 데이터',
+        },
+      ],
+    });
+  });
+
+  it('links craft collections to their page and breadcrumb nodes', () => {
+    const graph = createCraftIndexGraph({ articles: [article] });
+    const collection = findNode(graph, 'CollectionPage');
+
+    expect(collection['@id']).toBe('https://bendd.me/craft#webpage');
+    expect(collection.url).toBe('https://bendd.me/craft');
+    expect(collection.breadcrumb).toEqual({
+      '@id': 'https://bendd.me/craft#breadcrumb',
+    });
+    expect(collection.mainEntity).toMatchObject({
+      '@type': 'ItemList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          url: 'https://bendd.me/craft/structured-data',
+          name: '구조화 데이터',
+        },
+      ],
+    });
+  });
+
+  it('links series collections to their page and preserves article order values', () => {
+    const graph = createSeriesGraph({ seriesInfo });
+    const collection = findNode(graph, 'CollectionPage');
+
+    expect(collection['@id']).toBe(
+      'https://bendd.me/article/series/ai-coding-agent#webpage'
+    );
+    expect(collection.url).toBe(
+      'https://bendd.me/article/series/ai-coding-agent'
+    );
+    expect(collection.breadcrumb).toEqual({
+      '@id': 'https://bendd.me/article/series/ai-coding-agent#breadcrumb',
+    });
+    expect(collection.mainEntity).toMatchObject({
+      '@type': 'ItemList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 2,
+          url: 'https://bendd.me/article/agent-second',
+          name: '두 번째 글',
+        },
+        {
+          '@type': 'ListItem',
+          position: 1,
+          url: 'https://bendd.me/article/agent-first',
+          name: '첫 번째 글',
         },
       ],
     });
