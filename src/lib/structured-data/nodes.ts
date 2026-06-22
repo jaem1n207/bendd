@@ -27,7 +27,7 @@ import {
   softwareApplicationId,
   webpageId,
   websiteId,
-} from './ids';
+} from '@/lib/structured-data/ids';
 
 type SchemaReference = { '@id': string };
 

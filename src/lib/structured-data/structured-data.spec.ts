@@ -11,7 +11,7 @@ import {
   createCraftIndexGraph,
   createHomeGraph,
   createSeriesGraph,
-} from './graphs';
+} from '@/lib/structured-data/graphs';
 import {
   absoluteUrl,
   blogId,
@@ -21,7 +21,7 @@ import {
   softwareApplicationId,
   webpageId,
   websiteId,
-} from './ids';
+} from '@/lib/structured-data/ids';
 
 type NodeWithType = Thing & { '@id'?: string; '@type': string | string[] };
 type NodeLookupResult = NodeWithType & Record<string, unknown>;
