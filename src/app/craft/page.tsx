@@ -1,8 +1,9 @@
 import type { Metadata, ResolvingMetadata } from 'next';
-import type { CollectionPage, WithContext } from 'schema-dts';
 
 import { ArticleItem } from '@/components/article/ui/article-item';
+import { JsonLdScript } from '@/components/structured-data';
 import { siteMetadata } from '@/lib/site-metadata';
+import { createCraftIndexGraph } from '@/lib/structured-data';
 import { formatCraftsForDisplay, readCraftArticles, sortByDateDesc } from '@/mdx/mdx';
 
 export async function generateMetadata(
@@ -36,32 +37,11 @@ export default function CraftPage() {
     includeRelativeDate: false,
   });
 
-  const collectionJsonLd: WithContext<CollectionPage> = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: '작업 목록',
-    description: '작업한 결과물을 모아놓은 공간입니다.',
-    url: `${siteMetadata.siteUrl}/craft`,
-    mainEntity: {
-      '@type': 'ItemList',
-      itemListElement: articles.map((article, index) => ({
-        '@type': 'ListItem' as const,
-        position: index + 1,
-        url: `${siteMetadata.siteUrl}/craft/${article.slug}`,
-        name: article.metadata.title,
-      })),
-    },
-  };
+  const collectionJsonLd = createCraftIndexGraph({ articles });
 
   return (
     <main className="relative mx-auto my-0 min-h-screen max-w-4xl overflow-y-auto px-6 pt-10 sm:py-32">
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(collectionJsonLd),
-        }}
-      />
+      <JsonLdScript data={collectionJsonLd} />
       <div className="mt-8 flex flex-col gap-7">
         {formattedArticleInfo.map((article, index) => (
           <ArticleItem key={article.href} {...article} index={index} />

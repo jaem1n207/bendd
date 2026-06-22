@@ -1,8 +1,9 @@
 import type { Metadata, ResolvingMetadata } from 'next';
-import type { CollectionPage, WithContext } from 'schema-dts';
 
 import { ArticleList } from '@/components/article';
+import { JsonLdScript } from '@/components/structured-data';
 import { siteMetadata } from '@/lib/site-metadata';
+import { createArticleIndexGraph } from '@/lib/structured-data';
 import { readArticles, sortByDateDesc } from '@/mdx/mdx';
 
 export async function generateMetadata(
@@ -33,32 +34,11 @@ export async function generateMetadata(
 export default function ArticlePage() {
   const articles = sortByDateDesc(readArticles());
 
-  const collectionJsonLd: WithContext<CollectionPage> = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: '기술 이야기',
-    description: '경험과 지식을 공유하는 공간입니다.',
-    url: `${siteMetadata.siteUrl}/article`,
-    mainEntity: {
-      '@type': 'ItemList',
-      itemListElement: articles.map((article, index) => ({
-        '@type': 'ListItem' as const,
-        position: index + 1,
-        url: `${siteMetadata.siteUrl}/article/${article.slug}`,
-        name: article.metadata.title,
-      })),
-    },
-  };
+  const collectionJsonLd = createArticleIndexGraph({ articles });
 
   return (
     <main>
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(collectionJsonLd),
-        }}
-      />
+      <JsonLdScript data={collectionJsonLd} />
       <ArticleList />
     </main>
   );
