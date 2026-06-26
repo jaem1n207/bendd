@@ -20,7 +20,7 @@ Create or modify these files inside `/Users/jaemin/programming/projects/active/b
   - Responsibility: Apply labels to pull requests without checking out or executing untrusted PR code.
 - Create: `.github/labeler.yml`
   - Responsibility: Define file and branch matching rules for `area:*` and `type:*` labels.
-- No changes to Vercel deployment, package scripts, source files, or release configuration.
+- No changes to Vercel deployment, package scripts, or release configuration. Source changes are limited to a mechanical Prettier baseline only if required to make the CI format gate pass.
 
 ## Task 1: Add Native CI Workflow
 
