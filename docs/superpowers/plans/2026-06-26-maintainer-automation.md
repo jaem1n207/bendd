@@ -169,6 +169,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
   pull-requests: write
 
 jobs:
@@ -182,7 +183,7 @@ jobs:
           sync-labels: true
 ```
 
-Expected: The workflow does not checkout the repository and cannot execute PR code.
+Expected: The workflow does not checkout the repository and cannot execute PR code. `issues: write` allows `actions/labeler` to create missing configured labels on first run.
 
 - [ ] **Step 2: Add the labeler config**
 
