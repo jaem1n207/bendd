@@ -1,0 +1,53 @@
+'area:ci':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'
+
+'area:docs':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - 'README.md'
+          - 'AGENTS.md'
+
+'area:content':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'content/**'
+
+'area:mdx':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/mdx/**'
+          - '**/*.mdx'
+
+'area:app':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/app/**'
+          - 'src/components/**'
+
+'area:tests':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tests/**'
+          - '**/*.spec.ts'
+          - '**/*.spec.tsx'
+
+'type:feature':
+  - head-branch:
+      - '^feat[/-]'
+      - '^feature[/-]'
+
+'type:fix':
+  - head-branch:
+      - '^fix[/-]'
+      - '^hotfix[/-]'
+
+'type:docs':
+  - head-branch:
+      - '^docs[/-]'
+
+'status:needs-review':
+  - base-branch:
+      - '^main$'
