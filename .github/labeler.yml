@@ -48,6 +48,6 @@
   - head-branch:
       - '^docs[/-]'
 
-'status:needs-review':
+'target:main':
   - base-branch:
       - '^main$'

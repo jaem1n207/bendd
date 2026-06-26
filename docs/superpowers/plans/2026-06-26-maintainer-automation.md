@@ -240,7 +240,7 @@ Create `/Users/jaemin/programming/projects/active/bendd/.github/labeler.yml`:
   - head-branch:
       - '^docs[/-]'
 
-'status:needs-review':
+'target:main':
   - base-branch:
       - '^main$'
 ```
