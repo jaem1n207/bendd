@@ -70,6 +70,8 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@008330803749db0355799c700092d9a85fd074e9 # v6.0.9
+        with:
+          version: 11.7.0
 
       - name: Setup Node
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -90,7 +92,7 @@ jobs:
         run: pnpm format:check
 
       - name: Unit tests
-        run: pnpm test:unit -- --run
+        run: pnpm test:unit --run
 
       - name: Build
         run: pnpm build
@@ -126,11 +128,11 @@ Run:
 pnpm check-types
 pnpm lint
 pnpm format:check
-pnpm test:unit -- --run
+pnpm test:unit --run
 pnpm build
 ```
 
-Expected: All commands exit with code `0`.
+Expected: All commands exit with code `0`; the format baseline must pass before the workflow is considered ready.
 
 - [ ] **Step 6: Commit the CI workflow**
 
