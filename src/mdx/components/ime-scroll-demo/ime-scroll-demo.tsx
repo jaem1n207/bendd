@@ -185,8 +185,8 @@ function ImeScrollDemo({ initialText = '' }: ImeScrollDemoProps) {
           <li>1. 위 두 input 필드에 긴 한글 텍스트를 입력하세요</li>
           <li>2. 텍스트가 인풋 너비를 넘어갈 때까지 입력하세요</li>
           <li>
-            3. 한글 조합 중에{' '}
-            <strong className="text-foreground">공백</strong>을 눌러보세요
+            3. 한글 조합 중에 <strong className="text-foreground">공백</strong>
+            을 눌러보세요
           </li>
           <li>4. 첫 번째는 커서가 사라지고, 두 번째는 항상 보입니다</li>
         </ul>

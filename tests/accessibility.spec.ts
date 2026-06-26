@@ -27,7 +27,9 @@ test.describe('Color contrast - Article list items', () => {
     await page.waitForSelector('a[href^="/article/"]');
 
     const hasOpacityModifier = await page.evaluate(() => {
-      const allElements = document.querySelectorAll('[class*="muted-foreground"]');
+      const allElements = document.querySelectorAll(
+        '[class*="muted-foreground"]'
+      );
       for (const el of allElements) {
         const classes = el.getAttribute('class') || '';
         if (

@@ -235,7 +235,9 @@ export const getSeriesInfo = (
 
   const seriesArticles = articles
     .filter(a => a.metadata.series === seriesId)
-    .sort((a, b) => (a.metadata.seriesOrder ?? 0) - (b.metadata.seriesOrder ?? 0))
+    .sort(
+      (a, b) => (a.metadata.seriesOrder ?? 0) - (b.metadata.seriesOrder ?? 0)
+    )
     .map(a => ({
       slug: a.slug,
       title: a.metadata.title,
