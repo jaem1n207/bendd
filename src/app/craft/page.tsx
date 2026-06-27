@@ -4,7 +4,11 @@ import { ArticleItem } from '@/components/article/ui/article-item';
 import { JsonLdScript } from '@/components/structured-data';
 import { siteMetadata } from '@/lib/site-metadata';
 import { createCraftIndexGraph } from '@/lib/structured-data';
-import { formatCraftsForDisplay, readCraftArticles, sortByDateDesc } from '@/mdx/mdx';
+import {
+  formatCraftsForDisplay,
+  readCraftArticles,
+  sortByDateDesc,
+} from '@/mdx/mdx';
 
 export async function generateMetadata(
   {},

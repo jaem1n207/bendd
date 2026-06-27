@@ -131,10 +131,7 @@ export function StepActions({ className }: { className?: string }) {
   if (stepsData.length === 0) return null;
 
   return (
-    <motion.div
-      layout
-      className={cn('flex items-center space-x-2', className)}
-    >
+    <motion.div layout className={cn('flex items-center space-x-2', className)}>
       <Button
         size="icon"
         variant="outline"

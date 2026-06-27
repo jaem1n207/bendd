@@ -56,7 +56,7 @@ function MDXZoomImageBase({
 
 export const MDXZoomImage = createMDXComponent(
   MDXZoomImageBase,
-  ZoomImageSchema,
+  ZoomImageSchema
 );
 
 interface ZoomState {
@@ -221,7 +221,7 @@ function ZoomableImage({
         close();
       }
     },
-    [close],
+    [close]
   );
 
   return (
@@ -236,14 +236,14 @@ function ZoomableImage({
         quality={80}
         className={cn(
           'w-full cursor-zoom-in rounded-lg object-cover',
-          className,
+          className
         )}
         style={zoomState ? { visibility: 'hidden' } : undefined}
         onClick={open}
         role="button"
         aria-label={alt ? `${alt} - 클릭하여 확대` : '이미지 클릭하여 확대'}
         tabIndex={0}
-        onKeyDown={(e) => {
+        onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             open();
@@ -292,7 +292,7 @@ function ZoomableImage({
               onTransitionEnd={handleCloneTransitionEnd}
             />
           </>,
-          document.body,
+          document.body
         )}
     </>
   );

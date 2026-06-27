@@ -43,7 +43,7 @@ test.describe('이미지 줌', () => {
 
       // 원본 이미지가 visibility: hidden
       const visibility = await img.evaluate(
-        (el) => (el as HTMLElement).style.visibility,
+        el => (el as HTMLElement).style.visibility
       );
       expect(visibility).toBe('hidden');
     });
@@ -81,7 +81,7 @@ test.describe('이미지 줌', () => {
       await expect(page.getByRole('dialog')).toHaveCount(0);
 
       const visibility = await img.evaluate(
-        (el) => (el as HTMLElement).style.visibility,
+        el => (el as HTMLElement).style.visibility
       );
       expect(visibility).not.toBe('hidden');
     });
@@ -136,7 +136,7 @@ test.describe('이미지 줌', () => {
       await expect(dialog).toHaveCount(0);
 
       const visibility = await img.evaluate(
-        (el) => (el as HTMLElement).style.visibility,
+        el => (el as HTMLElement).style.visibility
       );
       expect(visibility).not.toBe('hidden');
     });
@@ -155,15 +155,13 @@ test.describe('이미지 줌', () => {
       await page.keyboard.press('Escape');
       await expect(page.getByRole('dialog')).toHaveCount(0);
 
-      const focusedAlt = await page.evaluate(
-        () => document.activeElement?.getAttribute('alt'),
+      const focusedAlt = await page.evaluate(() =>
+        document.activeElement?.getAttribute('alt')
       );
       expect(focusedAlt).toBe(FIRST_IMAGE_ALT);
     });
 
-    test('클릭으로 줌 열고 닫은 후에도 포커스가 복원된다', async ({
-      page,
-    }) => {
+    test('클릭으로 줌 열고 닫은 후에도 포커스가 복원된다', async ({ page }) => {
       const img = page.getByAltText(FIRST_IMAGE_ALT).first();
       await img.click();
       await expect(page.getByRole('dialog')).toBeVisible();
@@ -171,8 +169,8 @@ test.describe('이미지 줌', () => {
       await page.keyboard.press('Escape');
       await expect(page.getByRole('dialog')).toHaveCount(0);
 
-      const focusedAlt = await page.evaluate(
-        () => document.activeElement?.getAttribute('alt'),
+      const focusedAlt = await page.evaluate(() =>
+        document.activeElement?.getAttribute('alt')
       );
       expect(focusedAlt).toBe(FIRST_IMAGE_ALT);
     });
@@ -219,8 +217,8 @@ test.describe('이미지 줌', () => {
         await page.keyboard.press('Escape');
         await expect(page.getByRole('dialog')).toHaveCount(0);
 
-        const focusedAlt = await page.evaluate(
-          () => document.activeElement?.getAttribute('alt'),
+        const focusedAlt = await page.evaluate(() =>
+          document.activeElement?.getAttribute('alt')
         );
         expect(focusedAlt).toBe(FIRST_IMAGE_ALT);
       }
@@ -304,8 +302,8 @@ test.describe('이미지 줌', () => {
       const svgImages = await page.evaluate(() => {
         const imgs = document.querySelectorAll('img');
         return Array.from(imgs)
-          .filter((img) => img.src.startsWith('data:image/svg+xml'))
-          .map((img) => ({
+          .filter(img => img.src.startsWith('data:image/svg+xml'))
+          .map(img => ({
             role: img.getAttribute('role'),
             tabindex: img.getAttribute('tabindex'),
           }));
@@ -351,7 +349,7 @@ test.describe('이미지 줌', () => {
     test('줌 이미지에 cursor: zoom-in이 적용된다', async ({ page }) => {
       const img = page.getByAltText(FIRST_IMAGE_ALT).first();
       const cursor = await img.evaluate(
-        (el) => window.getComputedStyle(el).cursor,
+        el => window.getComputedStyle(el).cursor
       );
       // Tailwind의 cursor-zoom-in
       expect(cursor).toBe('zoom-in');
@@ -365,7 +363,7 @@ test.describe('이미지 줌', () => {
       await expect(dialog).toBeVisible();
 
       const cursor = await dialog.evaluate(
-        (el) => window.getComputedStyle(el).cursor,
+        el => window.getComputedStyle(el).cursor
       );
       expect(cursor).toBe('zoom-out');
     });

@@ -39,11 +39,11 @@ vi.mock('next/image', () => {
   const MockImage = forwardRef(
     (
       props: React.ImgHTMLAttributes<HTMLImageElement>,
-      ref: React.Ref<HTMLImageElement>,
+      ref: React.Ref<HTMLImageElement>
     ) => (
       // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
       <img ref={ref} {...props} />
-    ),
+    )
   );
   MockImage.displayName = 'MockImage';
   return { default: MockImage };
@@ -78,7 +78,7 @@ describe('MDXZoomImage', () => {
 
     it('className을 전달한다', () => {
       render(
-        <MDXZoomImage src="/test.png" alt="테스트" className="custom-class" />,
+        <MDXZoomImage src="/test.png" alt="테스트" className="custom-class" />
       );
       expect(screen.getByAltText('테스트').className).toContain('custom-class');
     });
@@ -86,7 +86,7 @@ describe('MDXZoomImage', () => {
     it('cursor-zoom-in 클래스가 적용된다', () => {
       render(<MDXZoomImage src="/test.png" alt="테스트" />);
       expect(screen.getByAltText('테스트').className).toContain(
-        'cursor-zoom-in',
+        'cursor-zoom-in'
       );
     });
 
@@ -114,15 +114,15 @@ describe('MDXZoomImage', () => {
 
     it('alt가 있으면 aria-label에 확대 안내가 포함된다', () => {
       render(<MDXZoomImage src="/test.png" alt="테스트 이미지" />);
-      expect(screen.getByAltText('테스트 이미지').getAttribute('aria-label')).toBe(
-        '테스트 이미지 - 클릭하여 확대',
-      );
+      expect(
+        screen.getByAltText('테스트 이미지').getAttribute('aria-label')
+      ).toBe('테스트 이미지 - 클릭하여 확대');
     });
 
     it('alt가 없으면 aria-label에 기본 안내가 표시된다', () => {
       render(<MDXZoomImage src="/test.png" />);
       expect(screen.getByAltText('').getAttribute('aria-label')).toBe(
-        '이미지 클릭하여 확대',
+        '이미지 클릭하여 확대'
       );
     });
 
@@ -136,7 +136,7 @@ describe('MDXZoomImage', () => {
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
       openZoom();
       expect(screen.getByRole('dialog').getAttribute('aria-modal')).toBe(
-        'true',
+        'true'
       );
     });
 
@@ -144,7 +144,7 @@ describe('MDXZoomImage', () => {
       render(<MDXZoomImage src="/test.png" alt="접근성 테스트" />);
       openZoom('접근성 테스트');
       expect(screen.getByRole('dialog').getAttribute('aria-label')).toBe(
-        '접근성 테스트',
+        '접근성 테스트'
       );
     });
 
@@ -152,7 +152,7 @@ describe('MDXZoomImage', () => {
       render(<MDXZoomImage src="/test.png" />);
       openZoom('');
       expect(screen.getByRole('dialog').getAttribute('aria-label')).toBe(
-        '이미지 확대 보기',
+        '이미지 확대 보기'
       );
     });
   });
@@ -579,7 +579,7 @@ describe('MDXZoomImage', () => {
     it('cursor-zoom-in 클래스가 없다', () => {
       render(<MDXZoomImage src={svgDataUri} alt="SVG" />);
       expect(screen.getByAltText('SVG').className).not.toContain(
-        'cursor-zoom-in',
+        'cursor-zoom-in'
       );
     });
 
@@ -600,7 +600,7 @@ describe('MDXZoomImage', () => {
 
     it('className을 전달한다', () => {
       render(
-        <MDXZoomImage src={svgDataUri} alt="SVG" className="custom-svg" />,
+        <MDXZoomImage src={svgDataUri} alt="SVG" className="custom-svg" />
       );
       expect(screen.getByAltText('SVG').className).toContain('custom-svg');
     });
@@ -626,7 +626,7 @@ describe('MDXZoomImage', () => {
         <>
           <MDXZoomImage src="/first.png" alt="첫 번째" />
           <MDXZoomImage src="/second.png" alt="두 번째" />
-        </>,
+        </>
       );
 
       // 첫 번째 이미지만 줌 (원본 = getAllByAltText[0])
@@ -635,7 +635,7 @@ describe('MDXZoomImage', () => {
       expect(screen.getByRole('dialog')).toBeDefined();
       expect(firstOriginal.style.visibility).toBe('hidden');
       expect(screen.getByAltText('두 번째').style.visibility).not.toBe(
-        'hidden',
+        'hidden'
       );
     });
 
@@ -644,7 +644,7 @@ describe('MDXZoomImage', () => {
         <>
           <MDXZoomImage src="/first.png" alt="첫 번째" />
           <MDXZoomImage src="/second.png" alt="두 번째" />
-        </>,
+        </>
       );
 
       // 첫 번째 열기 → 닫기
@@ -724,7 +724,7 @@ describe('MDXZoomImage', () => {
   describe('언마운트 안전성', () => {
     it('줌 열린 상태에서 언마운트해도 에러가 발생하지 않는다', () => {
       const { unmount } = render(
-        <MDXZoomImage src="/test.png" alt="줌 테스트" />,
+        <MDXZoomImage src="/test.png" alt="줌 테스트" />
       );
       fireEvent.click(screen.getByAltText('줌 테스트'));
       expect(screen.getByRole('dialog')).toBeDefined();
@@ -735,7 +735,7 @@ describe('MDXZoomImage', () => {
 
     it('줌 닫히는 중 언마운트해도 에러가 발생하지 않는다', () => {
       const { unmount } = render(
-        <MDXZoomImage src="/test.png" alt="줌 테스트" />,
+        <MDXZoomImage src="/test.png" alt="줌 테스트" />
       );
       fireEvent.click(screen.getByAltText('줌 테스트'));
       fireEvent.click(screen.getByRole('dialog'));
@@ -746,7 +746,7 @@ describe('MDXZoomImage', () => {
 
     it('언마운트 후 body overflow가 복원된다', () => {
       const { unmount } = render(
-        <MDXZoomImage src="/test.png" alt="줌 테스트" />,
+        <MDXZoomImage src="/test.png" alt="줌 테스트" />
       );
       fireEvent.click(screen.getByAltText('줌 테스트'));
       expect(document.body.style.overflow).toBe('hidden');

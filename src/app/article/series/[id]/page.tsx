@@ -40,11 +40,7 @@ export function generateMetadata({
   };
 }
 
-export default function SeriesPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function SeriesPage({ params }: { params: { id: string } }) {
   const config = getSeriesConfig(params.id);
   if (!config) notFound();
 
@@ -61,7 +57,10 @@ export default function SeriesPage({
       <Typography variant="p" className="!mt-2 text-muted-foreground">
         {config.description}
       </Typography>
-      <Typography variant="p" className="!mt-1 text-sm text-muted-foreground/60">
+      <Typography
+        variant="p"
+        className="!mt-1 text-sm text-muted-foreground/60"
+      >
         {seriesInfo.articles.length}개의 글
       </Typography>
 

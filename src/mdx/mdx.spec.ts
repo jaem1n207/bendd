@@ -9,7 +9,8 @@ vi.mock('@/lib/series', () => ({
     const configs: Record<string, { name: string; description: string }> = {
       'ai-coding-agent': {
         name: 'AI 코딩 에이전트',
-        description: 'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
+        description:
+          'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
       },
       'react-deep-dive': {
         name: 'React 딥다이브',
@@ -22,7 +23,9 @@ vi.mock('@/lib/series', () => ({
 
 // --- Test fixtures ---
 
-const createArticle = (overrides: Partial<Article> & { slug: string }): Article => ({
+const createArticle = (
+  overrides: Partial<Article> & { slug: string }
+): Article => ({
   metadata: {
     title: '테스트 글',
     publishedAt: '2025-01-15',
@@ -110,17 +113,26 @@ describe('formatDate', () => {
   });
 
   it('방금 전 (1분 미만)', () => {
-    const result = formatDate({ date: '2025-03-15T11:59:30', includeRelative: true });
+    const result = formatDate({
+      date: '2025-03-15T11:59:30',
+      includeRelative: true,
+    });
     expect(result).toContain('방금 전');
   });
 
   it('N분 전 (1시간 미만)', () => {
-    const result = formatDate({ date: '2025-03-15T11:30:00', includeRelative: true });
+    const result = formatDate({
+      date: '2025-03-15T11:30:00',
+      includeRelative: true,
+    });
     expect(result).toContain('30분 전');
   });
 
   it('N시간 전 (24시간 미만)', () => {
-    const result = formatDate({ date: '2025-03-15T06:00:00', includeRelative: true });
+    const result = formatDate({
+      date: '2025-03-15T06:00:00',
+      includeRelative: true,
+    });
     expect(result).toContain('6시간 전');
   });
 
@@ -165,7 +177,10 @@ describe('formatDate', () => {
   });
 
   it('T가 포함된 ISO 형식 날짜 처리', () => {
-    const result = formatDate({ date: '2025-03-14T10:00:00', includeRelative: true });
+    const result = formatDate({
+      date: '2025-03-14T10:00:00',
+      includeRelative: true,
+    });
     expect(result).toContain('하루 전');
   });
 });
@@ -208,7 +223,9 @@ describe('sortByDateDesc', () => {
   it('같은 날짜일 때 seriesOrder 내림차순으로 정렬한다', () => {
     const sorted = sortByDateDesc(ARTICLES);
     // ai-agent-part1 (order 1)과 ai-agent-part3 (order 3) 모두 2025-02-01
-    const sameDate = sorted.filter(a => a.metadata.publishedAt === '2025-02-01');
+    const sameDate = sorted.filter(
+      a => a.metadata.publishedAt === '2025-02-01'
+    );
     expect(sameDate[0].slug).toBe('ai-agent-part3'); // order 3 먼저
     expect(sameDate[1].slug).toBe('ai-agent-part1'); // order 1 나중
   });
@@ -338,7 +355,8 @@ describe('getSeriesSummaries', () => {
       id: 'ai-coding-agent',
       config: {
         name: 'AI 코딩 에이전트',
-        description: 'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
+        description:
+          'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
       },
       articleCount: 3,
     });

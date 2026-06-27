@@ -14,10 +14,7 @@ export function MDXAutoplayVideo({
         muted
         playsInline
         src={src}
-        className={cn(
-          'w-full object-contain h-auto block my-0',
-          className
-        )}
+        className={cn('w-full object-contain h-auto block my-0', className)}
         aria-label="Video player"
         {...props}
       />

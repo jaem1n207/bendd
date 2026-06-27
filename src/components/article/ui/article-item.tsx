@@ -49,7 +49,11 @@ export function ArticleItem({
       );
     }
 
-    animateSummary(summaryRef.current, { opacity: [0, 1] }, { duration, delay });
+    animateSummary(
+      summaryRef.current,
+      { opacity: [0, 1] },
+      { duration, delay }
+    );
     if (summaryRef.current) {
       cancelShuffles.push(
         shuffleLetters(summaryRef.current, {
