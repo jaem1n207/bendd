@@ -65,7 +65,7 @@ Add a native CI workflow first:
 - Trigger on `pull_request` and pushes to `main`.
 - Use `pnpm/action-setup@v6.0.9`, `actions/setup-node@v6.4.0`, and `actions/checkout@v7.0.0`, pinned to their full SHAs during implementation.
 - Run `pnpm install --frozen-lockfile`.
-- Run `pnpm check-types`, `pnpm lint`, `pnpm format:check`, `pnpm test:unit`, and `pnpm build`.
+- Run `pnpm check-types`, `pnpm lint`, `pnpm format:check`, `pnpm test:unit --run`, and `pnpm build`.
 
 Add Labeler after CI exists:
 
