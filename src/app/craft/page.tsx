@@ -1,10 +1,16 @@
 import type { Metadata, ResolvingMetadata } from 'next';
 
+import { SeriesBanner } from '@/components/series';
 import { ArticleItem } from '@/components/article/ui/article-item';
 import { JsonLdScript } from '@/components/structured-data';
 import { siteMetadata } from '@/lib/site-metadata';
 import { createCraftIndexGraph } from '@/lib/structured-data';
-import { formatCraftsForDisplay, readCraftArticles, sortByDateDesc } from '@/mdx/mdx';
+import {
+  formatCraftsForDisplay,
+  getSeriesSummaries,
+  readCraftArticles,
+  sortByDateDesc,
+} from '@/mdx/mdx';
 
 export async function generateMetadata(
   {},
@@ -33,6 +39,7 @@ export async function generateMetadata(
 
 export default function CraftPage() {
   const articles = sortByDateDesc(readCraftArticles());
+  const seriesSummaries = getSeriesSummaries(articles);
   const formattedArticleInfo = formatCraftsForDisplay(articles, {
     includeRelativeDate: false,
   });
@@ -43,6 +50,7 @@ export default function CraftPage() {
     <main className="relative mx-auto my-0 min-h-screen max-w-4xl overflow-y-auto px-6 pt-10 sm:py-32">
       <JsonLdScript data={collectionJsonLd} />
       <div className="mt-8 flex flex-col gap-7">
+        <SeriesBanner items={seriesSummaries} />
         {formattedArticleInfo.map((article, index) => (
           <ArticleItem key={article.href} {...article} index={index} />
         ))}
