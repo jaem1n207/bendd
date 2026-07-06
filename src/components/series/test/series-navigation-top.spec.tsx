@@ -8,6 +8,8 @@ const defaultProps = {
   id: 'ai-coding-agent',
   name: 'AI 코딩 에이전트',
   description: 'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
+  contentType: 'article' as const,
+  route: '/article/series/ai-coding-agent' as Route<''>,
   articles: [
     {
       slug: 'fix-compacting-conversation',
@@ -38,9 +40,7 @@ describe('SeriesNavigationTop', () => {
     expect(
       screen.getByText('Compacting 이후 AI 품질 저하 해결 가이드')
     ).toBeDefined();
-    expect(
-      screen.getByText('AI 에이전트 토큰 절약 실전 가이드')
-    ).toBeDefined();
+    expect(screen.getByText('AI 에이전트 토큰 절약 실전 가이드')).toBeDefined();
   });
 
   it('should highlight current article and not make it a link', () => {
@@ -53,9 +53,7 @@ describe('SeriesNavigationTop', () => {
 
   it('should make non-current articles clickable links', () => {
     render(<SeriesNavigationTop {...defaultProps} />);
-    const otherArticle = screen.getByText(
-      'AI 에이전트 토큰 절약 실전 가이드'
-    );
+    const otherArticle = screen.getByText('AI 에이전트 토큰 절약 실전 가이드');
     const link = otherArticle.closest('a');
     expect(link).not.toBeNull();
     expect(link?.getAttribute('href')).toBe(
@@ -67,8 +65,6 @@ describe('SeriesNavigationTop', () => {
     render(<SeriesNavigationTop {...defaultProps} />);
     const seriesLink = screen.getByText('AI 코딩 에이전트 시리즈');
     const link = seriesLink.closest('a');
-    expect(link?.getAttribute('href')).toBe(
-      '/article/series/ai-coding-agent'
-    );
+    expect(link?.getAttribute('href')).toBe('/article/series/ai-coding-agent');
   });
 });
