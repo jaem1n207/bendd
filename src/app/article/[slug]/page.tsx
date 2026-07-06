@@ -79,7 +79,14 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
 
   const seriesInfo =
     post.metadata.series && post.metadata.seriesOrder
-      ? getSeriesInfo(articles, post.metadata.series, post.metadata.seriesOrder)
+      ? getSeriesInfo(
+          articles,
+          post.metadata.series,
+          post.metadata.seriesOrder,
+          {
+            contentType: 'article',
+          }
+        )
       : undefined;
 
   return <MdxLayout post={post} type="article" seriesInfo={seriesInfo} />;

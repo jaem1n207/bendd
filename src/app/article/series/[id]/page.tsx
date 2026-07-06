@@ -5,7 +5,7 @@ import { cache } from 'react';
 
 import { JsonLdScript } from '@/components/structured-data';
 import { Typography } from '@/components/ui/typography';
-import { getAllSeriesIds, getSeriesConfig } from '@/lib/series';
+import { getAllSeriesIds, getSeriesConfig, seriesRoute } from '@/lib/series';
 import { siteMetadata } from '@/lib/site-metadata';
 import { createSeriesGraph } from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
@@ -14,7 +14,7 @@ import { formatDate, getSeriesInfo, readArticles } from '@/mdx/mdx';
 const getArticles = cache(() => readArticles());
 
 export function generateStaticParams() {
-  return getAllSeriesIds().map(id => ({ id }));
+  return getAllSeriesIds('article').map(id => ({ id }));
 }
 
 export function generateMetadata({
@@ -23,33 +23,31 @@ export function generateMetadata({
   params: { id: string };
 }): Metadata {
   const config = getSeriesConfig(params.id);
-  if (!config) notFound();
+  if (!config || config.contentType !== 'article') notFound();
 
   return {
     title: `${config.name} 시리즈`,
     description: config.description,
     alternates: {
-      canonical: `${siteMetadata.siteUrl}/article/series/${params.id}`,
+      canonical: `${siteMetadata.siteUrl}${seriesRoute(params.id, 'article')}`,
     },
     openGraph: {
       type: 'website',
-      url: `${siteMetadata.siteUrl}/article/series/${params.id}`,
+      url: `${siteMetadata.siteUrl}${seriesRoute(params.id, 'article')}`,
       title: `${config.name} 시리즈`,
       description: config.description,
     },
   };
 }
 
-export default function SeriesPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function SeriesPage({ params }: { params: { id: string } }) {
   const config = getSeriesConfig(params.id);
-  if (!config) notFound();
+  if (!config || config.contentType !== 'article') notFound();
 
   const articles = getArticles();
-  const seriesInfo = getSeriesInfo(articles, params.id, -1);
+  const seriesInfo = getSeriesInfo(articles, params.id, -1, {
+    contentType: 'article',
+  });
   if (!seriesInfo) notFound();
 
   const collectionJsonLd = createSeriesGraph({ seriesInfo });
@@ -61,7 +59,10 @@ export default function SeriesPage({
       <Typography variant="p" className="!mt-2 text-muted-foreground">
         {config.description}
       </Typography>
-      <Typography variant="p" className="!mt-1 text-sm text-muted-foreground/60">
+      <Typography
+        variant="p"
+        className="!mt-1 text-sm text-muted-foreground/60"
+      >
         {seriesInfo.articles.length}개의 글
       </Typography>
 
