@@ -1,0 +1,43 @@
+<svg width="1344" height="768" viewBox="0 0 1344 768" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1344" height="768" rx="32" fill="#F7F8FA"/>
+  <rect x="64" y="64" width="1216" height="640" rx="28" fill="white" stroke="#D9DEE8" stroke-width="2"/>
+  <text x="104" y="124" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="34" font-weight="700">같은 글을 읽어도 스크롤 위치는 쉽게 어긋나요</text>
+  <text x="104" y="164" fill="#6B7280" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="20">원문과 번역문은 같은 내용을 담아도 목차, 문장 길이, 배너 유무 때문에 화면 길이가 달라질 수 있어요.</text>
+
+  <rect x="104" y="218" width="524" height="394" rx="20" fill="#F9FAFB" stroke="#D9DEE8"/>
+  <rect x="136" y="250" width="460" height="44" rx="12" fill="#1F2937"/>
+  <circle cx="160" cy="272" r="6" fill="#F87171"/>
+  <circle cx="182" cy="272" r="6" fill="#FBBF24"/>
+  <circle cx="204" cy="272" r="6" fill="#34D399"/>
+  <text x="230" y="279" fill="#E5E7EB" font-family="Inter, sans-serif" font-size="16">developer.chrome.com / original</text>
+  <text x="136" y="334" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="24" font-weight="700">Inside look at modern web browsers</text>
+  <rect x="136" y="362" width="196" height="112" rx="14" fill="#EEF2FF" stroke="#A5B4FC"/>
+  <text x="158" y="398" fill="#4338CA" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="18" font-weight="700">Table of contents</text>
+  <rect x="158" y="418" width="136" height="10" rx="5" fill="#C7D2FE"/>
+  <rect x="158" y="442" width="114" height="10" rx="5" fill="#C7D2FE"/>
+  <rect x="136" y="506" width="360" height="14" rx="7" fill="#D1D5DB"/>
+  <rect x="136" y="536" width="420" height="14" rx="7" fill="#D1D5DB"/>
+  <rect x="136" y="566" width="300" height="14" rx="7" fill="#3B82F6"/>
+  <text x="136" y="642" fill="#374151" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="18">원문: 목차가 있어 본문 시작이 늦어짐</text>
+
+  <rect x="716" y="218" width="524" height="394" rx="20" fill="#F9FAFB" stroke="#D9DEE8"/>
+  <rect x="748" y="250" width="460" height="44" rx="12" fill="#1F2937"/>
+  <circle cx="772" cy="272" r="6" fill="#F87171"/>
+  <circle cx="794" cy="272" r="6" fill="#FBBF24"/>
+  <circle cx="816" cy="272" r="6" fill="#34D399"/>
+  <text x="842" y="279" fill="#E5E7EB" font-family="Inter, sans-serif" font-size="16">d2.naver.com / translation</text>
+  <text x="748" y="334" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="24" font-weight="700">최신 브라우저의 내부 살펴보기</text>
+  <rect x="748" y="374" width="390" height="14" rx="7" fill="#D1D5DB"/>
+  <rect x="748" y="404" width="310" height="14" rx="7" fill="#D1D5DB"/>
+  <rect x="748" y="434" width="430" height="14" rx="7" fill="#D1D5DB"/>
+  <rect x="748" y="464" width="360" height="14" rx="7" fill="#D1D5DB"/>
+  <rect x="748" y="506" width="330" height="14" rx="7" fill="#D1D5DB"/>
+  <rect x="748" y="536" width="422" height="14" rx="7" fill="#D1D5DB"/>
+  <rect x="748" y="566" width="256" height="14" rx="7" fill="#F59E0B"/>
+  <text x="748" y="642" fill="#374151" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="18">번역문: 문장 길이가 달라져 위치 차이가 누적됨</text>
+
+  <path d="M650 420H694" stroke="#9CA3AF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M680 402L698 420L680 438" stroke="#9CA3AF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="474" y="664" width="396" height="44" rx="22" fill="#111827"/>
+  <text x="510" y="693" fill="white" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="19" font-weight="700">같은 비율 ≠ 같은 문맥</text>
+</svg>

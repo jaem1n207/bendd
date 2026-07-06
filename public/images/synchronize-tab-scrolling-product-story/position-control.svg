@@ -1,0 +1,38 @@
+<svg width="1344" height="768" viewBox="0 0 1344 768" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1344" height="768" rx="32" fill="#F8FAFC"/>
+  <rect x="72" y="72" width="1200" height="624" rx="28" fill="white" stroke="#D8DEE8" stroke-width="2"/>
+  <text x="112" y="132" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="34" font-weight="700">오버레이 위치는 페이지마다 사용자가 피할 수 있어야 해요</text>
+  <text x="112" y="172" fill="#6B7280" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="20">문서마다 중요한 영역이 달라서, 하나의 고정 위치만으로는 충분하지 않았어요.</text>
+
+  <g font-family="Inter, Apple SD Gothic Neo, sans-serif">
+    <rect x="112" y="238" width="326" height="360" rx="22" fill="#F9FAFB" stroke="#E5E7EB"/>
+    <text x="144" y="284" fill="#111827" font-size="22" font-weight="700">왼쪽에 둘 때</text>
+    <rect x="144" y="326" width="244" height="172" rx="16" fill="white" stroke="#D1D5DB"/>
+    <rect x="196" y="362" width="150" height="12" rx="6" fill="#D1D5DB"/>
+    <rect x="196" y="396" width="174" height="12" rx="6" fill="#D1D5DB"/>
+    <rect x="196" y="430" width="124" height="12" rx="6" fill="#D1D5DB"/>
+    <circle cx="168" cy="428" r="28" fill="#2F343B" stroke="#111827" stroke-width="3"/>
+    <circle cx="196" cy="454" r="8" fill="#3B82F6" stroke="#111827" stroke-width="3"/>
+    <text x="144" y="544" fill="#6B7280" font-size="17">오른쪽 본문을 가리지 않음</text>
+
+    <rect x="510" y="238" width="326" height="360" rx="22" fill="#F9FAFB" stroke="#E5E7EB"/>
+    <text x="542" y="284" fill="#111827" font-size="22" font-weight="700">오른쪽에 둘 때</text>
+    <rect x="542" y="326" width="244" height="172" rx="16" fill="white" stroke="#D1D5DB"/>
+    <rect x="572" y="362" width="150" height="12" rx="6" fill="#D1D5DB"/>
+    <rect x="572" y="396" width="174" height="12" rx="6" fill="#D1D5DB"/>
+    <rect x="572" y="430" width="124" height="12" rx="6" fill="#D1D5DB"/>
+    <circle cx="762" cy="428" r="28" fill="#2F343B" stroke="#111827" stroke-width="3"/>
+    <circle cx="790" cy="454" r="8" fill="#3B82F6" stroke="#111827" stroke-width="3"/>
+    <text x="542" y="544" fill="#6B7280" font-size="17">왼쪽 목차나 코드 영역을 피함</text>
+
+    <rect x="908" y="238" width="326" height="360" rx="22" fill="#F9FAFB" stroke="#E5E7EB"/>
+    <text x="940" y="284" fill="#111827" font-size="22" font-weight="700">아래에 둘 때</text>
+    <rect x="940" y="326" width="244" height="172" rx="16" fill="white" stroke="#D1D5DB"/>
+    <rect x="970" y="362" width="150" height="12" rx="6" fill="#D1D5DB"/>
+    <rect x="970" y="396" width="174" height="12" rx="6" fill="#D1D5DB"/>
+    <rect x="970" y="430" width="124" height="12" rx="6" fill="#D1D5DB"/>
+    <circle cx="1062" cy="488" r="28" fill="#2F343B" stroke="#111827" stroke-width="3"/>
+    <circle cx="1090" cy="514" r="8" fill="#3B82F6" stroke="#111827" stroke-width="3"/>
+    <text x="940" y="544" fill="#6B7280" font-size="17">상단 헤더나 주요 버튼을 피함</text>
+  </g>
+</svg>
