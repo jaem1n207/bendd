@@ -252,7 +252,7 @@ export const createSeriesItemListNode = ({
   createItemListNode({
     entries: seriesInfo.articles.map(article => ({
       position: article.order,
-      url: absoluteUrl(`/article/${article.slug}`),
+      url: absoluteUrl(article.href),
       name: article.title,
     })),
   });
