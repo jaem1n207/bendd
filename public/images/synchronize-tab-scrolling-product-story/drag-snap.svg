@@ -1,0 +1,34 @@
+<svg width="1344" height="768" viewBox="0 0 1344 768" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1344" height="768" rx="32" fill="#F7F8FA"/>
+  <rect x="72" y="72" width="1200" height="624" rx="28" fill="white" stroke="#D9DEE8" stroke-width="2"/>
+  <text x="112" y="132" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="34" font-weight="700">자유롭게 옮기되, 세밀한 정렬은 요구하지 않아요</text>
+  <text x="112" y="172" fill="#6B7280" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="20">사용자는 방해되는 위치만 피하면 되고, 버튼은 가까운 테두리에 자동으로 스냅돼요.</text>
+
+  <rect x="154" y="238" width="1036" height="392" rx="24" fill="#F9FAFB" stroke="#D1D5DB" stroke-width="2"/>
+  <rect x="180" y="264" width="984" height="340" rx="18" fill="white" stroke="#E5E7EB"/>
+  <rect x="218" y="314" width="280" height="18" rx="9" fill="#D1D5DB"/>
+  <rect x="218" y="358" width="420" height="18" rx="9" fill="#D1D5DB"/>
+  <rect x="218" y="402" width="360" height="18" rx="9" fill="#D1D5DB"/>
+  <rect x="218" y="446" width="500" height="18" rx="9" fill="#D1D5DB"/>
+  <rect x="218" y="490" width="330" height="18" rx="9" fill="#D1D5DB"/>
+  <rect x="1018" y="286" width="104" height="274" rx="18" fill="#EEF2FF" stroke="#A5B4FC" stroke-dasharray="8 8"/>
+  <text x="1036" y="588" fill="#4F46E5" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="16" font-weight="700">snap zone</text>
+
+  <circle cx="506" cy="480" r="42" fill="#2F343B" stroke="#111827" stroke-width="3"/>
+  <rect x="486" y="462" width="40" height="5" rx="2.5" fill="white"/>
+  <rect x="486" y="479" width="40" height="5" rx="2.5" fill="white"/>
+  <rect x="486" y="496" width="40" height="5" rx="2.5" fill="white"/>
+  <circle cx="546" cy="512" r="12" fill="#3B82F6" stroke="#111827" stroke-width="4"/>
+
+  <path d="M566 462C700 372 810 366 996 396" stroke="#F59E0B" stroke-width="5" stroke-linecap="round" stroke-dasharray="14 14"/>
+  <path d="M972 371L1006 398L965 413" stroke="#F59E0B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <circle cx="1082" cy="420" r="42" fill="#2F343B" stroke="#111827" stroke-width="3"/>
+  <rect x="1062" y="402" width="40" height="5" rx="2.5" fill="white"/>
+  <rect x="1062" y="419" width="40" height="5" rx="2.5" fill="white"/>
+  <rect x="1062" y="436" width="40" height="5" rx="2.5" fill="white"/>
+  <circle cx="1122" cy="452" r="12" fill="#3B82F6" stroke="#111827" stroke-width="4"/>
+
+  <rect x="392" y="650" width="560" height="42" rx="21" fill="#111827"/>
+  <text x="430" y="678" fill="white" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="18" font-weight="700">대충 피하면, 제품이 마지막 정리를 해줘요</text>
+</svg>

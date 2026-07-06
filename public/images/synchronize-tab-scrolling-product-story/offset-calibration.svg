@@ -1,0 +1,37 @@
+<svg width="1344" height="768" viewBox="0 0 1344 768" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1344" height="768" rx="32" fill="#F8FAFC"/>
+  <rect x="72" y="72" width="1200" height="624" rx="28" fill="white" stroke="#D8DEE8" stroke-width="2"/>
+  <text x="112" y="132" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="34" font-weight="700">한 번 맞춘 위치 차이를 이후 스크롤에 계속 적용해요</text>
+  <text x="112" y="172" fill="#6B7280" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="20">문서 구조를 자동으로 추론하기보다, 사용자가 직접 맞춘 기준점을 유지하는 방식이에요.</text>
+
+  <line x1="192" y1="384" x2="1152" y2="384" stroke="#D1D5DB" stroke-width="6" stroke-linecap="round"/>
+  <g font-family="Inter, Apple SD Gothic Neo, sans-serif">
+    <circle cx="232" cy="384" r="28" fill="#DBEAFE" stroke="#3B82F6" stroke-width="4"/>
+    <text x="206" y="454" fill="#111827" font-size="20" font-weight="700">1. 기본 동기화</text>
+    <text x="178" y="482" fill="#6B7280" font-size="17">두 탭이 함께 움직임</text>
+
+    <circle cx="508" cy="384" r="28" fill="#FEF3C7" stroke="#F59E0B" stroke-width="4"/>
+    <text x="456" y="454" fill="#111827" font-size="20" font-weight="700">2. 보정 키 누름</text>
+    <text x="425" y="482" fill="#6B7280" font-size="17">현재 탭만 움직일 수 있음</text>
+
+    <circle cx="820" cy="384" r="28" fill="#FCE7F3" stroke="#EC4899" stroke-width="4"/>
+    <text x="760" y="454" fill="#111827" font-size="20" font-weight="700">3. 키를 떼면 저장</text>
+    <text x="760" y="482" fill="#6B7280" font-size="17">예: 원문 기준 +124px</text>
+
+    <circle cx="1112" cy="384" r="28" fill="#DCFCE7" stroke="#22C55E" stroke-width="4"/>
+    <text x="1050" y="454" fill="#111827" font-size="20" font-weight="700">4. 보정값 유지</text>
+    <text x="1036" y="482" fill="#6B7280" font-size="17">이후 스크롤에 계속 적용</text>
+  </g>
+
+  <rect x="188" y="234" width="288" height="78" rx="18" fill="#F9FAFB" stroke="#E5E7EB"/>
+  <text x="214" y="268" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="18" font-weight="700">Original</text>
+  <rect x="214" y="286" width="210" height="10" rx="5" fill="#3B82F6"/>
+  <rect x="560" y="234" width="288" height="78" rx="18" fill="#F9FAFB" stroke="#E5E7EB"/>
+  <text x="586" y="268" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="18" font-weight="700">Translation</text>
+  <rect x="586" y="286" width="158" height="10" rx="5" fill="#F59E0B"/>
+  <path d="M432 272H558" stroke="#9CA3AF" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8"/>
+  <text x="480" y="250" fill="#6B7280" font-family="Inter, sans-serif" font-size="16">offset</text>
+
+  <rect x="438" y="584" width="468" height="48" rx="24" fill="#111827"/>
+  <text x="474" y="615" fill="white" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="19" font-weight="700">완벽한 자동 추론 대신, 사용자가 이해할 수 있는 기준점</text>
+</svg>
