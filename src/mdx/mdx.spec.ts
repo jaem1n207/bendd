@@ -6,23 +6,45 @@ import type { Article } from './mdx';
 
 vi.mock('@/lib/series', () => ({
   getSeriesConfig: vi.fn((id: string) => {
-    const configs: Record<string, { name: string; description: string }> = {
+    const configs: Record<
+      string,
+      {
+        name: string;
+        description: string;
+        contentType: 'article' | 'craft';
+      }
+    > = {
       'ai-coding-agent': {
         name: 'AI 코딩 에이전트',
-        description: 'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
+        description:
+          'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
+        contentType: 'article',
       },
       'react-deep-dive': {
         name: 'React 딥다이브',
         description: 'React 내부 동작을 깊이 파헤치는 시리즈',
+        contentType: 'article',
+      },
+      'synchronize-tab-scrolling': {
+        name: '탭 스크롤 동기화 확장 프로그램',
+        description:
+          '탭 스크롤 동기화 확장 프로그램을 만들고 운영하며 배운 과정을 다루는 시리즈',
+        contentType: 'craft',
       },
     };
     return configs[id];
   }),
+  seriesRoute: vi.fn(
+    (id: string, contentType: 'article' | 'craft' = 'article') =>
+      `/${contentType}/series/${id}`
+  ),
 }));
 
 // --- Test fixtures ---
 
-const createArticle = (overrides: Partial<Article> & { slug: string }): Article => ({
+const createArticle = (
+  overrides: Partial<Article> & { slug: string }
+): Article => ({
   metadata: {
     title: '테스트 글',
     publishedAt: '2025-01-15',
@@ -94,6 +116,21 @@ const ARTICLES: ReadonlyArray<Article> = [
   }),
 ];
 
+const CRAFT_ARTICLES: ReadonlyArray<Article> = [
+  createArticle({
+    slug: 'synchronize-tab-scrolling-product-story',
+    metadata: {
+      title: '스크롤 동기화 확장 프로그램 개발기',
+      publishedAt: '2026-07-07',
+      category: 'craft',
+      description: '스크롤 동기화 확장 프로그램을 제품처럼 운영한 과정',
+      summary: '개인 도구가 제품이 된 과정',
+      series: 'synchronize-tab-scrolling',
+      seriesOrder: 1,
+    },
+  }),
+];
+
 // --- Tests ---
 
 describe('formatDate', () => {
@@ -110,17 +147,26 @@ describe('formatDate', () => {
   });
 
   it('방금 전 (1분 미만)', () => {
-    const result = formatDate({ date: '2025-03-15T11:59:30', includeRelative: true });
+    const result = formatDate({
+      date: '2025-03-15T11:59:30',
+      includeRelative: true,
+    });
     expect(result).toContain('방금 전');
   });
 
   it('N분 전 (1시간 미만)', () => {
-    const result = formatDate({ date: '2025-03-15T11:30:00', includeRelative: true });
+    const result = formatDate({
+      date: '2025-03-15T11:30:00',
+      includeRelative: true,
+    });
     expect(result).toContain('30분 전');
   });
 
   it('N시간 전 (24시간 미만)', () => {
-    const result = formatDate({ date: '2025-03-15T06:00:00', includeRelative: true });
+    const result = formatDate({
+      date: '2025-03-15T06:00:00',
+      includeRelative: true,
+    });
     expect(result).toContain('6시간 전');
   });
 
@@ -165,7 +211,10 @@ describe('formatDate', () => {
   });
 
   it('T가 포함된 ISO 형식 날짜 처리', () => {
-    const result = formatDate({ date: '2025-03-14T10:00:00', includeRelative: true });
+    const result = formatDate({
+      date: '2025-03-14T10:00:00',
+      includeRelative: true,
+    });
     expect(result).toContain('하루 전');
   });
 });
@@ -208,7 +257,9 @@ describe('sortByDateDesc', () => {
   it('같은 날짜일 때 seriesOrder 내림차순으로 정렬한다', () => {
     const sorted = sortByDateDesc(ARTICLES);
     // ai-agent-part1 (order 1)과 ai-agent-part3 (order 3) 모두 2025-02-01
-    const sameDate = sorted.filter(a => a.metadata.publishedAt === '2025-02-01');
+    const sameDate = sorted.filter(
+      a => a.metadata.publishedAt === '2025-02-01'
+    );
     expect(sameDate[0].slug).toBe('ai-agent-part3'); // order 3 먼저
     expect(sameDate[1].slug).toBe('ai-agent-part1'); // order 1 나중
   });
@@ -236,6 +287,8 @@ describe('getSeriesInfo', () => {
     expect(info).toBeDefined();
     expect(info!.id).toBe('ai-coding-agent');
     expect(info!.name).toBe('AI 코딩 에이전트');
+    expect(info!.contentType).toBe('article');
+    expect(info!.route).toBe('/article/series/ai-coding-agent');
     expect(info!.currentOrder).toBe(1);
     expect(info!.articles).toHaveLength(3);
   });
@@ -251,6 +304,26 @@ describe('getSeriesInfo', () => {
     const info = getSeriesInfo(ARTICLES, 'ai-coding-agent', 1);
     expect(info!.articles[0].href).toBe('/article/ai-agent-part1');
     expect(info!.articles[1].href).toBe('/article/ai-agent-part2');
+  });
+
+  it('craft 시리즈 글에는 craft href를 생성한다', () => {
+    const info = getSeriesInfo(CRAFT_ARTICLES, 'synchronize-tab-scrolling', 1, {
+      contentType: 'craft',
+    });
+    expect(info).toBeDefined();
+    expect(info!.contentType).toBe('craft');
+    expect(info!.route).toBe('/craft/series/synchronize-tab-scrolling');
+    expect(info!.articles[0].href).toBe(
+      '/craft/synchronize-tab-scrolling-product-story'
+    );
+  });
+
+  it('요청한 콘텐츠 타입과 다른 시리즈는 반환하지 않는다', () => {
+    expect(
+      getSeriesInfo(ARTICLES, 'ai-coding-agent', 1, {
+        contentType: 'craft',
+      })
+    ).toBeUndefined();
   });
 
   it('존재하지 않는 시리즈 ID는 undefined를 반환한다', () => {
@@ -338,7 +411,9 @@ describe('getSeriesSummaries', () => {
       id: 'ai-coding-agent',
       config: {
         name: 'AI 코딩 에이전트',
-        description: 'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
+        description:
+          'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
+        contentType: 'article',
       },
       articleCount: 3,
     });
@@ -451,10 +526,17 @@ describe('formatCraftsForDisplay', () => {
     expect(result[0].href).toBe('/craft/react-hooks' as Route<''>);
   });
 
-  it('시리즈 배지를 포함하지 않는다', () => {
-    const seriesArticles = ARTICLES.filter(a => a.slug === 'ai-agent-part1');
+  it('craft 시리즈 글에 배지를 포함한다', () => {
+    const seriesArticles = CRAFT_ARTICLES.filter(
+      a => a.slug === 'synchronize-tab-scrolling-product-story'
+    );
     const result = formatCraftsForDisplay(seriesArticles);
-    expect(result[0].series).toBeUndefined();
+    expect(result[0].series).toEqual({
+      id: 'synchronize-tab-scrolling',
+      name: '탭 스크롤 동기화 확장 프로그램',
+      order: 1,
+      total: 1,
+    });
   });
 
   it('빈 배열을 처리한다', () => {

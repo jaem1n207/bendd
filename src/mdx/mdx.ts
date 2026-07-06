@@ -4,7 +4,12 @@ import { z } from 'zod';
 import { type Route } from 'next';
 
 import type { ArticleInfo } from '@/components/article/types/article';
-import { getSeriesConfig } from '@/lib/series';
+import {
+  getSeriesConfig,
+  seriesRoute,
+  type SeriesConfig,
+  type SeriesContentType,
+} from '@/lib/series';
 
 const MetadataSchema = z
   .object({
@@ -37,13 +42,15 @@ export type SeriesInfo = {
   id: string;
   name: string;
   description: string;
+  contentType: SeriesContentType;
+  route: Route<''>;
   articles: SeriesArticleEntry[];
   currentOrder: number;
 };
 
 export type SeriesSummary = {
   id: string;
-  config: { name: string; description: string };
+  config: SeriesConfig;
   articleCount: number;
 };
 
@@ -228,19 +235,27 @@ const groupBySeries = (
 export const getSeriesInfo = (
   articles: ReadonlyArray<Article>,
   seriesId: string,
-  currentOrder: number
+  currentOrder: number,
+  options: { contentType?: SeriesContentType } = {}
 ): SeriesInfo | undefined => {
   const config = getSeriesConfig(seriesId);
   if (!config) return undefined;
+  if (options.contentType && config.contentType !== options.contentType) {
+    return undefined;
+  }
+
+  const hrefPrefix = config.contentType === 'craft' ? '/craft' : '/article';
 
   const seriesArticles = articles
     .filter(a => a.metadata.series === seriesId)
-    .sort((a, b) => (a.metadata.seriesOrder ?? 0) - (b.metadata.seriesOrder ?? 0))
+    .sort(
+      (a, b) => (a.metadata.seriesOrder ?? 0) - (b.metadata.seriesOrder ?? 0)
+    )
     .map(a => ({
       slug: a.slug,
       title: a.metadata.title,
       order: a.metadata.seriesOrder ?? 0,
-      href: `/article/${a.slug}` as Route<''>,
+      href: `${hrefPrefix}/${a.slug}` as Route<''>,
       publishedAt: a.metadata.publishedAt,
     }));
 
@@ -250,6 +265,8 @@ export const getSeriesInfo = (
     id: seriesId,
     name: config.name,
     description: config.description,
+    contentType: config.contentType,
+    route: seriesRoute(seriesId, config.contentType),
     articles: seriesArticles,
     currentOrder,
   };
@@ -311,8 +328,9 @@ export const formatArticlesForDisplay = (
 export const formatCraftsForDisplay = (
   articles: ReadonlyArray<Article>,
   options: { includeRelativeDate?: boolean } = {}
-): ArticleInfo[] =>
-  articles.map(article => ({
+): ArticleInfo[] => {
+  const badges = getSeriesBadges(articles);
+  return articles.map(article => ({
     name: article.metadata.title,
     summary: article.metadata.summary,
     href: `/craft/${article.slug}` as Route<''>,
@@ -320,4 +338,6 @@ export const formatCraftsForDisplay = (
       date: article.metadata.publishedAt,
       includeRelative: options.includeRelativeDate,
     }),
+    ...(badges.has(article.slug) && { series: badges.get(article.slug) }),
   }));
+};
