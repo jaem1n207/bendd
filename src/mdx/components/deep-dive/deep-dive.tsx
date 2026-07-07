@@ -28,12 +28,12 @@ function DeepDive({ label, title, image, blocks }: DeepDiveProps) {
       <span
         className={cn(
           'inline-flex items-center rounded-full border border-border/70',
-          'bg-muted/40 px-4 py-1 text-sm font-medium text-muted-foreground'
+          'bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground'
         )}
       >
         {label}
       </span>
-      <h3 className="mt-4 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+      <h3 className="mt-4 text-xl font-semibold tracking-tight text-foreground md:text-2xl">
         {title}
       </h3>
 
@@ -53,10 +53,12 @@ function DeepDive({ label, title, image, blocks }: DeepDiveProps) {
       <div className="space-y-6">
         {blocks.map(block => (
           <section key={block.title}>
-            <h4 className="mb-1 text-lg font-semibold tracking-tight text-foreground">
+            <h4 className="mb-1 text-base font-semibold tracking-tight text-foreground">
               {block.title}
             </h4>
-            <p className="text-lg leading-8 text-foreground/75">{block.body}</p>
+            <p className="text-base leading-7 text-foreground/75">
+              {block.body}
+            </p>
           </section>
         ))}
       </div>
