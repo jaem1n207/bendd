@@ -27,10 +27,7 @@ export function MDXRoundedImage({
       <img
         alt={alt}
         src={src}
-        className={cn(
-          'mx-auto rounded-lg max-w-full h-auto',
-          className
-        )}
+        className={cn('mx-auto rounded-lg max-w-full h-auto', className)}
         {...props}
       />
     );
