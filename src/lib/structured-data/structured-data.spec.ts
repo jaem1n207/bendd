@@ -93,7 +93,7 @@ const craftSeriesInfo = {
         '원문과 번역문을 함께 읽기 위해 만든 확장 프로그램이 제품이 되기까지',
       order: 1,
       href: '/craft/synchronize-tab-scrolling-product-story' as Route<''>,
-      publishedAt: '2026-07-07',
+      publishedAt: '2026-07-08',
     },
   ],
 } satisfies SeriesInfo;

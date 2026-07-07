@@ -121,7 +121,7 @@ const CRAFT_ARTICLES: ReadonlyArray<Article> = [
     slug: 'synchronize-tab-scrolling-product-story',
     metadata: {
       title: '스크롤 동기화 확장 프로그램 개발기',
-      publishedAt: '2026-07-07',
+      publishedAt: '2026-07-08',
       category: 'craft',
       description: '스크롤 동기화 확장 프로그램을 제품처럼 운영한 과정',
       summary: '개인 도구가 제품이 된 과정',
