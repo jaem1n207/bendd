@@ -7,10 +7,9 @@ import { useEffect, useRef, useState } from 'react';
 
 import { shouldPlayEntranceAnimation } from '@/components/article/lib/entrance-animation';
 import { shuffleLetters } from '@/components/article/lib/shuffle-letters';
+import type { ArticleInfo } from '@/components/article/types/article';
 import { WithSound } from '@/components/sound';
 import { cn } from '@/lib/utils';
-
-import type { ArticleInfo } from '../types/article';
 
 const MotionLink = motion(Link);
 
@@ -93,14 +92,14 @@ export function ArticleItem({
         ref={itemRef}
         href={href}
         className={cn(
-          'relative block w-[calc(100%+1rem)] overflow-hidden rounded-xl px-3 py-4 hover:bg-gray-300 sm:flex sm:items-center sm:gap-3'
+          'relative block w-[calc(100%+1rem)] overflow-hidden rounded-xl px-3 py-4 hover:bg-gray-300 sm:flex sm:min-w-0 sm:items-center sm:gap-3'
         )}
         initial={shouldAnimate ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}
       >
         <motion.h2
           ref={nameRef}
-          className="overflow-hidden whitespace-nowrap text-sm font-medium md:text-base"
+          className="min-w-0 shrink truncate text-sm font-medium md:text-base"
         >
           {name}
         </motion.h2>
@@ -111,17 +110,17 @@ export function ArticleItem({
         )}
         <motion.span
           ref={summaryRef}
-          className="-ml-1.5 hidden overflow-hidden whitespace-nowrap text-sm text-muted-foreground sm:inline-block"
+          className="hidden min-w-0 shrink truncate text-sm text-muted-foreground sm:inline-block"
         >
           {summary}
         </motion.span>
         <motion.div
           ref={lineRef}
-          className="hidden h-px origin-left bg-gray-700 sm:inline-block sm:flex-1"
+          className="hidden h-px min-w-8 origin-left bg-gray-700 sm:inline-block sm:flex-1"
         />
         <motion.span
           ref={publishedAtRef}
-          className="text-sm tabular-nums text-muted-foreground"
+          className="shrink-0 whitespace-nowrap text-sm tabular-nums text-muted-foreground"
         >
           {publishedAt}
         </motion.span>

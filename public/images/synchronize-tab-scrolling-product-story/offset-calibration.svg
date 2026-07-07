@@ -1,0 +1,51 @@
+<svg width="1344" height="768" viewBox="0 0 1344 768" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1344" height="768" rx="32" fill="#F8FAFC"/>
+  <text x="72" y="70" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="34" font-weight="700">사용자가 기준점을 맞추면 그 차이를 유지해요</text>
+  <text x="72" y="102" fill="#64748B" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="18">문서 구조를 자동 추론하기보다, 사용자가 맞춘 위치 차이를 이후 스크롤에 계속 적용해요.</text>
+
+  <g font-family="Inter, Apple SD Gothic Neo, sans-serif">
+    <rect x="86" y="164" width="350" height="438" rx="28" fill="white" stroke="#D8DEE8"/>
+    <text x="122" y="218" fill="#111827" font-size="22" font-weight="700">1. 기본 동기화</text>
+    <rect x="122" y="258" width="278" height="238" rx="22" fill="#F8FAFC" stroke="#E5E7EB"/>
+    <rect x="158" y="302" width="184" height="14" rx="7" fill="#CBD5E1"/>
+    <rect x="158" y="342" width="214" height="14" rx="7" fill="#CBD5E1"/>
+    <rect x="158" y="382" width="154" height="14" rx="7" fill="#CBD5E1"/>
+    <rect x="158" y="422" width="214" height="14" rx="7" fill="#CBD5E1"/>
+    <text x="122" y="542" fill="#64748B" font-size="16">두 탭이 같은 상대 위치로 움직여요.</text>
+
+    <path d="M462 383H526" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+    <path d="M514 365L532 383L514 401" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <rect x="562" y="164" width="350" height="438" rx="28" fill="white" stroke="#D8DEE8"/>
+    <text x="598" y="210" fill="#111827" font-size="22" font-weight="700">2. 키를 누르는 동안</text>
+    <text x="598" y="240" fill="#111827" font-size="22" font-weight="700">현재 탭만 조정</text>
+    <rect x="598" y="258" width="278" height="238" rx="22" fill="#F8FAFC" stroke="#E5E7EB"/>
+    <rect x="634" y="286" width="184" height="14" rx="7" fill="#CBD5E1"/>
+    <rect x="634" y="326" width="214" height="14" rx="7" fill="#CBD5E1"/>
+    <rect x="634" y="366" width="154" height="14" rx="7" fill="#CBD5E1"/>
+    <rect x="634" y="406" width="214" height="14" rx="7" fill="#CBD5E1"/>
+    <path d="M838 314V414" stroke="#3B82F6" stroke-width="4" stroke-linecap="round"/>
+    <path d="M824 402L838 418L852 402" stroke="#3B82F6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="630" y="458" width="206" height="34" rx="17" fill="#DBEAFE"/>
+    <text x="658" y="481" fill="#1D4ED8" font-size="15" font-weight="700">현재 탭만 움직이는 구간</text>
+    <text x="598" y="536" fill="#64748B" font-size="16">문맥이 맞는 지점까지</text>
+    <text x="598" y="562" fill="#64748B" font-size="16">수동으로 스크롤해요.</text>
+
+    <path d="M938 383H1002" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+    <path d="M990 365L1008 383L990 401" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <rect x="1038" y="164" width="220" height="438" rx="28" fill="white" stroke="#D8DEE8"/>
+    <text x="1074" y="218" fill="#111827" font-size="22" font-weight="700">3. 기준점 저장</text>
+    <rect x="1074" y="274" width="148" height="88" rx="22" fill="#ECFDF5" stroke="#10B981"/>
+    <text x="1111" y="310" fill="#047857" font-size="18" font-weight="700">+124px</text>
+    <text x="1103" y="338" fill="#059669" font-size="15">차이 유지</text>
+    <rect x="1074" y="398" width="148" height="88" rx="22" fill="#F8FAFC" stroke="#CBD5E1"/>
+    <text x="1108" y="434" fill="#111827" font-size="17" font-weight="700">이후 스크롤</text>
+    <text x="1094" y="462" fill="#64748B" font-size="15">함께 이동</text>
+    <text x="1074" y="536" fill="#64748B" font-size="16">사용자가 맞춘 기준을</text>
+    <text x="1074" y="562" fill="#64748B" font-size="16">자동화가 유지해요.</text>
+  </g>
+
+  <rect x="286" y="634" width="772" height="58" rx="22" fill="white" stroke="#D8DEE8"/>
+  <text x="322" y="669" fill="#334155" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="18" font-weight="700">아래 GIF에서는 직접 스크롤을 조정해 문서 구조를 맞추는 흐름을 볼 수 있어요.</text>
+</svg>

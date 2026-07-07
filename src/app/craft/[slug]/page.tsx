@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { MdxLayout } from '@/components/layout/mdx';
 import { siteMetadata } from '@/lib/site-metadata';
-import { findBySlug, readCraftArticles } from '@/mdx/mdx';
+import { findBySlug, getSeriesInfo, readCraftArticles } from '@/mdx/mdx';
 
 const getCraftArticles = cache(() => readCraftArticles());
 
@@ -77,5 +77,17 @@ export default function CraftPage({ params }: { params: { slug: string } }) {
     notFound();
   }
 
-  return <MdxLayout post={post} type="craft" />;
+  const seriesInfo =
+    post.metadata.series && post.metadata.seriesOrder
+      ? getSeriesInfo(
+          articles,
+          post.metadata.series,
+          post.metadata.seriesOrder,
+          {
+            contentType: 'craft',
+          }
+        )
+      : undefined;
+
+  return <MdxLayout post={post} type="craft" seriesInfo={seriesInfo} />;
 }

@@ -1,0 +1,28 @@
+<svg width="1344" height="768" viewBox="0 0 1344 768" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1344" height="768" rx="32" fill="#F7F8FA"/>
+  <rect x="72" y="72" width="1200" height="624" rx="28" fill="white" stroke="#D9DEE8" stroke-width="2"/>
+  <text x="112" y="132" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="34" font-weight="700">URL Sync는 하나의 정답보다 사용 맥락이 중요했어요</text>
+  <text x="112" y="172" fill="#6B7280" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="20">기존 기대를 바꾸지 않기 위해 navigation policy를 별도 모드로 분리했어요.</text>
+
+  <rect x="112" y="230" width="536" height="380" rx="24" fill="#F9FAFB" stroke="#D1D5DB"/>
+  <text x="144" y="280" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="24" font-weight="700">Follow changed tab</text>
+  <text x="144" y="312" fill="#6B7280" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="18">변경한 탭의 이동을 기준으로 따라가요</text>
+  <rect x="144" y="354" width="456" height="58" rx="14" fill="white" stroke="#E5E7EB"/>
+  <text x="166" y="389" fill="#1F2937" font-family="Inter, sans-serif" font-size="17">developer.chrome.com/blog/part4?hl=en</text>
+  <path d="M372 430V470" stroke="#9CA3AF" stroke-width="3" stroke-linecap="round"/>
+  <path d="M358 458L372 472L386 458" stroke="#9CA3AF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="144" y="488" width="456" height="58" rx="14" fill="#DBEAFE" stroke="#3B82F6"/>
+  <text x="166" y="523" fill="#1E40AF" font-family="Inter, sans-serif" font-size="17">developer.chrome.com/blog/part5?hl=ko</text>
+  <text x="144" y="578" fill="#374151" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="17">같은 사이트 안에서 언어 맥락을 유지할 때 자연스러워요.</text>
+
+  <rect x="696" y="230" width="536" height="380" rx="24" fill="#F9FAFB" stroke="#D1D5DB"/>
+  <text x="728" y="280" fill="#111827" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="24" font-weight="700">Keep each tab's website</text>
+  <text x="728" y="312" fill="#6B7280" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="18">각 탭은 자기 웹사이트에 남아요</text>
+  <rect x="728" y="354" width="456" height="58" rx="14" fill="white" stroke="#E5E7EB"/>
+  <text x="750" y="389" fill="#1F2937" font-family="Inter, sans-serif" font-size="17">acme.com/en-US/home</text>
+  <path d="M956 430V470" stroke="#9CA3AF" stroke-width="3" stroke-linecap="round"/>
+  <path d="M942 458L956 472L970 458" stroke="#9CA3AF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="728" y="488" width="456" height="58" rx="14" fill="#FEF3C7" stroke="#F59E0B"/>
+  <text x="750" y="523" fill="#92400E" font-family="Inter, sans-serif" font-size="17">staging.acme.com/en-US/about-us</text>
+  <text x="728" y="578" fill="#374151" font-family="Inter, Apple SD Gothic Neo, sans-serif" font-size="17">Staging과 Production을 비교할 때 기대하는 동작이에요.</text>
+</svg>

@@ -19,11 +19,18 @@
 }
 
 .caption {
+  position: fixed;
+  left: 50%;
+  bottom: 2rem;
+  z-index: 52;
+  transform: translateX(-50%);
+  width: min(calc(100vw - 4rem), 72rem);
+  pointer-events: none;
   color: hsl(0 0% 80%);
   font-size: 0.875rem;
   line-height: 1.5;
   text-align: center;
-  max-width: 60ch;
+  text-wrap: balance;
 }
 
 @media (prefers-reduced-motion: reduce) {

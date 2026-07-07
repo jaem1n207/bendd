@@ -9,12 +9,12 @@ import { getAllSeriesIds, getSeriesConfig, seriesRoute } from '@/lib/series';
 import { siteMetadata } from '@/lib/site-metadata';
 import { createSeriesGraph } from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
-import { formatDate, getSeriesInfo, readArticles } from '@/mdx/mdx';
+import { formatDate, getSeriesInfo, readCraftArticles } from '@/mdx/mdx';
 
-const getArticles = cache(() => readArticles());
+const getCraftArticles = cache(() => readCraftArticles());
 
 export function generateStaticParams() {
-  return getAllSeriesIds('article').map(id => ({ id }));
+  return getAllSeriesIds('craft').map(id => ({ id }));
 }
 
 export function generateMetadata({
@@ -23,30 +23,34 @@ export function generateMetadata({
   params: { id: string };
 }): Metadata {
   const config = getSeriesConfig(params.id);
-  if (!config || config.contentType !== 'article') notFound();
+  if (!config || config.contentType !== 'craft') notFound();
 
   return {
     title: `${config.name} 시리즈`,
     description: config.description,
     alternates: {
-      canonical: `${siteMetadata.siteUrl}${seriesRoute(params.id, 'article')}`,
+      canonical: `${siteMetadata.siteUrl}${seriesRoute(params.id, 'craft')}`,
     },
     openGraph: {
       type: 'website',
-      url: `${siteMetadata.siteUrl}${seriesRoute(params.id, 'article')}`,
+      url: `${siteMetadata.siteUrl}${seriesRoute(params.id, 'craft')}`,
       title: `${config.name} 시리즈`,
       description: config.description,
     },
   };
 }
 
-export default function SeriesPage({ params }: { params: { id: string } }) {
+export default function CraftSeriesPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const config = getSeriesConfig(params.id);
-  if (!config || config.contentType !== 'article') notFound();
+  if (!config || config.contentType !== 'craft') notFound();
 
-  const articles = getArticles();
+  const articles = getCraftArticles();
   const seriesInfo = getSeriesInfo(articles, params.id, -1, {
-    contentType: 'article',
+    contentType: 'craft',
   });
   if (!seriesInfo) notFound();
 

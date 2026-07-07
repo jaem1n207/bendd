@@ -8,6 +8,8 @@ const defaultProps = {
   id: 'ai-coding-agent',
   name: 'AI 코딩 에이전트',
   description: 'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
+  contentType: 'article' as const,
+  route: '/article/series/ai-coding-agent' as Route<''>,
   articles: [
     {
       slug: 'fix-compacting-conversation',

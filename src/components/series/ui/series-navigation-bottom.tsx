@@ -1,14 +1,12 @@
 import { ArrowLeft, ArrowRight, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
-import { seriesRoute } from '@/lib/series';
-
 import type { SeriesNavigationProps } from '@/components/series/types/series';
 import { SeriesArticleList } from '@/components/series/ui/series-article-list';
 
 export function SeriesNavigationBottom({
-  id,
   name,
+  route,
   articles,
   currentOrder,
 }: SeriesNavigationProps) {
@@ -25,7 +23,7 @@ export function SeriesNavigationBottom({
       className="mb-16 mt-12 rounded-lg border border-border/60 bg-muted/30 p-5"
     >
       <Link
-        href={seriesRoute(id)}
+        href={route}
         data-webmcp-series-target="series"
         className="mb-4 flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary"
       >

@@ -9,6 +9,26 @@
   @apply border-gray-600 text-sm font-normal bg-gray-400 border px-1 py-0.5 rounded-sm break-words;
 }
 
+.container > :global(h2) {
+  @apply scroll-mt-28 text-pretty;
+}
+
+.container > :global(h2:not(:first-child)) {
+  @apply mt-24 border-t border-border/60 pt-12;
+}
+
+.container > :global(h2 + p) {
+  @apply mt-6;
+}
+
+.container > :global(h3) {
+  @apply mt-16 text-pretty;
+}
+
+.container > :global(figure) {
+  @apply my-12;
+}
+
 .container :global(.header-anchor::after) {
   content: '#';
   @apply invisible relative ml-2 text-gray-900;

@@ -153,8 +153,12 @@ export const createSeriesGraph = ({
 }: {
   seriesInfo: SeriesInfo;
 }) => {
-  const path = `/article/series/${seriesInfo.id}`;
+  const path = seriesInfo.route;
   const itemList = createSeriesItemListNode({ seriesInfo });
+  const root =
+    seriesInfo.contentType === 'craft'
+      ? { name: '작업 목록', path: '/craft' }
+      : { name: '기술 이야기', path: '/article' };
 
   return createGraph([
     createWebsiteNode({ slim: true }),
@@ -163,7 +167,7 @@ export const createSeriesGraph = ({
       path,
       items: [
         { name: '홈', path: '/' },
-        { name: '기술 이야기', path: '/article' },
+        root,
         { name: `${seriesInfo.name} 시리즈`, path },
       ],
     }),

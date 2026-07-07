@@ -58,6 +58,8 @@ const seriesInfo = {
   id: 'ai-coding-agent',
   name: 'AI Coding Agent',
   description: 'AI 코딩 에이전트 활용 방법을 다루는 시리즈',
+  contentType: 'article',
+  route: '/article/series/ai-coding-agent' as Route<''>,
   currentOrder: 1,
   articles: [
     {
@@ -73,6 +75,25 @@ const seriesInfo = {
       order: 1,
       href: '/article/agent-first' as Route<''>,
       publishedAt: '2026-06-21',
+    },
+  ],
+} satisfies SeriesInfo;
+
+const craftSeriesInfo = {
+  id: 'synchronize-tab-scrolling',
+  name: '탭 스크롤 동기화 확장 프로그램',
+  description: '스크롤 동기화 확장 프로그램을 만들고 운영하며 배운 과정',
+  contentType: 'craft',
+  route: '/craft/series/synchronize-tab-scrolling' as Route<''>,
+  currentOrder: 1,
+  articles: [
+    {
+      slug: 'synchronize-tab-scrolling-product-story',
+      title:
+        '원문과 번역문을 함께 읽기 위해 만든 확장 프로그램이 제품이 되기까지',
+      order: 1,
+      href: '/craft/synchronize-tab-scrolling-product-story' as Route<''>,
+      publishedAt: '2026-07-08',
     },
   ],
 } satisfies SeriesInfo;
@@ -224,6 +245,33 @@ describe('structured data graphs', () => {
           position: 1,
           url: 'https://bendd.me/article/agent-first',
           name: '첫 번째 글',
+        },
+      ],
+    });
+  });
+
+  it('links craft series collections to craft paths and breadcrumbs', () => {
+    const graph = createSeriesGraph({ seriesInfo: craftSeriesInfo });
+    const collection = findNode(graph, 'CollectionPage');
+
+    expect(collection['@id']).toBe(
+      'https://bendd.me/craft/series/synchronize-tab-scrolling#webpage'
+    );
+    expect(collection.url).toBe(
+      'https://bendd.me/craft/series/synchronize-tab-scrolling'
+    );
+    expect(collection.breadcrumb).toEqual({
+      '@id':
+        'https://bendd.me/craft/series/synchronize-tab-scrolling#breadcrumb',
+    });
+    expect(collection.mainEntity).toMatchObject({
+      '@type': 'ItemList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          url: 'https://bendd.me/craft/synchronize-tab-scrolling-product-story',
+          name: '원문과 번역문을 함께 읽기 위해 만든 확장 프로그램이 제품이 되기까지',
         },
       ],
     });

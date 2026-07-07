@@ -17,7 +17,7 @@ export function SeriesBanner({ items }: SeriesBannerProps) {
       {items.map(({ id, config, articleCount }) => (
         <Link
           key={id}
-          href={seriesRoute(id)}
+          href={seriesRoute(id, config.contentType)}
           className={cn(
             'group flex items-center justify-between rounded-xl border border-border/60 px-5 py-4',
             'transition-colors hover:border-primary/40 hover:bg-muted/50'

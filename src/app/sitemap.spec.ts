@@ -4,7 +4,28 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Article } from '@/mdx/mdx';
 
 vi.mock('@/lib/series', () => ({
-  getAllSeriesIds: vi.fn(() => ['ai-coding-agent']),
+  getAllSeriesIds: vi.fn(() => [
+    'ai-coding-agent',
+    'synchronize-tab-scrolling',
+  ]),
+  getSeriesConfig: vi.fn((id: string) => {
+    switch (id) {
+      case 'ai-coding-agent':
+        return {
+          contentType: 'article',
+        };
+      case 'synchronize-tab-scrolling':
+        return {
+          contentType: 'craft',
+        };
+      default:
+        return undefined;
+    }
+  }),
+  seriesRoute: vi.fn(
+    (id: string, contentType: 'article' | 'craft' = 'article') =>
+      `/${contentType}/series/${id}`
+  ),
 }));
 
 vi.mock('@/lib/site-metadata', () => ({
@@ -64,6 +85,9 @@ describe('sitemap', () => {
     const urls = entries.map(e => e.url);
 
     expect(urls).toContain('https://bendd.me/article/series/ai-coding-agent');
+    expect(urls).toContain(
+      'https://bendd.me/craft/series/synchronize-tab-scrolling'
+    );
   });
 
   it('article의 lastModified는 publishedAt을 사용한다', () => {

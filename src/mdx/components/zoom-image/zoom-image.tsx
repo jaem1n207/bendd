@@ -7,25 +7,24 @@ import Image from 'next/image';
 import { z } from 'zod';
 
 import { cn } from '@/lib/utils';
-
-import { createMDXComponent } from '../../common/create-mdx-component';
-import styles from './zoom-image.module.css';
+import { createMDXComponent } from '@/mdx/common/create-mdx-component';
+import styles from '@/mdx/components/zoom-image/zoom-image.module.css';
 
 // medium-zoom과 동일한 타이밍
 const DURATION = '300ms';
 const EASING = 'cubic-bezier(0.2, 0, 0.2, 1)';
 const TRANSITION = `transform ${DURATION} ${EASING}`;
+const CAPTION_RESERVED_HEIGHT = 96;
 
 const ZoomImageSchema = z.object({
   src: z.string().optional(),
   alt: z.string().optional(),
   className: z.string().optional(),
+  width: z.union([z.number().positive(), z.string().min(1)]).optional(),
+  height: z.union([z.number().positive(), z.string().min(1)]).optional(),
 });
 
-type ZoomImageProps = Omit<
-  JSX.IntrinsicElements['img'],
-  'srcSet' | 'width' | 'height'
->;
+type ZoomImageProps = Omit<JSX.IntrinsicElements['img'], 'srcSet'>;
 
 function MDXZoomImageBase({
   className,
@@ -67,15 +66,28 @@ interface ZoomState {
   closeTransform: string;
 }
 
+function resolveImageDimension(
+  value: number | string | undefined,
+  fallback: number
+) {
+  const dimension = Number(value);
+
+  return Number.isFinite(dimension) && dimension > 0 ? dimension : fallback;
+}
+
 function ZoomableImage({
   src,
   alt,
   className,
+  width = 1344,
+  height = 768,
   ...props
 }: {
   src: string;
   alt: string;
   className?: string;
+  width?: number | string;
+  height?: number | string;
 } & Record<string, unknown>) {
   const imgRef = useRef<HTMLImageElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -86,6 +98,9 @@ function ZoomableImage({
   const scrollTrackRAF = useRef<number>(0);
   const [isOpen, setIsOpen] = useState(false);
   const [zoomState, setZoomState] = useState<ZoomState | null>(null);
+  const shouldSkipOptimization = src.toLowerCase().endsWith('.gif');
+  const resolvedWidth = resolveImageDimension(width, 1344);
+  const resolvedHeight = resolveImageDimension(height, 768);
   // 클론 이미지의 transform이 적용됐는지 (2프레임 대기 후)
   const [cloneAnimated, setCloneAnimated] = useState(false);
 
@@ -97,13 +112,16 @@ function ZoomableImage({
     const viewW = document.documentElement.clientWidth;
     const viewH = document.documentElement.clientHeight;
     const margin = 32;
+    const captionHeight = alt ? CAPTION_RESERVED_HEIGHT : 0;
+    const availableHeight = Math.max(160, viewH - margin * 2 - captionHeight);
+    const imageCenterY = margin + availableHeight / 2;
 
     const scaleX = (viewW - margin * 2) / rect.width;
-    const scaleY = (viewH - margin * 2) / rect.height;
+    const scaleY = availableHeight / rect.height;
     const scale = Math.min(scaleX, scaleY) || 1;
 
     const translateX = (-rect.left + (viewW - rect.width) / 2) / scale;
-    const translateY = (-rect.top + (viewH - rect.height) / 2) / scale;
+    const translateY = (-rect.top + imageCenterY - rect.height / 2) / scale;
 
     setZoomState({
       src,
@@ -230,12 +248,14 @@ function ZoomableImage({
         ref={imgRef}
         alt={alt}
         src={src}
-        width={1344}
-        height={768}
+        width={resolvedWidth}
+        height={resolvedHeight}
         sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 672px"
         quality={80}
+        unoptimized={shouldSkipOptimization}
         className={cn(
           'w-full cursor-zoom-in rounded-lg object-cover',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           className
         )}
         style={zoomState ? { visibility: 'hidden' } : undefined}
@@ -267,9 +287,7 @@ function ZoomableImage({
               aria-modal="true"
               aria-label={alt || '이미지 확대 보기'}
               tabIndex={-1}
-            >
-              {alt && <span className={styles.caption}>{alt}</span>}
-            </div>
+            />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               ref={cloneRef}
@@ -291,6 +309,7 @@ function ZoomableImage({
               onClick={close}
               onTransitionEnd={handleCloneTransitionEnd}
             />
+            {alt && <span className={styles.caption}>{alt}</span>}
           </>,
           document.body
         )}

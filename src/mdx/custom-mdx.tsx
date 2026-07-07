@@ -16,19 +16,24 @@ import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
 import smartypants from 'remark-smartypants';
 
-import { MDXCustomLink } from './components/a/custom-link';
-import { MDXCallout } from './components/callout/callout';
-import { MDXHeading } from './components/heading/heading';
-import { MDXImeScrollDemo } from './components/ime-scroll-demo/ime-scroll-demo';
-import { MDXZoomImage } from './components/zoom-image/zoom-image';
-import { MDXMagicMove } from './components/magic-move/magic-move';
-import { MDXPre } from './components/pre/pre';
-import { MDXShuffleLettersDemo } from './components/shuffle-letters-demo/shuffle-letters-demo';
-import { MDXSteps } from './components/steps/steps';
-import { MDXAutoplayVideo, MDXPreLoadVideo } from './components/video/video';
+import { MDXDeepDive } from '@/mdx/components/deep-dive/deep-dive';
+import { MDXCustomLink } from '@/mdx/components/a/custom-link';
+import { MDXCallout } from '@/mdx/components/callout/callout';
+import { MDXHeading } from '@/mdx/components/heading/heading';
+import { MDXImeScrollDemo } from '@/mdx/components/ime-scroll-demo/ime-scroll-demo';
+import { MDXMagicMove } from '@/mdx/components/magic-move/magic-move';
+import { MDXPre } from '@/mdx/components/pre/pre';
+import { MDXShuffleLettersDemo } from '@/mdx/components/shuffle-letters-demo/shuffle-letters-demo';
+import { MDXSteps } from '@/mdx/components/steps/steps';
+import {
+  MDXAutoplayVideo,
+  MDXPreLoadVideo,
+} from '@/mdx/components/video/video';
+import { MDXVisualStack } from '@/mdx/components/visual-stack/visual-stack';
+import { MDXZoomImage } from '@/mdx/components/zoom-image/zoom-image';
+import { ensureLocalStorage } from '@/mdx/lib/ensure-local-storage';
 
-import { ensureLocalStorage } from './lib/ensure-local-storage';
-import styles from './mdx.module.css';
+import styles from '@/mdx/mdx.module.css';
 
 const components: MDXRemoteProps['components'] = {
   h2: props => <MDXHeading level={2} {...props} />,
@@ -53,6 +58,8 @@ const components: MDXRemoteProps['components'] = {
   PreLoadVideo: MDXPreLoadVideo,
   MagicMove: MDXMagicMove,
   Callout: MDXCallout,
+  DeepDive: MDXDeepDive,
+  VisualStack: MDXVisualStack,
   Steps: MDXSteps,
   ShuffleLettersDemo: MDXShuffleLettersDemo,
   ImeScrollDemo: MDXImeScrollDemo,

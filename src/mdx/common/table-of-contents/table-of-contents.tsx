@@ -6,8 +6,11 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Typography } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
-import type { MenuItem } from './toc';
-import { getHeaders, useActiveAnchor } from './use-toc';
+import type { MenuItem } from '@/mdx/common/table-of-contents/toc';
+import {
+  getHeaders,
+  useActiveAnchor,
+} from '@/mdx/common/table-of-contents/use-toc';
 
 export function TableOfContents() {
   const [toc, setToc] = useState<MenuItem[]>([]);
@@ -21,7 +24,7 @@ export function TableOfContents() {
   }, []);
 
   return (
-    <nav className="toc-navbar flex-1 min-h-0 flex flex-col">
+    <nav className="toc-navbar flex min-h-0 min-w-0 flex-1 flex-col">
       <div
         ref={markerRef}
         className={cn(
@@ -35,7 +38,7 @@ export function TableOfContents() {
       <ul
         ref={containerRef}
         className={cn(
-          'flex-1 min-h-0 overflow-y-auto mt-1 rounded-sm font-sans'
+          'mt-1 min-h-0 flex-1 overflow-y-auto rounded-sm font-sans'
         )}
       >
         {renderItems(toc)}
@@ -50,7 +53,7 @@ function renderItems(items: MenuItem[]) {
       <Link
         href={item.link as Route<''>}
         className={cn(
-          'block text-sm font-medium transition-colors hover:text-foreground truncate',
+          'block max-w-full break-keep text-sm font-medium leading-5 transition-colors hover:text-foreground',
           'text-muted-foreground/70'
         )}
       >
