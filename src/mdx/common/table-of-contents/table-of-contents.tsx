@@ -53,7 +53,7 @@ function renderItems(items: MenuItem[]) {
       <Link
         href={item.link as Route<''>}
         className={cn(
-          'block max-w-full truncate text-sm font-medium transition-colors hover:text-foreground',
+          'block max-w-full break-keep text-sm font-medium leading-5 transition-colors hover:text-foreground',
           'text-muted-foreground/70'
         )}
       >
