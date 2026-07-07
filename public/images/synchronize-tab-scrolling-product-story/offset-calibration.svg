@@ -17,7 +17,8 @@
     <path d="M514 365L532 383L514 401" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 
     <rect x="562" y="164" width="350" height="438" rx="28" fill="white" stroke="#D8DEE8"/>
-    <text x="598" y="218" fill="#111827" font-size="22" font-weight="700">2. 키를 누르고 현재 탭만 조정</text>
+    <text x="598" y="210" fill="#111827" font-size="22" font-weight="700">2. 키를 누르는 동안</text>
+    <text x="598" y="240" fill="#111827" font-size="22" font-weight="700">현재 탭만 조정</text>
     <rect x="598" y="258" width="278" height="238" rx="22" fill="#F8FAFC" stroke="#E5E7EB"/>
     <rect x="634" y="286" width="184" height="14" rx="7" fill="#CBD5E1"/>
     <rect x="634" y="326" width="214" height="14" rx="7" fill="#CBD5E1"/>
@@ -27,7 +28,8 @@
     <path d="M824 402L838 418L852 402" stroke="#3B82F6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     <rect x="630" y="458" width="206" height="34" rx="17" fill="#DBEAFE"/>
     <text x="658" y="481" fill="#1D4ED8" font-size="15" font-weight="700">현재 탭만 움직이는 구간</text>
-    <text x="598" y="542" fill="#64748B" font-size="16">문맥이 맞는 지점까지 수동으로 스크롤해요.</text>
+    <text x="598" y="536" fill="#64748B" font-size="16">문맥이 맞는 지점까지</text>
+    <text x="598" y="562" fill="#64748B" font-size="16">수동으로 스크롤해요.</text>
 
     <path d="M938 383H1002" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
     <path d="M990 365L1008 383L990 401" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -40,7 +42,8 @@
     <rect x="1074" y="398" width="148" height="88" rx="22" fill="#F8FAFC" stroke="#CBD5E1"/>
     <text x="1108" y="434" fill="#111827" font-size="17" font-weight="700">이후 스크롤</text>
     <text x="1094" y="462" fill="#64748B" font-size="15">함께 이동</text>
-    <text x="1074" y="542" fill="#64748B" font-size="16">사용자가 맞춘 기준을 자동화가 유지해요.</text>
+    <text x="1074" y="536" fill="#64748B" font-size="16">사용자가 맞춘 기준을</text>
+    <text x="1074" y="562" fill="#64748B" font-size="16">자동화가 유지해요.</text>
   </g>
 
   <rect x="286" y="634" width="772" height="58" rx="22" fill="white" stroke="#D8DEE8"/>
