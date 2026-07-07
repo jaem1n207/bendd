@@ -14,6 +14,7 @@ import styles from '@/mdx/components/zoom-image/zoom-image.module.css';
 const DURATION = '300ms';
 const EASING = 'cubic-bezier(0.2, 0, 0.2, 1)';
 const TRANSITION = `transform ${DURATION} ${EASING}`;
+const CAPTION_RESERVED_HEIGHT = 96;
 
 const ZoomImageSchema = z.object({
   src: z.string().optional(),
@@ -111,13 +112,16 @@ function ZoomableImage({
     const viewW = document.documentElement.clientWidth;
     const viewH = document.documentElement.clientHeight;
     const margin = 32;
+    const captionHeight = alt ? CAPTION_RESERVED_HEIGHT : 0;
+    const availableHeight = Math.max(160, viewH - margin * 2 - captionHeight);
+    const imageCenterY = margin + availableHeight / 2;
 
     const scaleX = (viewW - margin * 2) / rect.width;
-    const scaleY = (viewH - margin * 2) / rect.height;
+    const scaleY = availableHeight / rect.height;
     const scale = Math.min(scaleX, scaleY) || 1;
 
     const translateX = (-rect.left + (viewW - rect.width) / 2) / scale;
-    const translateY = (-rect.top + (viewH - rect.height) / 2) / scale;
+    const translateY = (-rect.top + imageCenterY - rect.height / 2) / scale;
 
     setZoomState({
       src,
@@ -283,9 +287,7 @@ function ZoomableImage({
               aria-modal="true"
               aria-label={alt || '이미지 확대 보기'}
               tabIndex={-1}
-            >
-              {alt && <span className={styles.caption}>{alt}</span>}
-            </div>
+            />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               ref={cloneRef}
@@ -307,6 +309,7 @@ function ZoomableImage({
               onClick={close}
               onTransitionEnd={handleCloneTransitionEnd}
             />
+            {alt && <span className={styles.caption}>{alt}</span>}
           </>,
           document.body
         )}
