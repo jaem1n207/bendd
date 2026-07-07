@@ -23,6 +23,7 @@ const DeepDiveSchema = z
     title: z.string(),
     image: DeepDiveMediaSchema.optional(),
     media: z.array(DeepDiveMediaSchema).min(1).optional(),
+    layout: z.enum(['stack', 'grid']).default('stack'),
     blocks: z.array(DeepDiveBlockSchema).min(1),
   })
   .refine(props => props.image || props.media, {
@@ -31,8 +32,16 @@ const DeepDiveSchema = z
 
 type DeepDiveProps = z.infer<typeof DeepDiveSchema>;
 
-function DeepDive({ label, title, image, media, blocks }: DeepDiveProps) {
+function DeepDive({
+  label,
+  title,
+  image,
+  media,
+  layout,
+  blocks,
+}: DeepDiveProps) {
   const mediaItems = media ?? (image ? [image] : []);
+  const isGrid = layout === 'grid';
 
   return (
     <section className="not-prose mb-20 mt-14">
@@ -48,7 +57,12 @@ function DeepDive({ label, title, image, media, blocks }: DeepDiveProps) {
         {title}
       </h3>
 
-      <figure className="my-10 space-y-4">
+      <figure
+        className={cn(
+          'my-10',
+          isGrid ? 'grid gap-4 md:grid-cols-2 md:items-start' : 'space-y-4'
+        )}
+      >
         {mediaItems.map(item => (
           <div key={item.src}>
             <MDXZoomImage
@@ -56,7 +70,10 @@ function DeepDive({ label, title, image, media, blocks }: DeepDiveProps) {
               alt={item.alt}
               width={item.width}
               height={item.height}
-              className="mx-auto w-full max-w-3xl rounded-2xl object-contain"
+              className={cn(
+                'mx-auto w-full rounded-2xl object-contain',
+                isGrid ? 'max-w-none' : 'max-w-3xl'
+              )}
             />
             {item.caption && (
               <figcaption className="sr-only">{item.caption}</figcaption>
