@@ -18,6 +18,7 @@ import smartypants from 'remark-smartypants';
 
 import { MDXCustomLink } from './components/a/custom-link';
 import { MDXCallout } from './components/callout/callout';
+import { MDXDeepDive } from '@/mdx/components/deep-dive/deep-dive';
 import { MDXHeading } from './components/heading/heading';
 import { MDXImeScrollDemo } from './components/ime-scroll-demo/ime-scroll-demo';
 import { MDXZoomImage } from './components/zoom-image/zoom-image';
@@ -53,6 +54,7 @@ const components: MDXRemoteProps['components'] = {
   PreLoadVideo: MDXPreLoadVideo,
   MagicMove: MDXMagicMove,
   Callout: MDXCallout,
+  DeepDive: MDXDeepDive,
   Steps: MDXSteps,
   ShuffleLettersDemo: MDXShuffleLettersDemo,
   ImeScrollDemo: MDXImeScrollDemo,
