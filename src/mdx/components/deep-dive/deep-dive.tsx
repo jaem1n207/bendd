@@ -1,8 +1,8 @@
-import Image from 'next/image';
 import { z } from 'zod';
 
 import { cn } from '@/lib/utils';
 import { createMDXComponent } from '@/mdx/common/create-mdx-component';
+import { MDXZoomImage } from '@/mdx/components/zoom-image/zoom-image';
 
 const DeepDiveBlockSchema = z.object({
   title: z.string(),
@@ -24,7 +24,7 @@ type DeepDiveProps = z.infer<typeof DeepDiveSchema>;
 
 function DeepDive({ label, title, image, blocks }: DeepDiveProps) {
   return (
-    <section className="not-prose my-24 first:mt-12">
+    <section className="not-prose my-24 border-t border-border/60 pt-14">
       <span
         className={cn(
           'inline-flex items-center rounded-full border border-border/70',
@@ -38,11 +38,9 @@ function DeepDive({ label, title, image, blocks }: DeepDiveProps) {
       </h3>
 
       <figure className="my-12">
-        <Image
+        <MDXZoomImage
           src={image.src}
           alt={image.alt}
-          width={960}
-          height={540}
           className="mx-auto w-full max-w-3xl rounded-2xl"
         />
         {image.caption && (
