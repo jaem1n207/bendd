@@ -9,22 +9,33 @@ const DeepDiveBlockSchema = z.object({
   body: z.string(),
 });
 
-const DeepDiveSchema = z.object({
-  label: z.string(),
-  title: z.string(),
-  image: z.object({
-    src: z.string(),
-    alt: z.string(),
-    caption: z.string().optional(),
-  }),
-  blocks: z.array(DeepDiveBlockSchema).min(1),
+const DeepDiveMediaSchema = z.object({
+  src: z.string(),
+  alt: z.string(),
+  caption: z.string().optional(),
+  width: z.number().positive().optional(),
+  height: z.number().positive().optional(),
 });
+
+const DeepDiveSchema = z
+  .object({
+    label: z.string(),
+    title: z.string(),
+    image: DeepDiveMediaSchema.optional(),
+    media: z.array(DeepDiveMediaSchema).min(1).optional(),
+    blocks: z.array(DeepDiveBlockSchema).min(1),
+  })
+  .refine(props => props.image || props.media, {
+    message: 'image or media is required',
+  });
 
 type DeepDiveProps = z.infer<typeof DeepDiveSchema>;
 
-function DeepDive({ label, title, image, blocks }: DeepDiveProps) {
+function DeepDive({ label, title, image, media, blocks }: DeepDiveProps) {
+  const mediaItems = media ?? (image ? [image] : []);
+
   return (
-    <section className="not-prose my-24 border-t border-border/60 pt-14">
+    <section className="not-prose mb-20 mt-14">
       <span
         className={cn(
           'inline-flex items-center rounded-full border border-border/70',
@@ -37,15 +48,21 @@ function DeepDive({ label, title, image, blocks }: DeepDiveProps) {
         {title}
       </h3>
 
-      <figure className="my-12">
-        <MDXZoomImage
-          src={image.src}
-          alt={image.alt}
-          className="mx-auto w-full max-w-3xl rounded-2xl"
-        />
-        {image.caption && (
-          <figcaption className="sr-only">{image.caption}</figcaption>
-        )}
+      <figure className="my-10 space-y-4">
+        {mediaItems.map(item => (
+          <div key={item.src}>
+            <MDXZoomImage
+              src={item.src}
+              alt={item.alt}
+              width={item.width}
+              height={item.height}
+              className="mx-auto w-full max-w-3xl rounded-2xl object-contain"
+            />
+            {item.caption && (
+              <figcaption className="sr-only">{item.caption}</figcaption>
+            )}
+          </div>
+        ))}
       </figure>
 
       <div className="space-y-6">
