@@ -58,7 +58,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         data-webmcp-series-name={seriesInfo?.name}
       >
         <JsonLdScript data={detailJsonLd} />
-        <div className="fixed bottom-16 left-5 top-24 hidden flex-col overflow-hidden lg:flex">
+        <div className="fixed bottom-16 left-5 top-24 hidden w-64 flex-col overflow-hidden pr-4 lg:flex">
           <Link
             href={`/${type}`}
             className={cn(
