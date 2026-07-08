@@ -1,6 +1,5 @@
 import { CornerUpLeft } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { Gaegu as FontContentHandwriting } from 'next/font/google';
 import Link from 'next/link';
 
 import { Giscus } from '@/components/comments/giscus';
@@ -31,13 +30,6 @@ const TableOfContents = dynamic(
   }
 );
 
-const contentHandwritingFont = FontContentHandwriting({
-  weight: ['400', '700'],
-  display: 'swap',
-  preload: false,
-  variable: '--font-content-handwriting',
-});
-
 interface MdxLayoutProps {
   post: Article;
   type: 'article' | 'craft';
@@ -56,7 +48,6 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
     <main className="relative mx-auto my-0 min-h-screen max-w-2xl overflow-hidden px-6 py-32">
       <section
         id="BenddDoc"
-        className={contentHandwritingFont.variable}
         data-webmcp-content
         data-webmcp-content-type={type}
         data-webmcp-slug={post.slug}
@@ -84,7 +75,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         </div>
         <Typography
           variant="h2"
-          className={cn(styles.handwritingText, styles.handwritingTitle)}
+          className={cn(styles.contentText, styles.contentTitle)}
         >
           {title}
         </Typography>
@@ -104,8 +95,8 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
           variant="blockquote"
           className={cn(
             'mt-6 break-keep',
-            styles.handwritingText,
-            styles.handwritingSummary
+            styles.contentText,
+            styles.contentSummary
           )}
           asChild
         >
@@ -117,10 +108,10 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         </Typography>
         {seriesInfo && <SeriesNavigationTop {...seriesInfo} />}
         <article
-          data-content-font="gaegu"
+          data-content-font="system"
           className={cn(
             'prose prose-slate mb-24 dark:prose-invert md:mb-40',
-            styles.handwritingArticle,
+            styles.contentArticle,
             type === 'article' ? 'mt-16 md:mt-24' : 'mt-40 md:mt-52'
           )}
         >

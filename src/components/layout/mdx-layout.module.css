@@ -1,23 +1,21 @@
-.handwritingText {
-  font-family:
-    var(--font-content-handwriting), var(--font-sans), system-ui, sans-serif;
+.contentText {
+  font-family: var(--font-sans), system-ui, sans-serif;
   word-break: keep-all;
   overflow-wrap: break-word;
 }
 
-.handwritingTitle {
+.contentTitle {
   line-height: 1.35;
   font-weight: 700;
 }
 
-.handwritingSummary {
+.contentSummary {
   line-height: 1.8;
   font-weight: 400;
 }
 
-.handwritingArticle {
-  font-family:
-    var(--font-content-handwriting), var(--font-sans), system-ui, sans-serif;
+.contentArticle {
+  font-family: var(--font-sans), system-ui, sans-serif;
   font-size: 1.0625rem;
   line-height: 1.9;
   word-break: keep-all;
@@ -26,30 +24,30 @@
   text-rendering: optimizeLegibility;
 }
 
-.handwritingArticle :global(p),
-.handwritingArticle :global(li),
-.handwritingArticle :global(blockquote) {
+.contentArticle :global(p),
+.contentArticle :global(li),
+.contentArticle :global(blockquote) {
   line-height: 1.9;
 }
 
-.handwritingArticle :global(pre),
-.handwritingArticle :global(code),
-.handwritingArticle :global(kbd),
-.handwritingArticle :global(samp) {
+.contentArticle :global(pre),
+.contentArticle :global(code),
+.contentArticle :global(kbd),
+.contentArticle :global(samp) {
   font-family:
     var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     'Liberation Mono', 'Courier New', monospace;
 }
 
-.handwritingArticle :global(table),
-.handwritingArticle :global(table *),
-.handwritingArticle :global(button),
-.handwritingArticle :global(input),
-.handwritingArticle :global(select),
-.handwritingArticle :global(textarea),
-.handwritingArticle :global([role='button']),
-.handwritingArticle :global([role='menuitem']),
-.handwritingArticle :global([role='option']),
-.handwritingArticle :global([role='tab']) {
+.contentArticle :global(table),
+.contentArticle :global(table *),
+.contentArticle :global(button),
+.contentArticle :global(input),
+.contentArticle :global(select),
+.contentArticle :global(textarea),
+.contentArticle :global([role='button']),
+.contentArticle :global([role='menuitem']),
+.contentArticle :global([role='option']),
+.contentArticle :global([role='tab']) {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
