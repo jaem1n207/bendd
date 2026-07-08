@@ -49,7 +49,7 @@ test.describe('MDX article detail pages', () => {
     await expect(ogTitle).toHaveAttribute('content', /정교한 디자인 토큰/);
   });
 
-  test('should use scoped Gaegu typography without breaking code readability', async ({
+  test('should keep article typography on the existing system font contract', async ({
     page,
   }) => {
     const fontRequests: string[] = [];
@@ -62,7 +62,7 @@ test.describe('MDX article detail pages', () => {
     await page.goto('/article/naming-tokens-in-design');
     await page.evaluate(() => document.fonts.ready);
 
-    const article = page.locator('article[data-content-font="gaegu"]');
+    const article = page.locator('article[data-content-font="system"]');
     await expect(article).toBeVisible();
 
     const articleMetrics = await article.evaluate(element => {
@@ -74,7 +74,8 @@ test.describe('MDX article detail pages', () => {
       };
     });
 
-    expect(articleMetrics.fontFamily).toContain('Gaegu');
+    expect(articleMetrics.fontFamily).toContain('Inter');
+    expect(articleMetrics.fontFamily).not.toContain('Gaegu');
     expect(
       articleMetrics.lineHeight / articleMetrics.fontSize
     ).toBeGreaterThanOrEqual(1.7);
@@ -85,6 +86,7 @@ test.describe('MDX article detail pages', () => {
       element => window.getComputedStyle(element).fontFamily
     );
 
+    expect(codeFontFamily).not.toBe(articleMetrics.fontFamily);
     expect(codeFontFamily).not.toContain('Gaegu');
     expect(
       fontRequests.every(url => {
@@ -93,7 +95,7 @@ test.describe('MDX article detail pages', () => {
       })
     ).toBe(true);
 
-    const gaeguFontDisplays = await page.evaluate(() =>
+    const gaeguFontFaces = await page.evaluate(() =>
       Array.from(document.styleSheets).flatMap(sheet => {
         try {
           return Array.from(sheet.cssRules)
@@ -104,19 +106,16 @@ test.describe('MDX article detail pages', () => {
 
               const fontFamily = rule.style.getPropertyValue('font-family');
 
-              return (
-                fontFamily.includes('Gaegu') && !fontFamily.includes('Fallback')
-              );
+              return fontFamily.includes('Gaegu');
             })
-            .map(rule => rule.style.getPropertyValue('font-display'));
+            .map(rule => rule.style.getPropertyValue('font-family'));
         } catch {
           return [];
         }
       })
     );
 
-    expect(gaeguFontDisplays.length).toBeGreaterThan(0);
-    expect(new Set(gaeguFontDisplays)).toEqual(new Set(['swap']));
+    expect(gaeguFontFaces).toHaveLength(0);
   });
 });
 
@@ -148,29 +147,30 @@ test.describe('MDX craft detail pages', () => {
     await expect(page.locator('text=TypeError')).not.toBeVisible();
   });
 
-  test('should use the same scoped content font contract on craft details', async ({
+  test('should use the same existing font contract on craft details', async ({
     page,
   }) => {
     await page.goto('/craft/implement-rauno-style-text-animation');
     await page.evaluate(() => document.fonts.ready);
 
-    const article = page.locator('article[data-content-font="gaegu"]');
+    const article = page.locator('article[data-content-font="system"]');
     await expect(article).toBeVisible();
 
     const fontFamily = await article.evaluate(
       element => window.getComputedStyle(element).fontFamily
     );
 
-    expect(fontFamily).toContain('Gaegu');
+    expect(fontFamily).toContain('Inter');
+    expect(fontFamily).not.toContain('Gaegu');
   });
 
-  test('should keep visual MDX text in the scoped handwriting font', async ({
+  test('should keep visual MDX text in the existing content font', async ({
     page,
   }) => {
     await page.goto('/craft/synchronize-tab-scrolling-product-story');
     await page.evaluate(() => document.fonts.ready);
 
-    const article = page.locator('article[data-content-font="gaegu"]');
+    const article = page.locator('article[data-content-font="system"]');
     await expect(article).toBeVisible();
 
     const visualCaption = page.getByText(
@@ -183,6 +183,9 @@ test.describe('MDX craft detail pages', () => {
     );
     await expect(deepDiveBody).toBeVisible();
 
+    const articleFontFamily = await article.evaluate(
+      element => window.getComputedStyle(element).fontFamily
+    );
     const [captionFontFamily, deepDiveFontFamily] = await Promise.all([
       visualCaption.evaluate(
         element => window.getComputedStyle(element).fontFamily
@@ -192,7 +195,10 @@ test.describe('MDX craft detail pages', () => {
       ),
     ]);
 
-    expect(captionFontFamily).toContain('Gaegu');
-    expect(deepDiveFontFamily).toContain('Gaegu');
+    expect(articleFontFamily).toContain('Inter');
+    expect(captionFontFamily).toBe(articleFontFamily);
+    expect(deepDiveFontFamily).toBe(articleFontFamily);
+    expect(captionFontFamily).not.toContain('Gaegu');
+    expect(deepDiveFontFamily).not.toContain('Gaegu');
   });
 });
