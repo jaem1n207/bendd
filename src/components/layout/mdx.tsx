@@ -108,7 +108,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         </Typography>
         {seriesInfo && <SeriesNavigationTop {...seriesInfo} />}
         <article
-          data-content-font="system"
+          data-content-font="pretendard"
           className={cn(
             'prose prose-slate mb-24 dark:prose-invert md:mb-40',
             styles.contentArticle,
