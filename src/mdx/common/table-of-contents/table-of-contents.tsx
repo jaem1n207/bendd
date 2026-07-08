@@ -24,7 +24,7 @@ export function TableOfContents() {
   }, []);
 
   return (
-    <nav className="toc-navbar flex min-h-0 min-w-0 flex-1 flex-col">
+    <nav className="toc-navbar flex max-h-full min-h-0 min-w-0 flex-col self-start overflow-hidden">
       <div
         ref={markerRef}
         className={cn(
