@@ -2,7 +2,8 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
-import { Fira_Mono as FontMono, Inter as FontSans } from 'next/font/google';
+import { Fira_Mono as FontMono } from 'next/font/google';
+import localFont from 'next/font/local';
 
 import { Navigation, PathnameHistoryTracker } from '@/components/navigation';
 import { ThemeProvider } from '@/components/theme';
@@ -35,10 +36,13 @@ const WebMCPProvider = dynamic(
   }
 );
 
-const fontSans = FontSans({
-  subsets: ['latin'],
+const fontPretendard = localFont({
+  src: './fonts/PretendardVariable.woff2',
   display: 'swap',
+  preload: false,
+  weight: '100 900',
   variable: '--font-sans',
+  fallback: ['system-ui', 'Apple SD Gothic Neo', 'Malgun Gothic', 'sans-serif'],
 });
 
 const fontMono = FontMono({
@@ -100,7 +104,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn(
         'bg-background text-foreground',
-        fontSans.variable,
+        fontPretendard.variable,
         fontMono.variable
       )}
       dir="ltr"

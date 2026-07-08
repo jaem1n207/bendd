@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
 import { Giscus } from '@/components/comments/giscus';
+import styles from '@/components/layout/mdx-layout.module.css';
 import {
   SeriesNavigationBottom,
   SeriesNavigationTop,
@@ -72,7 +73,12 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
           </Link>
           <TableOfContents />
         </div>
-        <Typography variant="h2">{title}</Typography>
+        <Typography
+          variant="h2"
+          className={cn(styles.contentText, styles.contentTitle)}
+        >
+          {title}
+        </Typography>
         <Typography
           variant="p"
           className="!mt-2 text-muted-foreground/80"
@@ -85,7 +91,15 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
             })}
           </p>
         </Typography>
-        <Typography variant="blockquote" className="mt-6 break-keep" asChild>
+        <Typography
+          variant="blockquote"
+          className={cn(
+            'mt-6 break-keep',
+            styles.contentText,
+            styles.contentSummary
+          )}
+          asChild
+        >
           <blockquote>
             <p>
               <strong>TL;DR</strong>: {description}
@@ -94,8 +108,10 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         </Typography>
         {seriesInfo && <SeriesNavigationTop {...seriesInfo} />}
         <article
+          data-content-font="pretendard"
           className={cn(
             'prose prose-slate mb-24 dark:prose-invert md:mb-40',
+            styles.contentArticle,
             type === 'article' ? 'mt-16 md:mt-24' : 'mt-40 md:mt-52'
           )}
         >

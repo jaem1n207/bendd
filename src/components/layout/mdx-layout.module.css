@@ -1,0 +1,57 @@
+.contentText,
+.contentArticle {
+  --content-font-sans: var(--font-sans), system-ui, sans-serif;
+}
+
+.contentText {
+  font-family: var(--content-font-sans);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.contentTitle {
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.contentSummary {
+  line-height: 1.8;
+  font-weight: 400;
+}
+
+.contentArticle {
+  font-family: var(--content-font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.9;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  font-synthesis-weight: none;
+  text-rendering: optimizelegibility;
+}
+
+.contentArticle :global(p),
+.contentArticle :global(li),
+.contentArticle :global(blockquote) {
+  line-height: 1.9;
+}
+
+.contentArticle :global(pre),
+.contentArticle :global(code),
+.contentArticle :global(kbd),
+.contentArticle :global(samp) {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+.contentArticle :global(table),
+.contentArticle :global(table *),
+.contentArticle :global(button),
+.contentArticle :global(input),
+.contentArticle :global(select),
+.contentArticle :global(textarea),
+.contentArticle :global([role='button']),
+.contentArticle :global([role='menuitem']),
+.contentArticle :global([role='option']),
+.contentArticle :global([role='tab']) {
+  font-family: var(--content-font-sans);
+}
