@@ -157,7 +157,7 @@ Pretendard Variable은 `100 900` weight range를 선언해 browser가 굵기를
 
 **Issue:** 본문 font를 article 전체에 적용하면 code, table, button, select 같은 UI에도 같은 font가 흘러 들어갈 수 있다. code는 mono가 아니면 읽기 어렵고, control은 platform expectation과 달라진다.
 
-**Response:** `code`, `pre`, `kbd`, `samp`는 `--font-mono`를 강제한다. `table`, form controls, interactive role elements는 `--font-sans`로 유지한다.
+**Response:** `code`, `pre`, `kbd`, `samp`는 `--font-mono`를 강제한다. `table`, form controls, interactive role elements는 `--content-font-sans`로 유지해 본문 sans stack과 같은 값을 참조한다.
 
 **Why:** prose와 UI/control은 읽는 방식이 다르다. prose는 흐름을 읽고, code/table/control은 정확히 비교하고 조작한다.
 
@@ -196,20 +196,23 @@ Current code lives in `src/components/layout/mdx.tsx` and `src/components/layout
 - `MdxLayout` does not import a page-specific content font from
   `next/font/google`.
 - `article[data-content-font="pretendard"]` marks the current contract.
-- `contentArticle` uses `var(--font-sans), system-ui, sans-serif`.
+- `contentText` and `contentArticle` define `--content-font-sans` as the local content font stack.
+- `contentArticle` uses `var(--content-font-sans)`.
 - `contentArticle` keeps Korean text readable with `word-break: keep-all`, `overflow-wrap: break-word`, and `line-height: 1.9`.
 - `code/pre/kbd/samp` use `var(--font-mono)`.
-- `table`, native controls, and interactive role elements use `var(--font-sans)`.
+- `table`, native controls, and interactive role elements use `var(--content-font-sans)`.
 
 ## Regression Tests
 
 `tests/mdx-rendering.spec.ts` protects the contract:
 
 - Article detail body uses Pretendard and does not contain Gaegu.
-- Craft detail body uses the same Pretendard contract.
+- Craft detail body uses the same helper-backed Pretendard contract.
+- At least one runtime font request is observed before same-origin assertions run, so an empty request list cannot pass.
 - Font requests stay on the same origin.
+- Pretendard is not preloaded into the critical path.
 - Pretendard `@font-face` exists and no Gaegu `@font-face` rule is present in runtime stylesheets.
-- Code does not inherit the prose font.
+- Code does not inherit the prose font when visible; table cells and interactive controls keep the content sans stack.
 - Visual MDX text such as captions and DeepDive body text inherits the article content font.
 - Article body line-height remains at least 1.7x font size.
 

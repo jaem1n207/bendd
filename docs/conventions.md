@@ -190,7 +190,8 @@ Article/Craft 상세 본문은 page-specific decorative font를 로드하지 않
 
 - 적용 범위: `/article/[slug]`, `/craft/[slug]`의 제목, TL;DR, MDX 본문
 - 본문 규칙: 충분한 line-height, Korean line break, long-token wrapping
-- 격리 범위: code/pre/kbd/samp는 `--font-mono`, table과 button/input/select/textarea 및 interactive role 요소는 `--font-sans`
+- 구현 규칙: `mdx-layout.module.css` 안에서는 본문 sans stack을 `--content-font-sans`로 모아 title/TL;DR/body/control reset이 같은 값을 참조하게 한다
+- 격리 범위: code/pre/kbd/samp는 `--font-mono`, table과 button/input/select/textarea 및 interactive role 요소는 `--content-font-sans`
 - 금지 사항: Article/Craft 본문용 장식적 custom font 추가, 런타임 `fonts.googleapis.com` 또는 `fonts.gstatic.com` 직접 호출
 - 라이선스: local Pretendard asset을 갱신할 때 `src/app/fonts/Pretendard-LICENSE.txt`도 함께 유지
 

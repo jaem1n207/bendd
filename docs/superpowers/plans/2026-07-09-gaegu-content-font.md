@@ -50,7 +50,8 @@ The code:
 - keeps system Korean fallbacks after the generated font family;
 - marks detail bodies with `article[data-content-font="pretendard"]`;
 - keeps `code/pre/kbd/samp` on `--font-mono`;
-- keeps tables and interactive controls on `--font-sans`;
+- keeps tables and interactive controls on the shared `--content-font-sans`
+  stack;
 - keeps line-height, Korean line breaking, wrapping, and font-synthesis
   safeguards.
 
@@ -59,11 +60,14 @@ The code:
 The regression tests assert the current font contract:
 
 - Article detail pages use Pretendard and not Gaegu.
-- Craft detail pages use the same Pretendard contract.
+- Craft detail pages use the same helper-backed Pretendard contract.
+- Runtime font requests must be present before same-origin checks run.
 - Runtime font requests stay same-origin.
+- Pretendard is not preloaded into the critical path.
 - Pretendard `@font-face` is present.
 - Gaegu `@font-face` is absent.
-- Code does not inherit the prose font.
+- Code does not inherit the prose font when visible.
+- Table cells and interactive controls keep the content sans stack.
 - Visual MDX text such as captions and DeepDive body text stays in the content
   font.
 - Article body line-height remains readable.
