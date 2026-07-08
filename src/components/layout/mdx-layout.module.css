@@ -43,7 +43,13 @@
 
 .handwritingArticle :global(table),
 .handwritingArticle :global(table *),
-.handwritingArticle :global(.not-prose),
-.handwritingArticle :global(.not-prose *) {
+.handwritingArticle :global(button),
+.handwritingArticle :global(input),
+.handwritingArticle :global(select),
+.handwritingArticle :global(textarea),
+.handwritingArticle :global([role='button']),
+.handwritingArticle :global([role='menuitem']),
+.handwritingArticle :global([role='option']),
+.handwritingArticle :global([role='tab']) {
   font-family: var(--font-sans), system-ui, sans-serif;
 }

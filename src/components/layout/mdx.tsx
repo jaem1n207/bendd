@@ -33,7 +33,7 @@ const TableOfContents = dynamic(
 
 const contentHandwritingFont = FontContentHandwriting({
   weight: ['400', '700'],
-  display: 'optional',
+  display: 'swap',
   preload: false,
   variable: '--font-content-handwriting',
 });
