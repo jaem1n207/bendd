@@ -47,9 +47,9 @@ export default function CraftPage() {
   const collectionJsonLd = createCraftIndexGraph({ articles });
 
   return (
-    <main className="relative mx-auto my-0 min-h-screen max-w-4xl overflow-y-auto px-6 pt-10 sm:py-32">
+    <main>
       <JsonLdScript data={collectionJsonLd} />
-      <div className="mt-8 flex flex-col gap-7">
+      <div className="relative mx-auto my-0 mt-8 max-w-4xl space-y-1 overflow-y-auto overflow-x-hidden px-2 pb-28 pt-10 sm:px-6 sm:py-32">
         <SeriesBanner items={seriesSummaries} />
         {formattedArticleInfo.map((article, index) => (
           <ArticleItem key={article.href} {...article} index={index} />

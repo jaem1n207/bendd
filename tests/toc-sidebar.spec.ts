@@ -62,6 +62,39 @@ test.describe('Table of Contents sidebar', () => {
       viewportHeight - bottom16InPx + 1
     );
   });
+
+  test('should size the TOC border to the rendered list', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+
+    const tocNav = page.locator('nav.toc-navbar');
+    await expect(tocNav).toBeVisible();
+    await page.locator('nav.toc-navbar ul a').first().waitFor();
+
+    const containerBox = await page
+      .locator('.fixed.bottom-16.left-5.top-24')
+      .boundingBox();
+    const tocMetrics = await tocNav.evaluate(nav => {
+      const list = nav.querySelector('ul');
+      if (!list) {
+        throw new Error('TOC list is missing');
+      }
+
+      const navRect = nav.getBoundingClientRect();
+      const listRect = list.getBoundingClientRect();
+
+      return {
+        listBottom: listRect.bottom,
+        navBottom: navRect.bottom,
+        navHeight: navRect.height,
+      };
+    });
+
+    expect(containerBox).not.toBeNull();
+    expect(tocMetrics.navHeight).toBeLessThan(containerBox!.height);
+    expect(Math.abs(tocMetrics.navBottom - tocMetrics.listBottom)).toBeLessThan(
+      2
+    );
+  });
 });
 
 test.describe('TOC highlight after page refresh', () => {
@@ -93,7 +126,22 @@ test.describe('TOC highlight after page refresh', () => {
     await page.reload();
     await page.locator('nav.toc-navbar ul a').first().waitFor();
 
-    const scrollPositions = [300, 600, 1200, 1800];
+    const scrollPositions = await page
+      .locator('nav.toc-navbar ul a')
+      .evaluateAll(links =>
+        links.slice(0, 4).map(link => {
+          const hash = link.getAttribute('href');
+          const id = hash ? decodeURIComponent(hash.slice(1)) : '';
+          const heading = document.getElementById(id);
+          const navbar = document.querySelector('nav.toc-navbar');
+          const scrollOffset = (navbar?.getBoundingClientRect().top ?? 0) + 8;
+          const headingTop =
+            (heading?.getBoundingClientRect().top ?? 0) + window.scrollY;
+
+          return Math.max(1, headingTop - scrollOffset + 1);
+        })
+      );
+
     for (const pos of scrollPositions) {
       await page.evaluate(y => window.scrollTo(0, y), pos);
 
