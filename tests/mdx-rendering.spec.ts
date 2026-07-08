@@ -49,7 +49,7 @@ test.describe('MDX article detail pages', () => {
     await expect(ogTitle).toHaveAttribute('content', /정교한 디자인 토큰/);
   });
 
-  test('should keep article typography on the existing system font contract', async ({
+  test('should keep article typography on the Pretendard font contract', async ({
     page,
   }) => {
     const fontRequests: string[] = [];
@@ -62,7 +62,7 @@ test.describe('MDX article detail pages', () => {
     await page.goto('/article/naming-tokens-in-design');
     await page.evaluate(() => document.fonts.ready);
 
-    const article = page.locator('article[data-content-font="system"]');
+    const article = page.locator('article[data-content-font="pretendard"]');
     await expect(article).toBeVisible();
 
     const articleMetrics = await article.evaluate(element => {
@@ -74,7 +74,7 @@ test.describe('MDX article detail pages', () => {
       };
     });
 
-    expect(articleMetrics.fontFamily).toContain('Inter');
+    expect(articleMetrics.fontFamily).toContain('Pretendard');
     expect(articleMetrics.fontFamily).not.toContain('Gaegu');
     expect(
       articleMetrics.lineHeight / articleMetrics.fontSize
@@ -95,7 +95,7 @@ test.describe('MDX article detail pages', () => {
       })
     ).toBe(true);
 
-    const gaeguFontFaces = await page.evaluate(() =>
+    const fontFaces = await page.evaluate(() =>
       Array.from(document.styleSheets).flatMap(sheet => {
         try {
           return Array.from(sheet.cssRules)
@@ -106,16 +106,43 @@ test.describe('MDX article detail pages', () => {
 
               const fontFamily = rule.style.getPropertyValue('font-family');
 
-              return fontFamily.includes('Gaegu');
+              return (
+                fontFamily.includes('Gaegu') ||
+                fontFamily.includes('Pretendard')
+              );
             })
-            .map(rule => rule.style.getPropertyValue('font-family'));
+            .map(rule => ({
+              fontFamily: rule.style.getPropertyValue('font-family'),
+              src: rule.style.getPropertyValue('src'),
+            }));
         } catch {
           return [];
         }
       })
     );
 
-    expect(gaeguFontFaces).toHaveLength(0);
+    expect(
+      fontFaces.some(({ fontFamily }) => fontFamily.includes('Gaegu'))
+    ).toBe(false);
+    const pretendardFontFace = fontFaces.find(({ fontFamily }) =>
+      fontFamily.includes('Pretendard')
+    );
+    expect(pretendardFontFace).toBeDefined();
+
+    const preloadedFontHrefs = await page
+      .locator('link[rel="preload"][as="font"]')
+      .evaluateAll(elements =>
+        elements.map(element => (element as HTMLLinkElement).href)
+      );
+    const pretendardFontPath = pretendardFontFace?.src
+      .match(/url\(([^)]+)\)/)?.[1]
+      ?.replaceAll('"', '')
+      .replaceAll("'", '');
+
+    expect(pretendardFontPath).toBeTruthy();
+    expect(
+      preloadedFontHrefs.some(href => href.endsWith(pretendardFontPath ?? ''))
+    ).toBe(false);
   });
 });
 
@@ -147,30 +174,30 @@ test.describe('MDX craft detail pages', () => {
     await expect(page.locator('text=TypeError')).not.toBeVisible();
   });
 
-  test('should use the same existing font contract on craft details', async ({
+  test('should use the same Pretendard font contract on craft details', async ({
     page,
   }) => {
     await page.goto('/craft/implement-rauno-style-text-animation');
     await page.evaluate(() => document.fonts.ready);
 
-    const article = page.locator('article[data-content-font="system"]');
+    const article = page.locator('article[data-content-font="pretendard"]');
     await expect(article).toBeVisible();
 
     const fontFamily = await article.evaluate(
       element => window.getComputedStyle(element).fontFamily
     );
 
-    expect(fontFamily).toContain('Inter');
+    expect(fontFamily).toContain('Pretendard');
     expect(fontFamily).not.toContain('Gaegu');
   });
 
-  test('should keep visual MDX text in the existing content font', async ({
+  test('should keep visual MDX text in the Pretendard content font', async ({
     page,
   }) => {
     await page.goto('/craft/synchronize-tab-scrolling-product-story');
     await page.evaluate(() => document.fonts.ready);
 
-    const article = page.locator('article[data-content-font="system"]');
+    const article = page.locator('article[data-content-font="pretendard"]');
     await expect(article).toBeVisible();
 
     const visualCaption = page.getByText(
@@ -195,7 +222,7 @@ test.describe('MDX craft detail pages', () => {
       ),
     ]);
 
-    expect(articleFontFamily).toContain('Inter');
+    expect(articleFontFamily).toContain('Pretendard');
     expect(captionFontFamily).toBe(articleFontFamily);
     expect(deepDiveFontFamily).toBe(articleFontFamily);
     expect(captionFontFamily).not.toContain('Gaegu');
