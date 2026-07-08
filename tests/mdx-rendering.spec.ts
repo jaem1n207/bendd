@@ -60,6 +60,7 @@ test.describe('MDX article detail pages', () => {
     });
 
     await page.goto('/article/naming-tokens-in-design');
+    await page.evaluate(() => document.fonts.ready);
 
     const article = page.locator('article[data-content-font="gaegu"]');
     await expect(article).toBeVisible();
@@ -91,6 +92,31 @@ test.describe('MDX article detail pages', () => {
         return requestUrl.origin === new URL(page.url()).origin;
       })
     ).toBe(true);
+
+    const gaeguFontDisplays = await page.evaluate(() =>
+      Array.from(document.styleSheets).flatMap(sheet => {
+        try {
+          return Array.from(sheet.cssRules)
+            .filter((rule): rule is CSSFontFaceRule => {
+              if (!(rule instanceof CSSFontFaceRule)) {
+                return false;
+              }
+
+              const fontFamily = rule.style.getPropertyValue('font-family');
+
+              return (
+                fontFamily.includes('Gaegu') && !fontFamily.includes('Fallback')
+              );
+            })
+            .map(rule => rule.style.getPropertyValue('font-display'));
+        } catch {
+          return [];
+        }
+      })
+    );
+
+    expect(gaeguFontDisplays.length).toBeGreaterThan(0);
+    expect(new Set(gaeguFontDisplays)).toEqual(new Set(['swap']));
   });
 });
 
@@ -126,6 +152,7 @@ test.describe('MDX craft detail pages', () => {
     page,
   }) => {
     await page.goto('/craft/implement-rauno-style-text-animation');
+    await page.evaluate(() => document.fonts.ready);
 
     const article = page.locator('article[data-content-font="gaegu"]');
     await expect(article).toBeVisible();
@@ -135,5 +162,37 @@ test.describe('MDX craft detail pages', () => {
     );
 
     expect(fontFamily).toContain('Gaegu');
+  });
+
+  test('should keep visual MDX text in the scoped handwriting font', async ({
+    page,
+  }) => {
+    await page.goto('/craft/synchronize-tab-scrolling-product-story');
+    await page.evaluate(() => document.fonts.ready);
+
+    const article = page.locator('article[data-content-font="gaegu"]');
+    await expect(article).toBeVisible();
+
+    const visualCaption = page.getByText(
+      '같은 글을 읽어도 목차, 문장 길이, 배너 유무 때문에 스크롤 위치는 쉽게 어긋나요.'
+    );
+    await expect(visualCaption).toBeVisible();
+
+    const deepDiveBody = page.getByText(
+      '동기화 상태와 연결된 탭 정보는 필요하지만, 문서를 읽는 동안 계속 보여야 하는 정보는 아니었어요.'
+    );
+    await expect(deepDiveBody).toBeVisible();
+
+    const [captionFontFamily, deepDiveFontFamily] = await Promise.all([
+      visualCaption.evaluate(
+        element => window.getComputedStyle(element).fontFamily
+      ),
+      deepDiveBody.evaluate(
+        element => window.getComputedStyle(element).fontFamily
+      ),
+    ]);
+
+    expect(captionFontFamily).toContain('Gaegu');
+    expect(deepDiveFontFamily).toContain('Gaegu');
   });
 });
