@@ -1,59 +1,82 @@
-# Content Font Experiment And Rollback Plan
+# Pretendard Content Font Plan
 
 ## Outcome
 
-Gaegu was evaluated for `/article/[slug]` and `/craft/[slug]` detail pages, then reverted before merge.
+Gaegu was evaluated for `/article/[slug]` and `/craft/[slug]` detail pages,
+then reverted before merge because it reduced long-form Korean readability.
+Pretendard Variable is now applied as the global sans reading font.
 
-The final implementation does not use Gaegu or any Article/Craft-specific custom content font. It keeps the existing `--font-sans` reading font and preserves the font risk safeguards introduced during the experiment.
+The implementation uses a self-hosted local font file instead of a runtime font
+CDN request. Article/Craft detail pages inherit the global `--font-sans`
+contract and keep the typography safeguards introduced during the Gaegu
+experiment.
 
-## Why The Rollback Happened
+## Why Pretendard Replaced The Rollback State
 
-The handwritten look matched the original visual direction, but the real page showed a sharper product problem:
+The rollback to the existing sans stack solved readability, but it left Korean
+and English rendering split between Inter and platform Korean fallbacks.
+Pretendard is a better product typography fit for bendd.me because the site is
+mostly Korean technical writing with frequent English terms, numbers, links,
+and code-ish tokens.
 
-- long Korean paragraphs became harder to scan;
-- title and TL;DR looked expressive, but body text became visually noisy;
-- mixed Korean, English, code-ish tokens, emoji, and links lost rhythm;
-- the readability loss outweighed the emotional gain.
+The chosen direction:
 
-The site publishes long-form technical writing. Body typography must optimize reading, not decoration.
+- keeps the handwritten Gaegu experiment out of long-form body text;
+- uses Pretendard for Korean/English body rhythm;
+- keeps code, tables, controls, and interactive elements isolated;
+- keeps font requests same-origin;
+- avoids preloading the large CJK variable font into the critical path.
 
-## Final Implementation
+## Implementation
 
 Files:
 
+- `src/app/layout.tsx`
+- `src/app/fonts/PretendardVariable.woff2`
+- `src/app/fonts/Pretendard-LICENSE.txt`
 - `src/components/layout/mdx.tsx`
 - `src/components/layout/mdx-layout.module.css`
 - `tests/mdx-rendering.spec.ts`
 - `docs/conventions.md`
 - `docs/font-risk-management.md`
 
-The final code:
+The code:
 
-- removes the `Gaegu` import from `next/font/google`;
-- removes the content-specific font loader and CSS variable;
-- marks the detail body with `article[data-content-font="system"]`;
-- keeps Article/Craft text on `var(--font-sans), system-ui, sans-serif`;
-- keeps `code/pre/kbd/samp` on `var(--font-mono)`;
-- keeps tables and interactive controls on the existing sans UI font;
-- keeps line-height, Korean line breaking, wrapping, and font-synthesis safeguards.
+- loads Pretendard with `next/font/local`;
+- maps Pretendard to `--font-sans`;
+- sets `display: 'swap'`;
+- sets `preload: false` because the CJK variable file is large;
+- declares `weight: '100 900'` for variable weight coverage;
+- keeps system Korean fallbacks after the generated font family;
+- marks detail bodies with `article[data-content-font="pretendard"]`;
+- keeps `code/pre/kbd/samp` on `--font-mono`;
+- keeps tables and interactive controls on `--font-sans`;
+- keeps line-height, Korean line breaking, wrapping, and font-synthesis
+  safeguards.
 
 ## Tests Kept
 
-The regression tests no longer assert that Gaegu is present. They assert the safer long-term contract:
+The regression tests assert the current font contract:
 
-- Article detail pages use the existing sans content font.
-- Craft detail pages use the same contract.
-- Gaegu `@font-face` rules are absent.
+- Article detail pages use Pretendard and not Gaegu.
+- Craft detail pages use the same Pretendard contract.
 - Runtime font requests stay same-origin.
+- Pretendard `@font-face` is present.
+- Gaegu `@font-face` is absent.
 - Code does not inherit the prose font.
-- Visual MDX text such as captions and DeepDive body text stays in the content font.
+- Visual MDX text such as captions and DeepDive body text stays in the content
+  font.
 - Article body line-height remains readable.
 
 ## Documentation
 
-`docs/font-risk-management.md` is the source of truth for font-related user experience risks. It covers readability, FOIT, FOUT, CLS, CJK payload, preload misuse, third-party requests, glyph fallback, synthetic styles, code/table/control isolation, visual MDX text, and accessibility preferences.
+`docs/font-risk-management.md` is the source of truth for font-related user
+experience risks. It covers readability, FOIT, FOUT, CLS, CJK payload, preload
+misuse, third-party requests, glyph fallback, synthetic styles,
+code/table/control isolation, visual MDX text, and accessibility preferences.
 
-`docs/conventions.md` links to that document and records the current Article/Craft font policy.
+`docs/conventions.md` links to that document and records the current Pretendard
+font policy.
 
 ## Verification
 
@@ -68,4 +91,5 @@ pnpm exec playwright test tests/mdx-rendering.spec.ts --project=chromium
 pnpm exec playwright test tests/accessibility.spec.ts --project=chromium
 ```
 
-Expected result: all commands pass. Existing unrelated lint warnings in `pnpm build` may still appear, but the build must exit with code `0`.
+Expected result: all commands pass. Existing unrelated lint warnings in
+`pnpm build` may still appear, but the build must exit with code `0`.
