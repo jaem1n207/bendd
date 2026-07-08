@@ -172,19 +172,27 @@ docs(architecture): 아키텍처 문서 업데이트
 
 ## 폰트
 
-Inter (sans)와 Fira Mono (mono)를 Google Fonts에서 로드한다. CSS 변수로 적용:
+Pretendard Variable (sans)는 local font asset으로 self-host하고, Fira Mono
+(mono)는 Google Fonts를 `next/font`로 self-host한다. CSS 변수로 적용:
 
-- `--font-sans` -> Inter
+- `--font-sans` -> Pretendard Variable
 - `--font-mono` -> Fira Mono
 
-`display: 'swap'` 설정으로 FOUT를 방지한다. 필요한 weight만 로드한다 (전체 로드 금지).
+`--font-sans`는 `src/app/fonts/PretendardVariable.woff2`를
+`next/font/local`로 로드한다. 한글 variable font는 payload가 크므로
+`preload: false`로 critical path를 과점하지 않게 하고, `display: 'swap'`
+및 system Korean fallback stack을 둔다. 필요한 font file만 로드한다 (weight별
+다중 파일 전체 로드 금지).
 
-Article/Craft 상세 본문은 별도 content-only 웹폰트를 로드하지 않는다. `MdxLayout`은 기존 `--font-sans`를 사용하되, font로 인한 사용자 경험 저하를 막기 위해 다음 safeguard를 유지한다:
+Article/Craft 상세 본문은 page-specific decorative font를 로드하지 않는다.
+`MdxLayout`은 전역 `--font-sans` Pretendard contract를 사용하되, font로
+인한 사용자 경험 저하를 막기 위해 다음 safeguard를 유지한다:
 
 - 적용 범위: `/article/[slug]`, `/craft/[slug]`의 제목, TL;DR, MDX 본문
 - 본문 규칙: 충분한 line-height, Korean line break, long-token wrapping
 - 격리 범위: code/pre/kbd/samp는 `--font-mono`, table과 button/input/select/textarea 및 interactive role 요소는 `--font-sans`
 - 금지 사항: Article/Craft 본문용 장식적 custom font 추가, 런타임 `fonts.googleapis.com` 또는 `fonts.gstatic.com` 직접 호출
+- 라이선스: local Pretendard asset을 갱신할 때 `src/app/fonts/Pretendard-LICENSE.txt`도 함께 유지
 
 폰트 관련 risk와 대응 기준은 [font-risk-management.md](font-risk-management.md)를 따른다.
 
