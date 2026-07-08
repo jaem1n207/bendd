@@ -1,0 +1,49 @@
+.handwritingText {
+  font-family:
+    var(--font-content-handwriting), var(--font-sans), system-ui, sans-serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.handwritingTitle {
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.handwritingSummary {
+  line-height: 1.8;
+  font-weight: 400;
+}
+
+.handwritingArticle {
+  font-family:
+    var(--font-content-handwriting), var(--font-sans), system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.9;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+}
+
+.handwritingArticle :global(p),
+.handwritingArticle :global(li),
+.handwritingArticle :global(blockquote) {
+  line-height: 1.9;
+}
+
+.handwritingArticle :global(pre),
+.handwritingArticle :global(code),
+.handwritingArticle :global(kbd),
+.handwritingArticle :global(samp) {
+  font-family:
+    var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+}
+
+.handwritingArticle :global(table),
+.handwritingArticle :global(table *),
+.handwritingArticle :global(.not-prose),
+.handwritingArticle :global(.not-prose *) {
+  font-family: var(--font-sans), system-ui, sans-serif;
+}

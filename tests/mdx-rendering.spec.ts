@@ -48,6 +48,50 @@ test.describe('MDX article detail pages', () => {
     const ogTitle = page.locator('meta[property="og:title"]');
     await expect(ogTitle).toHaveAttribute('content', /정교한 디자인 토큰/);
   });
+
+  test('should use scoped Gaegu typography without breaking code readability', async ({
+    page,
+  }) => {
+    const fontRequests: string[] = [];
+    page.on('request', request => {
+      if (request.resourceType() === 'font') {
+        fontRequests.push(request.url());
+      }
+    });
+
+    await page.goto('/article/naming-tokens-in-design');
+
+    const article = page.locator('article[data-content-font="gaegu"]');
+    await expect(article).toBeVisible();
+
+    const articleMetrics = await article.evaluate(element => {
+      const style = window.getComputedStyle(element);
+      return {
+        fontFamily: style.fontFamily,
+        fontSize: Number.parseFloat(style.fontSize),
+        lineHeight: Number.parseFloat(style.lineHeight),
+      };
+    });
+
+    expect(articleMetrics.fontFamily).toContain('Gaegu');
+    expect(
+      articleMetrics.lineHeight / articleMetrics.fontSize
+    ).toBeGreaterThanOrEqual(1.7);
+
+    const code = article.locator('code').first();
+    await expect(code).toBeVisible();
+    const codeFontFamily = await code.evaluate(
+      element => window.getComputedStyle(element).fontFamily
+    );
+
+    expect(codeFontFamily).not.toContain('Gaegu');
+    expect(
+      fontRequests.every(url => {
+        const requestUrl = new URL(url);
+        return requestUrl.origin === new URL(page.url()).origin;
+      })
+    ).toBe(true);
+  });
 });
 
 test.describe('MDX craft detail pages', () => {
@@ -76,5 +120,20 @@ test.describe('MDX craft detail pages', () => {
 
     await expect(page.locator('text=Internal Server Error')).not.toBeVisible();
     await expect(page.locator('text=TypeError')).not.toBeVisible();
+  });
+
+  test('should use the same scoped content font contract on craft details', async ({
+    page,
+  }) => {
+    await page.goto('/craft/implement-rauno-style-text-animation');
+
+    const article = page.locator('article[data-content-font="gaegu"]');
+    await expect(article).toBeVisible();
+
+    const fontFamily = await article.evaluate(
+      element => window.getComputedStyle(element).fontFamily
+    );
+
+    expect(fontFamily).toContain('Gaegu');
   });
 });

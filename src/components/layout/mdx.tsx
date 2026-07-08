@@ -1,8 +1,10 @@
 import { CornerUpLeft } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { Gaegu as FontContentHandwriting } from 'next/font/google';
 import Link from 'next/link';
 
 import { Giscus } from '@/components/comments/giscus';
+import styles from '@/components/layout/mdx-layout.module.css';
 import {
   SeriesNavigationBottom,
   SeriesNavigationTop,
@@ -29,6 +31,13 @@ const TableOfContents = dynamic(
   }
 );
 
+const contentHandwritingFont = FontContentHandwriting({
+  weight: ['400', '700'],
+  display: 'optional',
+  preload: false,
+  variable: '--font-content-handwriting',
+});
+
 interface MdxLayoutProps {
   post: Article;
   type: 'article' | 'craft';
@@ -47,6 +56,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
     <main className="relative mx-auto my-0 min-h-screen max-w-2xl overflow-hidden px-6 py-32">
       <section
         id="BenddDoc"
+        className={contentHandwritingFont.variable}
         data-webmcp-content
         data-webmcp-content-type={type}
         data-webmcp-slug={post.slug}
@@ -72,7 +82,12 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
           </Link>
           <TableOfContents />
         </div>
-        <Typography variant="h2">{title}</Typography>
+        <Typography
+          variant="h2"
+          className={cn(styles.handwritingText, styles.handwritingTitle)}
+        >
+          {title}
+        </Typography>
         <Typography
           variant="p"
           className="!mt-2 text-muted-foreground/80"
@@ -85,7 +100,15 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
             })}
           </p>
         </Typography>
-        <Typography variant="blockquote" className="mt-6 break-keep" asChild>
+        <Typography
+          variant="blockquote"
+          className={cn(
+            'mt-6 break-keep',
+            styles.handwritingText,
+            styles.handwritingSummary
+          )}
+          asChild
+        >
           <blockquote>
             <p>
               <strong>TL;DR</strong>: {description}
@@ -94,8 +117,10 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         </Typography>
         {seriesInfo && <SeriesNavigationTop {...seriesInfo} />}
         <article
+          data-content-font="gaegu"
           className={cn(
             'prose prose-slate mb-24 dark:prose-invert md:mb-40',
+            styles.handwritingArticle,
             type === 'article' ? 'mt-16 md:mt-24' : 'mt-40 md:mt-52'
           )}
         >
