@@ -1,11 +1,14 @@
 import Image from 'next/image';
+import type { ComponentProps } from 'react';
 
 import { cn } from '@/lib/utils';
 
 type RoundedImageProps = Omit<
-  JSX.IntrinsicElements['img'],
-  'srcSet' | 'width' | 'height'
->;
+  ComponentProps<'img'>,
+  'src' | 'srcSet' | 'width' | 'height'
+> & {
+  src?: string;
+};
 
 export function MDXRoundedImage({
   className,
