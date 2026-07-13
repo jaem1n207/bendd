@@ -14,7 +14,10 @@ export async function generateStaticParams() {
   return articles.map(article => ({ slug: article.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}) {
+  const params = await props.params;
   const articles = getArticles();
   const post = findBySlug(articles, params.slug);
 
@@ -69,7 +72,10 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   } satisfies Metadata;
 }
 
-export default function ArticlePage({ params }: { params: { slug: string } }) {
+export default async function ArticlePage(props: {
+  params: Promise<{ slug: string }>;
+}) {
+  const params = await props.params;
   const articles = getArticles();
   const post = findBySlug(articles, params.slug);
 

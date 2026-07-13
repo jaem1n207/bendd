@@ -14,7 +14,10 @@ export async function generateStaticParams() {
   return articles.map(article => ({ slug: article.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}) {
+  const params = await props.params;
   const articles = getCraftArticles();
   const post = findBySlug(articles, params.slug);
 
@@ -69,7 +72,10 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   } satisfies Metadata;
 }
 
-export default function CraftPage({ params }: { params: { slug: string } }) {
+export default async function CraftPage(props: {
+  params: Promise<{ slug: string }>;
+}) {
+  const params = await props.params;
   const articles = getCraftArticles();
   const post = findBySlug(articles, params.slug);
 
