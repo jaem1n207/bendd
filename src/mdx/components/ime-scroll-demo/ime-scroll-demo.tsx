@@ -22,7 +22,7 @@ function isChromeBrowser(): boolean {
 }
 
 function useImeSafeScroll(
-  inputRef: React.RefObject<HTMLInputElement>,
+  inputRef: React.RefObject<HTMLInputElement | null>,
   value: string
 ) {
   const isComposingRef = useRef(false);
