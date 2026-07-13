@@ -6,6 +6,8 @@ type MotionSlotProps = {
   children: ReactNode | ReactNode[];
 };
 
+type MotionChildProps = Record<string, unknown>;
+
 const shouldRemoveProp = (prop: string) => {
   const propsToRemove = [
     'animate',
@@ -27,9 +29,12 @@ export const MotionSlot = ({ children }: MotionSlotProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const processChild = (child: ReactNode): ReactNode => {
-    if (isValidElement(child) && isMotionComponent(child.type)) {
+    if (
+      isValidElement<MotionChildProps>(child) &&
+      isMotionComponent(child.type)
+    ) {
       const props = Object.keys(child.props).reduce(
-        (acc: Record<string, any>, key) => {
+        (acc: MotionChildProps, key) => {
           if (shouldRemoveProp(key) && prefersReducedMotion) {
             acc[key] = undefined;
           } else {
