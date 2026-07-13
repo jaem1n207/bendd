@@ -11,10 +11,8 @@ const nextConfig = {
       fullUrl: true,
     },
   },
-  experimental: {
-    serverComponentsExternalPackages: ['@shikijs/twoslash'],
-    typedRoutes: true,
-  },
+  serverExternalPackages: ['@shikijs/twoslash'],
+  typedRoutes: true,
   headers() {
     return [
       {
