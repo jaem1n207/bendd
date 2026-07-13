@@ -1,5 +1,4 @@
 import { CornerUpLeft } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
 import { Giscus } from '@/components/comments/giscus';
@@ -15,20 +14,9 @@ import {
   createCraftDetailGraph,
 } from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
-import { SkeletonTableOfContents } from '@/mdx/common/table-of-contents/skeleton-table-of-contents';
+import { ClientTableOfContents } from '@/mdx/common/table-of-contents/client-table-of-contents';
 import { CustomMDX } from '@/mdx/custom-mdx';
 import { type Article, type SeriesInfo, formatDate } from '@/mdx/mdx';
-
-const TableOfContents = dynamic(
-  () =>
-    import('@/mdx/common/table-of-contents/table-of-contents').then(
-      mod => mod.TableOfContents
-    ),
-  {
-    ssr: false,
-    loading: SkeletonTableOfContents,
-  }
-);
 
 interface MdxLayoutProps {
   post: Article;
@@ -71,7 +59,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
             <CornerUpLeft className="size-4" />
             {type.charAt(0).toUpperCase() + type.slice(1)}
           </Link>
-          <TableOfContents />
+          <ClientTableOfContents />
         </div>
         <Typography
           variant="h2"
