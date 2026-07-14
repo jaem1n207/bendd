@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
+import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import useMeasure from 'react-use-measure';
 
@@ -63,7 +63,7 @@ export function StepInfo({ className }: { className?: string }) {
           className
         )}
       >
-        <div ref={ref} className="px-4 py-2">
+        <div ref={ref} className="relative px-4 py-2">
           <AnimatePresence mode="popLayout" initial={false} custom={direction}>
             {stepData && (
               <motion.div
