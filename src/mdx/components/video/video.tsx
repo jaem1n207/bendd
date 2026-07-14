@@ -1,10 +1,7 @@
 import { cn } from '@/lib/utils';
-import type { DetailedHTMLProps, VideoHTMLAttributes } from 'react';
+import type { ComponentProps } from 'react';
 
-type VideoProps = Omit<
-  DetailedHTMLProps<VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>,
-  'src'
-> & {
+type VideoProps = Omit<ComponentProps<'video'>, 'src'> & {
   src?: string;
 };
 
