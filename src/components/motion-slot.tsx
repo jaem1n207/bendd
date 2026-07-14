@@ -1,5 +1,5 @@
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
-import { isMotionComponent } from 'framer-motion';
+import { isMotionComponent } from 'motion/react';
 import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
 
 type MotionSlotProps = {
