@@ -3,11 +3,15 @@
 import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
 import useSound from 'use-sound';
 
-import { useSoundStore } from '../model/sound-store';
+import { useSoundStore } from '@/components/sound/model/sound-store';
 
 type WithSoundProps = {
   children: ReactNode;
   assetPath: string;
+};
+
+type ClickableChildProps = {
+  onClick?: () => void;
 };
 
 export function WithSound({ children, assetPath }: WithSoundProps) {
@@ -19,13 +23,10 @@ export function WithSound({ children, assetPath }: WithSoundProps) {
   });
 
   const processChild = (child: ReactNode): ReactNode => {
-    if (isValidElement(child)) {
+    if (isValidElement<ClickableChildProps>(child)) {
       return cloneElement(child, {
-        // @ts-expect-error
         onClick: () => {
-          if (child.props.onClick) {
-            child.props.onClick();
-          }
+          child.props.onClick?.();
           playClickSound();
         },
       });

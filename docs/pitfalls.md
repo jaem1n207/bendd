@@ -69,9 +69,9 @@ import { SoundSwitcher } from '@/components/sound/ui/sound-switcher';
 
 `custom-mdx.tsx`의 `blockJS: false`는 MagicMove 등 커스텀 컴포넌트에 필요한 설정이다. `blockDangerousJS: true`는 보안을 위해 유지해야 한다. CVE-2026-0969 참조.
 
-## P10: 동적 import 없이 client 컴포넌트 사용
+## P10: Server Component에서 `ssr: false` 사용
 
-루트 레이아웃은 Server Component다. client-only 컴포넌트(`useEffect`, `useState` 사용)는 `dynamic(() => import(...), { ssr: false })`로 가져와야 한다. 그렇지 않으면 hydration 불일치 에러가 발생한다.
+루트 레이아웃은 Server Component다. Next.js 15에서는 Server Component가 `dynamic(() => import(...), { ssr: false })`를 직접 사용할 수 없다. `ssr: false` 동적 import는 `'use client'` wrapper 안에 두고, Server Component는 그 wrapper를 import해야 한다.
 
 ## P11: OG 이미지를 정적 파일로 가정
 

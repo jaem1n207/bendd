@@ -1,4 +1,4 @@
-import { useAnimation, useSpring, useTransform } from 'framer-motion';
+import { useAnimation, useSpring, useTransform } from 'motion/react';
 import useSound from 'use-sound';
 
 import { useSoundStore } from '@/components/sound';

@@ -1,6 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  type ComponentProps,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 
 import Image from 'next/image';
@@ -24,7 +30,9 @@ const ZoomImageSchema = z.object({
   height: z.union([z.number().positive(), z.string().min(1)]).optional(),
 });
 
-type ZoomImageProps = Omit<JSX.IntrinsicElements['img'], 'srcSet'>;
+type ZoomImageProps = Omit<ComponentProps<'img'>, 'src' | 'srcSet'> & {
+  src?: string;
+};
 
 function MDXZoomImageBase({
   className,

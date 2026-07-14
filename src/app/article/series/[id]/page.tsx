@@ -17,11 +17,10 @@ export function generateStaticParams() {
   return getAllSeriesIds('article').map(id => ({ id }));
 }
 
-export function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Metadata {
+export async function generateMetadata(props: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const params = await props.params;
   const config = getSeriesConfig(params.id);
   if (!config || config.contentType !== 'article') notFound();
 
@@ -40,7 +39,10 @@ export function generateMetadata({
   };
 }
 
-export default function SeriesPage({ params }: { params: { id: string } }) {
+export default async function SeriesPage(props: {
+  params: Promise<{ id: string }>;
+}) {
+  const params = await props.params;
   const config = getSeriesConfig(params.id);
   if (!config || config.contentType !== 'article') notFound();
 

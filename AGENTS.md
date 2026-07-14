@@ -79,7 +79,7 @@ Same frontmatter schema, different display formatters and route prefixes.
 - **MDX 함수 API**: 순수 함수 기반 — `readArticles()` → `sortByDateDesc()` / `findBySlug()` / `getSeriesInfo()` 등 조합
 - **Zustand persist**: localStorage with named keys (e.g., `sound-enabled`)
 - **Theme sync**: `useThemeManager` syncs next-themes with giscus iframe via `postMessage`
-- **Dynamic imports**: Client-only components need `dynamic(() => import(...), { ssr: false })` in Server Component layouts
+- **Dynamic imports**: `ssr: false` must live in a Client Component wrapper; Server Component layouts import that wrapper
 - **OG images**: Dynamically generated at `/api/og` (Edge Runtime), not static files
 - **MDX security**: `blockJS: false` + `blockDangerousJS: true` (CVE-2026-0969) — do not change
 - **Middleware**: `/rss.xml` → rewrites to `/api/feed`; `/playground/*` → returns 404 to bots

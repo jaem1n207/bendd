@@ -1,5 +1,6 @@
-import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
+import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import useMeasure from 'react-use-measure';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -9,12 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
-
 import { Typography } from '@/components/ui/typography';
-import useMeasure from 'react-use-measure';
-import { useStepContentStore } from './provider';
-import type { StepData } from './step-data';
+import { cn } from '@/lib/utils';
+import { useStepContentStore } from '@/mdx/common/step-content/provider';
+import type { StepData } from '@/mdx/common/step-content/step-data';
 
 export function StepSelect() {
   const { stepsData, currentStep, setCurrentStep } = useStepContentStore(
@@ -43,7 +42,10 @@ export function StepSelect() {
 }
 
 export function StepInfo({ className }: { className?: string }) {
-  const direction = useStepContentStore(state => state.direction);
+  const { stepsData, currentStep, direction } = useStepContentStore(
+    state => state
+  );
+  const stepData = stepsData[currentStep];
 
   const [ref, bounds] = useMeasure();
 
@@ -61,42 +63,34 @@ export function StepInfo({ className }: { className?: string }) {
           className
         )}
       >
-        <div ref={ref} className="px-4 py-2">
+        <div ref={ref} className="relative px-4 py-2">
           <AnimatePresence mode="popLayout" initial={false} custom={direction}>
-            {/* 애니메이션 중 변경된 요소가 컴포넌트 트리에 여전히 존재하는지 액세스 가능하도록 */}
-            <StepInfoContent />
+            {stepData && (
+              <motion.div
+                key={currentStep}
+                variants={variants}
+                initial="initial"
+                animate="active"
+                exit="exit"
+                custom={direction}
+              >
+                <Typography
+                  variant="p"
+                  affects="large"
+                  asChild
+                  className="mb-2"
+                >
+                  <p>{stepData.title}</p>
+                </Typography>
+                <Typography variant="p" asChild>
+                  <p>{stepData.description}</p>
+                </Typography>
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </motion.div>
     </MotionConfig>
-  );
-}
-
-function StepInfoContent() {
-  const { stepsData, currentStep, direction } = useStepContentStore(
-    state => state
-  );
-
-  const stepData = stepsData[currentStep];
-
-  if (!stepData) return null;
-
-  return (
-    <motion.div
-      key={currentStep}
-      variants={variants}
-      initial="initial"
-      animate="active"
-      exit="exit"
-      custom={direction}
-    >
-      <Typography variant="p" affects="large" asChild className="mb-2">
-        <p>{stepData.title}</p>
-      </Typography>
-      <Typography variant="p" asChild>
-        <p>{stepData.description}</p>
-      </Typography>
-    </motion.div>
   );
 }
 

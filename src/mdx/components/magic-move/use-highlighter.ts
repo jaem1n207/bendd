@@ -6,7 +6,9 @@ export function useHighlighter(): HighlighterCore | undefined {
 
   useEffect(() => {
     async function initializeHighlighter() {
-      const { createHighlighterCore } = await import('shiki');
+      const { createHighlighterCore, createOnigurumaEngine } = await import(
+        'shiki'
+      );
       const getWasm = await import('shiki/wasm');
       const [vitesseDark, githubLight] = await Promise.all([
         import('shiki/themes/vitesse-dark.mjs'),
@@ -25,7 +27,7 @@ export function useHighlighter(): HighlighterCore | undefined {
           import('shiki/langs/yaml.mjs'),
           import('shiki/langs/svelte.mjs'),
         ],
-        loadWasm: getWasm,
+        engine: createOnigurumaEngine(getWasm),
       });
       setHighlighter(newHighlighter);
     }

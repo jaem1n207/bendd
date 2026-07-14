@@ -1,40 +1,22 @@
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 import { Fira_Mono as FontMono } from 'next/font/google';
 import localFont from 'next/font/local';
 
 import { Navigation, PathnameHistoryTracker } from '@/components/navigation';
+import {
+  BrowserDetector,
+  Signature,
+  WebMCPProvider,
+} from '@/components/root-client-components';
 import { ThemeProvider } from '@/components/theme';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { siteMetadata } from '@/lib/site-metadata';
 import { cn } from '@/lib/utils';
 
-import '../globals.css';
-
-const Signature = dynamic(
-  () => import('../components/signature').then(mod => mod.Signature),
-  {
-    ssr: false,
-  }
-);
-
-const BrowserDetector = dynamic(
-  () =>
-    import('@/components/browser-detector').then(mod => mod.BrowserDetector),
-  {
-    ssr: false,
-  }
-);
-
-const WebMCPProvider = dynamic(
-  () => import('@/components/webmcp').then(mod => mod.WebMCPProvider),
-  {
-    ssr: false,
-  }
-);
+import '@/globals.css';
 
 const fontPretendard = localFont({
   src: './fonts/PretendardVariable.woff2',

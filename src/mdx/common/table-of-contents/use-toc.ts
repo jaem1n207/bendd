@@ -1,7 +1,11 @@
 import { type RefObject, useEffect } from 'react';
 
 import { querySelectorAll } from '@/lib/dom';
-import type { HeadingLevel, LevelRange, MenuItem } from './toc';
+import type {
+  HeadingLevel,
+  LevelRange,
+  MenuItem,
+} from '@/mdx/common/table-of-contents/toc';
 
 // resolveHeaders 함수로부터 얻은 앵커 요소의 캐시된 목록
 const resolvedHeaders: { element: HTMLHeadingElement; link: string }[] = [];
@@ -100,8 +104,8 @@ function getAbsoluteTop(element: HTMLElement): number {
 }
 
 export function useActiveAnchor(
-  containerRef: RefObject<HTMLElement>,
-  markerRef: RefObject<HTMLElement>,
+  containerRef: RefObject<HTMLElement | null>,
+  markerRef: RefObject<HTMLElement | null>,
   linkCount = 0
 ) {
   useEffect(() => {

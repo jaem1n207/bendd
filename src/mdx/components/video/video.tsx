@@ -1,11 +1,11 @@
 import { cn } from '@/lib/utils';
-import type { DetailedHTMLProps, VideoHTMLAttributes } from 'react';
+import type { ComponentProps } from 'react';
 
-export function MDXAutoplayVideo({
-  src,
-  className,
-  ...props
-}: DetailedHTMLProps<VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>) {
+type VideoProps = Omit<ComponentProps<'video'>, 'src'> & {
+  src?: string;
+};
+
+export function MDXAutoplayVideo({ src, className, ...props }: VideoProps) {
   return (
     <div className="relative my-3 h-auto w-full overflow-hidden rounded-xl bg-gray-100 ring-1 ring-gray-200">
       <video
@@ -22,11 +22,7 @@ export function MDXAutoplayVideo({
   );
 }
 
-export function MDXPreLoadVideo({
-  src,
-  className,
-  ...props
-}: DetailedHTMLProps<VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>) {
+export function MDXPreLoadVideo({ src, className, ...props }: VideoProps) {
   return (
     <div className="relative my-3 h-auto w-full overflow-hidden rounded-xl bg-gray-100 ring-1 ring-gray-200">
       <video
@@ -35,7 +31,7 @@ export function MDXPreLoadVideo({
         loop
         muted
         playsInline
-        className="my-0 block h-auto w-full object-contain"
+        className={cn('my-0 block h-auto w-full object-contain', className)}
         aria-label="Video player"
         {...props}
       >

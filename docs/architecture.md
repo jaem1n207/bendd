@@ -112,9 +112,9 @@ src/components/{domain}/model/    <- 직접 import 금지
 
 ## WebMCP
 
-WebMCP is implemented as a progressive enhancement. The root layout dynamically
-mounts `WebMCPProvider` with `ssr: false`, and the provider exits immediately
-unless the browser exposes `navigator.modelContext`.
+WebMCP is implemented as a progressive enhancement. The root layout imports a
+Client Component wrapper that mounts `WebMCPProvider` with `ssr: false`, and the
+provider exits immediately unless the browser exposes `navigator.modelContext`.
 
 The provider registers route-relevant tools only during idle time and aborts
 the previous registration on route changes. Content search does not build a
