@@ -1,4 +1,4 @@
-import { MotionValue } from 'framer-motion';
+import type { MotionValue } from 'motion/react';
 
 export type ItemMotionProps = {
   magnification?: number;
