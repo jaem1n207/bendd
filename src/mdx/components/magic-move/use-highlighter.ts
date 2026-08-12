@@ -21,6 +21,7 @@ export function useHighlighter(): HighlighterCore | undefined {
           import('shiki/langs/javascript.mjs'),
           import('shiki/langs/html.mjs'),
           import('shiki/langs/css.mjs'),
+          import('shiki/langs/scss.mjs'),
           import('shiki/langs/json.mjs'),
           import('shiki/langs/shell.mjs'),
           import('shiki/langs/markdown.mjs'),
