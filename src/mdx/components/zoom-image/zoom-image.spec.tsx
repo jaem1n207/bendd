@@ -531,7 +531,7 @@ describe('MDXZoomImage', () => {
 
   describe('안전 타임아웃 (400ms)', () => {
     it('transitionEnd가 발생하지 않으면 400ms 후 자동 정리된다', () => {
-      vi.useFakeTimers();
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
       render(<MDXZoomImage src="/test.png" alt="줌 테스트" />);
       fireEvent.click(screen.getByAltText('줌 테스트'));
 
