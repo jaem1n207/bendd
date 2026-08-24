@@ -17,6 +17,20 @@ These rules are non-negotiable. Violating them causes build failures or broken b
 8. **PR Assignees**: PR 생성 시 반드시 `jaem1n207`을 Assignees로 등록 (`gh pr create` 시 `--assignee jaem1n207`)
 9. **PR 후 브랜치 정리**: PR 병합 후 반드시 원격/로컬 브랜치를 삭제 (`gh pr merge --delete-branch`, 로컬: `git branch -d <branch>`)
 
+## Communication and Engineering Rules
+
+- For human-facing text—comments, commit messages, and prompt replies—use the fewest precise words possible.
+- Avoid superlatives, praise, and reflexive agreement. State the cold hard truth.
+- Extract recurring or meaningful numbers and strings into descriptive constants (`const`) or enums. Keep self-explanatory one-off values inline. Specification-defined values, such as HTTP 200, require a constant even when used once.
+- Reduce indentation with early returns and `continue`; avoid the Arrow Anti-Pattern.
+- Keep function names under 30 characters.
+- Use enums, not booleans, for function parameters.
+- Separate logical code blocks with blank lines.
+- Program at consistent abstraction levels. Encapsulate low-level mechanics in dedicated driver or abstraction layers and expose domain-level APIs.
+- Enforce adjacent-layer dependencies: each layer may call only the layer immediately below it. Never bypass intermediate services or abstractions.
+- Always use braces for `if`, including one-line bodies.
+- When a prompt indicates a bug fix, write and run a failing test first. Then implement the fix and run the test to passing.
+
 ## Structure
 
 ```
