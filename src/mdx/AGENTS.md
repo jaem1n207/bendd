@@ -14,7 +14,7 @@ src/mdx/
 │   ├── create-mdx-component.ts     # Zod wrapper (ALL components must use this)
 │   ├── copy-to-clipboard/          # Code block copy button
 │   ├── step-content/               # Step rendering (4 files)
-│   └── table-of-contents/          # TOC sidebar (5 files, complex scroll sync)
+│   └── table-of-contents/          # TOC sidebar (8 files, complex scroll sync)
 ├── components/                     # 10 component directories → 13 registered tags
 │   ├── a/              # MDXCustomLink — external link detection
 │   ├── callout/        # MDXCallout — info/warning/error boxes
@@ -88,13 +88,16 @@ getSeriesBadges(articles);
 
 ## Table of Contents (complex subsystem)
 
-`common/table-of-contents/` — 5 files:
+`common/table-of-contents/` — 8 files:
 
-- `use-toc.ts`: `useActiveAnchor` hook — scroll sync with passive listeners + `requestAnimationFrame`. **No static NodeList caching** (P22) — always queries live DOM because React re-renders can replace nodes.
-- `table-of-contents.tsx`: Renders TOC sidebar with active link highlighting
+- `use-toc.ts`: `useActiveAnchor` hook — activates every visible heading, carries the latest heading above the existing scroll-offset line, and uses the current-section fallback when no heading is visible. Uses passive listeners + `requestAnimationFrame`. **No static NodeList caching** (P22) — always queries live DOM because React re-renders can replace nodes.
+- `toc-tree.ts`: Pure helpers for depth-aware SVG connector paths and active segments
+- `table-of-contents.tsx`: Renders the separated “On this page” section, depth-aware SVG rails, and multi-active link highlighting
+- `client-table-of-contents.tsx`: Client boundary and deferred TOC rendering
 - `skeleton-table-of-contents.tsx`: Loading skeleton
 - `toc.d.ts`: Type definitions
-- `use-toc.spec.ts`: 245-line test — INP regression tests, multi-highlight bug prevention
+- `toc-tree.spec.ts`: Connector path and active-segment unit tests
+- `use-toc.spec.ts`: INP and multi-active scroll-contract regression tests
 
 ## Security
 

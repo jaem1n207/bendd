@@ -60,5 +60,11 @@
 ## D10: TOC 링크 캐시 제거
 
 - **맥락**: `useActiveAnchor` 훅에서 `querySelectorAll('a')` 결과를 static `NodeListOf`로 캐싱했으나, 페이지 새로고침 후 스크롤 시 다중 하이라이트 버그 발생
-- **결정**: static NodeList 캐시를 제거하고 `activateLink` 호출 시마다 라이브 DOM 조회. `requestAnimationFrame` cleanup 추가
-- **근거**: `querySelectorAll`은 static 스냅샷을 반환하므로 React 리렌더링 후 새 DOM 노드를 반영하지 못한다. `prevActiveHash` dedup이 해시 변경 시에만 `activateLink`를 실행하므로 매번 조회해도 성능 영향이 무시 가능하다 (TOC 링크 5~15개, 해시 변경 시에만 호출). 캐싱의 미세한 성능 이점보다 정확성이 더 중요하다
+- **결정**: static NodeList 캐시를 제거하고 `activateLinks` 호출 시마다 라이브 DOM 조회. `requestAnimationFrame` cleanup 추가
+- **근거**: `querySelectorAll`은 static 스냅샷을 반환하므로 React 리렌더링 후 새 DOM 노드를 반영하지 못한다. `prevActiveKey` dedup이 활성 링크 집합 변경 시에만 `activateLinks`를 실행하므로 매번 조회해도 성능 영향이 무시 가능하다 (TOC 링크 5~15개, 활성 집합 변경 시에만 호출). 캐싱의 미세한 성능 이점보다 정확성이 더 중요하다
+
+## D11: TOC 다중 활성화와 계층형 커넥터
+
+- **맥락**: 한 화면에 여러 헤더가 보여도 하나만 활성화되어 현재 읽을 수 있는 섹션 범위를 충분히 표현하지 못했고, 단일 세로 막대로는 헤더 깊이를 구분하기 어려웠다
+- **결정**: 뷰포트에 보이는 모든 헤더와 기존 scroll-offset 선을 지난 마지막 헤더를 함께 활성화한다. 보이는 헤더가 없을 때는 기존 현재-섹션 fallback을 유지한다. 활성 표시는 헤더 깊이를 반영한 SVG 커넥터 경로를 사용한다
+- **근거**: 화면에 실제로 노출된 섹션과 스크롤 문맥을 동시에 보존하며, 텍스트 들여쓰기와 라인 구조가 같은 계층을 표현하도록 정렬할 수 있다

@@ -16,7 +16,7 @@ Chrome DevTools Performance 패널에서 `body.antialiased` 요소의 이벤트 
 | 항목                    | 문제                                                                 | 영향                      |
 | ----------------------- | -------------------------------------------------------------------- | ------------------------- |
 | `getAbsoluteTop()`      | `offsetParent` 체인을 순회하여 강제 레이아웃 재계산 유발             | 렌더링 지연               |
-| `querySelectorAll('a')` | 매 스크롤 이벤트마다 DOM 쿼리 반복 실행                              | 불필요한 DOM 접근         |
+| `querySelectorAll('a')` | 활성 링크 집합이 바뀔 때마다 DOM 쿼리 반복 실행                      | 불필요한 DOM 접근         |
 | `activateLink()`        | 활성 링크가 변경되지 않아도 모든 링크의 클래스를 제거 후 재설정      | 203ms 렌더 시간의 주 원인 |
 | 스크롤 리스너           | `{ passive: true }` 미설정으로 브라우저가 JS 실행을 기다린 후 스크롤 | 125ms 입력 지연의 주 원인 |
 
@@ -56,17 +56,20 @@ function activateLink(hash: string | null) {
   // ...
 }
 
-// After: 캐시된 쿼리 + 해시 변경 시에만 DOM 업데이트
-let prevActiveHash: string | null | undefined;
-let cachedLinks: NodeListOf<HTMLAnchorElement> | null = null;
+// After: 활성 링크 집합 변경 시에만 라이브 DOM 업데이트
+let prevActiveKey: string | undefined;
 
-function activateLink(hash: string | null) {
-  if (hash === prevActiveHash) return; // 변경 없으면 건너뛰기
-  prevActiveHash = hash;
-  const links = getLinks(); // 캐시된 결과 반환
+function activateLinks(hashes: string[]) {
+  const activeKey = hashes.join('\n');
+  if (activeKey === prevActiveKey) return; // 변경 없으면 건너뛰기
+  prevActiveKey = activeKey;
+  const links = containerRef.current?.querySelectorAll('a');
   // ...
 }
 ```
+
+`querySelectorAll()` 결과는 캐싱하지 않는다. React 리렌더링이 링크 노드를 교체할 수
+있으므로 활성 집합이 바뀌는 시점마다 현재 DOM을 다시 조회한다.
 
 ```typescript
 // Before: 비-passive 리스너
@@ -94,11 +97,11 @@ rIC(() => {
 
 ## 변경 파일
 
-| 파일                                          | 변경 내용                                                          |
-| --------------------------------------------- | ------------------------------------------------------------------ |
-| `src/mdx/common/table-of-contents/use-toc.ts` | `getAbsoluteTop` 단순화, 링크 캐싱, 해시 변경 감지, passive 리스너 |
-| `src/components/theme/use-theme-manger.ts`    | `track()` → `requestIdleCallback` 래핑, cleanup 추가               |
-| `src/components/sound/ui/sound-switcher.tsx`  | `track()` → `requestIdleCallback` 래핑                             |
+| 파일                                          | 변경 내용                                                         |
+| --------------------------------------------- | ----------------------------------------------------------------- |
+| `src/mdx/common/table-of-contents/use-toc.ts` | `getBoundingClientRect` 측정, 활성 집합 변경 감지, passive 리스너 |
+| `src/components/theme/use-theme-manger.ts`    | `track()` → `requestIdleCallback` 래핑, cleanup 추가              |
+| `src/components/sound/ui/sound-switcher.tsx`  | `track()` → `requestIdleCallback` 래핑                            |
 
 ## 회귀 테스트
 
@@ -107,8 +110,9 @@ rIC(() => {
 | 테스트 파일                | 검증 항목                                          |
 | -------------------------- | -------------------------------------------------- |
 | `use-toc.spec.ts`          | 스크롤 리스너 `passive: true` 등록                 |
-| `use-toc.spec.ts`          | 링크 쿼리 캐싱 (반복 `querySelectorAll` 방지)      |
-| `use-toc.spec.ts`          | 동일 해시 시 DOM 업데이트 건너뛰기                 |
+| `use-toc.spec.ts`          | 활성 집합 변경 시 라이브 링크 노드 재조회          |
+| `use-toc.spec.ts`          | 동일 활성 집합일 때 DOM 업데이트 건너뛰기          |
+| `use-toc.spec.ts`          | 화면에 보이는 모든 헤더와 offset 섹션 동시 활성화  |
 | `use-toc.spec.ts`          | unmount 시 리스너 정리                             |
 | `use-theme-manger.spec.ts` | `track()`이 `requestIdleCallback`을 통해 지연 호출 |
 | `use-theme-manger.spec.ts` | cleanup 시 idle callback 취소                      |
