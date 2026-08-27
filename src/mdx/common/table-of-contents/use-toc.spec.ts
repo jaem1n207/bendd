@@ -229,6 +229,26 @@ describe('useActiveAnchor — INP regression tests', () => {
 
     expect(cancelAnimationFrameSpy).toHaveBeenCalledTimes(1);
   });
+
+  it('should cancel pending scroll timers on unmount', () => {
+    vi.useFakeTimers();
+
+    try {
+      const { unmount } = renderHook(() =>
+        useActiveAnchor(containerRef, ACTIVE_LINK_COUNT)
+      );
+
+      window.dispatchEvent(new Event('scroll'));
+      window.dispatchEvent(new Event('scroll'));
+
+      unmount();
+
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.clearAllTimers();
+      vi.useRealTimers();
+    }
+  });
 });
 
 describe('useActiveAnchor — multi-highlight regression', () => {
