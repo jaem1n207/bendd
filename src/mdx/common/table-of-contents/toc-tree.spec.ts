@@ -50,7 +50,7 @@ describe('getConnectorGeometry', () => {
   test('should render a straight root connector', () => {
     expect(getConnectorGeometry(0, 0)).toEqual({
       lineX: 8.5,
-      lineStartY: 6,
+      lineStartY: 0,
       paddingInlineStart: 20,
       transitionPath: null,
       width: 17,
@@ -60,9 +60,10 @@ describe('getConnectorGeometry', () => {
   test('should bend into a child depth', () => {
     expect(getConnectorGeometry(1, 0)).toEqual({
       lineX: 20.5,
-      lineStartY: 12,
+      lineStartY: 18,
       paddingInlineStart: 32,
-      transitionPath: 'M 8.5 0 L 8.5 0 L 20.5 12',
+      transitionPath:
+        'M 8.5 0 V 2 Q 8.5 4 10.5 6 L 18.5 12 Q 20.5 14 20.5 16 V 18',
       width: 29,
     });
   });
@@ -70,9 +71,10 @@ describe('getConnectorGeometry', () => {
   test('should bend back to the parent depth', () => {
     expect(getConnectorGeometry(0, 1)).toEqual({
       lineX: 8.5,
-      lineStartY: 12,
+      lineStartY: 18,
       paddingInlineStart: 20,
-      transitionPath: 'M 20.5 0 L 20.5 0 L 8.5 12',
+      transitionPath:
+        'M 20.5 0 V 2 Q 20.5 4 18.5 6 L 10.5 12 Q 8.5 14 8.5 16 V 18',
       width: 29,
     });
   });

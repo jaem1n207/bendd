@@ -89,10 +89,39 @@ test.describe('Table of Contents sidebar', () => {
     await expect(page.locator('text=On this page')).toBeVisible();
   });
 
+  test('should keep the back link and TOC free of an outer rail', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+
+    const tocNav = page.locator('nav.toc-navbar');
+    await expect(tocNav).toBeVisible();
+
+    const navMetrics = await tocNav.evaluate(nav => {
+      const styles = getComputedStyle(nav);
+      const headingIcon = nav.querySelector('div > svg');
+
+      if (!headingIcon) {
+        throw new Error('TOC heading icon is missing');
+      }
+
+      return {
+        borderLeftWidth: styles.borderLeftWidth,
+        headingIconInset:
+          headingIcon.getBoundingClientRect().left -
+          nav.getBoundingClientRect().left,
+      };
+    });
+
+    expect(navMetrics.borderLeftWidth).toBe('0px');
+    expect(navMetrics.headingIconInset).toBeGreaterThan(0);
+  });
+
   test('should contain TOC items as links', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
 
     const tocLinks = page.locator('nav.toc-navbar ul a');
+    await tocLinks.first().waitFor();
     const count = await tocLinks.count();
 
     expect(count).toBeGreaterThan(0);
@@ -108,21 +137,40 @@ test.describe('Table of Contents sidebar', () => {
 
     const connectorMetrics = await page
       .locator('nav.toc-navbar ul a')
-      .evaluateAll(links => ({
-        ariaLevelCount: new Set(
-          links.map(link => link.parentElement?.getAttribute('aria-level'))
-        ).size,
-        connectorCount: links.filter(link => link.querySelector('svg')).length,
-        hasDepthTransition: links.some(link => link.querySelector('svg path')),
-        indentationCount: new Set(
-          links.map(link => getComputedStyle(link).paddingInlineStart)
-        ).size,
-      }));
+      .evaluateAll(links => {
+        const animatedStroke = links[0]?.querySelector('svg line:last-of-type');
+
+        if (!animatedStroke) {
+          throw new Error('Animated TOC connector stroke is missing');
+        }
+
+        const strokeStyles = getComputedStyle(animatedStroke);
+
+        return {
+          ariaLevelCount: new Set(
+            links.map(link => link.parentElement?.getAttribute('aria-level'))
+          ).size,
+          connectorCount: links.filter(link => link.querySelector('svg'))
+            .length,
+          hasRoundedDepthTransition: links.some(link =>
+            link.querySelector('svg path[d*="Q"]')
+          ),
+          indentationCount: new Set(
+            links.map(link => getComputedStyle(link).paddingInlineStart)
+          ).size,
+          transitionDuration: strokeStyles.transitionDuration,
+          transitionTimingFunction: strokeStyles.transitionTimingFunction,
+        };
+      });
 
     expect(connectorMetrics.ariaLevelCount).toBeGreaterThan(1);
     expect(connectorMetrics.connectorCount).toBeGreaterThan(0);
-    expect(connectorMetrics.hasDepthTransition).toBe(true);
+    expect(connectorMetrics.hasRoundedDepthTransition).toBe(true);
     expect(connectorMetrics.indentationCount).toBeGreaterThan(1);
+    expect(connectorMetrics.transitionDuration).toBe('0.2s');
+    expect(connectorMetrics.transitionTimingFunction).toBe(
+      'cubic-bezier(0.77, 0, 0.175, 1)'
+    );
   });
 
   test('should show back link to article list', async ({ page }) => {
