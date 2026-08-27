@@ -1,16 +1,70 @@
 import { type RefObject } from 'react';
 import { renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
-import { useActiveAnchor } from './use-toc';
+import {
+  getActiveHeaderLinks,
+  getHeaders,
+  useActiveAnchor,
+} from '@/mdx/common/table-of-contents/use-toc';
 
 const ACTIVE_LINK_COUNT = 3;
 
+describe('getActiveHeaderLinks', () => {
+  test('should include the carried section and every visible heading', () => {
+    const activeLinks = getActiveHeaderLinks(
+      [
+        { link: '#previous', top: 100, bottom: 140 },
+        { link: '#visible-a', top: 450, bottom: 490 },
+        { link: '#visible-b', top: 700, bottom: 740 },
+        { link: '#below', top: 950, bottom: 990 },
+      ],
+      {
+        scrollY: 300,
+        innerHeight: 600,
+        offsetHeight: 2_000,
+        scrollOffset: 100,
+      }
+    );
+
+    expect(activeLinks).toEqual(['#previous', '#visible-a', '#visible-b']);
+  });
+
+  test('should use the carried section when no heading is visible', () => {
+    const activeLinks = getActiveHeaderLinks(
+      [
+        { link: '#previous', top: 100, bottom: 140 },
+        { link: '#below', top: 1_000, bottom: 1_040 },
+      ],
+      {
+        scrollY: 300,
+        innerHeight: 600,
+        offsetHeight: 2_000,
+        scrollOffset: 100,
+      }
+    );
+
+    expect(activeLinks).toEqual(['#previous']);
+  });
+
+  test('should not activate a carried section at the top before headings appear', () => {
+    const activeLinks = getActiveHeaderLinks(
+      [{ link: '#below', top: 900, bottom: 940 }],
+      {
+        scrollY: 0,
+        innerHeight: 600,
+        offsetHeight: 2_000,
+        scrollOffset: 100,
+      }
+    );
+
+    expect(activeLinks).toEqual([]);
+  });
+});
+
 describe('useActiveAnchor — INP regression tests', () => {
   let containerEl: HTMLDivElement;
-  let markerEl: HTMLDivElement;
   let containerRef: RefObject<HTMLElement>;
-  let markerRef: RefObject<HTMLElement>;
   let addEventListenerCalls: Array<
     [string, EventListenerOrEventListenerObject, unknown]
   >;
@@ -18,11 +72,9 @@ describe('useActiveAnchor — INP regression tests', () => {
 
   beforeEach(() => {
     containerEl = document.createElement('div');
-    markerEl = document.createElement('div');
     document.body.appendChild(containerEl);
 
-    containerRef = { current: containerEl } as RefObject<HTMLElement>;
-    markerRef = { current: markerEl } as RefObject<HTMLElement>;
+    containerRef = { current: containerEl };
 
     addEventListenerCalls = [];
     originalAddEventListener = window.addEventListener.bind(window);
@@ -43,9 +95,7 @@ describe('useActiveAnchor — INP regression tests', () => {
   });
 
   it('should register scroll listener with passive: true', () => {
-    renderHook(() =>
-      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
-    );
+    renderHook(() => useActiveAnchor(containerRef, ACTIVE_LINK_COUNT));
 
     const scrollCall = addEventListenerCalls.find(
       ([type]) => type === 'scroll'
@@ -56,7 +106,7 @@ describe('useActiveAnchor — INP regression tests', () => {
   });
 
   it('should not set up listeners when linkCount is 0', () => {
-    renderHook(() => useActiveAnchor(containerRef, markerRef, 0));
+    renderHook(() => useActiveAnchor(containerRef, 0));
 
     const scrollCall = addEventListenerCalls.find(
       ([type]) => type === 'scroll'
@@ -72,9 +122,7 @@ describe('useActiveAnchor — INP regression tests', () => {
 
     const querySelectorAllSpy = vi.spyOn(containerEl, 'querySelectorAll');
 
-    renderHook(() =>
-      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
-    );
+    renderHook(() => useActiveAnchor(containerRef, ACTIVE_LINK_COUNT));
 
     window.dispatchEvent(new Event('scroll'));
     window.dispatchEvent(new Event('scroll'));
@@ -91,7 +139,7 @@ describe('useActiveAnchor — INP regression tests', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
     const { unmount } = renderHook(() =>
-      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
+      useActiveAnchor(containerRef, ACTIVE_LINK_COUNT)
     );
     unmount();
 
@@ -105,7 +153,7 @@ describe('useActiveAnchor — INP regression tests', () => {
     const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
 
     const { unmount } = renderHook(() =>
-      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
+      useActiveAnchor(containerRef, ACTIVE_LINK_COUNT)
     );
     unmount();
 
@@ -115,52 +163,57 @@ describe('useActiveAnchor — INP regression tests', () => {
 
 describe('useActiveAnchor — multi-highlight regression', () => {
   let containerEl: HTMLDivElement;
-  let markerEl: HTMLDivElement;
   let containerRef: RefObject<HTMLElement>;
-  let markerRef: RefObject<HTMLElement>;
 
   beforeEach(() => {
     containerEl = document.createElement('div');
-    markerEl = document.createElement('div');
     document.body.appendChild(containerEl);
 
-    containerRef = { current: containerEl } as RefObject<HTMLElement>;
-    markerRef = { current: markerEl } as RefObject<HTMLElement>;
+    containerRef = { current: containerEl };
   });
 
   afterEach(() => {
+    document.getElementById('BenddDoc')?.remove();
     document.body.removeChild(containerEl);
     vi.restoreAllMocks();
   });
 
-  it('should highlight at most one link at a time', async () => {
-    const linkA = document.createElement('a');
-    linkA.href = '#section-a';
-    linkA.className = 'text-muted-foreground/70';
-    containerEl.appendChild(linkA);
+  it('should highlight the carried section and every visible heading', async () => {
+    const documentEl = document.createElement('div');
+    documentEl.id = 'BenddDoc';
+    document.body.appendChild(documentEl);
 
-    const linkB = document.createElement('a');
-    linkB.href = '#section-b';
-    linkB.className = 'text-muted-foreground/70';
-    containerEl.appendChild(linkB);
+    const headingPositions = [
+      { id: 'previous', top: -200, bottom: -160 },
+      { id: 'visible-a', top: 150, bottom: 190 },
+      { id: 'visible-b', top: 400, bottom: 440 },
+    ];
 
-    const linkC = document.createElement('a');
-    linkC.href = '#section-c';
-    linkC.className = 'text-muted-foreground/70';
-    containerEl.appendChild(linkC);
+    for (const { id, top, bottom } of headingPositions) {
+      const heading = document.createElement('h2');
+      heading.id = id;
+      heading.innerHTML = `<a class="header-anchor">${id}</a>`;
+      heading.getBoundingClientRect = vi.fn(
+        () => new DOMRect(0, top, 0, bottom - top)
+      );
+      documentEl.appendChild(heading);
 
-    renderHook(() =>
-      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
-    );
+      const link = document.createElement('a');
+      link.href = `#${id}`;
+      containerEl.appendChild(link);
+    }
 
-    linkA.classList.add('!text-foreground');
-    linkB.classList.add('!text-foreground');
+    vi.spyOn(window, 'scrollY', 'get').mockReturnValue(300);
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(600);
+
+    getHeaders([2, 4]);
+    renderHook(() => useActiveAnchor(containerRef, ACTIVE_LINK_COUNT));
 
     window.dispatchEvent(new Event('scroll'));
 
     await vi.waitFor(() => {
       const highlighted = containerEl.querySelectorAll('.\\!text-foreground');
-      expect(highlighted.length).toBeLessThanOrEqual(1);
+      expect(highlighted).toHaveLength(3);
     });
   });
 
@@ -173,9 +226,7 @@ describe('useActiveAnchor — multi-highlight regression', () => {
     linkB.href = '#section-b';
     containerEl.appendChild(linkB);
 
-    renderHook(() =>
-      useActiveAnchor(containerRef, markerRef, ACTIVE_LINK_COUNT)
-    );
+    renderHook(() => useActiveAnchor(containerRef, ACTIVE_LINK_COUNT));
 
     linkA.classList.add('!text-foreground');
 
@@ -190,7 +241,7 @@ describe('useActiveAnchor — multi-highlight regression', () => {
     const addScrollSpy = vi.spyOn(window, 'addEventListener');
 
     const { rerender } = renderHook(
-      ({ count }) => useActiveAnchor(containerRef, markerRef, count),
+      ({ count }) => useActiveAnchor(containerRef, count),
       { initialProps: { count: 0 } }
     );
 
@@ -212,7 +263,7 @@ describe('useActiveAnchor — multi-highlight regression', () => {
     const cancelRafSpy = vi.spyOn(window, 'cancelAnimationFrame');
 
     const { rerender } = renderHook(
-      ({ count }) => useActiveAnchor(containerRef, markerRef, count),
+      ({ count }) => useActiveAnchor(containerRef, count),
       { initialProps: { count: 3 } }
     );
 
@@ -232,7 +283,7 @@ describe('useActiveAnchor — multi-highlight regression', () => {
     const rafSpy = vi.spyOn(window, 'requestAnimationFrame');
 
     const { rerender } = renderHook(
-      ({ count }) => useActiveAnchor(containerRef, markerRef, count),
+      ({ count }) => useActiveAnchor(containerRef, count),
       { initialProps: { count: 0 } }
     );
 

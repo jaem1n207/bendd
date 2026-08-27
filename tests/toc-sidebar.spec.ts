@@ -1,4 +1,68 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
+
+async function scrollToMultiHighlightScenario(page: Page) {
+  const scenario = await page
+    .locator('nav.toc-navbar ul a')
+    .evaluateAll(links => {
+      const navbar = document.querySelector('nav.toc-navbar');
+      const scrollOffset = (navbar?.getBoundingClientRect().top ?? 0) + 8;
+      const headings = links.flatMap(link => {
+        const href = link.getAttribute('href');
+        const id = href ? decodeURIComponent(href.slice(1)) : '';
+        const heading = document.getElementById(id);
+
+        if (!href || !heading) return [];
+
+        const rect = heading.getBoundingClientRect();
+        return [
+          {
+            href,
+            top: rect.top + window.scrollY,
+            bottom: rect.bottom + window.scrollY,
+          },
+        ];
+      });
+
+      for (const candidate of headings) {
+        const scrollY = Math.max(1, Math.ceil(candidate.bottom + 24));
+        const visibleHrefs = headings
+          .filter(
+            heading =>
+              heading.bottom > scrollY &&
+              heading.top < scrollY + window.innerHeight
+          )
+          .map(({ href }) => href);
+        const carriedHeading = headings
+          .filter(heading => heading.top <= scrollY + scrollOffset)
+          .at(-1);
+
+        if (
+          carriedHeading?.href === candidate.href &&
+          candidate.bottom <= scrollY &&
+          visibleHrefs.length >= 2 &&
+          !visibleHrefs.includes(candidate.href)
+        ) {
+          return {
+            scrollY,
+            expectedHrefs: headings
+              .filter(
+                ({ href }) =>
+                  href === candidate.href || visibleHrefs.includes(href)
+              )
+              .map(({ href }) => href),
+          };
+        }
+      }
+
+      throw new Error(
+        '직전 섹션과 두 개 이상의 보이는 헤더를 포함하는 테스트 위치가 필요합니다.'
+      );
+    });
+
+  await page.evaluate(scrollY => window.scrollTo(0, scrollY), scenario.scrollY);
+
+  return scenario;
+}
 
 test.describe('Table of Contents sidebar', () => {
   test.beforeEach(async ({ page }) => {
@@ -35,6 +99,30 @@ test.describe('Table of Contents sidebar', () => {
 
     const firstLink = tocLinks.first();
     await expect(firstLink).toHaveAttribute('href', /^#/);
+  });
+
+  test('should render depth-aware connector rails', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/article/difference-between-put-patch');
+    await page.locator('nav.toc-navbar ul a').first().waitFor();
+
+    const connectorMetrics = await page
+      .locator('nav.toc-navbar ul a')
+      .evaluateAll(links => ({
+        ariaLevelCount: new Set(
+          links.map(link => link.parentElement?.getAttribute('aria-level'))
+        ).size,
+        connectorCount: links.filter(link => link.querySelector('svg')).length,
+        hasDepthTransition: links.some(link => link.querySelector('svg path')),
+        indentationCount: new Set(
+          links.map(link => getComputedStyle(link).paddingInlineStart)
+        ).size,
+      }));
+
+    expect(connectorMetrics.ariaLevelCount).toBeGreaterThan(1);
+    expect(connectorMetrics.connectorCount).toBeGreaterThan(0);
+    expect(connectorMetrics.hasDepthTransition).toBe(true);
+    expect(connectorMetrics.indentationCount).toBeGreaterThan(1);
   });
 
   test('should show back link to article list', async ({ page }) => {
@@ -97,8 +185,8 @@ test.describe('Table of Contents sidebar', () => {
   });
 });
 
-test.describe('TOC highlight after page refresh', () => {
-  test('should highlight only one TOC item after refresh and scroll', async ({
+test.describe('TOC multi-highlight after page refresh', () => {
+  test('should keep the last TOC item active at the page bottom', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -112,43 +200,39 @@ test.describe('TOC highlight after page refresh', () => {
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
-    await expect(
-      page.locator('nav.toc-navbar ul a.\\!text-foreground')
-    ).toHaveCount(1);
+    await expect(page.locator('nav.toc-navbar ul a').last()).toHaveAttribute(
+      'data-active',
+      'true'
+    );
   });
 
-  test('should maintain single highlight while scrolling after refresh', async ({
+  test('should activate the carried section and all visible headings', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto('/article/naming-tokens-in-design');
+    await page.goto('/article/difference-between-put-patch');
 
     await page.reload();
     await page.locator('nav.toc-navbar ul a').first().waitFor();
 
-    const scrollPositions = await page
-      .locator('nav.toc-navbar ul a')
-      .evaluateAll(links =>
-        links.slice(0, 4).map(link => {
-          const hash = link.getAttribute('href');
-          const id = hash ? decodeURIComponent(hash.slice(1)) : '';
-          const heading = document.getElementById(id);
-          const navbar = document.querySelector('nav.toc-navbar');
-          const scrollOffset = (navbar?.getBoundingClientRect().top ?? 0) + 8;
-          const headingTop =
-            (heading?.getBoundingClientRect().top ?? 0) + window.scrollY;
+    const { expectedHrefs } = await scrollToMultiHighlightScenario(page);
 
-          return Math.max(1, headingTop - scrollOffset + 1);
-        })
-      );
+    await expect
+      .poll(() =>
+        page
+          .locator('nav.toc-navbar ul a[data-active="true"]')
+          .evaluateAll(links => links.map(link => link.getAttribute('href')))
+      )
+      .toEqual(expectedHrefs);
 
-    for (const pos of scrollPositions) {
-      await page.evaluate(y => window.scrollTo(0, y), pos);
+    const activeConnector = page
+      .locator('nav.toc-navbar ul a[data-active="true"]')
+      .first()
+      .locator('svg line')
+      .last();
 
-      await expect(
-        page.locator('nav.toc-navbar ul a.\\!text-foreground')
-      ).toHaveCount(1);
-    }
+    await expect(activeConnector).toHaveCSS('opacity', '1');
+    await expect(activeConnector).toHaveCSS('stroke-dashoffset', '0px');
   });
 });
 
@@ -160,27 +244,29 @@ test.describe('TOC highlight restored on refresh without scroll', () => {
     await page.goto('/article/naming-tokens-in-design');
 
     const tocNav = page.locator('nav.toc-navbar');
-    const highlightedLink = page.locator(
-      'nav.toc-navbar ul a.\\!text-foreground'
+    const highlightedLinks = page.locator(
+      'nav.toc-navbar ul a[data-active="true"]'
     );
 
     await expect(tocNav).toBeVisible();
 
     await page.evaluate(() => window.scrollTo(0, 600));
-    await expect(highlightedLink).toHaveCount(1);
-    const activeHrefBeforeReload = await highlightedLink
-      .first()
-      .getAttribute('href');
-    expect(activeHrefBeforeReload).not.toBeNull();
+    await expect(highlightedLinks.first()).toBeVisible();
+    const activeHrefsBeforeReload = await highlightedLinks.evaluateAll(links =>
+      links.map(link => link.getAttribute('href'))
+    );
+    expect(activeHrefsBeforeReload.length).toBeGreaterThan(0);
 
     await page.reload();
     await page.locator('nav.toc-navbar ul a').first().waitFor();
 
-    await expect(highlightedLink).toHaveCount(1);
-    await expect(highlightedLink.first()).toHaveAttribute(
-      'href',
-      activeHrefBeforeReload!
-    );
+    await expect
+      .poll(() =>
+        highlightedLinks.evaluateAll(links =>
+          links.map(link => link.getAttribute('href'))
+        )
+      )
+      .toEqual(activeHrefsBeforeReload);
   });
 });
 
