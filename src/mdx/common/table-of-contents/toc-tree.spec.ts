@@ -48,7 +48,7 @@ describe('flattenMenuItems', () => {
 });
 
 describe('getTocRailGeometry', () => {
-  test('should create one continuous rounded path through every TOC row', () => {
+  test('should finish depth transitions before the next row text begins', () => {
     expect(
       getTocRailGeometry(
         [
@@ -60,7 +60,7 @@ describe('getTocRailGeometry', () => {
         136
       )
     ).toEqual({
-      path: 'M 8.5 4 V 36 V 38 Q 8.5 40 10.5 42 L 18.5 48 Q 20.5 50 20.5 52 V 54 V 68 V 100 V 102 Q 20.5 104 18.5 106 L 10.5 112 Q 8.5 114 8.5 116 V 118 V 132',
+      path: 'M 8.5 4 V 30 V 31 Q 8.5 32 10.5 33 L 18.5 39 Q 20.5 40 20.5 41 V 42 V 68 V 94 V 95 Q 20.5 96 18.5 97 L 10.5 103 Q 8.5 104 8.5 105 V 106 V 132',
       width: 29,
       height: 136,
     });
