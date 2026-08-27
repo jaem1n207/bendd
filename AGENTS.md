@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> Canonical AI agent instructions for **bendd.me** — a Next.js 14 (App Router) personal blog.
+> Canonical AI agent instructions for **bendd.me** — a Next.js 15 (App Router) personal blog.
 > This file is the index. Detailed docs in [`docs/`](docs/).
 
 ## Critical Rules
@@ -68,7 +68,7 @@ bendd/
 | Task                 | Location                                 | Notes                                                         |
 | -------------------- | ---------------------------------------- | ------------------------------------------------------------- |
 | Add blog article     | `content/{category}/`                    | Must pass `MetadataSchema` validation                         |
-| Add craft content    | `craft/`                                 | Uses `createCraftMDXProcessor` (no relative dates)            |
+| Add craft content    | `craft/`                                 | Uses `readCraftArticles()` + `formatCraftsForDisplay()`       |
 | New MDX component    | `src/mdx/components/{name}/`             | Register in `src/mdx/custom-mdx.tsx`                          |
 | New domain component | `src/components/{domain}/`               | Must have `index.ts` barrel export                            |
 | Add shadcn component | `src/components/ui/`                     | `pnpm dlx shadcn@latest add <name>`                           |
@@ -81,10 +81,10 @@ bendd/
 
 ## Content System
 
-| Directory  | Route             | Processor                   | Purpose              |
-| ---------- | ----------------- | --------------------------- | -------------------- |
-| `content/` | `/article/[slug]` | `createMDXProcessor()`      | Blog articles        |
-| `craft/`   | `/craft/[slug]`   | `createCraftMDXProcessor()` | Experimental content |
+| Directory  | Route             | Reader                | Purpose              |
+| ---------- | ----------------- | --------------------- | -------------------- |
+| `content/` | `/article/[slug]` | `readArticles()`      | Blog articles        |
+| `craft/`   | `/craft/[slug]`   | `readCraftArticles()` | Experimental content |
 
 Same frontmatter schema, different display formatters and route prefixes.
 
@@ -161,7 +161,11 @@ Pre-commit hook runs `pnpm check-types` on TS/TSX + `prettier --write` on MD/MDX
 
 ## Deployment
 
-Vercel-only. No GitHub Actions CI. Pipeline: `git push` → Vercel auto-deploys (`pnpm install` → `pnpm build`). `INTERNAL_UNEXPECTED_ERROR` on Vercel = likely infra issue, not code — verify with `pnpm build && pnpm start` locally first (P23).
+Runtime deployment is Vercel-only. Pull requests and `main` pushes run GitHub Actions
+`Verify` (typecheck, lint, format, unit tests, build), CodeQL, and Vercel checks. Merges
+to `main` trigger Vercel auto-deploy. `INTERNAL_UNEXPECTED_ERROR` on Vercel is likely
+an infrastructure issue, not code — verify with `pnpm build && pnpm start` locally first
+(P23).
 
 ## Docs Index
 
@@ -169,7 +173,7 @@ Vercel-only. No GitHub Actions CI. Pipeline: `git push` → Vercel auto-deploys 
 | -------------------------------------------- | ------------------------------------------------------------- |
 | [docs/architecture.md](docs/architecture.md) | Content system, layer dependencies, routing, security headers |
 | [docs/conventions.md](docs/conventions.md)   | Naming rules, file structure, MDX patterns, CSS, commits      |
-| [docs/pitfalls.md](docs/pitfalls.md)         | 25 common agent mistakes with correct/incorrect examples      |
+| [docs/pitfalls.md](docs/pitfalls.md)         | 26 common agent mistakes with correct/incorrect examples      |
 | [docs/decisions.md](docs/decisions.md)       | ADR-lite: why we chose specific patterns (Zod, HSL, etc.)     |
 | [docs/commands.md](docs/commands.md)         | Dev commands, test runners, build workflow                    |
 | [docs/design-docs/](docs/design-docs/)       | Design documents for specific technical decisions             |

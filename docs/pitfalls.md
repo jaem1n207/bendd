@@ -244,3 +244,20 @@ overlay
 root.classList.add('theme-transition'); // * { transition: color … }
 toggleTheme();
 ```
+
+## P26: TOC 깊이 전환 곡선을 텍스트 행 안에서 그리기
+
+링크의 수평 padding과 레일 depth step이 일정해도, 깊이 전환 곡선이 텍스트
+영역까지 이어지면 항목마다 간격이 달라 보인다. TOC 링크는 `py-1.5`이므로
+텍스트가 행 상단에서 `6px` 아래에서 시작한다.
+
+```text
+올바름: 이전 행 bottom - 6px → 다음 행 top + 6px 안에서 곡선 완료
+잘못됨: 다음 행 top → 다음 행 top + 18px 동안 곡선 진행
+```
+
+현재 계약은 depth step `12px`, 텍스트 padding `20px + depth × 12px`,
+레일–텍스트 간격 `11.5px`다. 동일 깊이 항목은 계속 수직선으로 연결하고,
+제거 대상인 뒤로가기·`On this page` 외곽선과 TOC 내부 레일을 혼동하지 않는다.
+행 padding이나 depth step을 바꾸면 `toc-tree.spec.ts`의 geometry fixture와 실제
+브라우저 간격을 함께 검증한다.

@@ -6,37 +6,36 @@
 
 ### content/ vs craft/ 분리
 
-두 디렉토리는 **서로 다른 프로세서와 라우트**를 사용한다:
+두 디렉토리는 **서로 다른 읽기 함수와 라우트**를 사용한다:
 
-| 항목      | content/                              | craft/                                       |
-| --------- | ------------------------------------- | -------------------------------------------- |
-| 용도      | 블로그 글                             | 실험적/크리에이티브 콘텐츠                   |
-| 프로세서  | `createMDXProcessor()`                | `createCraftMDXProcessor()`                  |
-| 라우트    | `/article/[slug]`                     | `/craft/[slug]`                              |
-| 표시 형식 | `formatForDisplay()` (상대 시간 포함) | `formatForCraftDisplay()` (상대 시간 미포함) |
+| 항목      | content/                                        | craft/                                   |
+| --------- | ----------------------------------------------- | ---------------------------------------- |
+| 용도      | 블로그 글                                       | 실험적/크리에이티브 콘텐츠               |
+| 읽기 함수 | `readArticles()`                                | `readCraftArticles()`                    |
+| 라우트    | `/article/[slug]`                               | `/craft/[slug]`                          |
+| 표시 형식 | `formatArticlesForDisplay()` (시리즈 정보 포함) | `formatCraftsForDisplay()` (시리즈 없음) |
 
-프론트매터 스키마는 동일하지만 (`MetadataSchema`), 포맷 메서드가 생성하는 href 경로가 다르다 (`/article/` vs `/craft/`).
+프론트매터 스키마는 동일하지만 (`MetadataSchema`), 포맷 함수가 생성하는 href
+경로가 다르다 (`/article/` vs `/craft/`).
 
-### MDXProcessor 지연 평가
+### MDX 순수 함수 API
 
-`MDXProcessor`는 불변 체이닝 패턴을 사용한다:
+콘텐츠 API는 숨겨진 상태나 지연 실행이 없는 순수 함수 조합을 사용한다:
 
-- 각 메서드(`sortByDateDesc`, `limit`, `filterByCategory`)는 **새 인스턴스**를 반환
-- 연산은 내부 `operations` 배열에 누적되며, **즉시 실행되지 않는다**
-- `getArticles()`, `formatForDisplay()`, `map()` 호출 시에만 실행
+- `readArticles()`와 `readCraftArticles()`가 각 디렉토리의 콘텐츠를 읽는다.
+- `sortByDateDesc()`, `findBySlug()` 등은 입력 배열을 명시적으로 받는다.
+- `formatArticlesForDisplay()`는 전체 글 컬렉션을 함께 받아 시리즈 정보를 계산한다.
+- `formatCraftsForDisplay()`는 craft 전용 route와 표시 모델을 만든다.
 
 ```typescript
-// 올바른 사용
-createMDXProcessor()
-  .sortByDateDesc()
-  .limit(5)
-  .formatForDisplay({ includeRelativeDate: true });
-
-// 주의: 이 시점에서는 아직 실행되지 않음
-const processor = createMDXProcessor().sortByDateDesc();
-// 여기서 실행됨
-const articles = processor.getArticles();
+const articles = readArticles();
+const sorted = sortByDateDesc(articles);
+const post = findBySlug(articles, slug);
+const displayItems = formatArticlesForDisplay(sorted, articles);
 ```
+
+각 함수의 데이터 출처와 실행 시점이 호출부에 드러나므로 클래스 인스턴스의
+operations queue나 lazy evaluation을 가정하지 않는다.
 
 ### MDX 보안 설정
 
