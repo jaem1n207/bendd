@@ -76,18 +76,50 @@ function resolveHeaders(headers: MenuItem[], range: LevelRange): MenuItem[] {
   return menuItem;
 }
 
-function throttleAndDebounce(fn: () => void, delay: number): () => void {
-  let timeoutId: NodeJS.Timeout;
+interface CancellableCallback {
+  (): void;
+  cancel: () => void;
+}
+
+function throttleAndDebounce(
+  fn: () => void,
+  delay: number
+): CancellableCallback {
+  let trailingTimeoutId: ReturnType<typeof setTimeout> | undefined;
+  let throttleTimeoutId: ReturnType<typeof setTimeout> | undefined;
   let called = false;
 
-  return () => {
-    if (timeoutId) clearTimeout(timeoutId);
+  const callback: CancellableCallback = () => {
+    if (trailingTimeoutId) {
+      clearTimeout(trailingTimeoutId);
+      trailingTimeoutId = undefined;
+    }
 
     if (!called) {
       fn();
-      (called = true) && setTimeout(() => (called = false), delay);
-    } else timeoutId = setTimeout(fn, delay);
+      called = true;
+      throttleTimeoutId = setTimeout(() => {
+        called = false;
+        throttleTimeoutId = undefined;
+      }, delay);
+    } else {
+      trailingTimeoutId = setTimeout(() => {
+        trailingTimeoutId = undefined;
+        fn();
+      }, delay);
+    }
   };
+
+  callback.cancel = () => {
+    if (trailingTimeoutId) clearTimeout(trailingTimeoutId);
+    if (throttleTimeoutId) clearTimeout(throttleTimeoutId);
+
+    trailingTimeoutId = undefined;
+    throttleTimeoutId = undefined;
+    called = false;
+  };
+
+  return callback;
 }
 
 function getScrollOffset(): number {
@@ -292,6 +324,7 @@ export function useActiveAnchor(
 
     return () => {
       cancelAnimationFrame(rafId);
+      onScroll.cancel();
       if (readyRafId !== null) {
         cancelAnimationFrame(readyRafId);
       }
