@@ -14,7 +14,7 @@ src/mdx/
 │   ├── create-mdx-component.ts     # Zod wrapper (ALL components must use this)
 │   ├── copy-to-clipboard/          # Code block copy button
 │   ├── step-content/               # Step rendering (4 files)
-│   └── table-of-contents/          # TOC sidebar (8 files, complex scroll sync)
+│   └── table-of-contents/          # TOC sidebar (11 files, complex scroll sync)
 ├── components/                     # 10 component directories → 13 registered tags
 │   ├── a/              # MDXCustomLink — external link detection
 │   ├── callout/        # MDXCallout — info/warning/error boxes
@@ -88,16 +88,19 @@ getSeriesBadges(articles);
 
 ## Table of Contents (complex subsystem)
 
-`common/table-of-contents/` — 8 files:
+`common/table-of-contents/` — 11 files:
 
-- `use-toc.ts`: `useActiveAnchor` hook — activates every visible heading, carries the latest heading above the existing scroll-offset line, and uses the current-section fallback when no heading is visible. Uses passive listeners + `requestAnimationFrame`. **No static NodeList caching** (P22) — always queries live DOM because React re-renders can replace nodes.
-- `toc-tree.ts`: Pure helpers for depth-aware SVG connector paths and active segments
-- `table-of-contents.tsx`: Renders the separated “On this page” section, depth-aware SVG rails, and multi-active link highlighting
+- `use-toc.ts`: `useActiveAnchor` hook — activates every visible heading, carries the latest heading above the existing scroll-offset line, and uses the current-section fallback when no heading is visible. Updates the continuous rail's top/bottom CSS insets without a React scroll re-render. Uses passive listeners + `requestAnimationFrame`. **No static NodeList caching** (P22) — always queries live DOM because React re-renders can replace nodes.
+- `toc-tree.ts`: Pure helpers for flattening the menu and creating one continuous, depth-aware SVG rail path
+- `toc-rail.tsx`: Measures rendered rows before paint, observes layout-only changes with `ResizeObserver`, and renders shared base/active rail paths
+- `table-of-contents.tsx`: Renders the separated “On this page” section, depth metadata, the shared SVG rail, and multi-active link highlighting
 - `client-table-of-contents.tsx`: Client boundary and deferred TOC rendering
 - `skeleton-table-of-contents.tsx`: Loading skeleton
 - `toc.d.ts`: Type definitions
-- `toc-tree.spec.ts`: Connector path and active-segment unit tests
-- `use-toc.spec.ts`: INP and multi-active scroll-contract regression tests
+- `toc-tree.spec.ts`: Continuous connector geometry unit tests
+- `toc-rail.spec.tsx`: Shared base/active path and resize-observer lifecycle tests
+- `table-of-contents.spec.tsx`: TOC depth-to-shared-rail wiring test
+- `use-toc.spec.ts`: INP, multi-active scroll contract, and independent rail-endpoint regression tests
 
 ## Security
 

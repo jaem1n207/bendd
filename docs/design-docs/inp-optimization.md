@@ -97,11 +97,12 @@ rIC(() => {
 
 ## 변경 파일
 
-| 파일                                          | 변경 내용                                                         |
-| --------------------------------------------- | ----------------------------------------------------------------- |
-| `src/mdx/common/table-of-contents/use-toc.ts` | `getBoundingClientRect` 측정, 활성 집합 변경 감지, passive 리스너 |
-| `src/components/theme/use-theme-manger.ts`    | `track()` → `requestIdleCallback` 래핑, cleanup 추가              |
-| `src/components/sound/ui/sound-switcher.tsx`  | `track()` → `requestIdleCallback` 래핑                            |
+| 파일                                            | 변경 내용                                                                                    |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `src/mdx/common/table-of-contents/use-toc.ts`   | `getBoundingClientRect` 측정, 활성 집합 변경 감지, passive 리스너, active rail CSS 변수 갱신 |
+| `src/mdx/common/table-of-contents/toc-rail.tsx` | 초기·레이아웃 변경 시에만 연속 SVG path 측정 (`ResizeObserver`)                              |
+| `src/components/theme/use-theme-manger.ts`      | `track()` → `requestIdleCallback` 래핑, cleanup 추가                                         |
+| `src/components/sound/ui/sound-switcher.tsx`    | `track()` → `requestIdleCallback` 래핑                                                       |
 
 ## 회귀 테스트
 
@@ -113,7 +114,10 @@ rIC(() => {
 | `use-toc.spec.ts`          | 활성 집합 변경 시 라이브 링크 노드 재조회          |
 | `use-toc.spec.ts`          | 동일 활성 집합일 때 DOM 업데이트 건너뛰기          |
 | `use-toc.spec.ts`          | 화면에 보이는 모든 헤더와 offset 섹션 동시 활성화  |
+| `use-toc.spec.ts`          | active rail의 위·아래 endpoint를 독립적으로 갱신   |
 | `use-toc.spec.ts`          | unmount 시 리스너 정리                             |
+| `toc-rail.spec.tsx`        | 하나의 연속 active path와 ResizeObserver cleanup   |
+| `toc-sidebar.spec.ts`      | endpoint 중간 보간·방향 전환·reduced motion        |
 | `use-theme-manger.spec.ts` | `track()`이 `requestIdleCallback`을 통해 지연 호출 |
 | `use-theme-manger.spec.ts` | cleanup 시 idle callback 취소                      |
 | `use-theme-manger.spec.ts` | `requestIdleCallback` 미지원 시 `setTimeout` 폴백  |
