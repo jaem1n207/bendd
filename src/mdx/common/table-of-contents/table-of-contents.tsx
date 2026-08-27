@@ -1,12 +1,17 @@
 'use client';
 
-import { type Route } from 'next';
+import { ListTree } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 import { Typography } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
 import type { MenuItem } from '@/mdx/common/table-of-contents/toc';
+import {
+  flattenMenuItems,
+  getConnectorGeometry,
+  type ConnectorGeometry,
+} from '@/mdx/common/table-of-contents/toc-tree';
 import {
   getHeaders,
   useActiveAnchor,
@@ -15,53 +20,148 @@ import {
 export function TableOfContents() {
   const [toc, setToc] = useState<MenuItem[]>([]);
   const containerRef = useRef<HTMLUListElement>(null);
-  const markerRef = useRef<HTMLDivElement>(null);
+  const flatToc = flattenMenuItems(toc);
 
-  useActiveAnchor(containerRef, markerRef, toc.length);
+  useActiveAnchor(containerRef, flatToc.length);
 
   useEffect(() => {
     setToc(getHeaders([2, 4]));
   }, []);
 
   return (
-    <nav className="toc-navbar flex max-h-full min-h-0 min-w-0 flex-col self-start overflow-hidden">
-      <div
-        ref={markerRef}
-        className={cn(
-          'absolute -left-px top-10 z-0 h-3 w-0.5 rounded-sm bg-primary opacity-0',
-          'transition-[opacity,top,background-color] motion-reduce:transition-none motion-reduce:hover:transition-none'
-        )}
-      />
-      <Typography variant="p" affects="small" asChild className="!leading-8">
-        <p>On this page</p>
-      </Typography>
+    <nav
+      aria-labelledby="table-of-contents-heading"
+      className="toc-navbar flex max-h-full min-h-0 min-w-0 flex-col self-start overflow-hidden"
+    >
+      <div className="mt-6 flex items-center gap-1.5 text-muted-foreground">
+        <ListTree aria-hidden="true" className="size-3.5 shrink-0" />
+        <Typography
+          id="table-of-contents-heading"
+          variant="p"
+          affects="small"
+          asChild
+          className="!mt-0 !leading-5"
+        >
+          <p>On this page</p>
+        </Typography>
+      </div>
       <ul
         ref={containerRef}
         className={cn(
-          'mt-1 min-h-0 flex-1 overflow-y-auto rounded-sm font-sans'
+          'relative mt-2 min-h-0 flex-1 overflow-y-auto rounded-sm py-1 font-sans'
         )}
       >
-        {renderItems(toc)}
+        {flatToc.map(({ item, depth }, index) => {
+          const previousDepth = flatToc[index - 1]?.depth ?? depth;
+
+          return (
+            <TableOfContentsItem
+              key={item.link}
+              item={item}
+              depth={depth}
+              geometry={getConnectorGeometry(depth, previousDepth)}
+            />
+          );
+        })}
       </ul>
     </nav>
   );
 }
 
-function renderItems(items: MenuItem[]) {
-  return items.map(item => (
-    <li key={item.link} className="py-1">
+interface TableOfContentsItemProps {
+  item: MenuItem;
+  depth: number;
+  geometry: ConnectorGeometry;
+}
+
+function TableOfContentsItem({
+  item,
+  depth,
+  geometry,
+}: TableOfContentsItemProps) {
+  return (
+    <li aria-level={depth + 1}>
       <Link
-        href={item.link as Route<''>}
+        href={{ hash: item.link.slice(1) }}
+        data-active="false"
+        style={{ paddingInlineStart: geometry.paddingInlineStart }}
         className={cn(
-          'block max-w-full break-keep text-sm font-medium leading-5 transition-colors hover:text-foreground',
-          'text-muted-foreground/70'
+          'group relative block max-w-full break-keep py-1.5 text-sm font-medium leading-5',
+          'text-muted-foreground/70 transition-colors hover:text-foreground',
+          'data-[active=true]:!text-foreground'
         )}
       >
-        {item.title}
+        <TocConnector geometry={geometry} />
+        <span className="relative z-10">{item.title}</span>
       </Link>
-      {item.children && item.children.length > 0 && (
-        <ul className="ml-4 mt-1">{renderItems(item.children)}</ul>
-      )}
     </li>
-  ));
+  );
+}
+
+interface TocConnectorProps {
+  geometry: ConnectorGeometry;
+}
+
+function TocConnector({ geometry }: TocConnectorProps) {
+  const { lineX, lineStartY, transitionPath, width } = geometry;
+  const baseStrokeClassName = 'stroke-muted-foreground/20';
+  const activeStrokeClassName = cn(
+    'stroke-primary opacity-0 [stroke-dashoffset:1]',
+    'transition-[opacity,stroke-dashoffset] duration-300 ease-out',
+    'group-data-[active=true]:opacity-100 group-data-[active=true]:[stroke-dashoffset:0]',
+    'motion-reduce:transition-none motion-reduce:[stroke-dashoffset:0]'
+  );
+
+  return (
+    <svg
+      aria-hidden="true"
+      className="pointer-events-none absolute -top-1.5 bottom-0 left-0 z-0 h-[calc(100%+0.375rem)] overflow-visible"
+      style={{ width }}
+    >
+      {transitionPath && (
+        <>
+          <path
+            d={transitionPath}
+            fill="none"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={baseStrokeClassName}
+          />
+          <path
+            d={transitionPath}
+            pathLength={1}
+            fill="none"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray={1}
+            strokeDashoffset={1}
+            className={activeStrokeClassName}
+          />
+        </>
+      )}
+      <line
+        x1={lineX}
+        y1={lineStartY}
+        x2={lineX}
+        y2="100%"
+        strokeWidth="1"
+        strokeLinecap="round"
+        className={baseStrokeClassName}
+      />
+      <line
+        x1={lineX}
+        y1={lineStartY}
+        x2={lineX}
+        y2="100%"
+        pathLength={1}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeDasharray={1}
+        strokeDashoffset={1}
+        className={activeStrokeClassName}
+      />
+    </svg>
+  );
 }
