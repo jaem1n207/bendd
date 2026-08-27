@@ -108,7 +108,7 @@
   }
 
   .toc-navbar {
-    @apply relative border-l border-solid border-border pl-4;
+    @apply pl-4;
   }
   .header-anchor {
     @apply font-bold no-underline;

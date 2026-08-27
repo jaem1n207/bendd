@@ -107,7 +107,7 @@ function TocConnector({ geometry }: TocConnectorProps) {
   const baseStrokeClassName = 'stroke-muted-foreground/20';
   const activeStrokeClassName = cn(
     'stroke-primary opacity-0 [stroke-dashoffset:1]',
-    'transition-[opacity,stroke-dashoffset] duration-300 ease-out',
+    'transition-[opacity,stroke-dashoffset] duration-200 [transition-timing-function:cubic-bezier(0.77,0,0.175,1)]',
     'group-data-[active=true]:opacity-100 group-data-[active=true]:[stroke-dashoffset:0]',
     'motion-reduce:transition-none motion-reduce:[stroke-dashoffset:0]'
   );
@@ -115,7 +115,7 @@ function TocConnector({ geometry }: TocConnectorProps) {
   return (
     <svg
       aria-hidden="true"
-      className="pointer-events-none absolute -top-1.5 bottom-0 left-0 z-0 h-[calc(100%+0.375rem)] overflow-visible"
+      className="pointer-events-none absolute inset-y-0 left-0 z-0 h-full overflow-visible"
       style={{ width }}
     >
       {transitionPath && (
@@ -124,7 +124,7 @@ function TocConnector({ geometry }: TocConnectorProps) {
             d={transitionPath}
             fill="none"
             strokeWidth="1"
-            strokeLinecap="round"
+            strokeLinecap="butt"
             strokeLinejoin="round"
             className={baseStrokeClassName}
           />
@@ -133,7 +133,7 @@ function TocConnector({ geometry }: TocConnectorProps) {
             pathLength={1}
             fill="none"
             strokeWidth="1.5"
-            strokeLinecap="round"
+            strokeLinecap="butt"
             strokeLinejoin="round"
             strokeDasharray={1}
             strokeDashoffset={1}
@@ -147,7 +147,7 @@ function TocConnector({ geometry }: TocConnectorProps) {
         x2={lineX}
         y2="100%"
         strokeWidth="1"
-        strokeLinecap="round"
+        strokeLinecap="butt"
         className={baseStrokeClassName}
       />
       <line
@@ -157,7 +157,7 @@ function TocConnector({ geometry }: TocConnectorProps) {
         y2="100%"
         pathLength={1}
         strokeWidth="1.5"
-        strokeLinecap="round"
+        strokeLinecap="butt"
         strokeDasharray={1}
         strokeDashoffset={1}
         className={activeStrokeClassName}
