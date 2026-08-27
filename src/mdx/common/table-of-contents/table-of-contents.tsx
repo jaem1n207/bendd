@@ -6,11 +6,11 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Typography } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
+import { TocRail } from '@/mdx/common/table-of-contents/toc-rail';
 import type { MenuItem } from '@/mdx/common/table-of-contents/toc';
 import {
   flattenMenuItems,
-  getConnectorGeometry,
-  type ConnectorGeometry,
+  getTocRailPadding,
 } from '@/mdx/common/table-of-contents/toc-tree';
 import {
   getHeaders,
@@ -51,18 +51,10 @@ export function TableOfContents() {
           'relative mt-2 min-h-0 flex-1 overflow-y-auto rounded-sm py-1 font-sans'
         )}
       >
-        {flatToc.map(({ item, depth }, index) => {
-          const previousDepth = flatToc[index - 1]?.depth ?? depth;
-
-          return (
-            <TableOfContentsItem
-              key={item.link}
-              item={item}
-              depth={depth}
-              geometry={getConnectorGeometry(depth, previousDepth)}
-            />
-          );
-        })}
+        <TocRail linkCount={flatToc.length} />
+        {flatToc.map(({ item, depth }) => (
+          <TableOfContentsItem key={item.link} item={item} depth={depth} />
+        ))}
       </ul>
     </nav>
   );
@@ -71,97 +63,24 @@ export function TableOfContents() {
 interface TableOfContentsItemProps {
   item: MenuItem;
   depth: number;
-  geometry: ConnectorGeometry;
 }
 
-function TableOfContentsItem({
-  item,
-  depth,
-  geometry,
-}: TableOfContentsItemProps) {
+function TableOfContentsItem({ item, depth }: TableOfContentsItemProps) {
   return (
     <li aria-level={depth + 1}>
       <Link
         href={{ hash: item.link.slice(1) }}
         data-active="false"
-        style={{ paddingInlineStart: geometry.paddingInlineStart }}
+        data-toc-depth={depth}
+        style={{ paddingInlineStart: getTocRailPadding(depth) }}
         className={cn(
           'group relative block max-w-full break-keep py-1.5 text-sm font-medium leading-5',
           'text-muted-foreground/70 transition-colors hover:text-foreground',
           'data-[active=true]:!text-foreground'
         )}
       >
-        <TocConnector geometry={geometry} />
         <span className="relative z-10">{item.title}</span>
       </Link>
     </li>
-  );
-}
-
-interface TocConnectorProps {
-  geometry: ConnectorGeometry;
-}
-
-function TocConnector({ geometry }: TocConnectorProps) {
-  const { lineX, lineStartY, transitionPath, width } = geometry;
-  const baseStrokeClassName = 'stroke-muted-foreground/20';
-  const activeStrokeClassName = cn(
-    'stroke-primary opacity-0 [stroke-dashoffset:1]',
-    'transition-[opacity,stroke-dashoffset] duration-200 [transition-timing-function:cubic-bezier(0.77,0,0.175,1)]',
-    'group-data-[active=true]:opacity-100 group-data-[active=true]:[stroke-dashoffset:0]',
-    'motion-reduce:transition-none motion-reduce:[stroke-dashoffset:0]'
-  );
-
-  return (
-    <svg
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-y-0 left-0 z-0 h-full overflow-visible"
-      style={{ width }}
-    >
-      {transitionPath && (
-        <>
-          <path
-            d={transitionPath}
-            fill="none"
-            strokeWidth="1"
-            strokeLinecap="butt"
-            strokeLinejoin="round"
-            className={baseStrokeClassName}
-          />
-          <path
-            d={transitionPath}
-            pathLength={1}
-            fill="none"
-            strokeWidth="1.5"
-            strokeLinecap="butt"
-            strokeLinejoin="round"
-            strokeDasharray={1}
-            strokeDashoffset={1}
-            className={activeStrokeClassName}
-          />
-        </>
-      )}
-      <line
-        x1={lineX}
-        y1={lineStartY}
-        x2={lineX}
-        y2="100%"
-        strokeWidth="1"
-        strokeLinecap="butt"
-        className={baseStrokeClassName}
-      />
-      <line
-        x1={lineX}
-        y1={lineStartY}
-        x2={lineX}
-        y2="100%"
-        pathLength={1}
-        strokeWidth="1.5"
-        strokeLinecap="butt"
-        strokeDasharray={1}
-        strokeDashoffset={1}
-        className={activeStrokeClassName}
-      />
-    </svg>
   );
 }

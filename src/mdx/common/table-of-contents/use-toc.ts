@@ -159,6 +159,47 @@ function normalizeHash(hash: string): string {
   }
 }
 
+export interface ActiveRailRange {
+  topInset: number;
+  bottomInset: number;
+}
+
+export function updateActiveRailRange(container: HTMLElement): ActiveRailRange {
+  const railHeight = container.scrollHeight;
+  const containerTop = container.getBoundingClientRect().top;
+  const activeLinks = Array.from(
+    container.querySelectorAll<HTMLAnchorElement>(
+      'a[data-toc-depth][data-active="true"]'
+    )
+  );
+
+  let topInset = 0;
+  let bottomInset = railHeight;
+
+  if (activeLinks.length) {
+    const firstRect = activeLinks[0].getBoundingClientRect();
+    const lastRect =
+      activeLinks[activeLinks.length - 1].getBoundingClientRect();
+
+    topInset = Math.max(
+      0,
+      Math.min(railHeight, firstRect.top - containerTop + container.scrollTop)
+    );
+    bottomInset = Math.max(
+      0,
+      Math.min(
+        railHeight,
+        railHeight - (lastRect.bottom - containerTop + container.scrollTop)
+      )
+    );
+  }
+
+  container.style.setProperty('--toc-active-top', `${topInset}px`);
+  container.style.setProperty('--toc-active-bottom', `${bottomInset}px`);
+
+  return { topInset, bottomInset };
+}
+
 export function useActiveAnchor(
   containerRef: RefObject<HTMLElement | null>,
   linkCountOrLegacyMarkerRef: RefObject<HTMLElement | null> | number = 0,
@@ -173,16 +214,17 @@ export function useActiveAnchor(
     if (!linkCount) return;
 
     let prevActiveKey: string | undefined;
+    let readyRafId: number | null = null;
 
     function activateLinks(hashes: string[]) {
       const activeKey = hashes.join('\n');
       if (activeKey === prevActiveKey) return;
       prevActiveKey = activeKey;
 
-      if (containerRef.current) {
+      const container = containerRef.current;
+      if (container) {
         // 캐싱 금지: static NodeList는 React 리렌더링 후 stale 참조를 유발한다
-        const links =
-          containerRef.current.querySelectorAll<HTMLAnchorElement>('a');
+        const links = container.querySelectorAll<HTMLAnchorElement>('a');
         const activeHashes = new Set(hashes.map(normalizeHash));
 
         links.forEach(link => {
@@ -193,6 +235,17 @@ export function useActiveAnchor(
           link.classList.toggle('!text-foreground', isActive);
           link.dataset.active = String(isActive);
         });
+
+        updateActiveRailRange(container);
+
+        if (container.dataset.tocRailReady !== 'true' && readyRafId === null) {
+          readyRafId = requestAnimationFrame(() => {
+            if (containerRef.current === container) {
+              container.dataset.tocRailReady = 'true';
+            }
+            readyRafId = null;
+          });
+        }
       }
     }
     function setActiveLink() {
@@ -239,6 +292,9 @@ export function useActiveAnchor(
 
     return () => {
       cancelAnimationFrame(rafId);
+      if (readyRafId !== null) {
+        cancelAnimationFrame(readyRafId);
+      }
       window.removeEventListener('scroll', onScroll);
     };
   }, [containerRef, linkCount]);
