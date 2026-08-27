@@ -1,12 +1,17 @@
 'use client';
 
-import { type Route } from 'next';
+import { ListTree } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 import { Typography } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
+import { TocRail } from '@/mdx/common/table-of-contents/toc-rail';
 import type { MenuItem } from '@/mdx/common/table-of-contents/toc';
+import {
+  flattenMenuItems,
+  getTocRailPadding,
+} from '@/mdx/common/table-of-contents/toc-tree';
 import {
   getHeaders,
   useActiveAnchor,
@@ -15,53 +20,67 @@ import {
 export function TableOfContents() {
   const [toc, setToc] = useState<MenuItem[]>([]);
   const containerRef = useRef<HTMLUListElement>(null);
-  const markerRef = useRef<HTMLDivElement>(null);
+  const flatToc = flattenMenuItems(toc);
 
-  useActiveAnchor(containerRef, markerRef, toc.length);
+  useActiveAnchor(containerRef, flatToc.length);
 
   useEffect(() => {
     setToc(getHeaders([2, 4]));
   }, []);
 
   return (
-    <nav className="toc-navbar flex max-h-full min-h-0 min-w-0 flex-col self-start overflow-hidden">
-      <div
-        ref={markerRef}
-        className={cn(
-          'absolute -left-px top-10 z-0 h-3 w-0.5 rounded-sm bg-primary opacity-0',
-          'transition-[opacity,top,background-color] motion-reduce:transition-none motion-reduce:hover:transition-none'
-        )}
-      />
-      <Typography variant="p" affects="small" asChild className="!leading-8">
-        <p>On this page</p>
-      </Typography>
+    <nav
+      aria-labelledby="table-of-contents-heading"
+      className="toc-navbar flex max-h-full min-h-0 min-w-0 flex-col self-start overflow-hidden"
+    >
+      <div className="mt-6 flex items-center gap-1.5 text-muted-foreground">
+        <ListTree aria-hidden="true" className="size-3.5 shrink-0" />
+        <Typography
+          id="table-of-contents-heading"
+          variant="p"
+          affects="small"
+          asChild
+          className="!mt-0 !leading-5"
+        >
+          <p>On this page</p>
+        </Typography>
+      </div>
       <ul
         ref={containerRef}
         className={cn(
-          'mt-1 min-h-0 flex-1 overflow-y-auto rounded-sm font-sans'
+          'relative mt-2 min-h-0 flex-1 overflow-y-auto rounded-sm py-1 font-sans'
         )}
       >
-        {renderItems(toc)}
+        <TocRail linkCount={flatToc.length} />
+        {flatToc.map(({ item, depth }) => (
+          <TableOfContentsItem key={item.link} item={item} depth={depth} />
+        ))}
       </ul>
     </nav>
   );
 }
 
-function renderItems(items: MenuItem[]) {
-  return items.map(item => (
-    <li key={item.link} className="py-1">
+interface TableOfContentsItemProps {
+  item: MenuItem;
+  depth: number;
+}
+
+function TableOfContentsItem({ item, depth }: TableOfContentsItemProps) {
+  return (
+    <li aria-level={depth + 1}>
       <Link
-        href={item.link as Route<''>}
+        href={{ hash: item.link.slice(1) }}
+        data-active="false"
+        data-toc-depth={depth}
+        style={{ paddingInlineStart: getTocRailPadding(depth) }}
         className={cn(
-          'block max-w-full break-keep text-sm font-medium leading-5 transition-colors hover:text-foreground',
-          'text-muted-foreground/70'
+          'group relative block max-w-full break-keep py-1.5 text-sm font-medium leading-5',
+          'text-muted-foreground/70 transition-colors hover:text-foreground',
+          'data-[active=true]:!text-foreground'
         )}
       >
-        {item.title}
+        <span className="relative z-10">{item.title}</span>
       </Link>
-      {item.children && item.children.length > 0 && (
-        <ul className="ml-4 mt-1">{renderItems(item.children)}</ul>
-      )}
     </li>
-  ));
+  );
 }

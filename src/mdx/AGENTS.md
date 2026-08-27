@@ -14,18 +14,21 @@ src/mdx/
 │   ├── create-mdx-component.ts     # Zod wrapper (ALL components must use this)
 │   ├── copy-to-clipboard/          # Code block copy button
 │   ├── step-content/               # Step rendering (4 files)
-│   └── table-of-contents/          # TOC sidebar (5 files, complex scroll sync)
-├── components/                     # 10 component directories → 13 registered tags
+│   └── table-of-contents/          # TOC sidebar (11 files, complex scroll sync)
+├── components/                     # 13 component directories → 15 registered tags
 │   ├── a/              # MDXCustomLink — external link detection
 │   ├── callout/        # MDXCallout — info/warning/error boxes
+│   ├── deep-dive/      # MDXDeepDive — expandable detail blocks
 │   ├── heading/        # MDXHeading — h2/h3/h4 with anchor links
 │   ├── ime-scroll-demo/# MDXImeScrollDemo — interactive demo (201 lines)
-│   ├── img/            # MDXRoundedImage — SVG fallback to <img>
+│   ├── img/            # Legacy rounded image helper
 │   ├── magic-move/     # MDXMagicMove — animated code transitions
 │   ├── pre/            # MDXPre — code blocks with copy button
 │   ├── shuffle-letters-demo/ # MDXShuffleLettersDemo — letter animation
 │   ├── steps/          # MDXSteps — numbered step guides
-│   └── video/          # MDXAutoplayVideo + MDXPreLoadVideo
+│   ├── video/          # MDXAutoplayVideo + MDXPreLoadVideo
+│   ├── visual-stack/   # MDXVisualStack — layered visual layout
+│   └── zoom-image/     # MDXZoomImage — interactive image zoom
 └── lib/
     ├── ensure-local-storage.ts     # localStorage polyfill (twoslash needs it in SSR)
     └── ensure-local-storage.spec.ts
@@ -38,13 +41,15 @@ src/mdx/
 | MDX Tag              | Component               | Source                             |
 | -------------------- | ----------------------- | ---------------------------------- |
 | `h2`, `h3`, `h4`     | `MDXHeading`            | `components/heading/`              |
-| `img`                | `MDXRoundedImage`       | `components/img/`                  |
+| `img`                | `MDXZoomImage`          | `components/zoom-image/`           |
 | `a`                  | `MDXCustomLink`         | `components/a/`                    |
 | `pre`                | `MDXPre`                | `components/pre/`                  |
 | `AutoplayVideo`      | `MDXAutoplayVideo`      | `components/video/`                |
 | `PreLoadVideo`       | `MDXPreLoadVideo`       | `components/video/`                |
 | `MagicMove`          | `MDXMagicMove`          | `components/magic-move/`           |
 | `Callout`            | `MDXCallout`            | `components/callout/`              |
+| `DeepDive`           | `MDXDeepDive`           | `components/deep-dive/`            |
+| `VisualStack`        | `MDXVisualStack`        | `components/visual-stack/`         |
 | `Steps`              | `MDXSteps`              | `components/steps/`                |
 | `ShuffleLettersDemo` | `MDXShuffleLettersDemo` | `components/shuffle-letters-demo/` |
 | `ImeScrollDemo`      | `MDXImeScrollDemo`      | `components/ime-scroll-demo/`      |
@@ -88,13 +93,19 @@ getSeriesBadges(articles);
 
 ## Table of Contents (complex subsystem)
 
-`common/table-of-contents/` — 5 files:
+`common/table-of-contents/` — 11 files:
 
-- `use-toc.ts`: `useActiveAnchor` hook — scroll sync with passive listeners + `requestAnimationFrame`. **No static NodeList caching** (P22) — always queries live DOM because React re-renders can replace nodes.
-- `table-of-contents.tsx`: Renders TOC sidebar with active link highlighting
+- `use-toc.ts`: `useActiveAnchor` hook — activates every visible heading, carries the latest heading above the existing scroll-offset line, and uses the current-section fallback when no heading is visible. Updates the continuous rail's top/bottom CSS insets without a React scroll re-render. Uses passive listeners + `requestAnimationFrame`. **No static NodeList caching** (P22) — always queries live DOM because React re-renders can replace nodes.
+- `toc-tree.ts`: Pure helpers for flattening the menu and creating one continuous, depth-aware SVG rail path. Depth bends finish inside the row-boundary padding (`-6px ~ +6px`), preserving an `11.5px` rail-to-text gap at every depth.
+- `toc-rail.tsx`: Measures rendered rows before paint, observes layout-only changes with `ResizeObserver`, and renders shared base/active rail paths
+- `table-of-contents.tsx`: Renders the separated “On this page” section, depth metadata, the shared SVG rail, and multi-active link highlighting
+- `client-table-of-contents.tsx`: Client boundary and deferred TOC rendering
 - `skeleton-table-of-contents.tsx`: Loading skeleton
 - `toc.d.ts`: Type definitions
-- `use-toc.spec.ts`: 245-line test — INP regression tests, multi-highlight bug prevention
+- `toc-tree.spec.ts`: Continuous connector geometry unit tests
+- `toc-rail.spec.tsx`: Shared base/active path and resize-observer lifecycle tests
+- `table-of-contents.spec.tsx`: TOC depth-to-shared-rail wiring test
+- `use-toc.spec.ts`: INP, multi-active scroll contract, and independent rail-endpoint regression tests
 
 ## Security
 

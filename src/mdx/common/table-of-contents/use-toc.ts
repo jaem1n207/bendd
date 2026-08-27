@@ -76,18 +76,50 @@ function resolveHeaders(headers: MenuItem[], range: LevelRange): MenuItem[] {
   return menuItem;
 }
 
-function throttleAndDebounce(fn: () => void, delay: number): () => void {
-  let timeoutId: NodeJS.Timeout;
+interface CancellableCallback {
+  (): void;
+  cancel: () => void;
+}
+
+function throttleAndDebounce(
+  fn: () => void,
+  delay: number
+): CancellableCallback {
+  let trailingTimeoutId: ReturnType<typeof setTimeout> | undefined;
+  let throttleTimeoutId: ReturnType<typeof setTimeout> | undefined;
   let called = false;
 
-  return () => {
-    if (timeoutId) clearTimeout(timeoutId);
+  const callback: CancellableCallback = () => {
+    if (trailingTimeoutId) {
+      clearTimeout(trailingTimeoutId);
+      trailingTimeoutId = undefined;
+    }
 
     if (!called) {
       fn();
-      (called = true) && setTimeout(() => (called = false), delay);
-    } else timeoutId = setTimeout(fn, delay);
+      called = true;
+      throttleTimeoutId = setTimeout(() => {
+        called = false;
+        throttleTimeoutId = undefined;
+      }, delay);
+    } else {
+      trailingTimeoutId = setTimeout(() => {
+        trailingTimeoutId = undefined;
+        fn();
+      }, delay);
+    }
   };
+
+  callback.cancel = () => {
+    if (trailingTimeoutId) clearTimeout(trailingTimeoutId);
+    if (throttleTimeoutId) clearTimeout(throttleTimeoutId);
+
+    trailingTimeoutId = undefined;
+    throttleTimeoutId = undefined;
+    called = false;
+  };
+
+  return callback;
 }
 
 function getScrollOffset(): number {
@@ -98,48 +130,153 @@ function getScrollOffset(): number {
   return offset + padding;
 }
 
-function getAbsoluteTop(element: HTMLElement): number {
-  if (!element.isConnected) return NaN;
-  return element.getBoundingClientRect().top + window.scrollY;
+interface HeaderPosition {
+  link: string;
+  top: number;
+  bottom: number;
+}
+
+interface ScrollMetrics {
+  scrollY: number;
+  innerHeight: number;
+  offsetHeight: number;
+  scrollOffset: number;
+}
+
+export function getActiveHeaderLinks(
+  headers: HeaderPosition[],
+  { scrollY, innerHeight, offsetHeight, scrollOffset }: ScrollMetrics
+): string[] {
+  if (!headers.length) return [];
+
+  const viewportBottom = scrollY + innerHeight;
+  const activeLinks = new Set<string>();
+
+  for (const { link, top, bottom } of headers) {
+    const isVisible = bottom > scrollY && top < viewportBottom;
+    if (isVisible) {
+      activeLinks.add(link);
+    }
+  }
+
+  if (scrollY >= 1) {
+    const activationLine = scrollY + scrollOffset;
+    let carriedLink: string | null = null;
+
+    for (const { link, top } of headers) {
+      if (top > activationLine) break;
+      carriedLink = link;
+    }
+
+    if (carriedLink) {
+      activeLinks.add(carriedLink);
+    }
+  }
+
+  const isBottom = Math.abs(scrollY + innerHeight - offsetHeight) < 1;
+  if (isBottom) {
+    activeLinks.add(headers[headers.length - 1].link);
+  }
+
+  return headers
+    .filter(({ link }) => activeLinks.has(link))
+    .map(({ link }) => link);
+}
+
+function normalizeHash(hash: string): string {
+  try {
+    return decodeURIComponent(hash);
+  } catch {
+    return hash;
+  }
+}
+
+export interface ActiveRailRange {
+  topInset: number;
+  bottomInset: number;
+}
+
+export function updateActiveRailRange(container: HTMLElement): ActiveRailRange {
+  const railHeight = container.scrollHeight;
+  const containerTop = container.getBoundingClientRect().top;
+  const activeLinks = Array.from(
+    container.querySelectorAll<HTMLAnchorElement>(
+      'a[data-toc-depth][data-active="true"]'
+    )
+  );
+
+  let topInset = 0;
+  let bottomInset = railHeight;
+
+  if (activeLinks.length) {
+    const firstRect = activeLinks[0].getBoundingClientRect();
+    const lastRect =
+      activeLinks[activeLinks.length - 1].getBoundingClientRect();
+
+    topInset = Math.max(
+      0,
+      Math.min(railHeight, firstRect.top - containerTop + container.scrollTop)
+    );
+    bottomInset = Math.max(
+      0,
+      Math.min(
+        railHeight,
+        railHeight - (lastRect.bottom - containerTop + container.scrollTop)
+      )
+    );
+  }
+
+  container.style.setProperty('--toc-active-top', `${topInset}px`);
+  container.style.setProperty('--toc-active-bottom', `${bottomInset}px`);
+
+  return { topInset, bottomInset };
 }
 
 export function useActiveAnchor(
   containerRef: RefObject<HTMLElement | null>,
-  markerRef: RefObject<HTMLElement | null>,
-  linkCount = 0
+  linkCountOrLegacyMarkerRef: RefObject<HTMLElement | null> | number = 0,
+  legacyLinkCount = 0
 ) {
+  const linkCount =
+    typeof linkCountOrLegacyMarkerRef === 'number'
+      ? linkCountOrLegacyMarkerRef
+      : legacyLinkCount;
+
   useEffect(() => {
     if (!linkCount) return;
 
-    let prevActiveHash: string | null | undefined;
+    let prevActiveKey: string | undefined;
+    let readyRafId: number | null = null;
 
-    function activateLink(hash: string | null) {
-      if (hash === prevActiveHash) return;
-      prevActiveHash = hash;
+    function activateLinks(hashes: string[]) {
+      const activeKey = hashes.join('\n');
+      if (activeKey === prevActiveKey) return;
+      prevActiveKey = activeKey;
 
-      if (containerRef.current) {
+      const container = containerRef.current;
+      if (container) {
         // 캐싱 금지: static NodeList는 React 리렌더링 후 stale 참조를 유발한다
-        const links =
-          containerRef.current.querySelectorAll<HTMLAnchorElement>('a');
+        const links = container.querySelectorAll<HTMLAnchorElement>('a');
+        const activeHashes = new Set(hashes.map(normalizeHash));
+
         links.forEach(link => {
-          link.classList.remove('!text-foreground');
+          const href = link.getAttribute('href');
+          const isActive =
+            href !== null && activeHashes.has(normalizeHash(href));
+
+          link.classList.toggle('!text-foreground', isActive);
+          link.dataset.active = String(isActive);
         });
 
-        if (hash != null) {
-          const activeLink =
-            containerRef.current.querySelector<HTMLAnchorElement>(
-              `a[href="${decodeURIComponent(hash)}"]`
-            );
-          if (activeLink) {
-            activeLink.classList.add('!text-foreground');
-            if (markerRef.current) {
-              markerRef.current.style.top = `${activeLink.offsetTop + 4}px`;
-              markerRef.current.style.opacity = '1';
+        updateActiveRailRange(container);
+
+        if (container.dataset.tocRailReady !== 'true' && readyRafId === null) {
+          readyRafId = requestAnimationFrame(() => {
+            if (containerRef.current === container) {
+              container.dataset.tocRailReady = 'true';
             }
-          }
-        } else if (markerRef.current) {
-          markerRef.current.style.top = '-12px';
-          markerRef.current.style.opacity = '0';
+            readyRafId = null;
+          });
         }
       }
     }
@@ -147,46 +284,38 @@ export function useActiveAnchor(
       const scrollY = window.scrollY;
       const innerHeight = window.innerHeight;
       const offsetHeight = document.body.offsetHeight;
-      const isBottom = Math.abs(scrollY + innerHeight - offsetHeight) < 1;
 
       // resolvedHeaders가 재배치되거나, `hidden` 또는 `fixed` 속성을 가질 수 있으니 예외 처리
       const headers = resolvedHeaders
-        .map(({ element, link }) => ({
-          link,
-          top: getAbsoluteTop(element),
-        }))
-        .filter(({ top }) => !Number.isNaN(top))
+        .map(({ element, link }) => {
+          if (!element.isConnected) return null;
+
+          const rect = element.getBoundingClientRect();
+          return {
+            link,
+            top: rect.top + scrollY,
+            bottom: rect.bottom + scrollY,
+          };
+        })
+        .filter(header => header !== null)
         .sort((a, b) => a.top - b.top);
 
       // 링크를 활성화할 헤더가 없는 경우
       if (!headers.length) {
-        activateLink(null);
+        activateLinks([]);
         return;
       }
 
-      // 페이지 최상단 - 하이라이트 링크 해제
-      if (scrollY < 1) {
-        activateLink(null);
-        return;
-      }
-
-      // 페이지 최하단 - 마지막 헤더 활성화
-      if (isBottom) {
-        activateLink(headers[headers.length - 1].link);
-        return;
-      }
-
-      // 뷰포트 상단으로부터 마지막 헤더를 찾아 활성화
       // getScrollOffset은 querySelector + getBoundingClientRect를 수행하므로 루프 밖에서 1회만 측정
       const scrollOffset = getScrollOffset();
-      let activeLink: string | null = null;
-      for (const { link, top } of headers) {
-        if (top > scrollY + scrollOffset) {
-          break;
-        }
-        activeLink = link;
-      }
-      activateLink(activeLink);
+      const activeLinks = getActiveHeaderLinks(headers, {
+        scrollY,
+        innerHeight,
+        offsetHeight,
+        scrollOffset,
+      });
+
+      activateLinks(activeLinks);
     }
 
     const onScroll = throttleAndDebounce(setActiveLink, 100);
@@ -195,7 +324,11 @@ export function useActiveAnchor(
 
     return () => {
       cancelAnimationFrame(rafId);
+      onScroll.cancel();
+      if (readyRafId !== null) {
+        cancelAnimationFrame(readyRafId);
+      }
       window.removeEventListener('scroll', onScroll);
     };
-  }, [containerRef, markerRef, linkCount]);
+  }, [containerRef, linkCount]);
 }
