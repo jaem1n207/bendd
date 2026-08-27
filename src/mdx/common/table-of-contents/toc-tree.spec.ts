@@ -2,7 +2,8 @@ import { describe, expect, test } from 'vitest';
 
 import {
   flattenMenuItems,
-  getConnectorGeometry,
+  getTocRailGeometry,
+  getTocRailPadding,
 } from '@/mdx/common/table-of-contents/toc-tree';
 import type { MenuItem } from '@/mdx/common/table-of-contents/toc';
 
@@ -46,36 +47,26 @@ describe('flattenMenuItems', () => {
   });
 });
 
-describe('getConnectorGeometry', () => {
-  test('should render a straight root connector', () => {
-    expect(getConnectorGeometry(0, 0)).toEqual({
-      lineX: 8.5,
-      lineStartY: 0,
-      paddingInlineStart: 20,
-      transitionPath: null,
-      width: 17,
+describe('getTocRailGeometry', () => {
+  test('should create one continuous rounded path through every TOC row', () => {
+    expect(
+      getTocRailGeometry(
+        [
+          { depth: 0, top: 4, bottom: 36 },
+          { depth: 1, top: 36, bottom: 68 },
+          { depth: 1, top: 68, bottom: 100 },
+          { depth: 0, top: 100, bottom: 132 },
+        ],
+        136
+      )
+    ).toEqual({
+      path: 'M 8.5 4 V 36 V 38 Q 8.5 40 10.5 42 L 18.5 48 Q 20.5 50 20.5 52 V 54 V 68 V 100 V 102 Q 20.5 104 18.5 106 L 10.5 112 Q 8.5 114 8.5 116 V 118 V 132',
+      width: 29,
+      height: 136,
     });
   });
 
-  test('should bend into a child depth', () => {
-    expect(getConnectorGeometry(1, 0)).toEqual({
-      lineX: 20.5,
-      lineStartY: 18,
-      paddingInlineStart: 32,
-      transitionPath:
-        'M 8.5 0 V 2 Q 8.5 4 10.5 6 L 18.5 12 Q 20.5 14 20.5 16 V 18',
-      width: 29,
-    });
-  });
-
-  test('should bend back to the parent depth', () => {
-    expect(getConnectorGeometry(0, 1)).toEqual({
-      lineX: 8.5,
-      lineStartY: 18,
-      paddingInlineStart: 20,
-      transitionPath:
-        'M 20.5 0 V 2 Q 20.5 4 18.5 6 L 10.5 12 Q 8.5 14 8.5 16 V 18',
-      width: 29,
-    });
+  test('should keep text indentation aligned with the rail depth', () => {
+    expect([0, 1, 2].map(getTocRailPadding)).toEqual([20, 32, 44]);
   });
 });

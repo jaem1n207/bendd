@@ -1,4 +1,134 @@
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Locator, type Page, test } from '@playwright/test';
+
+async function readRailInsets(rail: Locator) {
+  return rail.evaluate(element => {
+    const clipPath = getComputedStyle(element).clipPath;
+    const values = Array.from(
+      clipPath.matchAll(/(-?\d+(?:\.\d+)?)px/g),
+      match => Number(match[1])
+    );
+
+    if (!values.length) {
+      throw new Error(`Unexpected clip-path value: ${clipPath}`);
+    }
+
+    return {
+      clipPath,
+      top: values[0],
+      bottom: values.length >= 3 ? values[2] : values[0],
+    };
+  });
+}
+
+async function readRailInsetsDuringTransition(rail: Locator) {
+  return rail.evaluate(
+    element =>
+      new Promise<{ clipPath: string; top: number; bottom: number }>(
+        (resolve, reject) => {
+          const timeoutId = window.setTimeout(
+            () => reject(new Error('TOC rail transition did not start')),
+            500
+          );
+
+          function sample() {
+            const animation = element
+              .getAnimations()
+              .find(candidate => candidate.playState === 'running');
+            const progress = animation?.effect?.getComputedTiming().progress;
+
+            if (
+              progress !== null &&
+              progress !== undefined &&
+              progress > 0.15 &&
+              progress < 0.85
+            ) {
+              window.clearTimeout(timeoutId);
+              const clipPath = getComputedStyle(element).clipPath;
+              const values = Array.from(
+                clipPath.matchAll(/(-?\d+(?:\.\d+)?)px/g),
+                match => Number(match[1])
+              );
+
+              resolve({
+                clipPath,
+                top: values[0],
+                bottom: values.length >= 3 ? values[2] : values[0],
+              });
+              return;
+            }
+
+            requestAnimationFrame(sample);
+          }
+
+          sample();
+        }
+      )
+  );
+}
+
+async function waitForRailTransitionEnd(rail: Locator) {
+  await rail.evaluate(async element => {
+    await Promise.all(
+      element.getAnimations().map(animation => animation.finished)
+    );
+  });
+}
+
+async function retargetRailDuringTransition(rail: Locator) {
+  return rail.evaluate(
+    element =>
+      new Promise<{
+        beforeRetarget: number;
+        afterRetarget: number;
+      }>((resolve, reject) => {
+        const list = element.closest('ul');
+        if (!list) {
+          reject(new Error('TOC list is missing'));
+          return;
+        }
+        const tocList = list;
+
+        const timeoutId = window.setTimeout(
+          () => reject(new Error('TOC rail transition did not start')),
+          500
+        );
+
+        function readTopInset() {
+          const [topInset] = Array.from(
+            getComputedStyle(element).clipPath.matchAll(/(-?\d+(?:\.\d+)?)px/g),
+            match => Number(match[1])
+          );
+          return topInset;
+        }
+
+        function sample() {
+          const animation = element
+            .getAnimations()
+            .find(candidate => candidate.playState === 'running');
+          const progress = animation?.effect?.getComputedTiming().progress;
+
+          if (
+            progress !== null &&
+            progress !== undefined &&
+            progress > 0.15 &&
+            progress < 0.85
+          ) {
+            window.clearTimeout(timeoutId);
+            const beforeRetarget = readTopInset();
+            tocList.style.setProperty('--toc-active-top', '20px');
+            const afterRetarget = readTopInset();
+            resolve({ beforeRetarget, afterRetarget });
+            return;
+          }
+
+          requestAnimationFrame(sample);
+        }
+
+        tocList.style.setProperty('--toc-active-top', '120px');
+        sample();
+      })
+  );
+}
 
 async function scrollToMultiHighlightScenario(page: Page) {
   const scenario = await page
@@ -134,42 +264,132 @@ test.describe('Table of Contents sidebar', () => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/article/difference-between-put-patch');
     await page.locator('nav.toc-navbar ul a').first().waitFor();
+    await expect(page.locator('nav.toc-navbar ul')).toHaveAttribute(
+      'data-toc-rail-ready',
+      'true'
+    );
 
     const connectorMetrics = await page
-      .locator('nav.toc-navbar ul a')
-      .evaluateAll(links => {
-        const animatedStroke = links[0]?.querySelector('svg line:last-of-type');
+      .locator('nav.toc-navbar ul')
+      .evaluate(list => {
+        const links = Array.from(list.querySelectorAll('a'));
+        const basePath = list.querySelector<SVGPathElement>(
+          '[data-toc-rail="base"] path'
+        );
+        const activeRail = list.querySelector<SVGSVGElement>(
+          '[data-toc-rail="active"]'
+        );
+        const activePath = activeRail?.querySelector('path');
 
-        if (!animatedStroke) {
-          throw new Error('Animated TOC connector stroke is missing');
+        if (!basePath || !activeRail || !activePath) {
+          throw new Error('Continuous TOC rail is missing');
         }
 
-        const strokeStyles = getComputedStyle(animatedStroke);
+        const railStyles = getComputedStyle(activeRail);
 
         return {
           ariaLevelCount: new Set(
             links.map(link => link.parentElement?.getAttribute('aria-level'))
           ).size,
-          connectorCount: links.filter(link => link.querySelector('svg'))
+          activeRailCount: list.querySelectorAll(
+            '[data-toc-rail="active"] path'
+          ).length,
+          baseRailCount: list.querySelectorAll('[data-toc-rail="base"] path')
             .length,
-          hasRoundedDepthTransition: links.some(link =>
-            link.querySelector('svg path[d*="Q"]')
-          ),
+          pathsMatch:
+            basePath.getAttribute('d') === activePath.getAttribute('d'),
+          hasRoundedDepthTransition:
+            basePath.getAttribute('d')?.includes('Q') ?? false,
           indentationCount: new Set(
             links.map(link => getComputedStyle(link).paddingInlineStart)
           ).size,
-          transitionDuration: strokeStyles.transitionDuration,
-          transitionTimingFunction: strokeStyles.transitionTimingFunction,
+          transitionDuration: railStyles.transitionDuration,
+          transitionProperty: railStyles.transitionProperty,
+          transitionTimingFunction: railStyles.transitionTimingFunction,
         };
       });
 
     expect(connectorMetrics.ariaLevelCount).toBeGreaterThan(1);
-    expect(connectorMetrics.connectorCount).toBeGreaterThan(0);
+    expect(connectorMetrics.activeRailCount).toBe(1);
+    expect(connectorMetrics.baseRailCount).toBe(1);
+    expect(connectorMetrics.pathsMatch).toBe(true);
     expect(connectorMetrics.hasRoundedDepthTransition).toBe(true);
     expect(connectorMetrics.indentationCount).toBeGreaterThan(1);
-    expect(connectorMetrics.transitionDuration).toBe('0.2s');
+    expect(connectorMetrics.transitionDuration).toBe('0.24s');
+    expect(connectorMetrics.transitionProperty).toBe('clip-path');
     expect(connectorMetrics.transitionTimingFunction).toBe(
       'cubic-bezier(0.77, 0, 0.175, 1)'
+    );
+  });
+
+  test('should interpolate and retarget both rail endpoints without jumping', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/article/difference-between-put-patch');
+
+    const list = page.locator('nav.toc-navbar ul');
+    const activeRail = list.locator('[data-toc-rail="active"]');
+
+    await expect(list).toHaveAttribute('data-toc-rail-ready', 'true');
+
+    await activeRail.evaluate((rail, initialInset) => {
+      const list = rail.closest('ul');
+      if (!list) throw new Error('TOC list is missing');
+
+      (rail as SVGSVGElement).style.transition = 'none';
+      list.style.setProperty('--toc-active-top', `${initialInset}px`);
+      list.style.setProperty('--toc-active-bottom', `${initialInset}px`);
+      getComputedStyle(rail).clipPath;
+      (rail as SVGSVGElement).style.removeProperty('transition');
+    }, 120);
+
+    await list.evaluate(element =>
+      element.style.setProperty('--toc-active-top', '20px')
+    );
+
+    const upperMidpoint = await readRailInsetsDuringTransition(activeRail);
+    expect(upperMidpoint.top).toBeGreaterThan(20);
+    expect(upperMidpoint.top).toBeLessThan(120);
+    expect(upperMidpoint.bottom).toBeCloseTo(120, 0);
+
+    await waitForRailTransitionEnd(activeRail);
+    const upperEnd = await readRailInsets(activeRail);
+    expect(upperEnd.top).toBeCloseTo(20, 0);
+
+    await list.evaluate(element =>
+      element.style.setProperty('--toc-active-bottom', '20px')
+    );
+
+    const lowerMidpoint = await readRailInsetsDuringTransition(activeRail);
+    expect(lowerMidpoint.top).toBeCloseTo(20, 0);
+    expect(lowerMidpoint.bottom).toBeGreaterThan(20);
+    expect(lowerMidpoint.bottom).toBeLessThan(120);
+
+    await waitForRailTransitionEnd(activeRail);
+    const lowerEnd = await readRailInsets(activeRail);
+    expect(lowerEnd.bottom).toBeCloseTo(20, 0);
+
+    const { beforeRetarget, afterRetarget } =
+      await retargetRailDuringTransition(activeRail);
+
+    expect(Math.abs(afterRetarget - beforeRetarget)).toBeLessThan(1);
+    expect(afterRetarget).toBeGreaterThan(20);
+  });
+
+  test('should disable rail movement when reduced motion is requested', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/article/difference-between-put-patch');
+
+    const list = page.locator('nav.toc-navbar ul');
+    await expect(list).toHaveAttribute('data-toc-rail-ready', 'true');
+
+    await expect(list.locator('[data-toc-rail="active"]')).toHaveCSS(
+      'transition-duration',
+      '0s'
     );
   });
 
@@ -273,14 +493,14 @@ test.describe('TOC multi-highlight after page refresh', () => {
       )
       .toEqual(expectedHrefs);
 
-    const activeConnector = page
-      .locator('nav.toc-navbar ul a[data-active="true"]')
-      .first()
-      .locator('svg line')
-      .last();
-
-    await expect(activeConnector).toHaveCSS('opacity', '1');
-    await expect(activeConnector).toHaveCSS('stroke-dashoffset', '0px');
+    const activeRail = page.locator(
+      'nav.toc-navbar ul [data-toc-rail="active"]'
+    );
+    await expect(activeRail).toHaveCount(1);
+    await expect(activeRail).not.toHaveCSS(
+      'clip-path',
+      'inset(0px 0px 100% 0px)'
+    );
   });
 });
 

@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 import {
   getActiveHeaderLinks,
   getHeaders,
+  updateActiveRailRange,
   useActiveAnchor,
 } from '@/mdx/common/table-of-contents/use-toc';
 
@@ -59,6 +60,75 @@ describe('getActiveHeaderLinks', () => {
     );
 
     expect(activeLinks).toEqual([]);
+  });
+});
+
+function createRailFixture() {
+  const container = document.createElement('ul');
+  container.scrollTop = 20;
+  container.getBoundingClientRect = () => new DOMRect(0, 100, 240, 160);
+  Object.defineProperty(container, 'scrollHeight', {
+    configurable: true,
+    value: 160,
+  });
+
+  const links = [
+    { top: 110, bottom: 142 },
+    { top: 142, bottom: 174 },
+    { top: 174, bottom: 206 },
+  ].map(({ top, bottom }) => {
+    const link = document.createElement('a');
+    link.dataset.tocDepth = '0';
+    link.dataset.active = 'false';
+    link.getBoundingClientRect = () => new DOMRect(0, top, 200, bottom - top);
+    container.appendChild(link);
+    return link;
+  });
+
+  links[1].dataset.active = 'true';
+
+  return { container, links };
+}
+
+describe('updateActiveRailRange', () => {
+  test('should extend only the top endpoint when an upper heading becomes active', () => {
+    const { container, links } = createRailFixture();
+
+    expect(updateActiveRailRange(container)).toEqual({
+      topInset: 62,
+      bottomInset: 66,
+    });
+
+    links[0].dataset.active = 'true';
+
+    expect(updateActiveRailRange(container)).toEqual({
+      topInset: 30,
+      bottomInset: 66,
+    });
+    expect(container.style.getPropertyValue('--toc-active-top')).toBe('30px');
+    expect(container.style.getPropertyValue('--toc-active-bottom')).toBe(
+      '66px'
+    );
+  });
+
+  test('should extend only the bottom endpoint when a lower heading becomes active', () => {
+    const { container, links } = createRailFixture();
+
+    expect(updateActiveRailRange(container)).toEqual({
+      topInset: 62,
+      bottomInset: 66,
+    });
+
+    links[2].dataset.active = 'true';
+
+    expect(updateActiveRailRange(container)).toEqual({
+      topInset: 62,
+      bottomInset: 34,
+    });
+    expect(container.style.getPropertyValue('--toc-active-top')).toBe('62px');
+    expect(container.style.getPropertyValue('--toc-active-bottom')).toBe(
+      '34px'
+    );
   });
 });
 
@@ -234,6 +304,47 @@ describe('useActiveAnchor — multi-highlight regression', () => {
 
     await vi.waitFor(() => {
       expect(linkA.classList.contains('!text-foreground')).toBe(false);
+    });
+  });
+
+  it('should synchronize the rail range before enabling its transition', async () => {
+    const documentEl = document.createElement('div');
+    documentEl.id = 'BenddDoc';
+    document.body.appendChild(documentEl);
+
+    const heading = document.createElement('h2');
+    heading.id = 'visible';
+    heading.innerHTML = '<a class="header-anchor">visible</a>';
+    heading.getBoundingClientRect = () => new DOMRect(0, 120, 0, 40);
+    documentEl.appendChild(heading);
+
+    const link = document.createElement('a');
+    link.href = '#visible';
+    link.dataset.tocDepth = '0';
+    link.dataset.active = 'false';
+    link.getBoundingClientRect = () => new DOMRect(0, 110, 200, 32);
+    containerEl.appendChild(link);
+
+    containerEl.getBoundingClientRect = () => new DOMRect(0, 100, 240, 100);
+    Object.defineProperty(containerEl, 'scrollHeight', {
+      configurable: true,
+      value: 100,
+    });
+
+    vi.spyOn(window, 'scrollY', 'get').mockReturnValue(0);
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(600);
+
+    getHeaders([2, 4]);
+    renderHook(() => useActiveAnchor(containerRef, 1));
+
+    await vi.waitFor(() => {
+      expect(containerEl.style.getPropertyValue('--toc-active-top')).toBe(
+        '10px'
+      );
+      expect(containerEl.style.getPropertyValue('--toc-active-bottom')).toBe(
+        '58px'
+      );
+      expect(containerEl.dataset.tocRailReady).toBe('true');
     });
   });
 
