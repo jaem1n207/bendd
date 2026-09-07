@@ -89,3 +89,9 @@ pnpm 패치로 배포하므로 라이브러리 버전은 1.0.0으로 유지한�
 - `pnpm exec playwright test tests/magic-move-motion.spec.ts --project=chromium --workers=1 --reporter=line`: 수정 전 4개 실패, 수정 후 4개 통과. 동작 감소는 `<br>` 토큰 및 재생 중 변경도 포함한다. 키보드 선택기는 Radix의 포커스 이동 완료를 확인한 뒤 Enter로 선택한다.
 - 같은 Chromium 152.0.7977.83 / 1280×900 / CPU 4×에서 4→5→4→5→4 재측정: 설명 transition 구간 최대 rAF 간격 17.8–18.1ms, 33.4ms 초과 4회 모두 0. 전체 2초 구간 최대 간격 62.3–72.7ms. LayoutCount 평균 21.5회, ScriptDuration 평균 97.8ms.
 - 모든 회차에서 코드 DOM 갱신은 설명의 transform transition 종료 후 발생했다. rAF는 compositor FPS가 아니며 코드 준비 구간의 짧은 지연은 남는다. 모바일 및 모든 하드웨어의 무프레임드랍을 보증하는 검사는 아니다.
+
+### 코드 컨테이너 높이 애니메이션 복원
+
+사용자 요청에 따라 일반 포인터 조작에서 코드 컨테이너의 높이 애니메이션을 복원한다. `animateContainer: true`와 라이브러리의 기존 duration/delay를 사용하고, 컨테이너 전환 속성은 height/width/background-color/color로 명시해 `transition: all`은 복원하지 않는다. 설명 슬라이드 완료 후 코드 전환을 시작하는 순서와 렌더러 배치 최적화는 유지한다. 키보드 및 동작 감소 모드의 즉시 크기 반영도 유지한다.
+
+브라우저 회귀 검사는 일반 모드의 실제 height 전환이 존재하는지 확인하도록 수정했다. 위 리뷰 수정 후 성능 수치는 높이 애니메이션을 제거한 버전의 기록이며, 복원 이후의 측정값이 아니다.

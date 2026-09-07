@@ -137,15 +137,13 @@ test('reversing a slide preserves its current visual position', async ({
   await expect(root.getByRole('combobox')).toHaveText(FIFTH);
 });
 
-test('code transitions never animate container dimensions or arbitrary properties', async ({
+test('code transitions preserve container height motion without arbitrary properties', async ({
   page,
 }) => {
   const root = await openExample(page);
   await root.getByRole('button', { name: '다음 단계' }).click();
   await expect.poll(() => codeProperties(root)).toContain('transform');
-  const properties = await codeProperties(root);
-  expect(properties).not.toContain('height');
-  expect(properties).not.toContain('width');
+  await expect.poll(() => codeProperties(root)).toContain('height');
   const transitionProperties = await root
     .locator('pre')
     .evaluate(element =>

@@ -18,7 +18,7 @@
 .shiki-magic-move-container,
 .shiki-magic-move-container.shiki-magic-move-container-resize,
 .shiki-magic-move-container.shiki-magic-move-container-restyle {
-  transition: none;
+  transition-property: height, width, background-color, color;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -64,7 +64,7 @@ function MagicMoveContent({
               duration: 750,
               stagger: 3,
               lineNumbers: true,
-              animateContainer: false,
+              animateContainer: true,
             }}
           />
           <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition focus-within:opacity-100 [div:hover>&]:opacity-100">
