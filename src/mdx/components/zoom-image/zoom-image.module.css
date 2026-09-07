@@ -31,11 +31,27 @@
   line-height: 1.5;
   text-align: center;
   text-wrap: balance;
+  opacity: 0;
+  transition: opacity 150ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.caption[data-state='open'],
+.caption[data-motion='immediate'][data-state='opening'] {
+  opacity: 1;
+}
+
+.caption[data-motion='immediate'] {
+  transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .overlay,
-  .clone {
+  .clone,
+  .caption {
     transition: none !important;
+  }
+
+  .caption[data-state='opening'] {
+    opacity: 1;
   }
 }

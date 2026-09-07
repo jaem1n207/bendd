@@ -22,6 +22,11 @@ const EASING = 'cubic-bezier(0.2, 0, 0.2, 1)';
 const TRANSITION = `transform ${DURATION} ${EASING}`;
 const CAPTION_RESERVED_HEIGHT = 96;
 
+enum CaptionMotion {
+  Animated = 'animated',
+  Immediate = 'immediate',
+}
+
 const ZoomImageSchema = z.object({
   src: z.string().optional(),
   alt: z.string().optional(),
@@ -105,6 +110,7 @@ function ZoomableImage({
   const isClosingRef = useRef(false);
   const scrollTrackRAF = useRef<number>(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [captionMotion, setCaptionMotion] = useState(CaptionMotion.Animated);
   const [zoomState, setZoomState] = useState<ZoomState | null>(null);
   const shouldSkipOptimization = src.toLowerCase().endsWith('.gif');
   const resolvedWidth = resolveImageDimension(width, 1344);
@@ -112,46 +118,52 @@ function ZoomableImage({
   // 클론 이미지의 transform이 적용됐는지 (2프레임 대기 후)
   const [cloneAnimated, setCloneAnimated] = useState(false);
 
-  const open = useCallback(() => {
-    const img = imgRef.current;
-    if (!img) return;
+  const open = useCallback(
+    (motion: CaptionMotion) => {
+      const img = imgRef.current;
+      if (!img) {
+        return;
+      }
 
-    const rect = img.getBoundingClientRect();
-    const viewW = document.documentElement.clientWidth;
-    const viewH = document.documentElement.clientHeight;
-    const margin = 32;
-    const captionHeight = alt ? CAPTION_RESERVED_HEIGHT : 0;
-    const availableHeight = Math.max(160, viewH - margin * 2 - captionHeight);
-    const imageCenterY = margin + availableHeight / 2;
+      const rect = img.getBoundingClientRect();
+      const viewW = document.documentElement.clientWidth;
+      const viewH = document.documentElement.clientHeight;
+      const margin = 32;
+      const captionHeight = alt ? CAPTION_RESERVED_HEIGHT : 0;
+      const availableHeight = Math.max(160, viewH - margin * 2 - captionHeight);
+      const imageCenterY = margin + availableHeight / 2;
 
-    const scaleX = (viewW - margin * 2) / rect.width;
-    const scaleY = availableHeight / rect.height;
-    const scale = Math.min(scaleX, scaleY) || 1;
+      const scaleX = (viewW - margin * 2) / rect.width;
+      const scaleY = availableHeight / rect.height;
+      const scale = Math.min(scaleX, scaleY) || 1;
 
-    const translateX = (-rect.left + (viewW - rect.width) / 2) / scale;
-    const translateY = (-rect.top + imageCenterY - rect.height / 2) / scale;
+      const translateX = (-rect.left + (viewW - rect.width) / 2) / scale;
+      const translateY = (-rect.top + imageCenterY - rect.height / 2) / scale;
 
-    setZoomState({
-      src,
-      alt,
-      rect,
-      transform: `scale(${scale}) translate3d(${translateX}px, ${translateY}px, 0)`,
-      closeTransform: 'scale(1) translate3d(0, 0, 0)',
-    });
-    setIsOpen(true);
-    setCloneAnimated(false);
-    cloneAnimatedRef.current = false;
-    isClosingRef.current = false;
-
-    // 2프레임 후 transform 적용 → CSS transition 애니메이션 + 포커스 이동
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        cloneAnimatedRef.current = true;
-        setCloneAnimated(true);
-        overlayRef.current?.focus();
+      setZoomState({
+        src,
+        alt,
+        rect,
+        transform: `scale(${scale}) translate3d(${translateX}px, ${translateY}px, 0)`,
+        closeTransform: 'scale(1) translate3d(0, 0, 0)',
       });
-    });
-  }, [src, alt]);
+      setCaptionMotion(motion);
+      setIsOpen(true);
+      setCloneAnimated(false);
+      cloneAnimatedRef.current = false;
+      isClosingRef.current = false;
+
+      // 2프레임 후 transform 적용 → CSS transition 애니메이션 + 포커스 이동
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          cloneAnimatedRef.current = true;
+          setCloneAnimated(true);
+          overlayRef.current?.focus();
+        });
+      });
+    },
+    [src, alt]
+  );
 
   const close = useCallback(() => {
     // 이미 닫기 진행 중이면 무시 (연속 wheel 이벤트로 인한 중복 호출 방지)
@@ -230,7 +242,10 @@ function ZoomableImage({
     if (!isOpen) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
+      if (e.key === 'Escape') {
+        setCaptionMotion(CaptionMotion.Immediate);
+        close();
+      }
     };
 
     document.addEventListener('keydown', onKeyDown);
@@ -267,14 +282,20 @@ function ZoomableImage({
           className
         )}
         style={zoomState ? { visibility: 'hidden' } : undefined}
-        onClick={open}
+        onClick={event =>
+          open(
+            event.detail === 0
+              ? CaptionMotion.Immediate
+              : CaptionMotion.Animated
+          )
+        }
         role="button"
         aria-label={alt ? `${alt} - 클릭하여 확대` : '이미지 클릭하여 확대'}
         tabIndex={0}
         onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            open();
+            open(CaptionMotion.Immediate);
           }
         }}
         {...props}
@@ -317,7 +338,17 @@ function ZoomableImage({
               onClick={close}
               onTransitionEnd={handleCloneTransitionEnd}
             />
-            {alt && <span className={styles.caption}>{alt}</span>}
+            {alt && (
+              <span
+                className={styles.caption}
+                data-motion={captionMotion}
+                data-state={
+                  isOpen ? (cloneAnimated ? 'open' : 'opening') : 'closed'
+                }
+              >
+                {alt}
+              </span>
+            )}
           </>,
           document.body
         )}

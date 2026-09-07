@@ -6,7 +6,7 @@ import {
   screen,
 } from '@testing-library/react';
 
-import { MDXZoomImage } from './zoom-image';
+import { MDXZoomImage } from '@/mdx/components/zoom-image/zoom-image';
 
 // open()의 2-frame rAF를 즉시 실행하여 cloneAnimated=true가 되도록 함
 // close()의 스크롤 추적 rAF 루프는 무한 재귀 방지를 위해 최대 3회 실행
@@ -30,7 +30,7 @@ afterEach(() => {
   document.body.style.overflow = '';
 });
 
-vi.mock('./zoom-image.module.css', () => ({
+vi.mock('@/mdx/components/zoom-image/zoom-image.module.css', () => ({
   default: { overlay: 'overlay', caption: 'caption', clone: 'clone' },
 }));
 
@@ -205,6 +205,60 @@ describe('MDXZoomImage', () => {
       fireEvent.click(screen.getByAltText('캡션 테스트'));
 
       expect(screen.getByText('캡션 테스트')).toBeDefined();
+    });
+
+    it('캡션은 확대 준비 후 표시하고 닫기 시작에 숨긴다', () => {
+      const frames: FrameRequestCallback[] = [];
+      globalThis.requestAnimationFrame = callback => {
+        frames.push(callback);
+        return frames.length;
+      };
+
+      render(<MDXZoomImage src="/test.png" alt="캡션 전환" />);
+      const img = screen.getByAltText('캡션 전환');
+      fireEvent.click(img, { detail: 1 });
+
+      const caption = screen.getByText('캡션 전환');
+      expect(caption.getAttribute('data-state')).toBe('opening');
+
+      act(() => frames.shift()?.(0));
+      expect(caption.getAttribute('data-state')).toBe('opening');
+
+      act(() => frames.shift()?.(16));
+      expect(caption.getAttribute('data-state')).toBe('open');
+
+      fireEvent.click(screen.getByRole('dialog'));
+      expect(caption.getAttribute('data-state')).toBe('closed');
+      expect(screen.getAllByAltText('캡션 전환')).toHaveLength(2);
+
+      fireEvent.transitionEnd(caption);
+      expect(screen.getByRole('dialog')).toBeDefined();
+
+      fireEvent.transitionEnd(screen.getAllByAltText('캡션 전환')[1]);
+      expect(screen.queryByText('캡션 전환')).toBeNull();
+      expect(document.activeElement).toBe(img);
+    });
+
+    it('키보드로 열거나 닫으면 캡션을 즉시 전환한다', () => {
+      render(<MDXZoomImage src="/test.png" alt="키보드 캡션" />);
+      const img = screen.getByAltText('키보드 캡션');
+
+      fireEvent.keyDown(img, { key: 'Enter' });
+      expect(screen.getByText('키보드 캡션').getAttribute('data-motion')).toBe(
+        'immediate'
+      );
+      closeZoomViaOverlay('키보드 캡션');
+
+      rafCallCount = 0;
+      fireEvent.click(img, { detail: 1 });
+      expect(screen.getByText('키보드 캡션').getAttribute('data-motion')).toBe(
+        'animated'
+      );
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(screen.getByText('키보드 캡션').getAttribute('data-motion')).toBe(
+        'immediate'
+      );
     });
 
     it('alt가 비어있으면 캡션이 표시되지 않는다', () => {
