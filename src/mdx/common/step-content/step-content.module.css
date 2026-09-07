@@ -48,3 +48,7 @@
     animation: none;
   }
 }
+
+.panel[data-motion='immediate'] .content[aria-hidden] {
+  animation: none;
+}

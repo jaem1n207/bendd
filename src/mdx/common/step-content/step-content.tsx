@@ -45,12 +45,19 @@ export function StepSelect() {
   );
 }
 
+export enum StepMotion {
+  Animated = 'animated',
+  Immediate = 'immediate',
+}
+
 export function StepInfo({
   className,
   onStepSettled,
+  motion = StepMotion.Animated,
 }: {
   className?: string;
   onStepSettled?: (step: number) => void;
+  motion?: StepMotion;
 }) {
   const stepsData = useStepContentStore(state => state.stepsData);
   const currentStep = useStepContentStore(state => state.currentStep);
@@ -59,10 +66,14 @@ export function StepInfo({
 
   useEffect(() => {
     // Reduced motion has no animationend event, including when toggled mid-slide.
-    if (direction === 0 || prefersReducedMotion) {
+    if (
+      direction === 0 ||
+      prefersReducedMotion ||
+      motion === StepMotion.Immediate
+    ) {
       onStepSettled?.(currentStep);
     }
-  }, [currentStep, direction, onStepSettled, prefersReducedMotion]);
+  }, [currentStep, direction, motion, onStepSettled, prefersReducedMotion]);
 
   if (!stepsData[currentStep]) {
     return null;
@@ -71,6 +82,7 @@ export function StepInfo({
   return (
     <div
       data-direction={direction}
+      data-motion={motion}
       className={cn(
         styles.panel,
         'relative overflow-hidden rounded-md border border-border bg-background px-4 py-2 shadow-inner',

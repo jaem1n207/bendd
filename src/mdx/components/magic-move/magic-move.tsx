@@ -12,6 +12,7 @@ import { StepContentStoreProvider } from '@/mdx/common/step-content/provider';
 import {
   StepActions,
   StepInfo,
+  StepMotion,
   StepSelect,
 } from '@/mdx/common/step-content/step-content';
 import type { StepData } from '@/mdx/common/step-content/step-data';
@@ -83,6 +84,7 @@ function MagicMoveContent({
 
 function MagicMove({ codeSnippets, lang }: MagicMoveProps) {
   const [displayedStep, setDisplayedStep] = useState(0);
+  const [motion, setMotion] = useState(StepMotion.Animated);
   const [steps] = useState<StepData<CodeSnippet>[]>(() =>
     codeSnippets.map(snippet => ({
       title: snippet.title,
@@ -102,12 +104,16 @@ function MagicMove({ codeSnippets, lang }: MagicMoveProps) {
         direction: 0,
       }}
     >
-      <div>
+      <div
+        data-step-motion={motion}
+        onKeyDownCapture={() => setMotion(StepMotion.Immediate)}
+        onPointerDownCapture={() => setMotion(StepMotion.Animated)}
+      >
         <div className="mb-1 flex items-center justify-between">
           <StepSelect />
           <StepActions />
         </div>
-        <StepInfo onStepSettled={setDisplayedStep} />
+        <StepInfo motion={motion} onStepSettled={setDisplayedStep} />
         {highlighter && displayedContent && (
           <div className="mt-4">
             <MagicMoveContent

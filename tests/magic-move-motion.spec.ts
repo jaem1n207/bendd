@@ -57,3 +57,38 @@ test('reduced motion removes code movement, including mid-transition', async ({
   expect(cancelledProperties).not.toContain('transform');
   expect(cancelledProperties).not.toContain('height');
 });
+
+test('keyboard selection updates description and code without motion', async ({
+  page,
+}) => {
+  const root = await openExample(page);
+  await root.getByRole('button', { name: '다음 단계' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(root.locator('pre')).toContainText('Children.map', {
+    timeout: 250,
+  });
+  expect(
+    await root.evaluate(
+      element => element.getAnimations({ subtree: true }).length
+    )
+  ).toBe(0);
+  const select = root.getByRole('combobox');
+  await select.focus();
+  await page.keyboard.press('Enter');
+  await expect(
+    page.getByRole('option', { name: FIFTH, exact: true })
+  ).toBeFocused();
+  await page.keyboard.press('ArrowUp');
+  await expect(
+    page.getByRole('option', { name: FOURTH, exact: true })
+  ).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(root.locator('pre')).not.toContainText('Children.map', {
+    timeout: 250,
+  });
+  expect(
+    await root
+      .locator('[aria-hidden="false"]')
+      .evaluate(element => element.getAnimations().length)
+  ).toBe(0);
+});

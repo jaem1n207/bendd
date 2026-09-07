@@ -102,4 +102,22 @@ describe('MagicMove step transitions', () => {
       snippets[1].content
     );
   });
+  it('updates keyboard selection immediately and restores pointer animation', () => {
+    render(<MDXMagicMove codeSnippets={snippets} lang="typescript" />);
+    const next = screen.getByRole('button', { name: '다음 단계' });
+    fireEvent.keyDown(next, { key: 'Enter' });
+    fireEvent.click(next);
+    expect(screen.getByTestId('animated-code').textContent).toBe(
+      snippets[1].content
+    );
+    fireEvent.pointerDown(next);
+    fireEvent.click(next);
+    expect(screen.getByTestId('animated-code').textContent).toBe(
+      snippets[1].content
+    );
+    finishSlide(3);
+    expect(screen.getByTestId('animated-code').textContent).toBe(
+      snippets[2].content
+    );
+  });
 });

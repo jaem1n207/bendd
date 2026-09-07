@@ -23,3 +23,14 @@
     transition: none !important;
   }
 }
+
+[data-step-motion='immediate'] .shiki-magic-move-container,
+[data-step-motion='immediate'] .shiki-magic-move-container > * {
+  transition: none !important;
+  transform: none !important;
+}
+
+[data-step-motion='immediate'] .shiki-magic-move-container {
+  height: auto !important;
+  width: auto !important;
+}
