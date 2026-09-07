@@ -136,3 +136,25 @@ test('reversing a slide preserves its current visual position', async ({
   await expect(root.locator('pre')).toContainText('Children.map');
   await expect(root.getByRole('combobox')).toHaveText(FIFTH);
 });
+
+test('code transitions never animate container dimensions or arbitrary properties', async ({
+  page,
+}) => {
+  const root = await openExample(page);
+  await root.getByRole('button', { name: '다음 단계' }).click();
+  await expect.poll(() => codeProperties(root)).toContain('transform');
+  const properties = await codeProperties(root);
+  expect(properties).not.toContain('height');
+  expect(properties).not.toContain('width');
+  const transitionProperties = await root
+    .locator('pre')
+    .evaluate(element =>
+      [
+        element,
+        ...element.querySelectorAll(
+          '.shiki-magic-move-move, .shiki-magic-move-enter-active, .shiki-magic-move-leave-active'
+        ),
+      ].map(node => getComputedStyle(node).transitionProperty)
+    );
+  expect(transitionProperties).not.toContain('all');
+});

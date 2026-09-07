@@ -8,6 +8,19 @@
   background: rgba(183, 47, 47, 0.533);
 }
 
+/* Keep token movement on transform/opacity; never inherit transition: all. */
+.shiki-magic-move-container .shiki-magic-move-move,
+.shiki-magic-move-container .shiki-magic-move-enter-active,
+.shiki-magic-move-container .shiki-magic-move-leave-active {
+  transition-property: transform, opacity;
+}
+
+.shiki-magic-move-container,
+.shiki-magic-move-container.shiki-magic-move-container-resize,
+.shiki-magic-move-container.shiki-magic-move-container-restyle {
+  transition: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* Override the renderer's inline FLIP transforms, including in-flight motion. */
   .shiki-magic-move-container > * {

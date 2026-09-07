@@ -80,3 +80,12 @@ pnpm 패치로 배포하므로 라이브러리 버전은 1.0.0으로 유지한�
 - 키보드: React capture 이벤트로 입력 방식을 전달한다. 포털의 단계 선택도 포함하며 키보드에서는 설명과 코드를 즉시 전환한다. 다음 pointerdown부터 일반 애니메이션을 복원한다.
 
 - 방향 반전: 설명의 위치와 opacity를 CSS transition으로 재목표화한다. 이전 설명도 현재 위치에서 빠져나가므로 중간에 돌아와도 시작 위치로 초기화되지 않는다. 현재 설명의 transform transition 완료만 코드 갱신을 허용하며, 첫 프레임 전에 다시 선택해 transition이 생기지 않은 경우에는 즉시 갱신한다.
+
+- 코드 컨테이너: `animateContainer: false`로 크기는 즉시 반영한다. 이동/진입/퇴장 토큰의 transition 속성을 transform/opacity로 제한하고 컨테이너의 transition은 제거한다.
+
+### 리뷰 수정 후 검증
+
+- 전체 단위 테스트 33개 파일 / 311개 통과. 프로덕션 빌드, 타입·린트 검사, 포맷 검사 통과.
+- `pnpm exec playwright test tests/magic-move-motion.spec.ts --project=chromium --workers=1 --reporter=line`: 수정 전 4개 실패, 수정 후 4개 통과. 동작 감소는 `<br>` 토큰 및 재생 중 변경도 포함한다. 키보드 선택기는 Radix의 포커스 이동 완료를 확인한 뒤 Enter로 선택한다.
+- 같은 Chromium 152.0.7977.83 / 1280×900 / CPU 4×에서 4→5→4→5→4 재측정: 설명 transition 구간 최대 rAF 간격 17.8–18.1ms, 33.4ms 초과 4회 모두 0. 전체 2초 구간 최대 간격 62.3–72.7ms. LayoutCount 평균 21.5회, ScriptDuration 평균 97.8ms.
+- 모든 회차에서 코드 DOM 갱신은 설명의 transform transition 종료 후 발생했다. rAF는 compositor FPS가 아니며 코드 준비 구간의 짧은 지연은 남는다. 모바일 및 모든 하드웨어의 무프레임드랍을 보증하는 검사는 아니다.
