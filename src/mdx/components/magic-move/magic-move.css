@@ -7,3 +7,43 @@
 .magic-move-debug-style .shiki-magic-move-leave-active {
   background: rgba(183, 47, 47, 0.533);
 }
+
+/* Keep token movement on transform/opacity; never inherit transition: all. */
+.shiki-magic-move-container .shiki-magic-move-move,
+.shiki-magic-move-container .shiki-magic-move-enter-active,
+.shiki-magic-move-container .shiki-magic-move-leave-active {
+  transition-property: transform, opacity;
+}
+
+.shiki-magic-move-container,
+.shiki-magic-move-container.shiki-magic-move-container-resize,
+.shiki-magic-move-container.shiki-magic-move-container-restyle {
+  transition-property: height, width, background-color, color;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Override the renderer's inline FLIP transforms, including in-flight motion. */
+  .shiki-magic-move-container > * {
+    transform: none !important;
+    transition-property: opacity, color !important;
+    transition-duration: 200ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .shiki-magic-move-container {
+    height: auto !important;
+    width: auto !important;
+    transition: none !important;
+  }
+}
+
+[data-step-motion='immediate'] .shiki-magic-move-container,
+[data-step-motion='immediate'] .shiki-magic-move-container > * {
+  transition: none !important;
+  transform: none !important;
+}
+
+[data-step-motion='immediate'] .shiki-magic-move-container {
+  height: auto !important;
+  width: auto !important;
+}

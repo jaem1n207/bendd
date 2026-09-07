@@ -1,0 +1,45 @@
+.panel {
+  display: grid;
+}
+
+.content {
+  grid-area: 1 / 1;
+  min-width: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s 400ms;
+}
+
+.content[data-position='before'] {
+  transform: translateX(-110%);
+}
+
+.content[data-position='after'] {
+  transform: translateX(110%);
+}
+
+.content[aria-hidden='true'] {
+  pointer-events: none;
+}
+
+.content[aria-hidden='false'] {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.panel[data-direction='0'] .content,
+.panel[data-motion='immediate'] .content {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel .content {
+    transform: none;
+    transition: none;
+  }
+}
