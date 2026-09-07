@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useDeferredValue, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ShikiMagicMove } from 'shiki-magic-move/react';
 import { useTheme } from 'next-themes';
 import { z } from 'zod';
@@ -8,21 +8,17 @@ import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { CopyToClipboard } from '@/mdx/common/copy-to-clipboard/copy-to-clipboard';
 import { createMDXComponent } from '@/mdx/common/create-mdx-component';
-import {
-  StepContentStoreProvider,
-  useStepContentStore,
-} from '@/mdx/common/step-content/provider';
+import { StepContentStoreProvider } from '@/mdx/common/step-content/provider';
 import {
   StepActions,
-  StepContent,
   StepInfo,
   StepSelect,
 } from '@/mdx/common/step-content/step-content';
 import type { StepData } from '@/mdx/common/step-content/step-data';
-import { useHighlighter } from './use-highlighter';
+import { useHighlighter } from '@/mdx/components/magic-move/use-highlighter';
 
 import 'shiki-magic-move/dist/style.css';
-import './magic-move.css';
+import '@/mdx/components/magic-move/magic-move.css';
 import { HighlighterCore } from 'shiki';
 
 const CodeSnippetSchema = z.object({
@@ -42,12 +38,12 @@ type MagicMoveProps = z.infer<typeof MagicMoveSchema>;
 function MagicMoveContent({
   lang,
   highlighter,
+  content,
 }: {
   lang: string;
   highlighter: HighlighterCore;
+  content: CodeSnippet;
 }) {
-  const { stepsData, currentStep } = useStepContentStore(state => state);
-  const deferredCurrentStep = useDeferredValue(currentStep);
   const { resolvedTheme } = useTheme();
 
   const renderContent = useCallback(
@@ -78,16 +74,15 @@ function MagicMoveContent({
     [highlighter, lang, resolvedTheme]
   );
 
-  if (!resolvedTheme) return null;
+  if (!resolvedTheme) {
+    return null;
+  }
 
-  const stepData = stepsData[deferredCurrentStep] as StepData<CodeSnippet>;
-
-  if (!stepData) return null;
-
-  return renderContent(stepData.content);
+  return renderContent(content);
 }
 
 function MagicMove({ codeSnippets, lang }: MagicMoveProps) {
+  const [displayedStep, setDisplayedStep] = useState(0);
   const [steps] = useState<StepData<CodeSnippet>[]>(() =>
     codeSnippets.map(snippet => ({
       title: snippet.title,
@@ -97,6 +92,7 @@ function MagicMove({ codeSnippets, lang }: MagicMoveProps) {
   );
 
   const highlighter = useHighlighter();
+  const displayedContent = steps[displayedStep]?.content;
 
   return (
     <StepContentStoreProvider
@@ -111,13 +107,15 @@ function MagicMove({ codeSnippets, lang }: MagicMoveProps) {
           <StepSelect />
           <StepActions />
         </div>
-        <StepInfo />
-        {highlighter && (
-          <StepContent
-            render={() => (
-              <MagicMoveContent lang={lang} highlighter={highlighter} />
-            )}
-          />
+        <StepInfo onStepSettled={setDisplayedStep} />
+        {highlighter && displayedContent && (
+          <div className="mt-4">
+            <MagicMoveContent
+              lang={lang}
+              highlighter={highlighter}
+              content={displayedContent}
+            />
+          </div>
         )}
       </div>
     </StepContentStoreProvider>

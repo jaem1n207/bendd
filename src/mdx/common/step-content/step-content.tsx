@@ -1,6 +1,5 @@
-import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import useMeasure from 'react-use-measure';
+import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -10,17 +9,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Typography } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+
+import { Typography } from '@/components/ui/typography';
 import { useStepContentStore } from '@/mdx/common/step-content/provider';
 import type { StepData } from '@/mdx/common/step-content/step-data';
+import styles from '@/mdx/common/step-content/step-content.module.css';
 
 export function StepSelect() {
   const { stepsData, currentStep, setCurrentStep } = useStepContentStore(
     state => state
   );
 
-  if (stepsData.length === 0) return null;
+  if (stepsData.length === 0) {
+    return null;
+  }
 
   return (
     <Select
@@ -41,64 +45,61 @@ export function StepSelect() {
   );
 }
 
-export function StepInfo({ className }: { className?: string }) {
-  const { stepsData, currentStep, direction } = useStepContentStore(
-    state => state
-  );
-  const stepData = stepsData[currentStep];
+export function StepInfo({
+  className,
+  onStepSettled,
+}: {
+  className?: string;
+  onStepSettled?: (step: number) => void;
+}) {
+  const stepsData = useStepContentStore(state => state.stepsData);
+  const currentStep = useStepContentStore(state => state.currentStep);
+  const direction = useStepContentStore(state => state.direction);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
-  const [ref, bounds] = useMeasure();
+  useEffect(() => {
+    // Reduced motion has no animationend event, including when toggled mid-slide.
+    if (direction === 0 || prefersReducedMotion) {
+      onStepSettled?.(currentStep);
+    }
+  }, [currentStep, direction, onStepSettled, prefersReducedMotion]);
+
+  if (!stepsData[currentStep]) {
+    return null;
+  }
 
   return (
-    <MotionConfig
-      transition={{
-        type: 'spring',
-        bounce: 0.15,
-      }}
+    <div
+      data-direction={direction}
+      className={cn(
+        styles.panel,
+        'relative overflow-hidden rounded-md border border-border bg-background px-4 py-2 shadow-inner',
+        className
+      )}
     >
-      <motion.div
-        animate={{ height: bounds.height }}
-        className={cn(
-          'relative overflow-hidden rounded-md border border-border bg-background shadow-inner',
-          className
-        )}
-      >
-        <div ref={ref} className="relative px-4 py-2">
-          <AnimatePresence mode="popLayout" initial={false} custom={direction}>
-            {stepData && (
-              <motion.div
-                key={currentStep}
-                variants={variants}
-                initial="initial"
-                animate="active"
-                exit="exit"
-                custom={direction}
-              >
-                <Typography
-                  variant="p"
-                  affects="large"
-                  asChild
-                  className="mb-2"
-                >
-                  <p>{stepData.title}</p>
-                </Typography>
-                <Typography variant="p" asChild>
-                  <p>{stepData.description}</p>
-                </Typography>
-              </motion.div>
-            )}
-          </AnimatePresence>
+      {/* Overlap descriptions to reserve their intrinsic maximum height at any width. */}
+      {stepsData.map((step, index) => (
+        <div
+          key={index}
+          className={styles.content}
+          aria-hidden={index !== currentStep}
+          onAnimationEnd={event => {
+            if (index === currentStep && event.target === event.currentTarget) {
+              onStepSettled?.(currentStep);
+            }
+          }}
+        >
+          <Typography variant="p" affects="large" asChild className="mb-2">
+            <p>{step.title}</p>
+          </Typography>
+          <Typography variant="p" asChild>
+            <p>{step.description}</p>
+          </Typography>
         </div>
-      </motion.div>
-    </MotionConfig>
+      ))}
+    </div>
   );
 }
-
-const variants = {
-  initial: (direction: number) => ({ x: `${110 * direction}%`, opacity: 0 }),
-  active: { x: '0%', opacity: 1 },
-  exit: (direction: number) => ({ x: `${-110 * direction}%`, opacity: 0 }),
-};
 
 export function StepContent<T>({
   render,
@@ -111,7 +112,9 @@ export function StepContent<T>({
 
   const stepData = stepsData[currentStep] as StepData<T>;
 
-  if (!stepData) return null;
+  if (!stepData) {
+    return null;
+  }
 
   return (
     <div className={cn('mt-4', className)}>{render(stepData.content)}</div>
@@ -122,11 +125,14 @@ export function StepActions({ className }: { className?: string }) {
   const { stepsData, currentStep, nextStep, previousStep } =
     useStepContentStore(state => state);
 
-  if (stepsData.length === 0) return null;
+  if (stepsData.length === 0) {
+    return null;
+  }
 
   return (
-    <motion.div layout className={cn('flex items-center space-x-2', className)}>
+    <div className={cn('flex items-center space-x-2', className)}>
       <Button
+        aria-label="이전 단계"
         size="icon"
         variant="outline"
         onClick={previousStep}
@@ -138,6 +144,7 @@ export function StepActions({ className }: { className?: string }) {
         {currentStep + 1} / {stepsData.length}
       </span>
       <Button
+        aria-label="다음 단계"
         size="icon"
         variant="outline"
         onClick={nextStep}
@@ -145,6 +152,6 @@ export function StepActions({ className }: { className?: string }) {
       >
         <ChevronRight className="size-4" />
       </Button>
-    </motion.div>
+    </div>
   );
 }
