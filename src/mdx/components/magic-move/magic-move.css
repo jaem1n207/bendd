@@ -7,3 +7,19 @@
 .magic-move-debug-style .shiki-magic-move-leave-active {
   background: rgba(183, 47, 47, 0.533);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Override the renderer's inline FLIP transforms, including in-flight motion. */
+  .shiki-magic-move-container > * {
+    transform: none !important;
+    transition-property: opacity, color !important;
+    transition-duration: 200ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .shiki-magic-move-container {
+    height: auto !important;
+    width: auto !important;
+    transition: none !important;
+  }
+}

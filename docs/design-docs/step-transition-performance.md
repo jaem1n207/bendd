@@ -70,3 +70,9 @@ pnpm 패치로 배포하므로 라이브러리 버전은 1.0.0으로 유지한�
 - [MDN: animationend](https://developer.mozilla.org/en-US/docs/Web/API/Element/animationend_event) — 실제 완료 이벤트 및 중단 시 이벤트가 발생하지 않는 조건.
 - [pnpm patch-commit](https://pnpm.io/cli/patch-commit) — 패치 파일과 patchedDependencies 등록.
 - 설치된 `shiki-magic-move@1.0.0/dist/renderer.mjs` — 패치 대상과 루프 순서 확인. [프로젝트 소스](https://github.com/shikijs/shiki-magic-move).
+
+## 모션 리뷰 후 수정
+
+위 전후 수치는 초기 최적화 커밋의 기록이다. 아래 수정 이후의 성능 수치로 해석하지 않는다.
+
+- 동작 감소: 설명뿐 아니라 코드 토큰의 transform과 컨테이너 크기 전환도 제거한다. 코드의 opacity/color 전환만 200ms로 유지하며, 재생 중 설정을 바꾸면 진행 중인 이동도 취소한다. 실제 Shiki가 실행되는 `tests/magic-move-motion.spec.ts`에서 검증한다.
