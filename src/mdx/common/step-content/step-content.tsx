@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -45,6 +45,16 @@ export function StepSelect() {
   );
 }
 
+function getStepPosition(index: number, currentStep: number) {
+  if (index < currentStep) {
+    return 'before';
+  }
+  if (index > currentStep) {
+    return 'after';
+  }
+  return 'active';
+}
+
 export enum StepMotion {
   Animated = 'animated',
   Immediate = 'immediate',
@@ -63,14 +73,27 @@ export function StepInfo({
   const currentStep = useStepContentStore(state => state.currentStep);
   const direction = useStepContentStore(state => state.direction);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const activeContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Reduced motion has no animationend event, including when toggled mid-slide.
+    // Reduced motion has no transitionend event, including when toggled mid-slide.
     if (
       direction === 0 ||
       prefersReducedMotion ||
       motion === StepMotion.Immediate
     ) {
+      onStepSettled?.(currentStep);
+      return;
+    }
+
+    // A retarget before the first painted frame may have no transform transition.
+    const animations = activeContentRef.current?.getAnimations?.() ?? [];
+    const isMoving = animations.some(
+      animation =>
+        'transitionProperty' in animation &&
+        animation.transitionProperty === 'transform'
+    );
+    if (!isMoving) {
       onStepSettled?.(currentStep);
     }
   }, [currentStep, direction, motion, onStepSettled, prefersReducedMotion]);
@@ -93,10 +116,16 @@ export function StepInfo({
       {stepsData.map((step, index) => (
         <div
           key={index}
+          ref={index === currentStep ? activeContentRef : undefined}
+          data-position={getStepPosition(index, currentStep)}
           className={styles.content}
           aria-hidden={index !== currentStep}
-          onAnimationEnd={event => {
-            if (index === currentStep && event.target === event.currentTarget) {
+          onTransitionEnd={event => {
+            if (
+              index === currentStep &&
+              event.target === event.currentTarget &&
+              event.propertyName === 'transform'
+            ) {
               onStepSettled?.(currentStep);
             }
           }}

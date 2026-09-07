@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MDXMagicMove } from '@/mdx/components/magic-move/magic-move';
 
@@ -32,17 +32,47 @@ function nextStep() {
   fireEvent.click(screen.getByRole('button', { name: '다음 단계' }));
 }
 
+function endTransform(element: Element) {
+  fireEvent(
+    element,
+    Object.assign(new Event('transitionend', { bubbles: true }), {
+      propertyName: 'transform',
+    })
+  );
+}
+
 function finishSlide(step: number) {
   const panel = screen.getByText(`설명 ${step}`).parentElement;
   if (!panel) {
     throw new Error('설명 패널이 없습니다.');
   }
-  fireEvent.animationEnd(panel);
+  endTransform(panel);
 }
+
+const originalAnimations = Object.getOwnPropertyDescriptor(
+  HTMLElement.prototype,
+  'getAnimations'
+);
 
 describe('MagicMove step transitions', () => {
   beforeEach(() => {
     preferences.reducedMotion = false;
+    Object.defineProperty(HTMLElement.prototype, 'getAnimations', {
+      configurable: true,
+      value: () => [{ transitionProperty: 'transform' }],
+    });
+  });
+
+  afterEach(() => {
+    if (originalAnimations) {
+      Object.defineProperty(
+        HTMLElement.prototype,
+        'getAnimations',
+        originalAnimations
+      );
+    } else {
+      Reflect.deleteProperty(HTMLElement.prototype, 'getAnimations');
+    }
   });
 
   it('starts code updates after the description slide, ignoring descendant events', () => {
@@ -51,7 +81,7 @@ describe('MagicMove step transitions', () => {
     expect(screen.getByTestId('animated-code').textContent).toBe(
       snippets[0].content
     );
-    fireEvent.animationEnd(screen.getByText('설명 2'));
+    endTransform(screen.getByText('설명 2'));
     expect(screen.getByTestId('animated-code').textContent).toBe(
       snippets[0].content
     );
@@ -118,6 +148,17 @@ describe('MagicMove step transitions', () => {
     finishSlide(3);
     expect(screen.getByTestId('animated-code').textContent).toBe(
       snippets[2].content
+    );
+  });
+  it('settles immediately when no transform transition was created', () => {
+    Object.defineProperty(HTMLElement.prototype, 'getAnimations', {
+      configurable: true,
+      value: () => [],
+    });
+    render(<MDXMagicMove codeSnippets={snippets} lang="typescript" />);
+    nextStep();
+    expect(screen.getByTestId('animated-code').textContent).toBe(
+      snippets[1].content
     );
   });
 });

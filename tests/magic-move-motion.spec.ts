@@ -92,3 +92,47 @@ test('keyboard selection updates description and code without motion', async ({
       .evaluate(element => element.getAnimations().length)
   ).toBe(0);
 });
+
+test('reversing a slide preserves its current visual position', async ({
+  page,
+}) => {
+  const root = await openExample(page);
+  const continuity = await root.evaluate(async element => {
+    const next = element.querySelector('[aria-label="다음 단계"]');
+    const previous = element.querySelector('[aria-label="이전 단계"]');
+    if (
+      !(next instanceof HTMLButtonElement) ||
+      !(previous instanceof HTMLButtonElement)
+    ) {
+      throw new Error('Step controls missing');
+    }
+    const sample = () => {
+      const panel = element.querySelector('[aria-hidden="false"]');
+      if (!(panel instanceof HTMLElement)) {
+        throw new Error('Active panel missing');
+      }
+      const style = getComputedStyle(panel);
+      return {
+        x: new DOMMatrixReadOnly(style.transform).m41,
+        opacity: Number(style.opacity),
+      };
+    };
+    const frames = () =>
+      new Promise<void>(resolve =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+      );
+    next.click();
+    await new Promise(resolve => setTimeout(resolve, 180));
+    const first = sample();
+    previous.click();
+    await frames();
+    next.click();
+    await frames();
+    return { first, resumed: sample() };
+  });
+  expect(continuity.first.opacity).toBeGreaterThan(0.5);
+  expect(continuity.resumed.opacity).toBeGreaterThan(0.3);
+  expect(Math.abs(continuity.resumed.x - continuity.first.x)).toBeLessThan(200);
+  await expect(root.locator('pre')).toContainText('Children.map');
+  await expect(root.getByRole('combobox')).toHaveText(FIFTH);
+});
