@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import styles from '@/app/home.module.css';
 import { JsonLdScript } from '@/components/structured-data';
 import { Typography } from '@/components/ui/typography';
 import { createHomeGraph } from '@/lib/structured-data';
@@ -81,7 +82,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               href="https://jaem1n207.github.io/synchronize-tab-scrolling/"
-              className="group flex flex-col gap-2 rounded-xl p-3 transition-colors hover:bg-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:hover:bg-gray-200"
+              className={`${styles.pressableCard} group flex flex-col gap-2 rounded-xl p-3 hover:bg-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:hover:bg-gray-200`}
             >
               <div className="flex items-center gap-2">
                 <Typography
@@ -170,7 +171,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
             href="https://github.com/shuding/nextra/pull/2746"
-            className="-mx-3 flex flex-col gap-1 rounded-md px-3 transition-colors hover:bg-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:hover:bg-gray-200 sm:py-3"
+            className={`${styles.pressableCard} -mx-3 flex flex-col gap-1 rounded-md px-3 hover:bg-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:hover:bg-gray-200 sm:py-3`}
           >
             <Typography
               variant="p"

@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -18,6 +18,7 @@ import type { StepData } from '@/mdx/common/step-content/step-data';
 import styles from '@/mdx/common/step-content/step-content.module.css';
 
 export function StepSelect() {
+  const [motion, setMotion] = useState(StepMotion.Immediate);
   const { stepsData, currentStep, setCurrentStep } = useStepContentStore(
     state => state
   );
@@ -31,10 +32,17 @@ export function StepSelect() {
       value={currentStep.toString()}
       onValueChange={value => setCurrentStep(Number(value))}
     >
-      <SelectTrigger className="mr-1 flex-1">
+      <SelectTrigger
+        className="mr-1 flex-1"
+        onPointerDown={() => setMotion(StepMotion.Animated)}
+        onKeyDown={() => setMotion(StepMotion.Immediate)}
+      >
         <SelectValue placeholder="단계 선택" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent
+        data-motion={motion}
+        onKeyDownCapture={() => setMotion(StepMotion.Immediate)}
+      >
         {stepsData.map((step, index) => (
           <SelectItem key={index} value={index.toString()}>
             {step.title}

@@ -1,0 +1,19 @@
+.pressableCard {
+  transform-origin: 50% 50%;
+  transition:
+    background-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 120ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pressableCard:active:not(:focus-visible) {
+    transform: scale(0.99);
+    transition-duration: 150ms, 0ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pressableCard {
+    transition: none;
+  }
+}

@@ -93,6 +93,45 @@ test('keyboard selection updates description and code without motion', async ({
   ).toBe(0);
 });
 
+test('step menu closes after switching from pointer to Escape', async ({
+  page,
+}) => {
+  await page.goto(ARTICLE);
+  const select = page.getByRole('combobox').first();
+  const menu = page.getByRole('listbox');
+
+  await select.click();
+  await expect(page.getByRole('option').first()).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(menu).toHaveCount(0);
+  await expect(select).toBeFocused();
+
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('option').first()).toBeFocused();
+  const nextOption = page.getByRole('option').nth(1);
+  const nextTitle = await nextOption.innerText();
+  await page.keyboard.press('ArrowDown');
+  await expect(nextOption).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(menu).toHaveCount(0);
+  await expect(select).toHaveText(nextTitle);
+  await expect(select).toBeFocused();
+});
+
+test('step menu stays still with reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(ARTICLE);
+  const select = page.getByRole('combobox').first();
+
+  await select.click();
+  const menu = page.getByRole('listbox');
+  await expect(menu).toHaveCSS('animation-duration', '0s');
+  await expect(page.getByRole('option').first()).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(menu).toHaveCount(0);
+  await expect(select).toBeFocused();
+});
+
 test('reversing a slide preserves its current visual position', async ({
   page,
 }) => {
