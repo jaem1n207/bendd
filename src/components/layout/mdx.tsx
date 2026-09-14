@@ -1,6 +1,7 @@
 import { CornerUpLeft } from 'lucide-react';
 import Link from 'next/link';
 
+import { FluidHover } from '@/components/ui/fluid-hover';
 import { Giscus } from '@/components/comments/giscus';
 import styles from '@/components/layout/mdx-layout.module.css';
 import {
@@ -48,17 +49,22 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
       >
         <JsonLdScript data={detailJsonLd} />
         <div className="fixed bottom-16 left-5 top-24 hidden w-[34rem] max-w-[calc((100vw-42rem)/2-2rem)] flex-col overflow-hidden pr-4 lg:flex">
-          <Link
-            href={`/${type}`}
-            className={cn(
-              'flex items-center gap-x-1 w-fit leading-5 text-sm',
-              'p-1 -m-1',
-              'text-muted-foreground transition-colors hover:text-primary'
-            )}
-          >
-            <CornerUpLeft className="size-4" />
-            {type.charAt(0).toUpperCase() + type.slice(1)}
-          </Link>
+          <FluidHover highlightClassName="rounded-md">
+            <div className="w-fit">
+              <Link
+                data-fluid-hover-item=""
+                href={`/${type}`}
+                className={cn(
+                  'flex items-center gap-x-1 w-fit leading-5 text-sm',
+                  'p-1 -m-1',
+                  'text-muted-foreground transition-colors data-[fluid-hover-active]:text-primary'
+                )}
+              >
+                <CornerUpLeft className="size-4" />
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </Link>
+            </div>
+          </FluidHover>
           <ClientTableOfContents />
         </div>
         <Typography

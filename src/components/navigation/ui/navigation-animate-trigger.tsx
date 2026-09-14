@@ -5,10 +5,14 @@ import { motion, useMotionValue } from 'motion/react';
 import type { ReactNode } from 'react';
 import { Children, cloneElement, forwardRef, isValidElement } from 'react';
 
-import { MotionSlot } from '@/components/motion-slot';
+import { FluidHover } from '@/components/ui/fluid-hover';
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 import { cn } from '@/lib/utils';
-import { DEFAULT_DISTANCE, DEFAULT_MAGNIFICATION } from '../consts/size';
-import type { ItemMotionProps } from '../types/motion';
+import {
+  DEFAULT_DISTANCE,
+  DEFAULT_MAGNIFICATION,
+} from '@/components/navigation/consts/size';
+import type { ItemMotionProps } from '@/components/navigation/types/motion';
 
 const navigationAnimateTriggerVariants = cva(
   'flex h-20 w-full items-end gap-2 overflow-x-auto overflow-y-hidden py-2 xs:h-auto xs:overflow-visible'
@@ -37,6 +41,7 @@ export const NavigationAnimateTrigger = forwardRef<
     ref
   ) => {
     const mousex = useMotionValue(Infinity);
+    const reduceMotion = usePrefersReducedMotion();
 
     const renderChildren = () => {
       return Children.map(children, (child: ReactNode) => {
@@ -51,16 +56,24 @@ export const NavigationAnimateTrigger = forwardRef<
     };
 
     return (
-      <MotionSlot>
+      <FluidHover
+        axis="x"
+        itemSelector="[data-navigation-item]"
+        highlightClassName="z-20 rounded-full bg-primary/10"
+      >
         <motion.div
           ref={ref}
-          onMouseMove={e => mousex.set(e.pageX)}
+          onMouseMove={e => {
+            if (!reduceMotion) {
+              mousex.set(e.pageX);
+            }
+          }}
           onMouseLeave={() => mousex.set(Infinity)}
           className={cn(navigationAnimateTriggerVariants({ className }))}
         >
           {renderChildren()}
         </motion.div>
-      </MotionSlot>
+      </FluidHover>
     );
   }
 );

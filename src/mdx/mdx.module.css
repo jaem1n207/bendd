@@ -453,10 +453,6 @@
   @apply pr-4;
 }
 
-.container :global(table tbody tr:hover) {
-  @apply bg-muted/50;
-}
-
 .container :global(table tbody tr:last-child td) {
   @apply border-b-0;
 }

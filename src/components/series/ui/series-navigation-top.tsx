@@ -1,6 +1,7 @@
 import { BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
+import { FluidHover } from '@/components/ui/fluid-hover';
 import type { SeriesNavigationProps } from '@/components/series/types/series';
 import { SeriesArticleList } from '@/components/series/ui/series-article-list';
 
@@ -15,14 +16,19 @@ export function SeriesNavigationTop({
       aria-label="시리즈 상단 네비게이션"
       className="mt-6 rounded-lg border border-border/60 bg-muted/30 p-5"
     >
-      <Link
-        href={route}
-        data-webmcp-series-target="series"
-        className="mb-4 flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary"
-      >
-        <BookOpen className="size-4 shrink-0" />
-        {name} 시리즈
-      </Link>
+      <FluidHover highlightClassName="rounded-md bg-muted">
+        <div className="mb-4">
+          <Link
+            data-fluid-hover-item=""
+            href={route}
+            data-webmcp-series-target="series"
+            className="flex items-center gap-2 text-sm font-medium transition-colors data-[fluid-hover-active]:text-primary"
+          >
+            <BookOpen className="size-4 shrink-0" />
+            {name} 시리즈
+          </Link>
+        </div>
+      </FluidHover>
       <SeriesArticleList articles={articles} currentOrder={currentOrder} />
     </nav>
   );

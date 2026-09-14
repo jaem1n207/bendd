@@ -24,6 +24,7 @@ import { MDXImeScrollDemo } from '@/mdx/components/ime-scroll-demo/ime-scroll-de
 import { MDXMagicMove } from '@/mdx/components/magic-move/magic-move';
 import { MDXPre } from '@/mdx/components/pre/pre';
 import { MDXShuffleLettersDemo } from '@/mdx/components/shuffle-letters-demo/shuffle-letters-demo';
+import { MDXTable } from '@/mdx/components/table/table';
 import { MDXSteps } from '@/mdx/components/steps/steps';
 import {
   MDXAutoplayVideo,
@@ -54,6 +55,7 @@ const components: MDXRemoteProps['components'] = {
     );
   },
   pre: MDXPre,
+  table: MDXTable,
   AutoplayVideo: MDXAutoplayVideo,
   PreLoadVideo: MDXPreLoadVideo,
   MagicMove: MDXMagicMove,

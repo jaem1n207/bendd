@@ -90,9 +90,10 @@ export function ArticleItem({
     <WithSound assetPath="/sounds/stapling.mp3">
       <MotionLink
         ref={itemRef}
+        data-fluid-hover-item=""
         href={href}
         className={cn(
-          'relative block w-[calc(100%+1rem)] overflow-hidden rounded-xl px-3 py-4 hover:bg-gray-300 sm:flex sm:min-w-0 sm:items-center sm:gap-3'
+          'relative block w-full overflow-hidden rounded-xl px-3 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex sm:min-w-0 sm:items-center sm:gap-3'
         )}
         initial={shouldAnimate ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}

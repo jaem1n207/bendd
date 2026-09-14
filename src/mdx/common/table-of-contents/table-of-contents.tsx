@@ -4,6 +4,7 @@ import { ListTree } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
+import { FluidHover } from '@/components/ui/fluid-hover';
 import { Typography } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
 import { TocRail } from '@/mdx/common/table-of-contents/toc-rail';
@@ -45,17 +46,19 @@ export function TableOfContents() {
           <p>On this page</p>
         </Typography>
       </div>
-      <ul
-        ref={containerRef}
-        className={cn(
-          'relative mt-2 min-h-0 flex-1 overflow-y-auto rounded-sm py-1 font-sans'
-        )}
-      >
-        <TocRail linkCount={flatToc.length} />
-        {flatToc.map(({ item, depth }) => (
-          <TableOfContentsItem key={item.link} item={item} depth={depth} />
-        ))}
-      </ul>
+      <FluidHover highlightClassName="rounded-sm bg-muted/50">
+        <ul
+          ref={containerRef}
+          className={cn(
+            'relative mt-2 min-h-0 flex-1 overflow-y-auto rounded-sm py-1 font-sans'
+          )}
+        >
+          <TocRail linkCount={flatToc.length} />
+          {flatToc.map(({ item, depth }) => (
+            <TableOfContentsItem key={item.link} item={item} depth={depth} />
+          ))}
+        </ul>
+      </FluidHover>
     </nav>
   );
 }
@@ -70,12 +73,13 @@ function TableOfContentsItem({ item, depth }: TableOfContentsItemProps) {
     <li aria-level={depth + 1}>
       <Link
         href={{ hash: item.link.slice(1) }}
+        data-fluid-hover-item=""
         data-active="false"
         data-toc-depth={depth}
         style={{ paddingInlineStart: getTocRailPadding(depth) }}
         className={cn(
           'group relative block max-w-full break-keep py-1.5 text-sm font-medium leading-5',
-          'text-muted-foreground/70 transition-colors hover:text-foreground',
+          'text-muted-foreground/70 transition-colors data-[fluid-hover-active]:text-foreground',
           'data-[active=true]:!text-foreground'
         )}
       >

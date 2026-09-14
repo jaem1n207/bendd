@@ -1,7 +1,8 @@
 import type { Metadata, ResolvingMetadata } from 'next';
 
+import { FluidHover } from '@/components/ui/fluid-hover';
 import { SeriesBanner } from '@/components/series';
-import { ArticleItem } from '@/components/article/ui/article-item';
+import { ArticleItem } from '@/components/article';
 import { JsonLdScript } from '@/components/structured-data';
 import { siteMetadata } from '@/lib/site-metadata';
 import { createCraftIndexGraph } from '@/lib/structured-data';
@@ -51,9 +52,13 @@ export default function CraftPage() {
       <JsonLdScript data={collectionJsonLd} />
       <div className="relative mx-auto my-0 mt-8 max-w-4xl space-y-1 overflow-y-auto overflow-x-hidden px-2 pb-28 pt-10 sm:px-6 sm:py-32">
         <SeriesBanner items={seriesSummaries} />
-        {formattedArticleInfo.map((article, index) => (
-          <ArticleItem key={article.href} {...article} index={index} />
-        ))}
+        <FluidHover highlightClassName="bg-gray-300">
+          <div className="space-y-1">
+            {formattedArticleInfo.map((article, index) => (
+              <ArticleItem key={article.href} {...article} index={index} />
+            ))}
+          </div>
+        </FluidHover>
       </div>
     </main>
   );

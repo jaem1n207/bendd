@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { FluidHover } from '@/components/ui/fluid-hover';
 import styles from '@/app/home.module.css';
 import { JsonLdScript } from '@/components/structured-data';
 import { Typography } from '@/components/ui/typography';
@@ -78,83 +79,92 @@ export default function Home() {
             <span>프로젝트</span>
           </Typography>
           <div className="-mx-3">
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://jaem1n207.github.io/synchronize-tab-scrolling/"
-              className={`${styles.pressableCard} group flex flex-col gap-2 rounded-xl p-3 hover:bg-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:hover:bg-gray-200`}
-            >
-              <div className="flex items-center gap-2">
-                <Typography
-                  variant="p"
-                  affects="small"
-                  prose="removePMargin"
-                  asChild
+            <FluidHover highlightClassName="bg-gray-400 dark:bg-gray-200">
+              <div>
+                <a
+                  data-fluid-hover-item=""
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://jaem1n207.github.io/synchronize-tab-scrolling/"
+                  className={`${styles.pressableCard} group flex flex-col gap-2 rounded-xl p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2`}
                 >
-                  <span>Synchronize Tab Scrolling</span>
-                </Typography>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                  aria-hidden="true"
+                  <div className="flex items-center gap-2">
+                    <Typography
+                      variant="p"
+                      affects="small"
+                      prose="removePMargin"
+                      asChild
+                    >
+                      <span>Synchronize Tab Scrolling</span>
+                    </Typography>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-muted-foreground transition-transform group-data-[fluid-hover-active]:-translate-y-0.5 group-data-[fluid-hover-active]:translate-x-0.5"
+                      aria-hidden="true"
+                    >
+                      <path d="m7 17 10-10" />
+                      <path d="M7 7h10v10" />
+                    </svg>
+                  </div>
+                  <Typography
+                    variant="p"
+                    affects="muted"
+                    prose="removePMargin"
+                    asChild
+                  >
+                    <span className="break-keep">
+                      여러 탭의 스크롤을 실시간으로 동기화하는 오픈소스 브라우저
+                      확장 프로그램입니다. 번역본 비교, 코드 리뷰, 문서 대조 등
+                      탭을 나란히 놓고 비교하는 작업에 유용합니다.
+                    </span>
+                  </Typography>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
+                      Chrome
+                    </span>
+                    <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
+                      Firefox
+                    </span>
+                    <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
+                      Edge
+                    </span>
+                  </div>
+                </a>
+              </div>
+            </FluidHover>
+            <FluidHover axis="x">
+              <div className="mt-2 flex items-center gap-3 px-3 text-sm">
+                <a
+                  data-fluid-hover-item=""
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://chromewebstore.google.com/detail/synchronize-tab-scrolling/phceoocamipnafpgnchbfhkdlbleeafc"
+                  className="select-none text-muted-foreground transition-colors data-[fluid-hover-active]:text-primary"
                 >
-                  <path d="m7 17 10-10" />
-                  <path d="M7 7h10v10" />
-                </svg>
+                  Web Store
+                </a>
+                <span className="text-muted-foreground" aria-hidden="true">
+                  ·
+                </span>
+                <a
+                  data-fluid-hover-item=""
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://github.com/jaem1n207/synchronize-tab-scrolling"
+                  className="select-none text-muted-foreground transition-colors data-[fluid-hover-active]:text-primary"
+                >
+                  GitHub
+                </a>
               </div>
-              <Typography
-                variant="p"
-                affects="muted"
-                prose="removePMargin"
-                asChild
-              >
-                <span className="break-keep">
-                  여러 탭의 스크롤을 실시간으로 동기화하는 오픈소스 브라우저
-                  확장 프로그램입니다. 번역본 비교, 코드 리뷰, 문서 대조 등 탭을
-                  나란히 놓고 비교하는 작업에 유용합니다.
-                </span>
-              </Typography>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
-                  Chrome
-                </span>
-                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
-                  Firefox
-                </span>
-                <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
-                  Edge
-                </span>
-              </div>
-            </a>
-            <div className="flex items-center gap-3 px-3 pt-2 text-sm">
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://chromewebstore.google.com/detail/synchronize-tab-scrolling/phceoocamipnafpgnchbfhkdlbleeafc"
-                className="select-none text-muted-foreground transition-colors hover:text-primary"
-              >
-                Web Store
-              </a>
-              <span className="text-muted-foreground" aria-hidden="true">
-                ·
-              </span>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://github.com/jaem1n207/synchronize-tab-scrolling"
-                className="select-none text-muted-foreground transition-colors hover:text-primary"
-              >
-                GitHub
-              </a>
-            </div>
+            </FluidHover>
           </div>
         </div>
 
@@ -167,34 +177,39 @@ export default function Home() {
           >
             <span>기여</span>
           </Typography>
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://github.com/shuding/nextra/pull/2746"
-            className={`${styles.pressableCard} -mx-3 flex flex-col gap-1 rounded-md px-3 hover:bg-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:hover:bg-gray-200 sm:py-3`}
-          >
-            <Typography
-              variant="p"
-              affects="small"
-              prose="removePMargin"
-              asChild
-            >
-              <span>Nextra - Memory Leak Fix</span>
-            </Typography>
-            <Typography
-              variant="p"
-              affects="muted"
-              prose="removePMargin"
-              asChild
-            >
-              <span>
-                13.1K 스타의 Nextra에서 검색어에 연속된 공백이 포함될 때
-                발생하는 메모리 누수를 수정했습니다. 정규식이 빈 문자열과
-                매칭되어 무한 루프에 빠지는 문제를 해결하여 검색 기능을
-                안정화했습니다.
-              </span>
-            </Typography>
-          </a>
+          <FluidHover highlightClassName="rounded-md bg-gray-400 dark:bg-gray-200">
+            <div className="-mx-3">
+              <a
+                data-fluid-hover-item=""
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://github.com/shuding/nextra/pull/2746"
+                className={`${styles.pressableCard} flex flex-col gap-1 rounded-md px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:py-3`}
+              >
+                <Typography
+                  variant="p"
+                  affects="small"
+                  prose="removePMargin"
+                  asChild
+                >
+                  <span>Nextra - Memory Leak Fix</span>
+                </Typography>
+                <Typography
+                  variant="p"
+                  affects="muted"
+                  prose="removePMargin"
+                  asChild
+                >
+                  <span>
+                    13.1K 스타의 Nextra에서 검색어에 연속된 공백이 포함될 때
+                    발생하는 메모리 누수를 수정했습니다. 정규식이 빈 문자열과
+                    매칭되어 무한 루프에 빠지는 문제를 해결하여 검색 기능을
+                    안정화했습니다.
+                  </span>
+                </Typography>
+              </a>
+            </div>
+          </FluidHover>
         </div>
       </main>
     </div>
