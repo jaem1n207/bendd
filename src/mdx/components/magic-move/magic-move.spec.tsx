@@ -64,6 +64,8 @@ describe('MagicMove step transitions', () => {
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
     if (originalAnimations) {
       Object.defineProperty(
         HTMLElement.prototype,
@@ -73,6 +75,34 @@ describe('MagicMove step transitions', () => {
     } else {
       Reflect.deleteProperty(HTMLElement.prototype, 'getAnimations');
     }
+  });
+
+  it('removes the code fade when resized content fits', () => {
+    let onResize = () => {};
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(private callback: () => void) {}
+        observe(element: HTMLElement) {
+          if (element.classList.contains('scroll-fade-x')) {
+            onResize = this.callback;
+          }
+        }
+        disconnect() {}
+      }
+    );
+    const width = vi
+      .spyOn(HTMLElement.prototype, 'clientWidth', 'get')
+      .mockReturnValue(200);
+    vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(300);
+
+    render(<MDXMagicMove codeSnippets={snippets} lang="typescript" />);
+    const scroller = screen.getByTestId('animated-code').parentElement;
+    expect(scroller?.dataset.scrollFadeOverflow).toBe('true');
+
+    width.mockReturnValue(400);
+    onResize();
+    expect(scroller?.dataset.scrollFadeOverflow).toBe('false');
   });
 
   it('starts code updates after the description slide, ignoring descendant events', () => {

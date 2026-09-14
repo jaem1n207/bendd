@@ -123,13 +123,13 @@
     figure[data-rehype-pretty-code-figure]:has(
         > [data-rehype-pretty-code-title]
       )
-      pre
+      [data-code-block-frame]
   ) {
-  @apply !rounded-t-none !mt-0 border-border border-solid border rounded-lg;
+  @apply rounded-t-none;
 }
 
-.container :global(figure[data-rehype-pretty-code-figure] pre),
-.container :global(pre.shiki-magic-move-container) {
+.container
+  :global(figure[data-rehype-pretty-code-figure] [data-code-block-frame]) {
   @apply bg-gray-300 dark:!bg-gray-200;
 }
 
@@ -137,6 +137,11 @@
 .container :global(code),
 .container :global(figure) {
   @apply overflow-x-auto;
+}
+
+/* Let the pre own scrolling so its timeline follows the visible code. */
+.container :global([data-code-block-frame] > pre > code) {
+  @apply min-w-full w-max overflow-visible;
 }
 
 /* based on twoslash rich renderer style */
