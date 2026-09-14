@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
 
+import { FluidHover } from '@/components/ui/fluid-hover';
 import { JsonLdScript } from '@/components/structured-data';
 import { Typography } from '@/components/ui/typography';
 import { getAllSeriesIds, getSeriesConfig, seriesRoute } from '@/lib/series';
@@ -68,34 +69,37 @@ export default async function SeriesPage(props: {
         {seriesInfo.articles.length}개의 글
       </Typography>
 
-      <ol className="mt-10 space-y-3">
-        {seriesInfo.articles.map(article => (
-          <li key={article.slug}>
-            <Link
-              href={article.href}
-              className={cn(
-                'block rounded-xl border border-border/60 px-5 py-4',
-                'transition-colors hover:border-primary/40 hover:bg-muted/50'
-              )}
-            >
-              <div className="flex items-baseline gap-3">
-                <span className="shrink-0 text-sm tabular-nums text-muted-foreground/60">
-                  {article.order}.
-                </span>
-                <div className="min-w-0">
-                  <h3 className="text-base font-medium">{article.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {formatDate({
-                      date: article.publishedAt,
-                      includeRelative: true,
-                    })}
-                  </p>
+      <FluidHover>
+        <ol className="mt-10 space-y-3">
+          {seriesInfo.articles.map(article => (
+            <li key={article.slug}>
+              <Link
+                data-fluid-hover-item=""
+                href={article.href}
+                className={cn(
+                  'block rounded-xl border border-border/60 px-5 py-4',
+                  'transition-colors data-[fluid-hover-active]:border-primary/40'
+                )}
+              >
+                <div className="flex items-baseline gap-3">
+                  <span className="shrink-0 text-sm tabular-nums text-muted-foreground/60">
+                    {article.order}.
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="text-base font-medium">{article.title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {formatDate({
+                        date: article.publishedAt,
+                        includeRelative: true,
+                      })}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ol>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </FluidHover>
     </main>
   );
 }

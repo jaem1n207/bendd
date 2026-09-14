@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
+import { FluidHover } from '@/components/ui/fluid-hover';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -179,28 +180,36 @@ export function StepActions({ className }: { className?: string }) {
   }
 
   return (
-    <div className={cn('flex items-center space-x-2', className)}>
-      <Button
-        aria-label="이전 단계"
-        size="icon"
-        variant="outline"
-        onClick={previousStep}
-        disabled={currentStep === 0}
-      >
-        <ChevronLeft className="size-4" />
-      </Button>
-      <span className="text-sm">
-        {currentStep + 1} / {stepsData.length}
-      </span>
-      <Button
-        aria-label="다음 단계"
-        size="icon"
-        variant="outline"
-        onClick={nextStep}
-        disabled={currentStep === stepsData.length - 1}
-      >
-        <ChevronRight className="size-4" />
-      </Button>
-    </div>
+    <FluidHover
+      axis="x"
+      itemSelector="button"
+      highlightClassName="z-10 rounded-md bg-accent/60"
+    >
+      <div className={cn('flex items-center space-x-2', className)}>
+        <Button
+          className="hover:bg-background hover:text-foreground"
+          aria-label="이전 단계"
+          size="icon"
+          variant="outline"
+          onClick={previousStep}
+          disabled={currentStep === 0}
+        >
+          <ChevronLeft className="size-4" />
+        </Button>
+        <span className="text-sm">
+          {currentStep + 1} / {stepsData.length}
+        </span>
+        <Button
+          className="hover:bg-background hover:text-foreground"
+          aria-label="다음 단계"
+          size="icon"
+          variant="outline"
+          onClick={nextStep}
+          disabled={currentStep === stepsData.length - 1}
+        >
+          <ChevronRight className="size-4" />
+        </Button>
+      </div>
+    </FluidHover>
   );
 }

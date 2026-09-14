@@ -40,7 +40,7 @@ export function ThemeSwitcher() {
   return (
     <button
       title="Toggle Theme"
-      className="relative flex size-full items-center justify-center text-gray-950 transition-transform hover:scale-105"
+      className="relative flex size-full items-center justify-center text-gray-950"
       onClick={handleToggleTheme}
     >
       <ClientGate>

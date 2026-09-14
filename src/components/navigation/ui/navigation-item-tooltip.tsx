@@ -11,9 +11,9 @@ import {
 } from '@/components/ui/tooltip';
 import { isTouchDevice } from '@/lib/detect';
 import { cn } from '@/lib/utils';
-import { DEFAULT_ITEM_SIZE } from '../consts/size';
-import { useNavigationItemAnimation } from '../model/use-navigation-item-animation';
-import type { ItemMotionProps } from '../types/motion';
+import { DEFAULT_ITEM_SIZE } from '@/components/navigation/consts/size';
+import { useNavigationItemAnimation } from '@/components/navigation/model/use-navigation-item-animation';
+import type { ItemMotionProps } from '@/components/navigation/types/motion';
 
 type NavigationItemTooltipProps = {
   name: string;
@@ -42,8 +42,9 @@ export function NavigationItemTooltip({
       <TooltipTrigger asChild>
         <motion.div
           ref={ref}
+          data-navigation-item=""
           className={cn(
-            'relative top-0 aspect-square rounded-full bg-gray-300 bg-navigation-item text-gray-900/80 hover:text-gray-900 shrink-0',
+            'relative top-0 aspect-square rounded-full bg-gray-300 bg-navigation-item text-gray-900/80 data-[fluid-hover-active]:text-gray-900 shrink-0',
             className
           )}
           style={
