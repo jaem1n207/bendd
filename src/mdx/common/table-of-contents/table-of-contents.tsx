@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { FluidHover } from '@/components/ui/fluid-hover';
 import { Typography } from '@/components/ui/typography';
+import { useScrollFade } from '@/hooks/use-scroll-fade';
 import { cn } from '@/lib/utils';
 import { TocRail } from '@/mdx/common/table-of-contents/toc-rail';
 import type { MenuItem } from '@/mdx/common/table-of-contents/toc';
@@ -24,6 +25,7 @@ export function TableOfContents() {
   const flatToc = flattenMenuItems(toc);
 
   useActiveAnchor(containerRef, flatToc.length);
+  useScrollFade(containerRef, 'y', flatToc.length);
 
   useEffect(() => {
     setToc(getHeaders([2, 4]));
@@ -50,7 +52,7 @@ export function TableOfContents() {
         <ul
           ref={containerRef}
           className={cn(
-            'relative mt-2 min-h-0 flex-1 overflow-y-auto rounded-sm py-1 font-sans'
+            'scroll-fade-y relative mt-2 min-h-0 flex-1 overflow-y-auto rounded-sm py-1 font-sans [--scroll-fade-size:16px]'
           )}
         >
           <TocRail linkCount={flatToc.length} />

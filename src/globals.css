@@ -2,6 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tailwind 3 scroll-fade subset: y/x, responsive none, size and reveal variables.
+ * Keep backgrounds and borders on the wrapper, outside the masked scroller.
+ * Pair with useScrollFade to remove the mask when resized content fits.
+ * Based on https://ui.shadcn.com/docs/utils/scroll-fade
+ */
+@property --scroll-fade-start {
+  syntax: '<length-percentage>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --scroll-fade-end {
+  syntax: '<length-percentage>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --scroll-fade-mask {
+  syntax: '*';
+  inherits: false;
+}
+
+@keyframes scroll-fade-reveal-start {
+  from {
+    --scroll-fade-start: 0px;
+  }
+  to {
+    --scroll-fade-start: var(--scroll-fade-size, min(12%, 40px));
+  }
+}
+
+@keyframes scroll-fade-reveal-end {
+  from {
+    --scroll-fade-end: var(--scroll-fade-size, min(12%, 40px));
+  }
+  to {
+    --scroll-fade-end: 0px;
+  }
+}
+
+@layer utilities {
+  .scroll-fade,
+  .scroll-fade-y,
+  .scroll-fade-x {
+    --scroll-fade-direction: to bottom;
+    --scroll-fade-gradient: linear-gradient(
+      var(--scroll-fade-direction),
+      transparent,
+      hsl(var(--foreground)) var(--scroll-fade-start),
+      hsl(var(--foreground)) calc(100% - var(--scroll-fade-end)),
+      transparent
+    );
+    -webkit-mask-image: var(--scroll-fade-mask, var(--scroll-fade-gradient));
+    mask-image: var(--scroll-fade-mask, var(--scroll-fade-gradient));
+    mask-repeat: no-repeat;
+  }
+
+  .scroll-fade-x {
+    --scroll-fade-direction: to right;
+  }
+
+  .scroll-fade-x:dir(rtl) {
+    --scroll-fade-direction: to left;
+  }
+
+  @supports (animation-timeline: scroll()) and (animation-range: 0px 1px) {
+    .scroll-fade,
+    .scroll-fade-y,
+    .scroll-fade-x {
+      /* Both edges start at 0px before an overflowing timeline activates. */
+      animation:
+        scroll-fade-reveal-start 1ms linear both,
+        scroll-fade-reveal-end 1ms linear both;
+      animation-timeline: scroll(self y), scroll(self y);
+      animation-range:
+        0px var(--scroll-fade-reveal, 96px),
+        calc(100% - var(--scroll-fade-reveal, 96px)) 100%;
+    }
+
+    .scroll-fade-x {
+      animation-timeline: scroll(self inline), scroll(self inline);
+    }
+  }
+
+  @supports not (
+    (animation-timeline: scroll()) and (animation-range: 0px 1px)
+  ) {
+    .scroll-fade,
+    .scroll-fade-y,
+    .scroll-fade-x {
+      --scroll-fade-start: var(--scroll-fade-size, min(12%, 40px));
+      --scroll-fade-end: var(--scroll-fade-size, min(12%, 40px));
+    }
+  }
+
+  .scroll-fade-none,
+  .scroll-fade[data-scroll-fade-overflow='false'],
+  .scroll-fade-y[data-scroll-fade-overflow='false'],
+  .scroll-fade-x[data-scroll-fade-overflow='false'] {
+    --scroll-fade-mask: none;
+  }
+
+  @media (prefers-reduced-motion: reduce), (forced-colors: active) {
+    .scroll-fade,
+    .scroll-fade-y,
+    .scroll-fade-x {
+      --scroll-fade-mask: none;
+      animation: none;
+    }
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
