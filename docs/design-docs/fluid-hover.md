@@ -12,6 +12,8 @@ flowchart TD
   Detail --> Steps[StepActions · Radix Select]
   Dock[하단 Navigation] --> Adapter
   Lists --> Adapter[FluidHover 앱 어댑터]
+  Lists -->|Article / Craft 글 목록| Timing[ARTICLE_HOVER_TRANSITION / 50ms]
+  Timing -->|transition prop| Adapter
   TOC --> Adapter
   Table --> Adapter
   Steps --> Adapter
@@ -21,7 +23,7 @@ flowchart TD
   Adapter --> Highlight[FluidHoverHighlight / 단일 배경]
   Hook --> Geometry[DOM 측정 · ResizeObserver · requestAnimationFrame]
   Highlight --> Motion[기존 motion/react]
-  Highlight --> Spring[Fluid Functionalism spring.fast]
+  Highlight --> Spring[기본 Fluid Functionalism spring.fast / 80ms]
   Highlight --> Theme[Tailwind 3 / 기존 HSL 색상 토큰]
 ```
 
@@ -45,6 +47,7 @@ flowchart TD
 ## 동작 계약
 
 - 항목 이동은 같은 하이라이트 DOM의 transform과 크기를 갱신한다. 항목 index로 재마운트하지 않는다.
+- `/article`, `/craft` 글 목록은 `ARTICLE_HOVER_TRANSITION`으로 이동 시간을 50ms로 지정한다. `FluidHover.transition`을 통해 전달하며 다른 그룹은 기본 80ms spring을 사용한다. 두 설정 모두 bounce는 0이다.
 - DOM 항목 집합이 같으면 등록을 반복하지 않는다. 텍스트 셔플이나 하이라이트 자체의 DOM 변경이 재측정/깜빡임을 만들지 않는다.
 - 스크롤·리사이즈·항목 측정 완료 후에는 저장된 커서 좌표로 다시 선택한다. 관찰자와 이벤트 리스너는 언마운트 시 정리한다.
 - 키보드 포커스는 해당 항목을 즉시 표시한다. OS의 reduced motion에서는 이동을 생략한다. 원본 하이라이트의 짧은 opacity 전환은 유지한다.
@@ -69,7 +72,7 @@ pnpm dlx shadcn@latest add https://www.fluidfunctionalism.com/r/use-fluid-hover.
 ## 검증
 
 - Node 24.20.0 / pnpm 10.34.5, 최신 `origin/main` 기준의 독립 worktree.
-- 전체 단위 테스트 34개 파일 / 323개 테스트 통과. 새 어댑터 테스트는 10개로, 간격 이동 시 DOM 유지, 스크롤, 동적 제거·비활성화, 키보드, 터치, Strict Mode, 지연 마운트, 중첩 그룹을 검증한다.
+- 전체 단위 테스트 34개 파일 / 324개 테스트 통과. 새 어댑터 테스트는 11개로, 간격 이동 시 DOM 유지, 스크롤, 동적 제거·비활성화, 키보드, 터치, Strict Mode, 지연 마운트, 중첩 그룹, 그룹별 전환 설정을 검증한다.
 - TypeScript, 전체 Prettier, 프로덕션 빌드 통과. 빌드의 ESLint 단계도 에러 없이 완료했다. 기존 경고와 원본 훅의 ref cleanup 경고는 남는다.
 - Chromium의 글 목록 빠른 왕복 이동 105프레임: 단일 하이라이트 DOM 유지, 최소 opacity 1. 스크롤 후 항목/하이라이트 좌표 일치.
 - 홈·Craft·Article/Craft 시리즈·글 상세의 19개 표시 그룹에서 활성 항목과 하이라이트 확인. 목차의 기존 SVG 레일 2개 유지, 표 행 위치 오차 1px 이내.
@@ -78,3 +81,10 @@ pnpm dlx shadcn@latest add https://www.fluidfunctionalism.com/r/use-fluid-hover.
 - 로컬 Vercel Insights 스크립트의 404/MIME 콘솔 오류는 로컬 실행 환경에서 발생한다. 마지막 메뉴/단계 검증에서는 JavaScript pageerror가 없었다.
 
 브라우저 확인은 Chromium으로 수행했다. 현재 화면에서 사용하지 않는 DropdownMenu의 하위 메뉴는 공통 어댑터의 지연 마운트 테스트와 타입/빌드 검증으로 확인했다.
+
+### 글 목록 속도 조정
+
+- 기존 80ms spring의 지연을 인접 항목 60px 이동으로 재현했다. 각 경로 3회 측정에서 커서 입력부터 위치 오차 0.05px 미만까지 Article 83–85ms, Craft 100–102ms였다. 50ms 설정에서는 Article 66–67ms, Craft 67–83ms로 줄었다. 브라우저 프레임과 React 갱신 시간이 포함된 로컬 측정값이다.
+- 그룹별 transition과 키보드 즉시 이동의 회귀 테스트를 RED → GREEN으로 검증했다. 어댑터 테스트는 11개 통과했다. 새 프로덕션 빌드의 타입·ESLint 검사도 통과했다.
+- 새 빌드에서 빠른 왕복 이동 123프레임 동안 단일 DOM과 opacity 1을 유지했다. reduced motion의 위치 오차는 0px, JavaScript pageerror는 없었다.
+- 사용자 프리뷰는 Vercel 로그인으로 리디렉션되어 해당 PR 커밋과 수정본의 로컬 프로덕션 빌드를 비교했다.

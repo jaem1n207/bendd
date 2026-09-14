@@ -6,6 +6,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type ComponentProps,
   type MouseEvent,
   type ReactElement,
 } from 'react';
@@ -22,6 +23,7 @@ interface FluidHoverProps {
   axis?: UseFluidHoverOptions['axis'];
   itemSelector?: string;
   highlightClassName?: string;
+  transition?: ComponentProps<typeof FluidHoverHighlight>['transition'];
 }
 
 const GROUP_SELECTOR = '[data-fluid-hover-group]';
@@ -41,6 +43,7 @@ export function FluidHover({
   axis = 'y',
   itemSelector = ITEM_SELECTOR,
   highlightClassName,
+  transition,
 }: FluidHoverProps) {
   const containerRef = useRef<HTMLElement>(null);
   const [container, setContainer] = useState<HTMLElement | null>(null);
@@ -244,7 +247,7 @@ export function FluidHover({
       <Overlay aria-hidden="true" className="contents">
         <FluidHoverHighlight
           hover={hover}
-          transition={input === 'keyboard' ? false : undefined}
+          transition={input === 'keyboard' ? false : transition}
           className={cn('-z-10 rounded-xl bg-muted/50', highlightClassName)}
         />
       </Overlay>

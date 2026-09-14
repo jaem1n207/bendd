@@ -1,4 +1,5 @@
 import { FluidHover } from '@/components/ui/fluid-hover';
+import * as highlightComponents from '@/components/ui/fluid-hover-highlight';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { StrictMode, type ComponentPropsWithRef } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -101,6 +102,56 @@ describe('FluidHover integration', () => {
     expect(
       Array.from(list.children).every(child => child instanceof HTMLLIElement)
     ).toBe(true);
+  });
+
+  it('uses group travel for pointers and snaps keyboard focus on the same highlight', async () => {
+    const highlightRender = vi.spyOn(
+      highlightComponents,
+      'FluidHoverHighlight'
+    );
+    const pointerTransition = { duration: 0.05 };
+    render(
+      <FluidHover transition={pointerTransition}>
+        <div data-testid="list">
+          <button data-fluid-hover-item="" data-row="0">
+            One
+          </button>
+          <button data-fluid-hover-item="" data-row="1">
+            Two
+          </button>
+        </div>
+      </FluidHover>
+    );
+    await frame();
+    const list = screen.getByTestId('list');
+    fireEvent.mouseMove(list, { clientX: 50, clientY: 20 });
+    await frame();
+    const highlight = list.querySelector('[data-slot="fluid-hover-highlight"]');
+
+    fireEvent.mouseMove(list, { clientX: 50, clientY: 80 });
+    await frame();
+    expect(highlightRender).toHaveBeenLastCalledWith(
+      expect.objectContaining({ transition: pointerTransition }),
+      undefined
+    );
+
+    fireEvent.keyDown(screen.getByText('Two'), { key: 'Tab' });
+    await frame();
+    expect(highlightRender).toHaveBeenLastCalledWith(
+      expect.objectContaining({ transition: false }),
+      undefined
+    );
+
+    fireEvent.mouseMove(list, { clientX: 50, clientY: 20 });
+    await frame();
+    expect(highlightRender).toHaveBeenLastCalledWith(
+      expect.objectContaining({ transition: pointerTransition }),
+      undefined
+    );
+
+    expect(list.querySelector('[data-slot="fluid-hover-highlight"]')).toBe(
+      highlight
+    );
   });
 
   it('skips disabled rows and preserves native clicks in gaps', async () => {
