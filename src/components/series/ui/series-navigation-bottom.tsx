@@ -3,7 +3,9 @@ import Link from 'next/link';
 
 import { FluidHover } from '@/components/ui/fluid-hover';
 import type { SeriesNavigationProps } from '@/components/series/types/series';
+import styles from '@/components/series/ui/series-navigation-bottom.module.css';
 import { SeriesArticleList } from '@/components/series/ui/series-article-list';
+import { cn } from '@/lib/utils';
 
 export function SeriesNavigationBottom({
   name,
@@ -47,14 +49,24 @@ export function SeriesNavigationBottom({
                 data-fluid-hover-item=""
                 href={prev.href}
                 data-webmcp-series-target="previous"
-                className="group flex flex-1 flex-col gap-1 rounded-md p-2 text-sm transition-colors"
+                className={cn(
+                  'group flex flex-1 flex-col gap-1 rounded-md p-2 text-sm transition-colors',
+                  styles.pressLink
+                )}
               >
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <ArrowLeft className="size-3" />
-                  이전
-                </span>
-                <span className="line-clamp-1 text-foreground transition-colors group-data-[fluid-hover-active]:text-primary">
-                  {prev.title}
+                <span
+                  className={cn(
+                    'flex w-full flex-col gap-1',
+                    styles.pressContent
+                  )}
+                >
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <ArrowLeft className="size-3" />
+                    이전
+                  </span>
+                  <span className="line-clamp-1 text-foreground transition-colors group-data-[fluid-hover-active]:text-primary">
+                    {prev.title}
+                  </span>
                 </span>
               </Link>
             ) : (
@@ -65,14 +77,24 @@ export function SeriesNavigationBottom({
                 data-fluid-hover-item=""
                 href={next.href}
                 data-webmcp-series-target="next"
-                className="group flex flex-1 flex-col items-end gap-1 rounded-md p-2 text-sm transition-colors"
+                className={cn(
+                  'group flex flex-1 flex-col items-end gap-1 rounded-md p-2 text-sm transition-colors',
+                  styles.pressLink
+                )}
               >
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  다음
-                  <ArrowRight className="size-3" />
-                </span>
-                <span className="line-clamp-1 text-foreground transition-colors group-data-[fluid-hover-active]:text-primary">
-                  {next.title}
+                <span
+                  className={cn(
+                    'flex w-full flex-col items-end gap-1',
+                    styles.pressContent
+                  )}
+                >
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    다음
+                    <ArrowRight className="size-3" />
+                  </span>
+                  <span className="line-clamp-1 text-foreground transition-colors group-data-[fluid-hover-active]:text-primary">
+                    {next.title}
+                  </span>
                 </span>
               </Link>
             ) : (
