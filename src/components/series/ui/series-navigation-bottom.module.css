@@ -1,0 +1,18 @@
+.pressContent {
+  transform-origin: 50% 50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pressContent {
+    transition: transform 120ms cubic-bezier(0.2, 0, 0.2, 1);
+  }
+
+  .pressLink:active:not(:focus-visible) > .pressContent {
+    transform: scale(0.99);
+    transition-duration: 0ms;
+  }
+
+  .pressLink:focus-visible > .pressContent {
+    transition: none;
+  }
+}
