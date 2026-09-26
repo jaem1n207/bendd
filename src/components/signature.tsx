@@ -21,7 +21,7 @@ export function Signature() {
           fill="none"
           strokeDasharray={28.13859748840332}
           strokeDashoffset={28.13859748840332}
-          className="animate-signature"
+          className="animate-signature motion-reduce:animate-none motion-reduce:[stroke-dashoffset:0]"
         />
       </svg>
     </Link>

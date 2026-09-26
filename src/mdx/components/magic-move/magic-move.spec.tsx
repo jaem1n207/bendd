@@ -1,9 +1,18 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { ComponentProps } from 'react';
+import { codeToKeyedTokens, type KeyedTokensInfo } from 'shiki-magic-move/core';
+import { ShikiMagicMove, ShikiMagicMoveRenderer } from 'shiki-magic-move/react';
 
 import { MDXMagicMove } from '@/mdx/components/magic-move/magic-move';
 
-const preferences = vi.hoisted(() => ({ reducedMotion: false }));
+const preferences = vi.hoisted(() => {
+  const state: { reducedMotion: boolean | undefined; copied: string } = {
+    reducedMotion: false,
+    copied: '',
+  };
+  return state;
+});
 vi.mock('@/hooks/use-prefers-reduced-motion', () => ({
   usePrefersReducedMotion: () => preferences.reducedMotion,
 }));
@@ -14,12 +23,61 @@ vi.mock('next-themes', () => ({
   useTheme: () => ({ resolvedTheme: 'light' }),
 }));
 vi.mock('shiki-magic-move/react', () => ({
-  ShikiMagicMove: ({ code }: { code: string }) => (
-    <pre data-testid="animated-code">{code}</pre>
+  ShikiMagicMove: ({
+    code,
+    options,
+  }: ComponentProps<typeof ShikiMagicMove>) => (
+    <pre
+      data-testid="animated-code"
+      data-duration={options?.duration}
+      data-stagger={options?.stagger}
+    >
+      {code}
+    </pre>
+  ),
+  ShikiMagicMoveRenderer: ({
+    tokens,
+    animate,
+    options,
+  }: ComponentProps<typeof ShikiMagicMoveRenderer>) => (
+    <pre
+      data-testid="static-code"
+      data-animate={String(animate)}
+      data-duration={options?.duration}
+      data-stagger={options?.stagger}
+      data-lines={String(tokens.lineNumbers)}
+    >
+      {tokens.code}
+    </pre>
+  ),
+}));
+vi.mock('shiki-magic-move/core', () => ({
+  codeToKeyedTokens: vi.fn(
+    (
+      _highlighter: unknown,
+      code: string,
+      options: { lang: string; theme: string },
+      lineNumbers: boolean
+    ): KeyedTokensInfo => ({
+      code,
+      hash: code,
+      lang: options.lang,
+      themeName: options.theme,
+      lineNumbers,
+      tokens: [{ key: code, content: code, offset: 0 }],
+    })
   ),
 }));
 vi.mock('@/mdx/common/copy-to-clipboard/copy-to-clipboard', () => ({
-  CopyToClipboard: () => null,
+  CopyToClipboard: ({ getValue }: { getValue: () => string }) => (
+    <button
+      onClick={() => {
+        preferences.copied = getValue();
+      }}
+    >
+      Copy
+    </button>
+  ),
 }));
 
 const snippets = [1, 2, 3].map(step => ({
@@ -56,7 +114,9 @@ const originalAnimations = Object.getOwnPropertyDescriptor(
 
 describe('MagicMove step transitions', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     preferences.reducedMotion = false;
+    preferences.copied = '';
     Object.defineProperty(HTMLElement.prototype, 'getAnimations', {
       configurable: true,
       value: () => [{ transitionProperty: 'transform' }],
@@ -121,6 +181,25 @@ describe('MagicMove step transitions', () => {
     );
   });
 
+  it('observes the replacement code when the motion preference changes', () => {
+    const observed: Element[] = [];
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        observe(element: Element) {
+          observed.push(element);
+        }
+        disconnect() {}
+      }
+    );
+    const { rerender } = render(
+      <MDXMagicMove codeSnippets={snippets} lang="typescript" />
+    );
+    preferences.reducedMotion = true;
+    rerender(<MDXMagicMove codeSnippets={snippets} lang="typescript" />);
+    expect(observed).toContain(screen.getByTestId('static-code'));
+  });
+
   it('only displays the latest step after rapid forward and backward navigation', () => {
     render(<MDXMagicMove codeSnippets={snippets} lang="typescript" />);
     nextStep();
@@ -143,7 +222,7 @@ describe('MagicMove step transitions', () => {
     preferences.reducedMotion = true;
     render(<MDXMagicMove codeSnippets={snippets} lang="typescript" />);
     nextStep();
-    expect(screen.getByTestId('animated-code').textContent).toBe(
+    expect(screen.getByTestId('static-code').textContent).toBe(
       snippets[1].content
     );
   });
@@ -158,7 +237,7 @@ describe('MagicMove step transitions', () => {
     );
     preferences.reducedMotion = true;
     rerender(<MDXMagicMove codeSnippets={snippets} lang="typescript" />);
-    expect(screen.getByTestId('animated-code').textContent).toBe(
+    expect(screen.getByTestId('static-code').textContent).toBe(
       snippets[1].content
     );
   });
@@ -190,5 +269,56 @@ describe('MagicMove step transitions', () => {
     expect(screen.getByTestId('animated-code').textContent).toBe(
       snippets[1].content
     );
+  });
+  it.each([true, undefined])(
+    'uses static highlighted tokens for preference %s',
+    preference => {
+      preferences.reducedMotion = preference;
+      render(<MDXMagicMove codeSnippets={snippets} lang="typescript" />);
+      const code = screen.getByTestId('static-code');
+      expect(code.textContent).toBe(snippets[0].content);
+      expect(code.dataset).toMatchObject({
+        animate: 'false',
+        duration: '0',
+        stagger: '0',
+        lines: 'true',
+      });
+      expect(codeToKeyedTokens).toHaveBeenCalledWith(
+        expect.anything(),
+        snippets[0].content,
+        { lang: 'typescript', theme: 'github-light' },
+        true
+      );
+      expect(screen.queryByTestId('animated-code')).toBeNull();
+    }
+  );
+
+  it('keeps normal timing without calculating static tokens', () => {
+    render(<MDXMagicMove codeSnippets={snippets} lang="typescript" />);
+    expect(screen.getByTestId('animated-code').dataset).toMatchObject({
+      duration: '750',
+      stagger: '3',
+    });
+    expect(codeToKeyedTokens).not.toHaveBeenCalled();
+  });
+
+  it('replaces active tokens while preserving the copy control and current code', () => {
+    const { rerender } = render(
+      <MDXMagicMove codeSnippets={snippets} lang="typescript" />
+    );
+    nextStep();
+    finishSlide(2);
+    const copy = screen.getByRole('button', { name: 'Copy' });
+    copy.focus();
+    preferences.reducedMotion = true;
+    rerender(<MDXMagicMove codeSnippets={snippets} lang="typescript" />);
+    expect(screen.queryByTestId('animated-code')).toBeNull();
+    expect(screen.getByTestId('static-code').textContent).toBe(
+      snippets[1].content
+    );
+    expect(screen.getByRole('button', { name: 'Copy' })).toBe(copy);
+    expect(document.activeElement).toBe(copy);
+    fireEvent.click(copy);
+    expect(preferences.copied).toBe(snippets[1].content);
   });
 });

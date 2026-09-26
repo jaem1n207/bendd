@@ -9,6 +9,7 @@ import {
   forwardRef,
   isValidElement,
   useCallback,
+  useEffect,
   useRef,
 } from 'react';
 
@@ -49,7 +50,13 @@ export const NavigationAnimateTrigger = forwardRef<
     ref
   ) => {
     const mousex = useMotionValue(Infinity);
-    const reduceMotion = usePrefersReducedMotion();
+    const allowMotion = usePrefersReducedMotion() === false;
+
+    useEffect(() => {
+      if (!allowMotion) {
+        mousex.set(Infinity);
+      }
+    }, [allowMotion, mousex]);
     const scrollRef = useRef<HTMLDivElement | null>(null);
     useScrollFade(scrollRef, 'x', Children.count(children));
 
@@ -67,13 +74,15 @@ export const NavigationAnimateTrigger = forwardRef<
 
     const renderChildren = () => {
       return Children.map(children, (child: ReactNode) => {
-        if (!isValidElement(child)) return child;
+        if (!isValidElement<ItemMotionProps>(child)) {
+          return child;
+        }
 
         return cloneElement(child, {
           mousex: mousex,
           magnification: magnification,
           distance: distance,
-        } as ItemMotionProps);
+        });
       });
     };
 
@@ -86,7 +95,7 @@ export const NavigationAnimateTrigger = forwardRef<
         <motion.div
           ref={setRef}
           onMouseMove={e => {
-            if (!reduceMotion) {
+            if (allowMotion) {
               mousex.set(e.pageX);
             }
           }}

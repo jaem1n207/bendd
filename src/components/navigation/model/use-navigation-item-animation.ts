@@ -1,13 +1,15 @@
 import { useAnimation, useSpring, useTransform } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
 import useSound from 'use-sound';
 
 import { useSoundStore } from '@/components/sound';
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 import {
   DEFAULT_DISTANCE,
   DEFAULT_ITEM_SIZE,
   DEFAULT_MAGNIFICATION,
-} from '../consts/size';
-import type { ItemMotionProps } from '../types/motion';
+} from '@/components/navigation/consts/size';
+import type { ItemMotionProps } from '@/components/navigation/types/motion';
 
 type UseNavigationItemAnimationProps = {
   bounds: { x: number; width: number };
@@ -24,6 +26,21 @@ export const useNavigationItemAnimation = ({
   name,
 }: UseNavigationItemAnimationProps) => {
   const controls = useAnimation();
+  const allowMotion = usePrefersReducedMotion() === false;
+  const runGeneration = useRef(0);
+  const [hasPointerMoved, setHasPointerMoved] = useState(false);
+
+  useEffect(() => {
+    if (!allowMotion) {
+      setHasPointerMoved(false);
+      return;
+    }
+    return mousex?.on('change', position => {
+      if (Number.isFinite(position)) {
+        setHasPointerMoved(true);
+      }
+    });
+  }, [allowMotion, mousex]);
 
   const isSoundEnabled = useSoundStore(state => state.isSoundEnabled);
   const [playClickSound] = useSound('/sounds/blop.mp3', {
@@ -38,7 +55,7 @@ export const useNavigationItemAnimation = ({
   const widthSync = useTransform(
     distanceCalc,
     [-distance, 0, distance],
-    [size, magnification, size]
+    [size, allowMotion ? magnification : size, size]
   );
   const width = useSpring(widthSync, {
     mass: 0.1,
@@ -46,11 +63,37 @@ export const useNavigationItemAnimation = ({
     damping: 12,
   });
 
+  useEffect(() => {
+    runGeneration.current += 1;
+    if (!allowMotion) {
+      controls.stop();
+      controls.set({ top: 0 });
+      width.jump(size);
+    }
+
+    return () => {
+      runGeneration.current += 1;
+      controls.stop();
+    };
+  }, [allowMotion, controls, size, width]);
+
   const handleClick = async () => {
     name !== 'Toggle sound' && playClickSound();
+    const generation = ++runGeneration.current;
+    if (!allowMotion) {
+      return;
+    }
+
     await controls.start({ top: -DEFAULT_ITEM_SIZE / 2 });
-    controls.start({ top: 0 });
+    if (generation === runGeneration.current) {
+      void controls.start({ top: 0 });
+    }
   };
 
-  return { width, handleClick, controls };
+  return {
+    width: hasPointerMoved ? width : size,
+    handleClick,
+    controls,
+    allowMotion,
+  };
 };
