@@ -23,6 +23,7 @@ const config = {
     },
     extend: {
       transitionTimingFunction: {
+        'out-quint': 'cubic-bezier(0.23, 1, 0.32, 1)',
         'in-quad': 'cubic-bezier(.55, .085, .68, .53)',
         'in-cubic': 'cubic-bezier(.550, .055, .675, .19)',
         'in-quart': 'cubic-bezier(.895, .03, .685, .22)',

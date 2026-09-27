@@ -30,12 +30,13 @@ export function NavigationItemTooltip({
   ...props
 }: NavigationItemTooltipProps) {
   const [ref, bounds] = useMeasure();
-  const { width, handleClick, controls } = useNavigationItemAnimation({
-    name,
-    size: DEFAULT_ITEM_SIZE,
-    bounds,
-    ...props,
-  });
+  const { width, handleClick, controls, allowMotion } =
+    useNavigationItemAnimation({
+      name,
+      size: DEFAULT_ITEM_SIZE,
+      bounds,
+      ...props,
+    });
 
   return (
     <Tooltip delayDuration={50}>
@@ -48,7 +49,7 @@ export function NavigationItemTooltip({
             className
           )}
           style={
-            isTouchDevice
+            isTouchDevice || !allowMotion
               ? {
                   width: DEFAULT_ITEM_SIZE,
                 }
@@ -56,7 +57,8 @@ export function NavigationItemTooltip({
           }
           animate={controls}
           initial={{ top: 0 }}
-          whileTap={{ top: 8 }}
+          whileTap={allowMotion ? { top: 8 } : undefined}
+          transition={allowMotion ? undefined : { duration: 0 }}
           onTap={handleClick}
           tabIndex={-1}
         >

@@ -1,6 +1,9 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
-const ARTICLE = `http://127.0.0.1:${process.env.CI ? 3001 : 3000}/article/immediate-motion-component`;
+const baseURL =
+  process.env.PLAYWRIGHT_BASE_URL ??
+  `http://127.0.0.1:${process.env.CI ? 3001 : 3000}`;
+const ARTICLE = `${baseURL}/article/immediate-motion-component`;
 const FOURTH = '애니메이션 관련 속성 제거';
 const FIFTH = '새로운 React 엘리먼트 구성';
 
@@ -13,12 +16,14 @@ async function openExample(page: Page) {
   await expect(root.locator('pre')).toContainText('shouldRemoveProp');
   await expect
     .poll(() =>
-      root.evaluate(
-        element =>
-          element
-            .getAnimations({ subtree: true })
-            .filter(animation => animation.playState === 'running').length
-      )
+      root
+        .locator('pre, [aria-hidden="false"]')
+        .evaluateAll(
+          elements =>
+            elements
+              .flatMap(element => element.getAnimations({ subtree: true }))
+              .filter(animation => animation.playState === 'running').length
+        )
     )
     .toBe(0);
   return root;
@@ -68,9 +73,13 @@ test('keyboard selection updates description and code without motion', async ({
     timeout: 250,
   });
   expect(
-    await root.evaluate(
-      element => element.getAnimations({ subtree: true }).length
-    )
+    await root
+      .locator('pre, [aria-hidden="false"]')
+      .evaluateAll(
+        elements =>
+          elements.flatMap(element => element.getAnimations({ subtree: true }))
+            .length
+      )
   ).toBe(0);
   const select = root.getByRole('combobox');
   await select.focus();
