@@ -31,3 +31,6 @@ export enum DockMotionMode {
   Animated = 'animated',
   Static = 'static',
 }
+
+export const DOCK_STORAGE_KEY = 'dock-preferences';
+export const DOCK_INITIAL_SIZE_PROPERTY = '--site-dock-size';

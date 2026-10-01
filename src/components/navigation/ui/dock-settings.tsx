@@ -10,8 +10,10 @@ import {
   DOCK_MIN_MAGNIFICATION,
   DOCK_MIN_SIZE,
   DockMotionMode,
+  DockInput,
   DockSetting,
 } from '@/components/navigation/consts/dock';
+import { trackDockInput } from '@/components/navigation/lib/dock-input';
 import type { DockPreferences } from '@/components/navigation/lib/dock-geometry';
 import { DockSettingSlider } from '@/components/navigation/ui/dock-setting-slider';
 import styles from '@/components/navigation/ui/dock.module.css';
@@ -23,6 +25,7 @@ export interface DockSettingsAnchor {
   x: number;
   y: number;
   trigger: HTMLElement;
+  input: DockInput;
 }
 
 export function DockSettings({
@@ -32,6 +35,7 @@ export function DockSettings({
   mode,
   onPreview,
   onCommit,
+  onReset,
   onClose,
 }: {
   id: string;
@@ -40,6 +44,7 @@ export function DockSettings({
   mode: DockMotionMode;
   onPreview: (setting: DockSetting, value: number | null) => void;
   onCommit: (setting: DockSetting, value: number) => void;
+  onReset: () => void;
   onClose: () => void;
 }) {
   const panel = useRef<HTMLElement>(null);
@@ -73,9 +78,17 @@ export function DockSettings({
       });
     };
     place();
-    panel.current?.querySelector('input')?.focus({ preventScroll: true });
+    const releaseInput = panel.current
+      ? trackDockInput(panel.current, anchor.input)
+      : undefined;
+    if (anchor.input === DockInput.Keyboard) {
+      panel.current?.querySelector('input')?.focus({ preventScroll: true });
+    }
     window.addEventListener('resize', place);
-    return () => window.removeEventListener('resize', place);
+    return () => {
+      releaseInput?.();
+      window.removeEventListener('resize', place);
+    };
   }, [anchor]);
   useEffect(() => {
     if (!isPresent) {
@@ -140,6 +153,7 @@ export function DockSettings({
         transition: { duration: animated ? 0.1 : 0 },
       }}
       data-motion={mode}
+      data-dock-input={anchor.input}
     >
       <div className={styles.settingsHeader}>
         <strong>Dock 설정</strong>
@@ -176,7 +190,12 @@ export function DockSettings({
         onPreview={value => onPreview(DockSetting.Magnification, value)}
         onCommit={value => onCommit(DockSetting.Magnification, value)}
       />
-      <p className={styles.settingsHint}>가리켜 미리보기 · 눌러 적용</p>
+      <div className={styles.settingsFooter}>
+        <button type="button" onClick={onReset}>
+          기본값으로 복원
+        </button>
+        <p>클릭하여 적용</p>
+      </div>
     </motion.section>
   );
 }

@@ -181,7 +181,10 @@ export function DockSettingSlider({
         <div
           className={styles.valueTooltip}
           data-visible={active}
-          style={{ left: `${progress * 100}%` }}
+          style={{
+            left: `${progress * 100}%`,
+            translate: `${-progress * 100}% 0`,
+          }}
         >
           <RollingValue
             value={format(shown)}

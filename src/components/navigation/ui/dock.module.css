@@ -110,10 +110,13 @@
   transition: background 140ms ease-out;
 }
 .separator:hover .separatorLine,
-.separator:focus-visible .separatorLine {
+.dock[data-dock-input='keyboard'] .separator:focus .separatorLine {
   background: hsl(var(--foreground) / 0.6);
 }
-.separator:focus-visible {
+.separator:focus {
+  outline: none;
+}
+.dock[data-dock-input='keyboard'] .separator:focus {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
 }
@@ -234,7 +237,10 @@
 .settingsHeader button:hover {
   background: hsl(var(--muted));
 }
-.settingsHeader button:focus-visible {
+.settingsHeader button:focus {
+  outline: none;
+}
+.settingsPanel[data-dock-input='keyboard'] .settingsHeader button:focus {
   outline: 2px solid hsl(var(--primary));
 }
 .settingRow + .settingRow {
@@ -291,7 +297,7 @@
   cursor: ew-resize;
   touch-action: none;
 }
-.sliderTrack:has(input:focus-visible) {
+.settingsPanel[data-dock-input='keyboard'] .sliderTrack:has(input:focus) {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 5px;
   border-radius: 3px;
@@ -299,7 +305,6 @@
 .valueTooltip {
   position: absolute;
   top: -23px;
-  translate: -50% 0;
   transform: translateY(4px);
   padding: 5px 7px;
   border: 1px solid hsl(var(--border));
@@ -349,15 +354,39 @@
   color: hsl(var(--muted-foreground));
   font-size: 10px;
 }
-.settingsHint {
+.settingsFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-top: 12px;
   padding-top: 8px;
   border-top: 1px solid hsl(var(--border));
   color: hsl(var(--muted-foreground));
   font-size: 10px;
-  text-align: center;
+}
+.settingsFooter button {
+  min-height: 32px;
+  margin: -4px 0 -4px -6px;
+  padding-inline: 6px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: hsl(var(--foreground) / 0.76);
+}
+.settingsFooter button:hover {
+  background: hsl(var(--muted));
+}
+.settingsFooter button:focus {
+  outline: none;
+}
+.settingsPanel[data-dock-input='keyboard'] .settingsFooter button:focus {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
 }
 @media (pointer: coarse) {
+  .settingsFooter button {
+    min-height: 44px;
+  }
   .dock {
     --dock-item-size: max(44px, var(--dock-size));
   }

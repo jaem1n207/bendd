@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import { DOCK_STORAGE_KEY } from '@/components/navigation/consts/dock';
+
 import {
   clampDockSize,
   clampMagnification,
@@ -24,7 +26,7 @@ export const useDockPreferences = create<DockState>()(
       reset: () => set(readDockPreferences(null)),
     }),
     {
-      name: 'dock-preferences',
+      name: DOCK_STORAGE_KEY,
       version: 2,
       migrate: persisted => ({
         ...readDockPreferences(null),

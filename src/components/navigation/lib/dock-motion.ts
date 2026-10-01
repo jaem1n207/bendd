@@ -63,6 +63,13 @@ export function createDockMotion({
   let tooltipX = 0;
   let tooltipVelocity = 0;
   let pointer: number | null = null;
+  let hovering = false;
+  let hoverPeak = 0;
+  let lastPointer: { clientX: number; clientY: number } | null = null;
+  const hoverMedia =
+    typeof window.matchMedia === 'function'
+      ? window.matchMedia('(hover: hover) and (pointer: fine)')
+      : null;
 
   const tipTarget = () =>
     centers[active] + getDockOffsets(growth)[active] - scrollLeft;
@@ -89,7 +96,7 @@ export function createDockMotion({
       hoverArea.style.transform = scale;
     }
     if (active >= 0) {
-      tooltip.style.transform = `translate3d(${tooltipX}px, ${-Math.max(0, ...growth)}px, 0)`;
+      tooltip.style.transform = `translate3d(${tooltipX}px, ${-Math.max(hoverPeak, ...growth)}px, 0)`;
     }
   };
   const stop = () => {
@@ -204,6 +211,10 @@ export function createDockMotion({
       pointer: mode === DockMotionMode.Animated && !overflow ? pointer : null,
       budget,
     });
+    if (hovering) {
+      // 좌우 이동 중 유지 경계와 툴팁이 포인터 아래로 내려오지 않게 한다.
+      hoverPeak = Math.max(hoverPeak, ...growth, ...targets);
+    }
     if (interaction === DockInteraction.Preview) {
       stop();
       growth = [...targets];
@@ -248,16 +259,37 @@ export function createDockMotion({
     );
     const center = rect.left + width / 2;
     budget = Math.max(0, 2 * Math.min(center - left, right - center) - width);
+    hoverPeak = 0;
     reset();
     if (interaction === DockInteraction.Preview) {
       pointer = centers[Math.floor(centers.length / 2)] ?? null;
     }
     updateTargets();
   };
-  const leave = () => {
-    if (interaction !== DockInteraction.Idle) {
+  const insideHold = (point: { clientX: number; clientY: number }) => {
+    if (!hovering) {
+      return false;
+    }
+    const rect = root.getBoundingClientRect();
+    const expansion = Math.max(
+      growth.reduce((sum, value) => sum + value, 0),
+      targets.reduce((sum, value) => sum + value, 0)
+    );
+    // 툴팁의 Dock 쪽 경계는 root.top - hoverPeak이며 툴팁 자체는 제외한다.
+    return (
+      point.clientY > rect.top - Math.max(hoverPeak, ...growth) &&
+      point.clientY <= rect.bottom &&
+      point.clientX >= rect.left - expansion / 2 &&
+      point.clientX <= rect.right + expansion / 2
+    );
+  };
+  const leave = (event?: PointerEvent) => {
+    if (interaction !== DockInteraction.Idle || (event && insideHold(event))) {
       return;
     }
+    hovering = false;
+    hoverPeak = 0;
+    lastPointer = null;
     pointer = null;
     select(-1, DockInput.Static);
     updateTargets();
@@ -265,12 +297,30 @@ export function createDockMotion({
   const move = (event: PointerEvent) => {
     if (
       event.pointerType === 'touch' ||
+      hoverMedia?.matches === false ||
       interaction !== DockInteraction.Idle ||
       root.dataset.dockResizing === 'true'
     ) {
       return;
     }
     const element = event.target instanceof Element ? event.target : null;
+    const ownTarget = element !== null && root.contains(element);
+    if (!ownTarget) {
+      if (!hovering) {
+        return;
+      }
+      if (
+        element?.closest(
+          '[role="dialog"], [role="menu"], [role="listbox"], [data-dock]'
+        ) ||
+        !insideHold(event)
+      ) {
+        leave();
+        return;
+      }
+    }
+    hovering = true;
+    lastPointer = { clientX: event.clientX, clientY: event.clientY };
     if (element?.closest('[data-dock-separator]')) {
       select(-1, DockInput.Static);
       stop();
@@ -296,6 +346,22 @@ export function createDockMotion({
     select(index, DockInput.Pointer);
     updateTargets();
   };
+  const outsideMove = (event: PointerEvent) => {
+    if (!(event.target instanceof Node) || !root.contains(event.target)) {
+      move(event);
+    }
+  };
+  const outsideDown = (event: PointerEvent) => {
+    if (!(event.target instanceof Node) || !root.contains(event.target)) {
+      leave();
+    }
+  };
+  const pageScroll = () => {
+    if (lastPointer && !insideHold(lastPointer)) {
+      leave();
+    }
+  };
+  const leaveDocument = () => leave();
   const keydown = (event: KeyboardEvent) => {
     if (
       interaction !== DockInteraction.Idle ||
@@ -314,6 +380,9 @@ export function createDockMotion({
     ) {
       return;
     }
+    hovering = false;
+    hoverPeak = 0;
+    lastPointer = null;
     pointer = null;
     reset();
     select(
@@ -338,6 +407,9 @@ export function createDockMotion({
     ) {
       return;
     }
+    hovering = false;
+    hoverPeak = 0;
+    lastPointer = null;
     pointer = null;
     reset();
     select(
@@ -356,6 +428,9 @@ export function createDockMotion({
     }
   };
   const deactivate = () => {
+    hovering = false;
+    hoverPeak = 0;
+    lastPointer = null;
     pointer = null;
     select(-1, DockInput.Static);
     reset();
@@ -385,6 +460,13 @@ export function createDockMotion({
   root.addEventListener('focusin', focus);
   root.addEventListener('focusout', blur);
   document.addEventListener('keydown', keydown, true);
+  document.addEventListener('pointermove', outsideMove);
+  document.addEventListener('pointerdown', outsideDown);
+  document.addEventListener('pointerleave', leaveDocument);
+  document.addEventListener('scroll', pageScroll, {
+    capture: true,
+    passive: true,
+  });
   window.addEventListener('resize', measure);
   window.addEventListener('blur', deactivate);
   document.addEventListener('visibilitychange', visibility);
@@ -398,6 +480,10 @@ export function createDockMotion({
     root.removeEventListener('focusin', focus);
     root.removeEventListener('focusout', blur);
     document.removeEventListener('keydown', keydown, true);
+    document.removeEventListener('pointermove', outsideMove);
+    document.removeEventListener('pointerdown', outsideDown);
+    document.removeEventListener('pointerleave', leaveDocument);
+    document.removeEventListener('scroll', pageScroll, true);
     window.removeEventListener('resize', measure);
     window.removeEventListener('blur', deactivate);
     document.removeEventListener('visibilitychange', visibility);

@@ -2,6 +2,7 @@ import {
   DOCK_MAX_SIZE,
   DOCK_MIN_SIZE,
   DOCK_RESIZE_SENSITIVITY,
+  DockInput,
 } from '@/components/navigation/consts/dock';
 import { clampDockSize } from '@/components/navigation/lib/dock-geometry';
 
@@ -36,7 +37,7 @@ export function createDockResize({
   size: number;
   onCommit: (size: number) => void;
   onPreview?: (size: number) => void;
-  onOpen?: (handle: HTMLElement) => void;
+  onOpen?: (handle: HTMLElement, input: DockInput) => void;
 }) {
   let current = clampDockSize(size);
   let pending = current;
@@ -148,7 +149,7 @@ export function createDockResize({
     pending = tapped ? active.startSize : getSize(event.clientY);
     finish(ResizeEnd.Commit);
     if (tapped && active.touch) {
-      onOpen(active.handle);
+      onOpen(active.handle, DockInput.Pointer);
     }
   };
   const lost = (event: PointerEvent) => {
@@ -171,7 +172,7 @@ export function createDockResize({
       event.preventDefault();
       cancel();
       if (event.currentTarget instanceof HTMLElement) {
-        onOpen(event.currentTarget);
+        onOpen(event.currentTarget, DockInput.Keyboard);
       }
       return;
     }
@@ -201,7 +202,7 @@ export function createDockResize({
     event.preventDefault();
     cancel();
     if (event.currentTarget instanceof HTMLElement) {
-      onOpen(event.currentTarget);
+      onOpen(event.currentTarget, DockInput.Pointer);
     }
   };
   draw(current);

@@ -276,3 +276,99 @@ test('resumes pointer preview after a keyboard commit at the same pointer positi
   emit(slider, 'pointerout', { x: 50 });
   expect(dock.style.getPropertyValue('--dock-size')).toBe('55px');
 });
+
+test('resets both saved settings once without closing or moving the panel', () => {
+  const { panel, slider, dock } = openSettings();
+  fireEvent.change(slider, { target: { value: '60' } });
+  fireEvent.change(within(panel).getByRole('slider', { name: '아이콘 확대' }), {
+    target: { value: '1.9' },
+  });
+  const position = [panel.style.left, panel.style.top];
+  const writes = vi.spyOn(Storage.prototype, 'setItem');
+  fireEvent.click(
+    within(panel).getByRole('button', { name: '기본값으로 복원' })
+  );
+  expect(useDockPreferences.getState()).toMatchObject({
+    size: 40,
+    magnification: 1.6,
+  });
+  expect(dock.style.getPropertyValue('--dock-size')).toBe('40px');
+  expect([panel.style.left, panel.style.top]).toEqual(position);
+  expect(screen.getByRole('dialog', { name: 'Dock 설정' })).toBe(panel);
+  expect(within(panel).getByText('클릭하여 적용')).toBeDefined();
+  expect(writes).toHaveBeenCalledOnce();
+});
+
+test('opens settings without stealing pointer focus but focuses the slider for keyboard entry', () => {
+  const { panel, slider, handle } = openSettings();
+  expect(document.activeElement).not.toBe(slider);
+  fireEvent.keyDown(panel, { key: 'Escape' });
+  fireEvent.keyDown(handle, { key: 'Enter' });
+  expect(document.activeElement).toBe(
+    screen.getByRole('slider', { name: 'Dock 크기' })
+  );
+});
+
+test('keeps focus while switching the visible focus mode between mouse and keyboard', () => {
+  const { dock, handle, panel, slider } = openSettings();
+  emit(slider, 'pointerdown', { x: 300 });
+  emit(slider, 'pointerup', { x: 300 });
+  expect(document.activeElement).toBe(slider);
+  expect(panel.dataset.dockInput).toBe('pointer');
+  expect(dock.dataset.dockInput).toBe('pointer');
+  fireEvent.keyDown(slider, { key: 'ArrowRight' });
+  expect(document.activeElement).toBe(slider);
+  expect(panel.dataset.dockInput).toBe('keyboard');
+  expect(dock.dataset.dockInput).toBe('keyboard');
+  emit(slider, 'pointerdown', { x: 320 });
+  emit(slider, 'pointerup', { x: 320 });
+  expect(document.activeElement).toBe(slider);
+  expect(panel.dataset.dockInput).toBe('pointer');
+  fireEvent.keyDown(slider, { key: 'Escape' });
+  expect(document.activeElement).toBe(handle);
+  expect(dock.dataset.dockInput).toBe('keyboard');
+  capture(handle);
+  emit(handle, 'pointerdown');
+  expect(document.activeElement).toBe(handle);
+  expect(dock.dataset.dockInput).toBe('pointer');
+  emit(handle, 'pointerup');
+});
+
+test('restores only the demo defaults and leaves saved site preferences alone', () => {
+  const { dock, panel } = openSettings();
+  fireEvent.change(within(panel).getByRole('slider', { name: 'Dock 크기' }), {
+    target: { value: '56' },
+  });
+  fireEvent.change(within(panel).getByRole('slider', { name: '아이콘 확대' }), {
+    target: { value: '1.9' },
+  });
+  fireEvent.keyDown(panel, { key: 'Escape' });
+  render(<DockDemo />);
+  const demo = screen.getByRole('group', { name: 'Craft Dock 데모' });
+  const separator = within(demo).getByRole('slider', {
+    name: 'Dock 크기 조절',
+  });
+  fireEvent.keyDown(separator, { key: 'End' });
+  fireEvent.contextMenu(separator);
+  const settings = screen.getByRole('dialog', { name: 'Dock 설정' });
+  fireEvent.change(
+    within(settings).getByRole('slider', { name: '아이콘 확대' }),
+    { target: { value: '2' } }
+  );
+  const writes = vi.spyOn(Storage.prototype, 'setItem');
+  fireEvent.click(
+    within(settings).getByRole('button', { name: '기본값으로 복원' })
+  );
+  expect(separator.getAttribute('aria-valuenow')).toBe('40');
+  expect(
+    within(settings)
+      .getByRole('slider', { name: '아이콘 확대' })
+      .getAttribute('aria-valuetext')
+  ).toBe('1.6×');
+  expect(dock.style.getPropertyValue('--dock-size')).toBe('56px');
+  expect(useDockPreferences.getState()).toMatchObject({
+    size: 56,
+    magnification: 1.9,
+  });
+  expect(writes).not.toHaveBeenCalled();
+});

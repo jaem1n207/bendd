@@ -6,7 +6,8 @@ import {
 } from '@/components/navigation/consts/dock';
 import { createDockMotion } from '@/components/navigation/lib/dock-motion';
 
-function fixture(mode = DockMotionMode.Animated) {
+function fixture(mode = DockMotionMode.Animated, size = 40) {
+  const width = size * 3 + 32;
   const root = document.createElement('div');
   root.innerHTML = `<div data-dock-backdrop></div><div data-dock-viewport><div data-dock-rail>${['Home', 'Craft', 'Article'].map(name => `<div data-navigation-item data-dock-label="${name}"><button aria-describedby="help">${name}</button></div>`).join('')}</div></div><div data-dock-tooltip></div>`;
   document.body.append(root);
@@ -15,20 +16,22 @@ function fixture(mode = DockMotionMode.Animated) {
   if (!rail || !viewport) {
     throw new Error('Incomplete Dock fixture');
   }
-  Object.defineProperty(rail, 'offsetWidth', { value: 152 });
+  Object.defineProperty(rail, 'offsetWidth', { value: width });
   Object.defineProperty(viewport, 'clientWidth', {
-    value: 152,
+    value: width,
     configurable: true,
   });
-  root.getBoundingClientRect = () => new DOMRect(200, 500, 152, 60);
+  root.getBoundingClientRect = () => new DOMRect(200, 500, width, size + 20);
   rail.getBoundingClientRect = () =>
-    new DOMRect(200 - viewport.scrollLeft, 500, 152, 60);
+    new DOMRect(200 - viewport.scrollLeft, 500, width, size + 20);
   const items = Array.from(
     root.querySelectorAll<HTMLElement>('[data-navigation-item]')
   );
   items.forEach((item, index) => {
-    Object.defineProperty(item, 'offsetLeft', { value: 8 + index * 48 });
-    Object.defineProperty(item, 'offsetWidth', { value: 40 });
+    Object.defineProperty(item, 'offsetLeft', {
+      value: 8 + index * (size + 8),
+    });
+    Object.defineProperty(item, 'offsetWidth', { value: size });
   });
   const tooltip = vi.fn();
   const dispose = createDockMotion({
@@ -41,7 +44,8 @@ function fixture(mode = DockMotionMode.Animated) {
     items[index].dispatchEvent(
       new MouseEvent('pointermove', {
         bubbles: true,
-        clientX: 228 + index * 48 - viewport.scrollLeft,
+        clientX: 208 + size / 2 + index * (size + 8) - viewport.scrollLeft,
+        clientY: 508 + size / 2,
       })
     );
   return { root, items, viewport, tooltip, dispose, move };
@@ -116,6 +120,177 @@ describe('Dock magnification and shared tooltip lifecycle', () => {
     expect(frames.size).toBe(0);
     dock.dispose();
   });
+  test('keeps magnification above the Dock through horizontal motion, but releases at the tooltip', () => {
+    const dock = fixture();
+    dock.move(1);
+    settle();
+    const normal = dock.items[1].style.transform;
+    dock.root.dispatchEvent(
+      new MouseEvent('pointerleave', {
+        clientX: 276,
+        clientY: 490,
+      })
+    );
+    document.body.dispatchEvent(
+      new MouseEvent('pointermove', {
+        bubbles: true,
+        clientX: 276,
+        clientY: 490,
+      })
+    );
+    settle();
+    expect(dock.items[1].style.transform).toBe(normal);
+    expect(dock.tooltip).toHaveBeenLastCalledWith(
+      expect.objectContaining({ name: 'Craft' })
+    );
+    document.body.dispatchEvent(
+      new MouseEvent('pointermove', {
+        bubbles: true,
+        clientX: 324,
+        clientY: 490,
+      })
+    );
+    settle();
+    expect(dock.items[2].style.transform).toContain('scale(1.6)');
+    expect(dock.tooltip).toHaveBeenLastCalledWith(
+      expect.objectContaining({ name: 'Article' })
+    );
+    document.body.dispatchEvent(
+      new MouseEvent('pointermove', {
+        bubbles: true,
+        clientX: 228,
+        clientY: 490,
+      })
+    );
+    settle();
+    expect(dock.items[0].style.transform).toContain('scale(1.6)');
+    expect(dock.tooltip).toHaveBeenLastCalledWith(
+      expect.objectContaining({ name: 'Home', direction: -1 })
+    );
+    // The tooltip ends at root.top - growth: 500 - 24 = 476.
+    document.body.dispatchEvent(
+      new MouseEvent('pointermove', {
+        bubbles: true,
+        clientX: 228,
+        clientY: 476,
+      })
+    );
+    settle();
+    expect(dock.items.every(item => item.style.transform === 'none')).toBe(
+      true
+    );
+    expect(dock.tooltip).toHaveBeenLastCalledWith(null);
+    dock.dispose();
+  });
+
+  test.each([
+    [32, 1],
+    [32, 2],
+    [40, 1.6],
+    [64, 2],
+  ])(
+    'derives the holding height from %ipx at %s times magnification',
+    (size, magnification) => {
+      const dock = fixture(DockMotionMode.Animated, size);
+      dock.dispose.setPreferences({ size, magnification });
+      dock.move(1);
+      settle();
+      const original = dock.items[1].style.transform;
+      const edge = 500 - size * (magnification - 1);
+      const x = 216 + size * 1.5;
+      dock.root.dispatchEvent(
+        new MouseEvent('pointerleave', { clientX: x, clientY: edge + 1 })
+      );
+      document.body.dispatchEvent(
+        new MouseEvent('pointermove', {
+          bubbles: true,
+          clientX: x,
+          clientY: edge + 1,
+        })
+      );
+      settle();
+      expect(dock.items[1].style.transform).toBe(original);
+      document.body.dispatchEvent(
+        new MouseEvent('pointermove', {
+          bubbles: true,
+          clientX: x,
+          clientY: edge,
+        })
+      );
+      settle();
+      expect(dock.tooltip).toHaveBeenLastCalledWith(null);
+      expect(dock.items.every(item => item.style.transform === 'none')).toBe(
+        true
+      );
+      dock.dispose();
+    }
+  );
+
+  test('keeps the current spring state when reversing above the Dock', () => {
+    const dock = fixture();
+    dock.move(0);
+    tick();
+    const before = dock.items.map(item => item.style.transform);
+    document.body.dispatchEvent(
+      new MouseEvent('pointermove', {
+        bubbles: true,
+        clientX: 324,
+        clientY: 490,
+      })
+    );
+    expect(dock.items.map(item => item.style.transform)).toEqual(before);
+    tick();
+    const reversing = dock.items.map(item => item.style.transform);
+    document.body.dispatchEvent(
+      new MouseEvent('pointermove', {
+        bubbles: true,
+        clientX: 228,
+        clientY: 490,
+      })
+    );
+    expect(dock.items.map(item => item.style.transform)).toEqual(reversing);
+    settle();
+    expect(dock.items[0].style.transform).toContain('scale(1.6)');
+    dock.dispose();
+  });
+
+  test('yields to another panel without intercepting its input', () => {
+    const dock = fixture();
+    const panel = document.createElement('div');
+    panel.setAttribute('role', 'dialog');
+    document.body.append(panel);
+    dock.move(1);
+    settle();
+    const event = new MouseEvent('pointermove', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 276,
+      clientY: 490,
+    });
+    panel.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+    settle();
+    expect(dock.tooltip).toHaveBeenLastCalledWith(null);
+    dock.dispose();
+  });
+
+  test('does not activate from the upper region before entering the Dock', () => {
+    const dock = fixture();
+    document.body.dispatchEvent(
+      new MouseEvent('pointermove', {
+        bubbles: true,
+        clientX: 276,
+        clientY: 490,
+      })
+    );
+    settle();
+    expect(dock.tooltip).not.toHaveBeenCalled();
+    expect(dock.items.every(item => item.style.transform === 'none')).toBe(
+      true
+    );
+    dock.dispose();
+  });
+
   test('preserves other descriptions and moves the tooltip with the enlarged item', () => {
     const dock = fixture();
     dock.move(1);

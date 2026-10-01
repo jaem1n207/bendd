@@ -15,6 +15,7 @@ import { createPortal } from 'react-dom';
 
 import {
   DOCK_DEFAULT_MAGNIFICATION,
+  DockInput,
   DockInteraction,
   DockMotionMode,
   DockSetting,
@@ -27,6 +28,7 @@ import {
   createDockMotion,
   type DockTooltipState,
 } from '@/components/navigation/lib/dock-motion';
+import { trackDockInput } from '@/components/navigation/lib/dock-input';
 import { createDockResize } from '@/components/navigation/lib/dock-resize';
 import { DockContext } from '@/components/navigation/model/dock-context';
 import {
@@ -41,16 +43,20 @@ import { useScrollFade } from '@/hooks/use-scroll-fade';
 export function DockSurface({
   children,
   size,
+  initialSizeStyle,
   magnification = DOCK_DEFAULT_MAGNIFICATION,
   onSizeChange,
   onMagnificationChange,
+  onReset,
   label = 'Dock',
 }: {
   children: ReactNode;
   size: number;
+  initialSizeStyle?: string;
   magnification?: number;
   onSizeChange: (size: number) => void;
   onMagnificationChange?: (value: number) => void;
+  onReset?: () => void;
   label?: string;
 }) {
   const root = useRef<HTMLDivElement>(null);
@@ -59,8 +65,8 @@ export function DockSurface({
   const motion = useRef<ReturnType<typeof createDockMotion> | null>(null);
   const saved = useRef(readDockPreferences({ size, magnification }));
   const current = useRef(saved.current);
-  const callbacks = useRef({ onSizeChange, onMagnificationChange });
-  callbacks.current = { onSizeChange, onMagnificationChange };
+  const callbacks = useRef({ onSizeChange, onMagnificationChange, onReset });
+  callbacks.current = { onSizeChange, onMagnificationChange, onReset };
   const interaction = useRef(DockInteraction.Idle);
   const settingsOpen = useRef(false);
   const [portal, setPortal] = useState<HTMLElement | null>(null);
@@ -98,13 +104,14 @@ export function DockSurface({
     apply(saved.current);
   }, [apply, setInteraction]);
   const open = useCallback(
-    (handle: HTMLElement) => {
+    (handle: HTMLElement, input: DockInput) => {
       settingsOpen.current = true;
       const rect = handle.getBoundingClientRect();
       setAnchor({
         x: rect.left + rect.width / 2,
         y: rect.top,
         trigger: handle,
+        input,
       });
       setInteraction(DockInteraction.Settings);
       apply(saved.current);
@@ -116,6 +123,7 @@ export function DockSurface({
     if (!root.current) {
       return;
     }
+    const releaseInput = trackDockInput(root.current);
     const driver = createDockResize({
       root: root.current,
       handles: Array.from(
@@ -134,6 +142,7 @@ export function DockSurface({
     });
     resize.current = driver;
     return () => {
+      releaseInput();
       driver.dispose();
       resize.current = null;
     };
@@ -187,9 +196,21 @@ export function DockSurface({
       callbacks.current.onMagnificationChange?.(next.magnification);
     }
   };
+  const reset = () => {
+    const next = readDockPreferences(null);
+    saved.current = next;
+    setInteraction(DockInteraction.Settings);
+    apply(next);
+    if (callbacks.current.onReset) {
+      callbacks.current.onReset();
+      return;
+    }
+    callbacks.current.onSizeChange(next.size);
+    callbacks.current.onMagnificationChange?.(next.magnification);
+  };
   const preferences = readDockPreferences({ size, magnification });
   const variables: CSSProperties & { '--dock-size': string } = {
-    '--dock-size': `${preferences.size}px`,
+    '--dock-size': initialSizeStyle ?? `${preferences.size}px`,
   };
   return (
     <DockContext.Provider
@@ -203,6 +224,7 @@ export function DockSurface({
         aria-label={label}
         data-dock=""
         data-dock-mode={mode}
+        data-dock-input={DockInput.Pointer}
       >
         <div className={styles.backdrop} data-dock-backdrop="" />
         <div
@@ -238,6 +260,7 @@ export function DockSurface({
                 mode={mode}
                 onPreview={preview}
                 onCommit={commit}
+                onReset={reset}
                 onClose={close}
               />
             )}

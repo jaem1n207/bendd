@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { DockInput } from '@/components/navigation/consts/dock';
 import { createDockResize } from '@/components/navigation/lib/dock-resize';
 
 function emit(
@@ -220,9 +221,9 @@ test('opens settings on a touch tap or keyboard activation, never after a return
   });
   emit(second, 'pointerdown', { pointerType: 'touch' });
   emit(second, 'pointerup', { pointerType: 'touch' });
-  expect(open).toHaveBeenCalledExactlyOnceWith(second);
+  expect(open).toHaveBeenCalledExactlyOnceWith(second, DockInput.Pointer);
   first.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
-  expect(open).toHaveBeenLastCalledWith(first);
+  expect(open).toHaveBeenLastCalledWith(first, DockInput.Keyboard);
   emit(first, 'pointerdown', { pointerType: 'touch' });
   emit(first, 'pointermove', { pointerType: 'touch', y: 170 });
   emit(first, 'pointerup', { pointerType: 'touch' });
