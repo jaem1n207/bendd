@@ -192,7 +192,7 @@ export function DockSettings({
       />
       <div className={styles.settingsFooter}>
         <button type="button" onClick={onReset}>
-          기본값으로 복원
+          <span className={styles.settingsResetContent}>기본값으로 복원</span>
         </button>
         <p>클릭하여 적용</p>
       </div>
