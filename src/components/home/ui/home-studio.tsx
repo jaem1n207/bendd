@@ -247,8 +247,8 @@ export function HomeStudio({
                       <h3>직접 크기를 조절하는 Dock</h3>
                     </div>
                     <p>
-                      손잡이를 위아래로 끌면 Dock의 크기가 바뀌고, 이름은
-                      움직이는 방향으로 이어집니다.
+                      구분선으로 크기를 조절하고, 올리거나 누른 아이콘은
+                      움직임으로 반응합니다.
                     </p>
                     <p className={styles.craftCredit}>
                       macOS Dock에서 영감을 받은 인터랙션 · 이 사이트의 탐색에도

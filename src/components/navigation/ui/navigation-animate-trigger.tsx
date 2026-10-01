@@ -10,12 +10,19 @@ export function NavigationAnimateTrigger({
 }: {
   children: ReactNode;
 }) {
-  const { size, setSize } = useDockPreferences();
+  const { size, setSize, magnification, setMagnification } =
+    useDockPreferences();
   useEffect(() => {
     void useDockPreferences.persist.rehydrate();
   }, []);
   return (
-    <DockSurface size={size} onSizeChange={setSize} label="사이트 탐색 Dock">
+    <DockSurface
+      size={size}
+      onSizeChange={setSize}
+      magnification={magnification}
+      onMagnificationChange={setMagnification}
+      label="사이트 탐색 Dock"
+    >
       {children}
     </DockSurface>
   );

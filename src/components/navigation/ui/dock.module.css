@@ -88,11 +88,43 @@
   width: 50%;
   height: 50%;
 }
+/* 얇은 선의 바깥 조작 영역은 이웃 아이콘과 겹치지 않는다. */
 .separator {
-  flex: 0 0 1px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 24px;
+  width: 24px;
+  height: max(44px, var(--dock-size));
+  margin: -2px -4px;
+  border-radius: 8px;
+  cursor: ns-resize;
+  touch-action: none;
+  user-select: none;
+  color: hsl(var(--muted-foreground));
+}
+.separatorLine {
+  width: 1px;
   height: calc(var(--dock-item-size) * 0.65);
-  margin: 0 5px;
   background: hsl(var(--border));
+  transition: background 140ms ease-out;
+}
+.separator:hover .separatorLine,
+.separator:focus-visible .separatorLine {
+  background: hsl(var(--foreground) / 0.6);
+}
+.separator:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+.hoverArea {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  transform-origin: center bottom;
+}
+.viewport {
+  position: relative;
 }
 .tooltipAnchor {
   position: absolute;
@@ -139,64 +171,206 @@
   }
 }
 
-.resizeItem {
-  position: relative;
-  display: flex;
-  flex: 0 0 44px;
-  align-self: stretch;
-  align-items: center;
-  margin-right: 8px;
-}
-.resizeItem::before {
-  position: absolute;
-  top: 25%;
-  left: -3px;
-  width: 1px;
-  height: 50%;
-  background: hsl(var(--border));
-  content: '';
-}
-.resizeHandle {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: max(44px, var(--dock-size));
-  border-radius: 999px;
-  color: hsl(var(--foreground) / 0.5);
-  cursor: ns-resize;
-  touch-action: none;
-  user-select: none;
-}
-.resizeHandle:hover,
-.resizeHandle:focus-visible {
-  color: hsl(var(--foreground));
-  background: hsl(var(--primary) / 0.06);
-}
-.resizeHandle:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: -3px;
-}
 .resizeSize {
   position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  translate: -50% 0;
+  padding: 5px 7px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 7px;
+  background: hsl(var(--background));
   color: hsl(var(--foreground));
   font:
-    500 10px/1 var(--font-sans),
+    500 11px/1 var(--font-sans),
     sans-serif;
   font-variant-numeric: tabular-nums;
   pointer-events: none;
   visibility: hidden;
 }
-.dock[data-dock-resizing='true'] .resizeSize {
+.dock[data-dock-resizing='true'] .separator:focus .resizeSize {
   visibility: visible;
 }
-.dock[data-dock-resizing='true'] .resizeHandle svg {
-  visibility: hidden;
+.settingsPanel {
+  position: fixed;
+  z-index: 80;
+  width: min(320px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  padding: 14px 20px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 18px;
+  background: hsl(var(--background) / 0.98);
+  color: hsl(var(--foreground));
+  box-shadow:
+    0 12px 40px hsl(var(--foreground) / 0.12),
+    0 2px 5px hsl(var(--foreground) / 0.04);
+  font:
+    400 12px/1.5 var(--font-sans),
+    sans-serif;
+}
+.settingsHeader,
+.settingHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.settingsHeader {
+  margin-bottom: 10px;
+}
+.settingsHeader strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.settingsHeader button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px -8px -4px 0;
+  border-radius: 50%;
+  color: hsl(var(--muted-foreground));
+}
+.settingsHeader button:hover {
+  background: hsl(var(--muted));
+}
+.settingsHeader button:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+}
+.settingRow + .settingRow {
+  margin-top: 16px;
+}
+.settingHeading label {
+  font-weight: 500;
+}
+.settingHeading output {
+  color: hsl(var(--muted-foreground));
+  font-variant-numeric: tabular-nums;
+}
+.sliderTrack {
+  position: relative;
+  height: 44px;
+  margin-top: 22px;
+}
+.sliderBars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 4px;
+  pointer-events: none;
+}
+.sliderBars > span {
+  width: 3px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  background: hsl(var(--foreground) / 0.16);
+  transform-origin: center bottom;
+  transition:
+    transform 100ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 100ms ease-out;
+}
+.sliderTrack[data-active='true'] .sliderBars > span {
+  transition-duration: 160ms;
+}
+.sliderBars > span[data-filled='true'] {
+  background: hsl(var(--foreground) / 0.68);
+}
+.sliderBars > span[data-near='true'] {
+  background: hsl(var(--foreground));
+}
+.sliderTrack input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.sliderTrack:has(input:focus-visible) {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 5px;
+  border-radius: 3px;
+}
+.valueTooltip {
+  position: absolute;
+  top: -23px;
+  translate: -50% 0;
+  transform: translateY(4px);
+  padding: 5px 7px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 7px;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  box-shadow: 0 2px 6px hsl(var(--foreground) / 0.06);
+  font-size: 11px;
+  line-height: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    left 100ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 100ms ease-out,
+    transform 100ms ease-out;
+}
+.valueTooltip[data-visible='true'] {
+  opacity: 1;
+  transform: translateY(0);
+  transition-duration: 100ms, 140ms, 140ms;
+}
+.rollingValue {
+  display: flex;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.digitWindow {
+  display: inline-block;
+  width: 1ch;
+  height: 14px;
+  overflow: hidden;
+}
+.digitStrip {
+  display: flex;
+  flex-direction: column;
+}
+.digitStrip > span {
+  display: block;
+  height: 14px;
+  flex-shrink: 0;
+}
+.sliderEnds {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+  color: hsl(var(--muted-foreground));
+  font-size: 10px;
+}
+.settingsHint {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+  font-size: 10px;
+  text-align: center;
 }
 @media (pointer: coarse) {
   .dock {
     --dock-item-size: max(44px, var(--dock-size));
+  }
+  .separator {
+    flex-basis: 44px;
+    width: 44px;
+    margin-inline: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .separatorLine,
+  .sliderBars > span,
+  .valueTooltip {
+    transition: none;
   }
 }

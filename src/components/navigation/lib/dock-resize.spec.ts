@@ -44,7 +44,12 @@ function fixture(size = 40) {
     emit(handle, 'lostpointercapture', { id });
   });
   const commit = vi.fn();
-  const driver = createDockResize({ root, handle, size, onCommit: commit });
+  const driver = createDockResize({
+    root,
+    handles: [handle],
+    size,
+    onCommit: commit,
+  });
   const value = () => Number(handle.getAttribute('aria-valuenow'));
   return { root, handle, output, captures, commit, value, ...driver };
 }
@@ -167,7 +172,7 @@ describe('Dock resize direct manipulation', () => {
       dock.dispose();
     }
   );
-  test('supports keyboard limits, steps and reset without starting a drag', () => {
+  test('supports keyboard limits, steps without starting a drag', () => {
     const dock = fixture();
     const cases = [
       ['ArrowUp', 41],
@@ -176,7 +181,6 @@ describe('Dock resize direct manipulation', () => {
       ['ArrowLeft', 40],
       ['Home', 32],
       ['End', 64],
-      ['Enter', 40],
     ];
     for (const [key, expected] of cases) {
       const event = new KeyboardEvent('keydown', {
@@ -193,4 +197,37 @@ describe('Dock resize direct manipulation', () => {
     expect(frames.size).toBe(0);
     dock.dispose();
   });
+});
+
+test('opens settings on a touch tap or keyboard activation, never after a returning drag', () => {
+  const root = document.createElement('div');
+  const first = document.createElement('button');
+  const second = document.createElement('button');
+  root.append(first, second);
+  document.body.append(root);
+  for (const handle of [first, second]) {
+    handle.setPointerCapture = vi.fn();
+    handle.hasPointerCapture = () => false;
+  }
+  const open = vi.fn();
+  const commit = vi.fn();
+  const driver = createDockResize({
+    root,
+    handles: [first, second],
+    size: 40,
+    onCommit: commit,
+    onOpen: open,
+  });
+  emit(second, 'pointerdown', { pointerType: 'touch' });
+  emit(second, 'pointerup', { pointerType: 'touch' });
+  expect(open).toHaveBeenCalledExactlyOnceWith(second);
+  first.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+  expect(open).toHaveBeenLastCalledWith(first);
+  emit(first, 'pointerdown', { pointerType: 'touch' });
+  emit(first, 'pointermove', { pointerType: 'touch', y: 170 });
+  emit(first, 'pointerup', { pointerType: 'touch' });
+  expect(open).toHaveBeenCalledTimes(2);
+  expect(commit).not.toHaveBeenCalled();
+  driver.dispose();
+  root.remove();
 });

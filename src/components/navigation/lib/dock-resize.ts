@@ -1,5 +1,4 @@
 import {
-  DOCK_DEFAULT_SIZE,
   DOCK_MAX_SIZE,
   DOCK_MIN_SIZE,
   DOCK_RESIZE_SENSITIVITY,
@@ -8,7 +7,11 @@ import { clampDockSize } from '@/components/navigation/lib/dock-geometry';
 
 interface ResizeGesture {
   pointer: number;
+  handle: HTMLElement;
+  touch: boolean;
   startY: number;
+  startX: number;
+  moved: boolean;
   startSize: number;
   cursor: string;
   selection: string;
@@ -22,31 +25,38 @@ enum ResizeEnd {
 /** 드래그 중에는 DOM만 갱신하고 완료된 크기만 저장 경계에 전달한다. */
 export function createDockResize({
   root,
-  handle,
+  handles,
   size,
   onCommit,
+  onPreview = () => {},
+  onOpen = () => {},
 }: {
   root: HTMLElement;
-  handle: HTMLElement;
+  handles: readonly HTMLElement[];
   size: number;
   onCommit: (size: number) => void;
+  onPreview?: (size: number) => void;
+  onOpen?: (handle: HTMLElement) => void;
 }) {
   let current = clampDockSize(size);
   let pending = current;
   let gesture: ResizeGesture | null = null;
   let frame = 0;
   const page = document.documentElement;
-  const output = root.querySelector<HTMLElement>('[data-dock-size-output]');
+  const outputs = root.querySelectorAll<HTMLElement>('[data-dock-size-output]');
 
   const draw = (value: number) => {
     current = clampDockSize(value);
     root.style.setProperty('--dock-size', `${current}px`);
-    handle.setAttribute('aria-valuenow', String(current));
     const label = `${Number(current.toFixed(1))}px`;
-    handle.setAttribute('aria-valuetext', label);
-    if (output) {
+    handles.forEach(handle => {
+      handle.setAttribute('aria-valuenow', String(current));
+      handle.setAttribute('aria-valuetext', label);
+    });
+    outputs.forEach(output => {
       output.textContent = label;
-    }
+    });
+    onPreview(current);
   };
   const flush = () => {
     cancelAnimationFrame(frame);
@@ -66,8 +76,8 @@ export function createDockResize({
     delete root.dataset.dockResizing;
     page.style.cursor = active.cursor;
     page.style.userSelect = active.selection;
-    if (handle.hasPointerCapture(active.pointer)) {
-      handle.releasePointerCapture(active.pointer);
+    if (active.handle.hasPointerCapture(active.pointer)) {
+      active.handle.releasePointerCapture(active.pointer);
     }
     if (reason === ResizeEnd.Commit && current !== active.startSize) {
       onCommit(current);
@@ -84,12 +94,20 @@ export function createDockResize({
     if (gesture || !event.isPrimary || event.button !== 0) {
       return;
     }
+    const handle = event.currentTarget;
+    if (!(handle instanceof HTMLElement)) {
+      return;
+    }
     event.preventDefault();
     handle.focus({ preventScroll: true });
     handle.setPointerCapture(event.pointerId);
     gesture = {
       pointer: event.pointerId,
+      handle,
+      touch: event.pointerType === 'touch',
       startY: event.clientY,
+      startX: event.clientX,
+      moved: false,
       startSize: current,
       cursor: page.style.cursor,
       selection: page.style.userSelect,
@@ -103,6 +121,15 @@ export function createDockResize({
     if (event.pointerId !== gesture?.pointer) {
       return;
     }
+    if (
+      gesture &&
+      Math.hypot(
+        event.clientX - gesture.startX,
+        event.clientY - gesture.startY
+      ) >= 3
+    ) {
+      gesture.moved = true;
+    }
     pending = getSize(event.clientY);
     if (!frame) {
       frame = requestAnimationFrame(flush);
@@ -112,8 +139,17 @@ export function createDockResize({
     if (event.pointerId !== gesture?.pointer) {
       return;
     }
-    pending = getSize(event.clientY);
+    const active = gesture;
+    const tapped =
+      active &&
+      !active.moved &&
+      Math.hypot(event.clientX - active.startX, event.clientY - active.startY) <
+        3;
+    pending = tapped ? active.startSize : getSize(event.clientY);
     finish(ResizeEnd.Commit);
+    if (tapped && active.touch) {
+      onOpen(active.handle);
+    }
   };
   const lost = (event: PointerEvent) => {
     if (event.pointerId === gesture?.pointer) {
@@ -127,6 +163,18 @@ export function createDockResize({
     }
   };
   const keydown = (event: KeyboardEvent) => {
+    if (
+      event.key === 'Enter' ||
+      event.key === ' ' ||
+      (event.key === 'F10' && event.shiftKey)
+    ) {
+      event.preventDefault();
+      cancel();
+      if (event.currentTarget instanceof HTMLElement) {
+        onOpen(event.currentTarget);
+      }
+      return;
+    }
     const values: Record<string, number> = {
       ArrowUp: current + 1,
       ArrowRight: current + 1,
@@ -134,7 +182,6 @@ export function createDockResize({
       ArrowLeft: current - 1,
       Home: DOCK_MIN_SIZE,
       End: DOCK_MAX_SIZE,
-      Enter: DOCK_DEFAULT_SIZE,
     };
     if (!(event.key in values)) {
       return;
@@ -150,13 +197,23 @@ export function createDockResize({
     }
   };
 
+  const contextMenu = (event: MouseEvent) => {
+    event.preventDefault();
+    cancel();
+    if (event.currentTarget instanceof HTMLElement) {
+      onOpen(event.currentTarget);
+    }
+  };
   draw(current);
-  handle.addEventListener('pointerdown', down);
-  handle.addEventListener('pointermove', move);
-  handle.addEventListener('pointerup', up);
-  handle.addEventListener('pointercancel', lost);
-  handle.addEventListener('lostpointercapture', lost);
-  handle.addEventListener('keydown', keydown);
+  handles.forEach(handle => {
+    handle.addEventListener('pointerdown', down);
+    handle.addEventListener('pointermove', move);
+    handle.addEventListener('pointerup', up);
+    handle.addEventListener('pointercancel', lost);
+    handle.addEventListener('lostpointercapture', lost);
+    handle.addEventListener('keydown', keydown);
+    handle.addEventListener('contextmenu', contextMenu);
+  });
   document.addEventListener('keydown', escape, true);
   window.addEventListener('blur', cancel);
 
@@ -167,12 +224,15 @@ export function createDockResize({
     },
     dispose() {
       cancel();
-      handle.removeEventListener('pointerdown', down);
-      handle.removeEventListener('pointermove', move);
-      handle.removeEventListener('pointerup', up);
-      handle.removeEventListener('pointercancel', lost);
-      handle.removeEventListener('lostpointercapture', lost);
-      handle.removeEventListener('keydown', keydown);
+      handles.forEach(handle => {
+        handle.removeEventListener('pointerdown', down);
+        handle.removeEventListener('pointermove', move);
+        handle.removeEventListener('pointerup', up);
+        handle.removeEventListener('pointercancel', lost);
+        handle.removeEventListener('lostpointercapture', lost);
+        handle.removeEventListener('keydown', keydown);
+        handle.removeEventListener('contextmenu', contextMenu);
+      });
       document.removeEventListener('keydown', escape, true);
       window.removeEventListener('blur', cancel);
     },

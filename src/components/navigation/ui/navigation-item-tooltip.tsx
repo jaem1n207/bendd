@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 
 import { useNavigationItemAnimation } from '@/components/navigation/model/use-navigation-item-animation';
@@ -15,26 +16,20 @@ export function NavigationItemTooltip({
   children: ReactNode;
   className?: string;
 }) {
-  const {
-    handleClick,
-    handlePointerDown,
-    handleKeyDown,
-    stopMotion,
-    bodyStyle,
-  } = useNavigationItemAnimation({ name });
+  const { handleClick, handleKeyDown, bodyStyle } = useNavigationItemAnimation({
+    name,
+  });
   return (
     <div
       data-navigation-item=""
       data-dock-label={name}
       className={cn(styles.item, className)}
-      onPointerDownCapture={handlePointerDown}
-      onPointerLeave={stopMotion}
-      onKeyDownCapture={handleKeyDown}
       onClick={handleClick}
+      onKeyDownCapture={handleKeyDown}
     >
-      <div className={styles.itemBody} style={bodyStyle}>
+      <motion.div className={styles.itemBody} style={bodyStyle}>
         {children}
-      </div>
+      </motion.div>
     </div>
   );
 }

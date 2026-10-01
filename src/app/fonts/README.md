@@ -10,7 +10,7 @@ glyph outlines, metrics, and embedded license metadata. It includes printable
 ASCII, home, profile, and shared Dock component text (including interaction states), site metadata, and
 article frontmatter so any featured title or summary is covered. Article bodies
 are excluded. The original home subset was 90,912 bytes; the current home and
-profile, Tech Stack, code walkthrough, and Dock copy produces 103,992 bytes.
+profile, Tech Stack, code walkthrough, and Dock copy produces 103,340 bytes.
 
 Run `pnpm fonts:home` after editing home copy while the dev server is running.
 `pnpm dev` and `pnpm build` regenerate the subset before starting Next.js.

@@ -7,109 +7,107 @@ const state = vi.hoisted(() => {
   const preference: { reducedMotion: boolean | undefined } = {
     reducedMotion: false,
   };
-  return { ...preference, play: vi.fn(), start: vi.fn() };
+  return {
+    ...preference,
+    play: vi.fn(),
+    stop: vi.fn(),
+    start: vi.fn(
+      (
+        value: { get: () => number; set: (value: number) => void },
+        frames: number[],
+        options: object
+      ) => ({ value, frames, options, stop: () => state.stop() })
+    ),
+  };
 });
 vi.mock('motion/react', async importOriginal => ({
   ...(await importOriginal<typeof import('motion/react')>()),
-  useAnimation: () => ({ start: state.start, stop: vi.fn(), set: vi.fn() }),
+  animate: state.start,
 }));
 vi.mock('@/hooks/use-prefers-reduced-motion', () => ({
   usePrefersReducedMotion: () => state.reducedMotion,
 }));
 vi.mock('@/components/sound', () => ({ useSoundStore: () => true }));
 vi.mock('use-sound', () => ({ default: () => [state.play] }));
-
 function renderItem(name = 'Home') {
   const view = render(
     <NavigationItemTooltip name={name}>
       <button>{name}</button>
     </NavigationItemTooltip>
   );
-  const button = screen.getByRole('button', { name });
-  const body = button.parentElement;
-  if (!body) {
-    throw new Error('Missing item body');
-  }
-  return { ...view, button, body };
+  return { ...view, button: screen.getByRole('button', { name }) };
 }
-function pointer(target: EventTarget, type: string, pointerId = 1) {
-  const event = new MouseEvent(type, { bubbles: true, button: 0 });
-  Object.defineProperties(event, {
-    pointerId: { value: pointerId },
-    isPrimary: { value: true },
-    pointerType: { value: 'mouse' },
-  });
-  act(() => target.dispatchEvent(event));
-}
-
-describe('navigation press feedback', () => {
+describe('navigation click bounce', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     state.reducedMotion = false;
   });
-  it('compresses only the inner body while held and never queues vertical travel', () => {
-    const { button, body } = renderItem();
-    pointer(button, 'pointerdown');
-    expect(body.style.transform).toBe('scale(0.97)');
-    expect(body.style.transition).toContain('150ms');
-    expect(body.parentElement?.style.transform).toBe('');
-    pointer(document, 'pointerup');
-    expect(body.style.transform).toBe('none');
-    expect(body.style.transition).toContain('100ms');
-    fireEvent.click(button);
-    expect(state.start).not.toHaveBeenCalled();
+  it('runs a single 260ms hop on the inner body, proportional to base size', () => {
+    const { button } = renderItem();
+    const item = button.closest('[data-navigation-item]');
+    if (!item) {
+      throw new Error('Dock item missing');
+    }
+    Object.defineProperty(item, 'offsetWidth', { value: 64 });
+    fireEvent.click(button, { detail: 1 });
+    expect(state.start).toHaveBeenCalledWith(
+      expect.anything(),
+      [0, -9.6, 0],
+      expect.objectContaining({ duration: 0.26, times: [0, 0.08 / 0.26, 1] })
+    );
     expect(state.play).toHaveBeenCalledOnce();
   });
-  it('reverses rapid presses and ignores releases from another pointer', () => {
-    const { button, body } = renderItem();
-    for (let i = 0; i < 3; i += 1) {
-      pointer(button, 'pointerdown');
-      pointer(document, 'pointerup', 2);
-      expect(body.style.transform).toBe('scale(0.97)');
-      pointer(document, 'pointerup');
-      expect(body.style.transform).toBe('none');
-    }
-    expect(state.start).not.toHaveBeenCalled();
+  it('interrupts rapid clicks from the current position instead of queuing or resetting', () => {
+    const { button } = renderItem();
+    fireEvent.click(button, { detail: 1 });
+    const value = state.start.mock.calls[0][0];
+    act(() => value.set(-2));
+    fireEvent.click(button, { detail: 1 });
+    expect(state.stop).toHaveBeenCalledOnce();
+    expect(state.start).toHaveBeenLastCalledWith(
+      value,
+      [-2, -6, 0],
+      expect.anything()
+    );
   });
   it.each([true, undefined])(
-    'keeps %s motion preference static without silencing clicks',
+    'keeps preference %s still without silencing activation',
     preference => {
       state.reducedMotion = preference;
-      const { button, body } = renderItem();
-      pointer(button, 'pointerdown');
-      expect(body.style.transform).toBe('none');
-      expect(body.style.transition).toBe('none');
-      fireEvent.click(button);
+      const { button } = renderItem();
+      fireEvent.click(button, { detail: 1 });
+      expect(state.start).not.toHaveBeenCalled();
       expect(state.play).toHaveBeenCalledOnce();
     }
   );
-  it('switches to still keyboard feedback immediately and preserves sound-switch exclusion', () => {
-    const { button, body } = renderItem('Toggle sound');
-    pointer(button, 'pointerdown');
+  it('stops travel on keyboard input and preserves sound-toggle exclusion', () => {
+    const { button } = renderItem('Toggle sound');
+    fireEvent.click(button, { detail: 1 });
+    const value = state.start.mock.calls[0][0];
+    act(() => value.set(-3));
     fireEvent.keyDown(button, { key: 'Enter' });
-    expect(body.style.transform).toBe('none');
-    expect(body.style.transition).toBe('none');
     fireEvent.click(button, { detail: 0 });
+    expect(value.get()).toBe(0);
+    expect(state.start).toHaveBeenCalledOnce();
     expect(state.play).not.toHaveBeenCalled();
   });
-  it('clears a press on cancellation, blur, preference change and unmount', () => {
-    const { button, body, rerender, unmount } = renderItem();
-    pointer(button, 'pointerdown');
-    pointer(document, 'pointercancel');
-    expect(body.style.transform).toBe('none');
-    pointer(button, 'pointerdown');
+  it('cleans motion on blur, preference change and unmount', () => {
+    const { button, rerender, unmount } = renderItem();
+    fireEvent.click(button, { detail: 1 });
+    const value = state.start.mock.calls[0][0];
+    act(() => value.set(-3));
     fireEvent.blur(window);
-    expect(body.style.transform).toBe('none');
-    pointer(button, 'pointerdown');
+    expect(value.get()).toBe(0);
+    fireEvent.click(button, { detail: 1 });
     state.reducedMotion = true;
     rerender(
       <NavigationItemTooltip name="Home">
         <button>Home</button>
       </NavigationItemTooltip>
     );
-    expect(body.style.transform).toBe('none');
+    expect(value.get()).toBe(0);
+    const before = state.stop.mock.calls.length;
     unmount();
-    pointer(document, 'pointerup');
-    expect(state.start).not.toHaveBeenCalled();
+    expect(state.stop.mock.calls.length).toBeGreaterThan(before);
   });
 });

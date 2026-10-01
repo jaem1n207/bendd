@@ -4,7 +4,7 @@ import { type Route } from 'next';
 import { SoundSwitcher } from '@/components/sound';
 import { ThemeSwitcher } from '@/components/theme';
 import { Book, Bulb, GitHub, Home, Mail, Youtube } from '@/components/ui/icons';
-import styles from '@/components/navigation/ui/dock.module.css';
+import { DockSeparator } from '@/components/navigation/ui/dock-separator';
 import { siteMetadata } from '@/lib/site-metadata';
 import { NavigationAnimateTrigger } from '@/components/navigation/ui/navigation-animate-trigger';
 import {
@@ -27,7 +27,7 @@ export function Navigation() {
             />
           );
         })}
-        <StyledSeparator />
+        <DockSeparator />
         {socialItems.map(item => (
           <SocialNavigationItem
             key={item.name}
@@ -36,7 +36,7 @@ export function Navigation() {
             icon={item.icon}
           />
         ))}
-        <StyledSeparator />
+        <DockSeparator />
         {settingsItems.map(item => (
           <SettingNavigationItem key={item.name} name={item.name}>
             {item.children}
@@ -95,13 +95,3 @@ const settingsItems = [
     children: <SoundSwitcher />,
   },
 ];
-
-function StyledSeparator() {
-  return (
-    <div
-      aria-hidden="true"
-      className={styles.separator}
-      data-dock-separator=""
-    />
-  );
-}
