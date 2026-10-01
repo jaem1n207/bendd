@@ -187,6 +187,29 @@ export function HomeStudio({
               <div className={styles.crafts}>
                 <div className={styles.craftEntry}>
                   <MarginNote side="right">
+                    <span>도구를 눌러</span> <span>보세요</span>
+                  </MarginNote>
+                  <article
+                    className={styles.craft}
+                    data-reveal
+                    data-reveal-kind="craft"
+                  >
+                    <DockDemo />
+                    <div className={styles.craftTitle}>
+                      <h3>직접 크기를 조절하는 Dock</h3>
+                    </div>
+                    <p>
+                      구분선으로 크기를 조절하고, 아이콘에 올리면 크기와 간격이
+                      반응합니다.
+                    </p>
+                    <p className={styles.craftCredit}>
+                      macOS Dock에서 영감을 받은 인터랙션 · 이 사이트의 탐색에도
+                      적용
+                    </p>
+                  </article>
+                </div>
+                <div className={styles.craftEntry}>
+                  <MarginNote side="right">
                     <span>안에서 스크롤해</span> <span>보세요</span>
                   </MarginNote>
                   <article
@@ -231,29 +254,6 @@ export function HomeStudio({
                         Rauno에서 영감을 받아 문자별 처리로 확장
                       </p>
                     </div>
-                  </article>
-                </div>
-                <div className={styles.craftEntry}>
-                  <MarginNote side="right">
-                    <span>도구를 눌러</span> <span>보세요</span>
-                  </MarginNote>
-                  <article
-                    className={styles.craft}
-                    data-reveal
-                    data-reveal-kind="craft"
-                  >
-                    <DockDemo />
-                    <div className={styles.craftTitle}>
-                      <h3>직접 크기를 조절하는 Dock</h3>
-                    </div>
-                    <p>
-                      구분선으로 크기를 조절하고, 올리거나 누른 아이콘은
-                      움직임으로 반응합니다.
-                    </p>
-                    <p className={styles.craftCredit}>
-                      macOS Dock에서 영감을 받은 인터랙션 · 이 사이트의 탐색에도
-                      적용
-                    </p>
                   </article>
                 </div>
               </div>
