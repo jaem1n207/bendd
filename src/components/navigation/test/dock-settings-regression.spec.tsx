@@ -44,7 +44,7 @@ test('uses the existing separator for settings without adding a Resize Dock icon
   expect(screen.getByRole('slider', { name: '아이콘 확대' })).toBeDefined();
 });
 
-test('runs one short upward bounce on click without waiting to activate the button', () => {
+test('activates the button immediately without an upward bounce', () => {
   const activated = vi.fn();
   render(
     <NavigationItemTooltip name="Home">
@@ -53,11 +53,7 @@ test('runs one short upward bounce on click without waiting to activate the butt
   );
   fireEvent.click(screen.getByRole('button', { name: 'Home' }), { detail: 1 });
   expect(activated).toHaveBeenCalledOnce();
-  expect(motion.animate).toHaveBeenCalledWith(
-    expect.anything(),
-    [0, -6, 0],
-    expect.objectContaining({ duration: 0.26 })
-  );
+  expect(motion.animate).not.toHaveBeenCalled();
 });
 
 test('magnifies a hovered icon relative to its base size', () => {

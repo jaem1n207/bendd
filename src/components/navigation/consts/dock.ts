@@ -5,9 +5,6 @@ export const DOCK_MIN_MAGNIFICATION = 1;
 export const DOCK_MAX_MAGNIFICATION = 2;
 export const DOCK_DEFAULT_MAGNIFICATION = 1.6;
 export const DOCK_EDGE_SPACE = 16;
-export const DOCK_BOUNCE_RATIO = 0.15;
-export const DOCK_BOUNCE_DURATION = 0.26;
-export const DOCK_BOUNCE_RISE = 0.08;
 export enum DockSetting {
   Size = 'size',
   Magnification = 'magnification',
