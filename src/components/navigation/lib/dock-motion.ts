@@ -1,14 +1,9 @@
 import {
-  DOCK_EDGE_SPACE,
   DOCK_REST_THRESHOLD,
   DockInput,
   DockMotionMode,
 } from '@/components/navigation/consts/dock';
-import {
-  getDockOffsets,
-  getDockTargets,
-  stepDockSpring,
-} from '@/components/navigation/lib/dock-geometry';
+import { stepDockSpring } from '@/components/navigation/lib/dock-geometry';
 
 export interface DockTooltipState {
   name: string;
@@ -17,264 +12,174 @@ export interface DockTooltipState {
   input: DockInput;
 }
 
-/** 크기 측정은 입력/리사이즈 때만, 프레임에서는 transform만 갱신한다. */
+/** 공유 툴팁의 위치만 움직인다. 아이콘 크기와 좌표는 레이아웃이 소유한다. */
 export function createDockMotion({
   root,
-  size,
-  magnification,
   mode,
   tooltipId,
   onTooltip,
 }: {
   root: HTMLElement;
-  size: number;
-  magnification: number;
   mode: DockMotionMode;
   tooltipId: string;
   onTooltip: (tooltip: DockTooltipState | null) => void;
 }) {
   const rail = root.querySelector<HTMLElement>('[data-dock-rail]');
   const viewport = root.querySelector<HTMLElement>('[data-dock-viewport]');
-  const backdrop = root.querySelector<HTMLElement>('[data-dock-backdrop]');
   const tooltip = root.querySelector<HTMLElement>('[data-dock-tooltip]');
-  const hoverArea = root.querySelector<HTMLElement>('[data-dock-hover-area]');
-  if (!rail || !viewport || !backdrop || !tooltip) {
+  if (!rail || !viewport || !tooltip) {
     return () => {};
   }
   let items: HTMLElement[] = [];
-  let separators: { element: HTMLElement; preceding: number }[] = [];
   let centers: number[] = [];
-  let growth: number[] = [];
-  let velocities: number[] = [];
-  let targets: number[] = [];
-  let width = 0;
-  let scrollLeft = 0;
-  let budget = 0;
-  let frame = 0;
-  let previousTime = 0;
   let active = -1;
   let input = DockInput.Static;
-  let overflow = false;
   let tooltipX = 0;
-  let tooltipVelocity = 0;
-
-  const getTooltipX = () =>
-    centers[active] + getDockOffsets(growth)[active] - scrollLeft;
-
-  const positionTooltip = () => {
-    if (active < 0) {
-      return;
-    }
-    tooltip.style.transform = `translate3d(${tooltipX}px, ${-Math.max(...growth)}px, 0)`;
-  };
+  let velocity = 0;
+  let frame = 0;
+  let previousTime = 0;
 
   const draw = () => {
-    const offsets = getDockOffsets(growth);
-    const total = growth.reduce((sum, value) => sum + value, 0);
-    items.forEach((item, index) => {
-      item.style.transform =
-        growth[index] || offsets[index]
-          ? `translate3d(${offsets[index]}px, 0, 0) scale(${1 + growth[index] / size})`
-          : 'none';
-    });
-    separators.forEach(({ element, preceding }) => {
-      const before = growth
-        .slice(0, preceding)
-        .reduce((sum, value) => sum + value, 0);
-      element.style.transform = `translateX(${before - total / 2}px)`;
-    });
-    backdrop.style.transform =
-      total && width ? `scaleX(${1 + total / width})` : 'none';
-    if (hoverArea) {
-      hoverArea.style.transform = backdrop.style.transform;
-    }
-    positionTooltip();
+    tooltip.style.transform = `translate3d(${tooltipX}px, 0, 0)`;
   };
-
-  const reset = () => {
+  const stop = () => {
     cancelAnimationFrame(frame);
     frame = 0;
     previousTime = 0;
-    growth = items.map(() => 0);
-    velocities = items.map(() => 0);
-    targets = items.map(() => 0);
+    velocity = 0;
     root.dataset.dockAnimating = 'false';
-    root.dataset.dockHovering = 'false';
-    if (active >= 0) {
-      tooltipX = getTooltipX();
-      tooltipVelocity = 0;
-    }
-    draw();
   };
-
+  const animate = (time: number) => {
+    if (active < 0) {
+      stop();
+      return;
+    }
+    const seconds = previousTime
+      ? Math.min((time - previousTime) / 1000, 0.064)
+      : 1 / 60;
+    previousTime = time;
+    const target = centers[active];
+    const next = stepDockSpring(tooltipX, velocity, target, seconds);
+    const settled =
+      Math.abs(next.value - target) < DOCK_REST_THRESHOLD &&
+      Math.abs(next.velocity) < DOCK_REST_THRESHOLD;
+    tooltipX = settled ? target : next.value;
+    velocity = next.velocity;
+    draw();
+    if (settled) {
+      stop();
+      return;
+    }
+    frame = requestAnimationFrame(animate);
+  };
+  const clearDescription = (item: HTMLElement | undefined) => {
+    const control = item?.querySelector('a, button');
+    if (!control) {
+      return;
+    }
+    const ids = (control.getAttribute('aria-describedby') ?? '')
+      .split(/\s+/)
+      .filter(id => id && id !== tooltipId);
+    if (ids.length) {
+      control.setAttribute('aria-describedby', ids.join(' '));
+    } else {
+      control.removeAttribute('aria-describedby');
+    }
+  };
   const select = (index: number, nextInput: DockInput) => {
     if (index === active && nextInput === input) {
       return;
     }
     const direction = index >= active ? 1 : -1;
-    const previous = items[active];
-    const initialSelection = active < 0;
-    previous?.removeAttribute('data-dock-active');
-    previous
-      ?.querySelector('[aria-describedby]')
-      ?.removeAttribute('aria-describedby');
+    const initial = active < 0;
+    items[active]?.removeAttribute('data-dock-active');
+    clearDescription(items[active]);
     active = index;
     input = nextInput;
-    root.dataset.dockHovering = String(
-      index >= 0 &&
-        nextInput === DockInput.Pointer &&
-        mode === DockMotionMode.Animated &&
-        !overflow
-    );
     const item = items[index];
     if (!item) {
+      stop();
       onTooltip(null);
       return;
     }
     item.setAttribute('data-dock-active', '');
-    item
-      .querySelector('a, button')
-      ?.setAttribute('aria-describedby', tooltipId);
+    const control = item.querySelector('a, button');
+    const description = control?.getAttribute('aria-describedby') ?? '';
+    control?.setAttribute(
+      'aria-describedby',
+      `${description} ${tooltipId}`.trim()
+    );
     if (
-      initialSelection ||
+      initial ||
       nextInput !== DockInput.Pointer ||
-      mode === DockMotionMode.Static ||
-      overflow
+      mode === DockMotionMode.Static
     ) {
-      tooltipX = getTooltipX();
-      tooltipVelocity = 0;
-    }
-    onTooltip({ name: item.dataset.dockLabel ?? '', index, direction, input });
-    positionTooltip();
-  };
-
-  const animate = (time: number) => {
-    const seconds = previousTime
-      ? Math.min((time - previousTime) / 1000, 0.064)
-      : 1 / 60;
-    previousTime = time;
-    let moving = false;
-    growth = growth.map((value, index) => {
-      const next = stepDockSpring(
-        value,
-        velocities[index],
-        targets[index],
-        seconds
-      );
-      const settled =
-        Math.abs(next.value - targets[index]) < DOCK_REST_THRESHOLD &&
-        Math.abs(next.velocity) < DOCK_REST_THRESHOLD;
-      velocities[index] = settled ? 0 : next.velocity;
-      moving ||= !settled;
-      return settled
-        ? targets[index]
-        : Math.max(0, Math.min(magnification - size, next.value));
-    });
-    const total = growth.reduce((sum, value) => sum + value, 0);
-    if (total > budget && total > 0) {
-      growth = growth.map(value => (value * budget) / total);
-    }
-    if (active >= 0) {
-      const targetX = getTooltipX();
-      const next = stepDockSpring(tooltipX, tooltipVelocity, targetX, seconds);
-      const settled =
-        Math.abs(next.value - targetX) < DOCK_REST_THRESHOLD &&
-        Math.abs(next.velocity) < DOCK_REST_THRESHOLD;
-      tooltipX = settled ? targetX : next.value;
-      tooltipVelocity = settled ? 0 : next.velocity;
-      moving ||= !settled;
-    }
-    draw();
-    if (moving) {
-      frame = requestAnimationFrame(animate);
-    } else {
-      frame = 0;
-      previousTime = 0;
-      root.dataset.dockAnimating = 'false';
-    }
-  };
-
-  const updateTargets = (pointer: number | null) => {
-    targets = getDockTargets({ centers, size, magnification, pointer, budget });
-    if (
-      !frame &&
-      (targets.some((target, index) => target !== growth[index]) ||
-        (active >= 0 && tooltipX !== getTooltipX()))
-    ) {
+      stop();
+      tooltipX = centers[index];
+      draw();
+    } else if (!frame) {
       root.dataset.dockAnimating = 'true';
       frame = requestAnimationFrame(animate);
     }
+    onTooltip({ name: item.dataset.dockLabel ?? '', index, direction, input });
   };
-
   const measure = () => {
-    // 스크롤이나 컨텐츠 변경 후에는 현재 DOM에서 다시 읽는다.
+    // rail 밖 고정 손잡이도 같은 root 좌표계에서 측정한다.
     items = Array.from(
-      rail.querySelectorAll<HTMLElement>('[data-navigation-item]')
+      root.querySelectorAll<HTMLElement>('[data-navigation-item]')
     );
-    centers = items.map(item => item.offsetLeft + item.offsetWidth / 2);
-    separators = Array.from(
-      rail.querySelectorAll<HTMLElement>('[data-dock-separator]')
-    ).map(element => ({
-      element,
-      preceding: items.filter(item => item.offsetLeft < element.offsetLeft)
-        .length,
-    }));
-    width = rail.offsetWidth;
-    scrollLeft = viewport.scrollLeft;
-    overflow = width > viewport.clientWidth + 1;
+    const left = root.getBoundingClientRect().left;
+    centers = items.map(item => {
+      const rect = item.getBoundingClientRect();
+      return rect.left - left + rect.width / 2;
+    });
+    const overflow = rail.offsetWidth > viewport.clientWidth + 1;
     root.dataset.dockOverflow = String(overflow);
-    const rect = rail.getBoundingClientRect();
-    const boundary = root
-      .closest<HTMLElement>('[data-dock-boundary]')
-      ?.getBoundingClientRect();
-    const left = Math.max(DOCK_EDGE_SPACE, boundary?.left ?? DOCK_EDGE_SPACE);
-    const right = Math.min(
-      document.documentElement.clientWidth - DOCK_EDGE_SPACE,
-      boundary?.right ?? Infinity
-    );
-    const center = rect.left + width / 2;
-    budget = Math.max(0, 2 * Math.min(center - left, right - center) - width);
-    reset();
+    stop();
+    if (active >= 0) {
+      tooltipX = centers[active];
+      draw();
+    }
   };
-
   const move = (event: PointerEvent) => {
-    if (event.pointerType === 'touch') {
+    if (event.pointerType === 'touch' || root.dataset.dockResizing === 'true') {
       return;
     }
-    const rect = rail.getBoundingClientRect();
-    const pointer = event.clientX - rect.left;
-    const offsets = getDockOffsets(growth);
     const target =
       event.target instanceof Element
         ? event.target.closest('[data-navigation-item]')
         : null;
     let index = items.findIndex(item => item === target);
     if (index < 0) {
+      const x = event.clientX - root.getBoundingClientRect().left;
       index = centers.reduce(
         (nearest, center, candidate) =>
-          Math.abs(center + offsets[candidate] - pointer) <
-          Math.abs(centers[nearest] + offsets[nearest] - pointer)
+          Math.abs(center - x) < Math.abs(centers[nearest] - x)
             ? candidate
             : nearest,
         0
       );
     }
     select(index, DockInput.Pointer);
-    if (mode === DockMotionMode.Animated && !overflow) {
-      root.dataset.dockHovering = 'true';
-      updateTargets(pointer);
-    }
   };
-
-  const leave = () => {
-    select(-1, DockInput.Static);
-    updateTargets(null);
-  };
+  const leave = () => select(-1, DockInput.Static);
   const keydown = (event: KeyboardEvent) => {
-    if (!['Tab', 'Escape', 'Enter', ' '].includes(event.key)) {
+    if (
+      ![
+        'Tab',
+        'Escape',
+        'Enter',
+        ' ',
+        'ArrowUp',
+        'ArrowDown',
+        'ArrowLeft',
+        'ArrowRight',
+        'Home',
+        'End',
+      ].includes(event.key)
+    ) {
       return;
     }
-    reset();
     if (event.key === 'Escape') {
       select(-1, DockInput.Keyboard);
       return;
@@ -292,13 +197,10 @@ export function createDockMotion({
     ) {
       return;
     }
-    reset();
-    const item =
-      event.target instanceof Element
-        ? event.target.closest('[data-navigation-item]')
-        : null;
     select(
-      items.findIndex(candidate => candidate === item),
+      items.findIndex(
+        item => event.target instanceof Node && item.contains(event.target)
+      ),
       DockInput.Keyboard
     );
   };
@@ -312,20 +214,16 @@ export function createDockMotion({
   };
   const touch = (event: PointerEvent) => {
     if (event.pointerType === 'touch') {
-      reset();
-      select(-1, DockInput.Static);
+      leave();
     }
-  };
-  const deactivate = () => {
-    reset();
-    select(-1, DockInput.Static);
   };
   const visibility = () => {
     if (document.hidden) {
-      deactivate();
+      leave();
     }
   };
   const resize = new ResizeObserver(measure);
+  resize.observe(root);
   resize.observe(rail);
   resize.observe(viewport);
   measure();
@@ -336,16 +234,14 @@ export function createDockMotion({
   root.addEventListener('focusout', blur);
   document.addEventListener('keydown', keydown, true);
   window.addEventListener('resize', measure);
-  window.addEventListener('blur', deactivate);
+  window.addEventListener('blur', leave);
   document.addEventListener('visibilitychange', visibility);
   viewport.addEventListener('scroll', measure, { passive: true });
 
   return () => {
     resize.disconnect();
-    reset();
-    items[active]
-      ?.querySelector('[aria-describedby]')
-      ?.removeAttribute('aria-describedby');
+    stop();
+    clearDescription(items[active]);
     items[active]?.removeAttribute('data-dock-active');
     root.removeEventListener('pointermove', move);
     root.removeEventListener('pointerleave', leave);
@@ -354,7 +250,7 @@ export function createDockMotion({
     root.removeEventListener('focusout', blur);
     document.removeEventListener('keydown', keydown, true);
     window.removeEventListener('resize', measure);
-    window.removeEventListener('blur', deactivate);
+    window.removeEventListener('blur', leave);
     document.removeEventListener('visibilitychange', visibility);
     viewport.removeEventListener('scroll', measure);
   };

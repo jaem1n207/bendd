@@ -1,62 +1,22 @@
 import { describe, expect, test } from 'vitest';
 
 import {
-  getDockOffsets,
-  getDockTargets,
   readDockPreferences,
   stepDockSpring,
 } from '@/components/navigation/lib/dock-geometry';
 
-const centers = [20, 68, 116, 164, 212];
-const setup = {
-  centers,
-  size: 40,
-  magnification: 80,
-  pointer: 116,
-  budget: 400,
-};
-
 describe('dock geometry', () => {
-  test('magnifies the pointed item and its neighbors with a symmetric falloff', () => {
-    const growth = getDockTargets(setup);
-    expect(growth[2]).toBe(40);
-    expect(growth[1]).toBeGreaterThan(growth[0]);
-    expect(growth[0]).toBeCloseTo(growth[4]);
-    expect(growth[1]).toBeCloseTo(growth[3]);
-  });
-
-  test('keeps the center and spacing stable as icons expand', () => {
-    const growth = getDockTargets({ ...setup, pointer: 68 });
-    const offsets = getDockOffsets(growth);
-    for (let i = 1; i < centers.length; i += 1) {
-      const previousRight =
-        centers[i - 1] + offsets[i - 1] + (40 + growth[i - 1]) / 2;
-      const nextLeft = centers[i] + offsets[i] - (40 + growth[i]) / 2;
-      expect(nextLeft - previousRight).toBeCloseTo(8);
-    }
-    const left = centers[0] + offsets[0] - (40 + growth[0]) / 2;
-    const right = centers[4] + offsets[4] + (40 + growth[4]) / 2;
-    expect((left + right) / 2).toBeCloseTo(116);
-  });
-
-  test('fits all expansion inside the available viewport budget', () => {
-    const growth = getDockTargets({ ...setup, budget: 20 });
-    expect(growth.reduce((sum, value) => sum + value, 0)).toBeCloseTo(20);
-    expect(getDockTargets({ ...setup, budget: -1 })).toEqual([0, 0, 0, 0, 0]);
-    expect(getDockTargets({ ...setup, pointer: null })).toEqual([
-      0, 0, 0, 0, 0,
-    ]);
-  });
-
-  test('validates persisted limits and rejects malformed values', () => {
+  test('retains bounded legacy size and ignores obsolete magnification', () => {
     expect(readDockPreferences({ size: -50, magnification: 500 })).toEqual({
       size: 32,
-      magnification: 112,
     });
     expect(
       readDockPreferences({ size: Infinity, magnification: 'large' })
-    ).toEqual({ size: 40, magnification: 80 });
-    expect(readDockPreferences(null)).toEqual({ size: 40, magnification: 80 });
+    ).toEqual({ size: 40 });
+    expect(readDockPreferences({ size: 52.25, magnification: 80 })).toEqual({
+      size: 52.25,
+    });
+    expect(readDockPreferences(null)).toEqual({ size: 40 });
   });
 
   test('settles monotonically and gives the same result at different frame rates', () => {

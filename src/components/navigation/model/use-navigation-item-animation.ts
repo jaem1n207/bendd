@@ -1,52 +1,86 @@
-import { useAnimation } from 'motion/react';
-import { useEffect, useRef } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent,
+} from 'react';
 import useSound from 'use-sound';
 
 import { DockInput } from '@/components/navigation/consts/dock';
 import { useSoundStore } from '@/components/sound';
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 
-const BOUNCE_HEIGHT = 20;
+const PRESS_TRANSITION = 'transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+const RELEASE_TRANSITION =
+  'transform 100ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
 export function useNavigationItemAnimation({ name }: { name: string }) {
-  const controls = useAnimation();
   const allowMotion = usePrefersReducedMotion() === false;
-  const runGeneration = useRef(0);
+  const [pressed, setPressed] = useState(false);
+  const [input, setInput] = useState(DockInput.Static);
+  const pointer = useRef<number | null>(null);
   const enabled = useSoundStore(state => state.isSoundEnabled);
   const [play] = useSound('/sounds/blop.mp3', { soundEnabled: enabled });
+  const stopMotion = useCallback(() => {
+    pointer.current = null;
+    setPressed(false);
+  }, []);
 
   useEffect(() => {
-    runGeneration.current += 1;
-    if (!allowMotion) {
-      controls.stop();
-      controls.set({ y: 0 });
-    }
-    return () => {
-      runGeneration.current += 1;
-      controls.stop();
+    const release = (event: globalThis.PointerEvent) => {
+      if (event.pointerId === pointer.current) {
+        stopMotion();
+      }
     };
-  }, [allowMotion, controls]);
+    document.addEventListener('pointerup', release);
+    document.addEventListener('pointercancel', release);
+    window.addEventListener('blur', stopMotion);
+    return () => {
+      document.removeEventListener('pointerup', release);
+      document.removeEventListener('pointercancel', release);
+      window.removeEventListener('blur', stopMotion);
+    };
+  }, [stopMotion]);
 
-  const stopMotion = () => {
-    runGeneration.current += 1;
-    controls.stop();
-    controls.set({ y: 0 });
+  useEffect(() => {
+    if (!allowMotion) {
+      stopMotion();
+    }
+  }, [allowMotion, stopMotion]);
+
+  const handlePointerDown = (event: PointerEvent) => {
+    if (!event.isPrimary || event.button !== 0) {
+      return;
+    }
+    pointer.current = event.pointerId;
+    setInput(DockInput.Pointer);
+    setPressed(true);
   };
-
-  const handleClick = async (input = DockInput.Pointer) => {
+  const handleKeyDown = () => {
+    setInput(DockInput.Keyboard);
+    stopMotion();
+  };
+  const handleClick = () => {
     if (name !== 'Toggle sound') {
       play();
     }
-    const generation = ++runGeneration.current;
-    if (!allowMotion || input !== DockInput.Pointer) {
-      stopMotion();
-      return;
-    }
-    await controls.start({ y: -BOUNCE_HEIGHT });
-    if (generation === runGeneration.current) {
-      void controls.start({ y: 0 });
-    }
+  };
+  const animate = allowMotion && input === DockInput.Pointer;
+  const bodyStyle = {
+    transform: animate && pressed ? 'scale(0.97)' : 'none',
+    transition: animate
+      ? pressed
+        ? PRESS_TRANSITION
+        : RELEASE_TRANSITION
+      : 'none',
   };
 
-  return { handleClick, stopMotion, controls, allowMotion };
+  return {
+    handleClick,
+    handlePointerDown,
+    handleKeyDown,
+    stopMotion,
+    bodyStyle,
+  };
 }

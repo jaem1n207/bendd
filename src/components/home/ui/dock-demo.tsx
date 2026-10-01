@@ -4,10 +4,9 @@ import { BookOpen, Folder, Image, Music2, Terminal } from 'lucide-react';
 import { useState } from 'react';
 
 import styles from '@/components/home/ui/home-studio.module.css';
-import { DockControls, DockItem, DockSurface } from '@/components/navigation';
+import { DockItem, DockSurface } from '@/components/navigation';
 
 const DEMO_SIZE = 40;
-const DEMO_MAGNIFICATION = 80;
 const apps = [
   { name: 'Files', icon: Folder },
   { name: 'Photos', icon: Image },
@@ -18,17 +17,12 @@ const apps = [
 
 export function DockDemo() {
   const [size, setSize] = useState(DEMO_SIZE);
-  const [magnification, setMagnification] = useState(DEMO_MAGNIFICATION);
   const [selected, setSelected] = useState('Files');
   return (
     <div className={styles.dockDemo}>
       <div className={styles.dockStage} data-dock-boundary="">
-        <span className={styles.stageLabel}>DOCK / MAGNIFICATION</span>
-        <DockSurface
-          size={size}
-          magnification={magnification}
-          label="Craft Dock 데모"
-        >
+        <span className={styles.stageLabel}>DOCK / DRAG TO RESIZE</span>
+        <DockSurface size={size} onSizeChange={setSize} label="Craft Dock 데모">
           {apps.map(({ name, icon: Icon }) => (
             <DockItem key={name} name={name}>
               <button
@@ -45,15 +39,11 @@ export function DockDemo() {
           ))}
         </DockSurface>
       </div>
-      <div className={styles.dockDemoControls}>
-        <DockControls
-          size={size}
-          magnification={magnification}
-          onSizeChange={setSize}
-          onMagnificationChange={setMagnification}
-          labelPrefix="데모 "
-        />
-        <p>이 데모의 크기만 바뀝니다.</p>
+      <div className={styles.dockDemoHint}>
+        <p>Resize Dock을 누른 채 위아래로 끌어 크기를 조절해 보세요.</p>
+        <span>
+          이 데모만 변경 · <output>{Number(size.toFixed(1))}px</output>
+        </span>
       </div>
     </div>
   );

@@ -244,11 +244,11 @@ export function HomeStudio({
                   >
                     <DockDemo />
                     <div className={styles.craftTitle}>
-                      <h3>커서에 반응하는 Dock</h3>
+                      <h3>직접 크기를 조절하는 Dock</h3>
                     </div>
                     <p>
-                      다가가는 아이콘과 이웃이 함께 커지고, 이름은 움직이는
-                      방향으로 이어집니다.
+                      손잡이를 위아래로 끌면 Dock의 크기가 바뀌고, 이름은
+                      움직이는 방향으로 이어집니다.
                     </p>
                     <p className={styles.craftCredit}>
                       macOS Dock에서 영감을 받은 인터랙션 · 이 사이트의 탐색에도

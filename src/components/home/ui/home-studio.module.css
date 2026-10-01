@@ -978,8 +978,8 @@
 
 .dockDemo {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(180px, 1fr);
-  gap: 28px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
   align-items: center;
   margin-bottom: 18px;
 }
@@ -1020,22 +1020,22 @@
 .dockDemoButton[aria-pressed='true'] .dockDemoDot {
   opacity: 1;
 }
-.dockDemoControls > p {
-  margin-top: 16px;
+.dockDemoHint {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 20px;
   color: hsl(var(--muted-foreground));
   font-size: 11px;
 }
+.dockDemoHint p {
+  margin: 0;
+}
+.dockDemoHint output {
+  font-variant-numeric: tabular-nums;
+}
 @media (max-width: 700px) {
-  .dockDemo {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 20px;
-  }
   .dockStage {
     height: 208px;
-  }
-  .dockDemoControls {
-    max-width: 320px;
-    width: 100%;
-    margin: 0 auto;
   }
 }

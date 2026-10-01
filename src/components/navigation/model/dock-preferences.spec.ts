@@ -19,11 +19,11 @@ describe('saved dock preferences', () => {
     await useDockPreferences.persist.rehydrate();
     const state = useDockPreferences.getState();
     expect(state.size).toBe(64);
-    expect(state.magnification).toBe(64);
+    expect(state).not.toHaveProperty('magnification');
     state.setSize(52);
     expect(
       JSON.parse(localStorage.getItem('dock-preferences') ?? '{}').state
-    ).toEqual({ size: 52, magnification: 64 });
+    ).toEqual({ size: 52 });
   });
 
   test('keeps defaults when stored values have the wrong type', async () => {
@@ -37,7 +37,6 @@ describe('saved dock preferences', () => {
     await useDockPreferences.persist.rehydrate();
     expect(useDockPreferences.getState()).toMatchObject({
       size: 40,
-      magnification: 80,
     });
   });
 });

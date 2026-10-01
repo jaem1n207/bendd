@@ -1,132 +1,115 @@
-import { act, renderHook } from '@testing-library/react';
-import { DockInput } from '@/components/navigation/consts/dock';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useNavigationItemAnimation } from '@/components/navigation/model/use-navigation-item-animation';
+import { NavigationItemTooltip } from '@/components/navigation/ui/navigation-item-tooltip';
 
 const state = vi.hoisted(() => {
   const preference: { reducedMotion: boolean | undefined } = {
     reducedMotion: false,
   };
-  return {
-    ...preference,
-    play: vi.fn(),
-    controls: {
-      start: vi.fn(() => Promise.resolve()),
-      stop: vi.fn(),
-      set: vi.fn(),
-    },
-  };
+  return { ...preference, play: vi.fn(), start: vi.fn() };
 });
 vi.mock('motion/react', async importOriginal => ({
   ...(await importOriginal<typeof import('motion/react')>()),
-  useAnimation: () => state.controls,
+  useAnimation: () => ({ start: state.start, stop: vi.fn(), set: vi.fn() }),
 }));
 vi.mock('@/hooks/use-prefers-reduced-motion', () => ({
   usePrefersReducedMotion: () => state.reducedMotion,
 }));
-vi.mock('@/components/sound', () => ({
-  useSoundStore: () => true,
-}));
+vi.mock('@/components/sound', () => ({ useSoundStore: () => true }));
 vi.mock('use-sound', () => ({ default: () => [state.play] }));
 
-function useItem(name = 'Home') {
-  return useNavigationItemAnimation({
-    name,
+function renderItem(name = 'Home') {
+  const view = render(
+    <NavigationItemTooltip name={name}>
+      <button>{name}</button>
+    </NavigationItemTooltip>
+  );
+  const button = screen.getByRole('button', { name });
+  const body = button.parentElement;
+  if (!body) {
+    throw new Error('Missing item body');
+  }
+  return { ...view, button, body };
+}
+function pointer(target: EventTarget, type: string, pointerId = 1) {
+  const event = new MouseEvent(type, { bubbles: true, button: 0 });
+  Object.defineProperties(event, {
+    pointerId: { value: pointerId },
+    isPrimary: { value: true },
+    pointerType: { value: 'mouse' },
   });
+  act(() => target.dispatchEvent(event));
 }
 
-describe('navigation motion preference', () => {
+describe('navigation press feedback', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     state.reducedMotion = false;
-    state.controls.start.mockImplementation(() => Promise.resolve());
   });
-
+  it('compresses only the inner body while held and never queues vertical travel', () => {
+    const { button, body } = renderItem();
+    pointer(button, 'pointerdown');
+    expect(body.style.transform).toBe('scale(0.97)');
+    expect(body.style.transition).toContain('150ms');
+    expect(body.parentElement?.style.transform).toBe('');
+    pointer(document, 'pointerup');
+    expect(body.style.transform).toBe('none');
+    expect(body.style.transition).toContain('100ms');
+    fireEvent.click(button);
+    expect(state.start).not.toHaveBeenCalled();
+    expect(state.play).toHaveBeenCalledOnce();
+  });
+  it('reverses rapid presses and ignores releases from another pointer', () => {
+    const { button, body } = renderItem();
+    for (let i = 0; i < 3; i += 1) {
+      pointer(button, 'pointerdown');
+      pointer(document, 'pointerup', 2);
+      expect(body.style.transform).toBe('scale(0.97)');
+      pointer(document, 'pointerup');
+      expect(body.style.transform).toBe('none');
+    }
+    expect(state.start).not.toHaveBeenCalled();
+  });
   it.each([true, undefined])(
-    'keeps sound but skips movement for %s',
-    async preference => {
+    'keeps %s motion preference static without silencing clicks',
+    preference => {
       state.reducedMotion = preference;
-      const { result } = renderHook(() => useItem());
-      expect(result.current.allowMotion).toBe(false);
-      await act(() => result.current.handleClick());
+      const { button, body } = renderItem();
+      pointer(button, 'pointerdown');
+      expect(body.style.transform).toBe('none');
+      expect(body.style.transition).toBe('none');
+      fireEvent.click(button);
       expect(state.play).toHaveBeenCalledOnce();
-      expect(state.controls.start).not.toHaveBeenCalled();
-      expect(state.controls.set).toHaveBeenCalledWith({ y: 0 });
     }
   );
-
-  it('preserves the normal bounce and sound-switch exclusion', async () => {
-    const { result } = renderHook(() => useItem('Toggle sound'));
-    expect(result.current.allowMotion).toBe(true);
-    await act(() => result.current.handleClick());
-    expect(state.controls.start.mock.calls).toEqual([[{ y: -20 }], [{ y: 0 }]]);
+  it('switches to still keyboard feedback immediately and preserves sound-switch exclusion', () => {
+    const { button, body } = renderItem('Toggle sound');
+    pointer(button, 'pointerdown');
+    fireEvent.keyDown(button, { key: 'Enter' });
+    expect(body.style.transform).toBe('none');
+    expect(body.style.transition).toBe('none');
+    fireEvent.click(button, { detail: 0 });
     expect(state.play).not.toHaveBeenCalled();
   });
-
-  it('invalidates a pending bounce when the preference changes', async () => {
-    let finish = () => {};
-    state.controls.start.mockReturnValueOnce(
-      new Promise<void>(resolve => {
-        finish = resolve;
-      })
-    );
-    const { result, rerender } = renderHook(() => useItem());
-    const pending = result.current.handleClick();
+  it('clears a press on cancellation, blur, preference change and unmount', () => {
+    const { button, body, rerender, unmount } = renderItem();
+    pointer(button, 'pointerdown');
+    pointer(document, 'pointercancel');
+    expect(body.style.transform).toBe('none');
+    pointer(button, 'pointerdown');
+    fireEvent.blur(window);
+    expect(body.style.transform).toBe('none');
+    pointer(button, 'pointerdown');
     state.reducedMotion = true;
-    rerender();
-    expect(state.controls.stop).toHaveBeenCalled();
-    expect(state.controls.set).toHaveBeenCalledWith({ y: 0 });
-    state.reducedMotion = false;
-    rerender();
-    await act(async () => {
-      finish();
-      await pending;
-    });
-    expect(state.controls.start).toHaveBeenCalledTimes(1);
-  });
-
-  it('only lets the newest of three taps finish', async () => {
-    const finishes: (() => void)[] = [];
-    state.controls.start.mockImplementation(
-      () => new Promise<void>(resolve => finishes.push(resolve))
+    rerender(
+      <NavigationItemTooltip name="Home">
+        <button>Home</button>
+      </NavigationItemTooltip>
     );
-    const { result } = renderHook(() => useItem());
-    const pending = [
-      result.current.handleClick(),
-      result.current.handleClick(),
-      result.current.handleClick(),
-    ];
-    await act(async () => {
-      finishes.slice().forEach(finish => finish());
-      await Promise.all(pending);
-    });
-    expect(state.controls.start).toHaveBeenCalledTimes(4);
-    expect(state.controls.start).toHaveBeenLastCalledWith({ y: 0 });
-  });
-
-  it('does not restart a bounce after unmount', async () => {
-    let finish = () => {};
-    state.controls.start.mockReturnValueOnce(
-      new Promise<void>(resolve => {
-        finish = resolve;
-      })
-    );
-    const { result, unmount } = renderHook(() => useItem());
-    const pending = result.current.handleClick();
+    expect(body.style.transform).toBe('none');
     unmount();
-    await act(async () => {
-      finish();
-      await pending;
-    });
-    expect(state.controls.start).toHaveBeenCalledTimes(1);
-  });
-
-  it('keeps keyboard activation still without disabling sound', async () => {
-    const { result } = renderHook(() => useItem());
-    await act(() => result.current.handleClick(DockInput.Keyboard));
-    expect(state.controls.start).not.toHaveBeenCalled();
-    expect(state.controls.set).toHaveBeenCalledWith({ y: 0 });
-    expect(state.play).toHaveBeenCalledOnce();
+    pointer(document, 'pointerup');
+    expect(state.start).not.toHaveBeenCalled();
   });
 });

@@ -61,7 +61,7 @@ test('reduced dock stays still through hover, press, theme and keyboard navigati
   await expect(page).toHaveURL(`${baseURL}/article`);
 });
 
-test('enabling reduce settles hover and bounce without reviving the old pointer', async ({
+test('keeps hover at the set size and stops the press when reduced motion is enabled', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -70,75 +70,60 @@ test('enabling reduce settles hover and bounce without reviving the old pointer'
   const home = dock.getByRole('link', { name: 'Home', exact: true });
   const item = dock.locator('[data-dock-label="Home"]');
   await home.hover();
-  await expect
-    .poll(() => item.evaluate(element => element.getBoundingClientRect().width))
-    .toBeGreaterThan(60);
+  await expectStill(item);
+  const initial = await item.boundingBox();
   await page.mouse.down();
   await expect
     .poll(() =>
-      item.evaluate(element => {
-        const child = element.firstElementChild;
-        return child
-          ? child.getBoundingClientRect().top -
-              element.getBoundingClientRect().top
-          : 0;
-      })
+      item.evaluate(
+        element => element.firstElementChild?.getBoundingClientRect().width
+      )
     )
-    .toBeGreaterThan(0);
-  await page.mouse.up();
+    .toBeCloseTo(38.8, 1);
+  expect(await item.boundingBox()).toEqual(initial);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expectStill(item);
+  await page.mouse.up();
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await expectStill(item);
   await home.hover({ position: { x: 3, y: 20 } });
-  await expect
-    .poll(() => item.evaluate(element => element.getBoundingClientRect().width))
-    .toBeGreaterThan(50);
-  await page.mouse.move(0, 0);
-  await expect(item).toHaveCSS('transform', 'none');
-  await expect(dock).toHaveAttribute('data-dock-animating', 'false');
+  await expectStill(item);
 });
 
-test('saves dock limits across reloads and keeps the Craft demo independent', async ({
+test('commits a vertical Dock resize on release and keeps the Craft demo independent', async ({
   page,
 }) => {
   await page.goto(baseURL);
   const dock = page.locator('footer [data-dock]');
-  await dock.getByRole('button', { name: 'Dock 설정', exact: true }).click();
-  const panel = page.getByRole('dialog', { name: 'Dock 설정', exact: true });
-  await panel
-    .getByRole('slider', { name: '아이콘 크기', exact: true })
-    .press('Home');
-  await panel
-    .getByRole('slider', { name: '확대 크기', exact: true })
-    .press('End');
-  await expect(
-    panel.getByRole('slider', { name: '아이콘 크기', exact: true })
-  ).toHaveValue('32');
-  await expect(
-    panel.getByRole('slider', { name: '확대 크기', exact: true })
-  ).toHaveValue('112');
-  await panel.getByRole('button', { name: 'Dock 설정 닫기' }).click();
-  await page
-    .getByRole('slider', { name: '데모 아이콘 크기', exact: true })
-    .press('End');
-  await expect(
-    page.getByRole('slider', { name: '데모 아이콘 크기', exact: true })
-  ).toHaveValue('64');
-  await expect(dock.locator('[data-navigation-item]').first()).toHaveCSS(
-    'width',
-    '32px'
+  const handle = dock.getByRole('slider', { name: 'Resize Dock', exact: true });
+  const stored = await page.evaluate(() =>
+    localStorage.getItem('dock-preferences')
   );
+  await expect(handle).toBeVisible();
+  const { x, y } = await handle.evaluate(element => {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+  });
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x, y - 24, { steps: 8 });
+  await expect(handle).toHaveAttribute('aria-valuenow', '52');
+  expect(
+    await page.evaluate(() => localStorage.getItem('dock-preferences'))
+  ).toBe(stored);
+  await page.mouse.up();
+  await expect(dock).not.toHaveAttribute('data-dock-resizing', 'true');
+  const demo = page
+    .getByRole('group', { name: 'Craft Dock 데모' })
+    .getByRole('slider', { name: 'Resize Dock' });
+  await demo.press('End');
+  await expect(demo).toHaveAttribute('aria-valuenow', '64');
+  await expect(handle).toHaveAttribute('aria-valuenow', '52');
+  await handle.press('Home');
+  await expect(handle).toHaveAttribute('aria-valuenow', '32');
   await page.reload();
-  await expect(dock.locator('[data-navigation-item]').first()).toHaveCSS(
-    'width',
-    '32px'
-  );
-  await dock.getByRole('button', { name: 'Dock 설정', exact: true }).click();
-  await expect(
-    panel.getByRole('slider', { name: '확대 크기', exact: true })
-  ).toHaveValue('112');
-  await expect(
-    page.getByRole('slider', { name: '데모 아이콘 크기', exact: true })
-  ).toHaveValue('40');
+  await expect(handle).toHaveAttribute('aria-valuenow', '32');
+  await expect(demo).toHaveAttribute('aria-valuenow', '40');
+  await handle.press('Enter');
+  await expect(handle).toHaveAttribute('aria-valuenow', '40');
 });
