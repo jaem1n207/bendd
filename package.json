@@ -10,9 +10,9 @@
     "test:unit": "vitest",
     "test:e2e": "playwright test",
     "-------------------------------------------------": "",
-    "dev": "next dev",
+    "dev": "node scripts/generate-home-font.mjs && next dev",
     "start": "next start",
-    "build": "next build",
+    "build": "node scripts/generate-home-font.mjs && next build",
     "build-stats": "ANALYZE=true pnpm build",
     "------------------------------------------------": "",
     "clean": "rimraf .next",
@@ -23,7 +23,8 @@
     "check-types": "tsc --noEmit --pretty",
     "-----------------------------------------------": "",
     "cz": "czg checkbox",
-    "prepare": "husky"
+    "prepare": "husky",
+    "fonts:home": "node scripts/generate-home-font.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.20",
@@ -87,6 +88,7 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "3.2.6"
+    "vitest": "3.2.6",
+    "subset-font": "2.9.0"
   }
 }

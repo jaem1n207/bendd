@@ -85,16 +85,28 @@ export function shuffleLetters(
   const text = element.textContent ?? '';
   const charsArray = Array.from(text); // 문자열을 문자열 배열로 변환
   const charsTypes = charsArray.map(char => {
-    if (/\s/.test(char)) return 'space';
-    if (isKorean(char)) return 'korean';
-    if (/[a-z]/.test(char)) return 'lowerCase';
-    if (/[A-Z]/.test(char)) return 'upperCase';
-    if (/[0-9]/.test(char)) return 'digit';
+    if (/\s/.test(char)) {
+      return 'space';
+    }
+    if (isKorean(char)) {
+      return 'korean';
+    }
+    if (/[a-z]/.test(char)) {
+      return 'lowerCase';
+    }
+    if (/[A-Z]/.test(char)) {
+      return 'upperCase';
+    }
+    if (/[0-9]/.test(char)) {
+      return 'digit';
+    }
     return 'symbol';
   });
 
   const charsPositions = charsArray.reduce<number[]>((acc, char, index) => {
-    if (!/\s/.test(char)) acc.push(index);
+    if (!/\s/.test(char)) {
+      acc.push(index);
+    }
     return acc;
   }, []);
 
@@ -106,9 +118,8 @@ export function shuffleLetters(
       if (i < start + options.iterations) {
         const charType = charsTypes[charsPositions[i]];
         if (charType !== 'space') {
-          shuffledChars[charsPositions[i]] = getRandomCharacterForType(
-            charType as Exclude<typeof charType, 'space'>
-          );
+          shuffledChars[charsPositions[i]] =
+            getRandomCharacterForType(charType);
         }
       } else {
         shuffledChars[charsPositions[i]] = '';
@@ -126,7 +137,9 @@ export function shuffleLetters(
   let rafId: number | null = null;
 
   const tick = (now: number): void => {
-    if (lastStepTime === null) lastStepTime = now;
+    if (lastStepTime === null) {
+      lastStepTime = now;
+    }
 
     const elapsed = now - lastStepTime;
     if (elapsed >= stepDuration) {
@@ -152,6 +165,8 @@ export function shuffleLetters(
   rafId = requestAnimationFrame(tick);
 
   return () => {
-    if (rafId !== null) cancelAnimationFrame(rafId);
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+    }
   };
 }

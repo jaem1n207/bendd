@@ -19,6 +19,27 @@ Pretendard Variable을 사용한다. Gaegu를 실제 페이지에 적용해본 �
 - 본문 layout safeguard는 유지한다: 충분한 line-height, Korean line break, long-token wrapping, code/table/control font isolation.
 - 런타임에는 `fonts.googleapis.com` 또는 `fonts.gstatic.com`으로 직접 요청하지 않는다.
 
+### Home Initial Render
+
+홈은 긴 글과 달리 표시할 문자가 제한적이므로 동일한 Pretendard의 작은
+subset을 사용한다. `pnpm dev`/`pnpm build`가 홈 소스와 글 frontmatter에서
+`PretendardHome.woff2`를 재생성한다. 원본의 글자 모양, metrics, variable
+weight 100–900을 유지하며 최초 파일은 90,912 bytes로 원본보다 95.6% 작다.
+
+`HomeStudio`에서만 이 subset과 10,684-byte Gaegu 메모 폰트를
+`next/font/local`, `preload: true`, `display: 'block'`으로 선언한다.
+작은 파일을 HTML에서 일찍 발견하게 하여 시스템 폰트가 잠깐 보이는 FOUT를
+줄인다. 이미 preload하던 작은 Latin Fira Mono에도 `display: 'block'`을
+적용한다. 글꼴 대기 상태를 React state나 전체 페이지 visibility로 관리하지 않는다.
+네트워크가 극단적으로 느리거나 실패하면 브라우저의 유한한 block 기간 후
+fallback 텍스트가 표시된다.
+
+아래의 2 MB Pretendard `swap`/`preload: false` 정책은 전역 폰트와
+Article/Craft 본문에 계속 적용한다. 홈 subset은 `--font-home-sans`로
+격리하며, 포함하지 않은 글자는 원본 `--font-sans`로 fallback한다.
+손글씨는 작업물별 행동 안내를 포함한 짧은 한국어 메모 네 곳에만 한정한다. 생성 방법과 라이선스는
+`src/app/fonts/README.md`와 `public/fonts/README.md`에 기록한다.
+
 ## Why Gaegu Was Reverted
 
 Gaegu는 사용자의 reference image와 정서적으로 가까웠지만, 긴 본문에서 다음 문제가 컸다.
@@ -29,7 +50,8 @@ Gaegu는 사용자의 reference image와 정서적으로 가까웠지만, 긴 �
 - 영어, 숫자, code-ish token, 링크가 섞인 기술 글에서는 글꼴 리듬이 깨진다.
 - 사용자는 블로그 본문을 오래 읽어야 하므로 aesthetic gain보다 readability loss가 더 크다.
 
-따라서 Gaegu는 제품 폰트로 채택하지 않고, 이번 실험에서 얻은 performance/accessibility 방어선만 유지한다.
+따라서 Gaegu는 본문 폰트로 채택하지 않는다. 홈의 짧은 여백 메모에만 사용하고,
+이번 실험에서 얻은 performance/accessibility 방어선은 유지한다.
 
 ## Risk Register
 
@@ -46,7 +68,7 @@ Pretendard는 한글과 라틴 문자가 함께 나오는 문장에서도 밀도
 
 **User impact:** 사용자는 문단을 더 빠르게 훑고, 긴 글에서도 피로를 덜 느낀다. 특히 모바일, 저시력, 집중도가 떨어진 상황에서 차이가 커진다.
 
-### 2. FOIT
+### 2. FOIT In Long-Form Content
 
 **Issue:** `font-display: block` 또는 기본 브라우저 정책은 webfont가 준비될 때까지 텍스트를 숨길 수 있다. 이 경우 사용자는 빈 화면을 보거나 콘텐츠가 늦게 나타난다고 느낀다.
 
@@ -62,7 +84,7 @@ Pretendard는 한글과 라틴 문자가 함께 나오는 문장에서도 밀도
 
 **Issue:** `font-display: swap`은 fallback text를 먼저 보여주고 나중에 webfont로 바꾼다. fallback과 webfont metrics가 다르면 줄바꿈, 높이, 문단 위치가 흔들릴 수 있다.
 
-**Response:** Pretendard는 전역 sans contract 하나로만 로드한다.
+**Response:** 긴 글의 Pretendard는 전역 sans contract 하나로만 로드한다.
 Article/Craft 전용 추가 webfont를 만들지 않고, article body에는 stable
 line-height를 둔다. `next/font/local`의 fallback metric adjustment를
 사용해 fallback과 webfont 사이의 metric 차이를 줄인다.
@@ -106,7 +128,7 @@ coverage를 확보하되, browser가 CSS discovery 이후 필요할 때 받게 �
 
 **Issue:** 큰 폰트를 preload하면 브라우저가 CSS, JS, image보다 font를 과하게 우선시할 수 있다. 반대로 필요한 font를 너무 늦게 발견하면 swap이 늦어진다.
 
-**Response:** Pretendard local font는 root layout에서만 선언하고
+**Response:** 전체 문자 범위의 Pretendard local font는 root layout에서만 선언하고
 `preload: false`를 사용한다. Page component나 MDX component에서 font
 loader를 반복 호출하지 않는다.
 

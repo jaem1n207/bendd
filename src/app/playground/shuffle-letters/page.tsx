@@ -1,6 +1,6 @@
 'use client';
 
-import { shuffleLetters } from '@/components/article/lib/shuffle-letters';
+import { shuffleLetters } from '@/lib/shuffle-letters';
 import { Button } from '@/components/ui/button';
 import { useCallback, useEffect, useRef, useState } from 'react';
 

@@ -29,7 +29,8 @@ const fontPretendard = localFont({
 
 const fontMono = FontMono({
   subsets: ['latin'],
-  display: 'swap',
+  display: 'block',
+  preload: true,
   variable: '--font-mono',
   weight: ['400', '500', '700'],
 });

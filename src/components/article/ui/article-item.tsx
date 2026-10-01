@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { shouldPlayEntranceAnimation } from '@/components/article/lib/entrance-animation';
-import { shuffleLetters } from '@/components/article/lib/shuffle-letters';
+import { shuffleLetters } from '@/lib/shuffle-letters';
 import type { ArticleInfo } from '@/components/article/types/article';
 import { WithSound } from '@/components/sound';
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
