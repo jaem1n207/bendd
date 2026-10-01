@@ -1,77 +1,60 @@
 'use client';
 
 import { motion } from 'motion/react';
-import type { ReactNode } from 'react';
-import useMeasure from 'react-use-measure';
+import { useState, type ReactNode } from 'react';
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { isTouchDevice } from '@/lib/detect';
-import { cn } from '@/lib/utils';
-import { DEFAULT_ITEM_SIZE } from '@/components/navigation/consts/size';
+import { DockInput } from '@/components/navigation/consts/dock';
 import { useNavigationItemAnimation } from '@/components/navigation/model/use-navigation-item-animation';
-import type { ItemMotionProps } from '@/components/navigation/types/motion';
-
-type NavigationItemTooltipProps = {
-  name: string;
-  children: ReactNode;
-  content: ReactNode;
-  className?: string;
-} & ItemMotionProps;
+import styles from '@/components/navigation/ui/dock.module.css';
+import { cn } from '@/lib/utils';
 
 export function NavigationItemTooltip({
   name,
   children,
-  content,
   className,
-  ...props
-}: NavigationItemTooltipProps) {
-  const [ref, bounds] = useMeasure();
-  const { width, handleClick, controls, allowMotion } =
+}: {
+  name: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  const { handleClick, stopMotion, controls, allowMotion } =
     useNavigationItemAnimation({
       name,
-      size: DEFAULT_ITEM_SIZE,
-      bounds,
-      ...props,
     });
-
+  const [input, setInput] = useState(DockInput.Static);
   return (
-    <Tooltip delayDuration={50}>
-      <TooltipTrigger asChild>
-        <motion.div
-          ref={ref}
-          data-navigation-item=""
-          className={cn(
-            'relative top-0 aspect-square rounded-full bg-gray-300 bg-navigation-item text-gray-900/80 data-[fluid-hover-active]:text-gray-900 shrink-0',
-            className
-          )}
-          style={
-            isTouchDevice || !allowMotion
-              ? {
-                  width: DEFAULT_ITEM_SIZE,
-                }
-              : { width }
-          }
-          animate={controls}
-          initial={{ top: 0 }}
-          whileTap={allowMotion ? { top: 8 } : undefined}
-          transition={allowMotion ? undefined : { duration: 0 }}
-          onTap={handleClick}
-          tabIndex={-1}
-        >
-          {children}
-        </motion.div>
-      </TooltipTrigger>
-      <TooltipContent
-        side="top"
-        align="center"
-        className="mb-1 text-sm text-primary/60"
+    <div
+      data-navigation-item=""
+      data-dock-label={name}
+      className={cn(styles.item, className)}
+    >
+      <motion.div
+        className={styles.itemBody}
+        animate={controls}
+        initial={false}
+        whileTap={
+          allowMotion && input === DockInput.Pointer ? { y: 8 } : undefined
+        }
+        transition={
+          allowMotion
+            ? { type: 'spring', stiffness: 420, damping: 24 }
+            : { duration: 0 }
+        }
+        onPointerDownCapture={event =>
+          setInput(
+            event.pointerType === 'mouse' ? DockInput.Pointer : DockInput.Static
+          )
+        }
+        onKeyDownCapture={() => {
+          setInput(DockInput.Keyboard);
+          stopMotion();
+        }}
+        onClick={event => {
+          void handleClick(event.detail === 0 ? DockInput.Keyboard : input);
+        }}
       >
-        {content}
-      </TooltipContent>
-    </Tooltip>
+        {children}
+      </motion.div>
+    </div>
   );
 }

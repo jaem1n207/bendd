@@ -1,112 +1,126 @@
 'use client';
 
-import { cva, type VariantProps } from 'class-variance-authority';
-import { motion, useMotionValue } from 'motion/react';
-import type { ReactNode } from 'react';
-import {
-  Children,
-  cloneElement,
-  forwardRef,
-  isValidElement,
-  useCallback,
-  useEffect,
-  useRef,
-} from 'react';
+import { Settings2, X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
-import { FluidHover } from '@/components/ui/fluid-hover';
-import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
-import { useScrollFade } from '@/hooks/use-scroll-fade';
-import { cn } from '@/lib/utils';
-import {
-  DEFAULT_DISTANCE,
-  DEFAULT_MAGNIFICATION,
-} from '@/components/navigation/consts/size';
-import type { ItemMotionProps } from '@/components/navigation/types/motion';
+import { useDockPreferences } from '@/components/navigation/model/dock-preferences';
+import { DockControls } from '@/components/navigation/ui/dock-controls';
+import { DockSurface } from '@/components/navigation/ui/dock-surface';
+import styles from '@/components/navigation/ui/dock.module.css';
+import { NavigationItemTooltip } from '@/components/navigation/ui/navigation-item-tooltip';
 
-const navigationAnimateTriggerVariants = cva(
-  'scroll-fade-x xs:scroll-fade-none flex h-20 w-full items-end gap-2 overflow-x-auto overflow-y-hidden py-2 [--scroll-fade-reveal:32px] [--scroll-fade-size:12px] xs:h-auto xs:overflow-visible'
-);
+export function NavigationAnimateTrigger({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const { size, magnification, setSize, setMagnification, reset } =
+    useDockPreferences();
+  const [open, setOpen] = useState(false);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  const id = useId();
+  const pathname = usePathname();
 
-type NavigationAnimateTriggerProps = VariantProps<
-  typeof navigationAnimateTriggerVariants
-> & {
-  children: ReactNode | ReactNode[];
-  className?: string;
-  magnification?: number;
-  distance?: number;
-};
-
-export const NavigationAnimateTrigger = forwardRef<
-  HTMLDivElement,
-  NavigationAnimateTriggerProps
->(
-  (
-    {
-      children,
-      className,
-      magnification = DEFAULT_MAGNIFICATION,
-      distance = DEFAULT_DISTANCE,
-    },
-    ref
-  ) => {
-    const mousex = useMotionValue(Infinity);
-    const allowMotion = usePrefersReducedMotion() === false;
-
-    useEffect(() => {
-      if (!allowMotion) {
-        mousex.set(Infinity);
+  useEffect(() => {
+    void useDockPreferences.persist.rehydrate();
+  }, []);
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    panel.current
+      ?.querySelector<HTMLInputElement>('input')
+      ?.focus({ preventScroll: true });
+    const close = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !panel.current?.contains(event.target) &&
+        !trigger.current?.contains(event.target)
+      ) {
+        setOpen(false);
       }
-    }, [allowMotion, mousex]);
-    const scrollRef = useRef<HTMLDivElement | null>(null);
-    useScrollFade(scrollRef, 'x', Children.count(children));
-
-    const setRef = useCallback(
-      (element: HTMLDivElement | null) => {
-        scrollRef.current = element;
-        if (typeof ref === 'function') {
-          ref(element);
-        } else if (ref) {
-          ref.current = element;
-        }
-      },
-      [ref]
-    );
-
-    const renderChildren = () => {
-      return Children.map(children, (child: ReactNode) => {
-        if (!isValidElement<ItemMotionProps>(child)) {
-          return child;
-        }
-
-        return cloneElement(child, {
-          mousex: mousex,
-          magnification: magnification,
-          distance: distance,
-        });
-      });
     };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+        trigger.current?.focus({ preventScroll: true });
+      }
+    };
+    document.addEventListener('pointerdown', close);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', close);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [open]);
 
-    return (
-      <FluidHover
-        axis="x"
-        itemSelector="[data-navigation-item]"
-        highlightClassName="z-20 rounded-full bg-primary/10"
+  return (
+    <>
+      <DockSurface
+        size={size}
+        magnification={magnification}
+        paused={open}
+        label="사이트 탐색 Dock"
       >
-        <motion.div
-          ref={setRef}
-          onMouseMove={e => {
-            if (allowMotion) {
-              mousex.set(e.pageX);
-            }
-          }}
-          onMouseLeave={() => mousex.set(Infinity)}
-          className={cn(navigationAnimateTriggerVariants({ className }))}
-        >
-          {renderChildren()}
-        </motion.div>
-      </FluidHover>
-    );
-  }
-);
-
-NavigationAnimateTrigger.displayName = 'NavigationAnimateTrigger';
+        {children}
+        <NavigationItemTooltip name="Dock 설정">
+          <button
+            ref={trigger}
+            type="button"
+            aria-label="Dock 설정"
+            aria-expanded={open}
+            aria-controls={open ? id : undefined}
+            aria-haspopup="dialog"
+            className="flex size-full items-center justify-center"
+            onClick={() => setOpen(value => !value)}
+          >
+            <Settings2 aria-hidden="true" />
+          </button>
+        </NavigationItemTooltip>
+      </DockSurface>
+      {open &&
+        createPortal(
+          <div
+            ref={panel}
+            id={id}
+            role="dialog"
+            aria-labelledby={`${id}-title`}
+            className={styles.settings}
+          >
+            <div className={styles.settingsHeader}>
+              <h3 id={`${id}-title`}>Dock 설정</h3>
+              <button
+                type="button"
+                aria-label="Dock 설정 닫기"
+                onClick={() => {
+                  setOpen(false);
+                  trigger.current?.focus({ preventScroll: true });
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <DockControls
+              size={size}
+              magnification={magnification}
+              onSizeChange={setSize}
+              onMagnificationChange={setMagnification}
+            />
+            <div className={styles.settingsFooter}>
+              <span>이 브라우저에 저장됩니다.</span>
+              <button type="button" onClick={reset}>
+                기본값으로
+              </button>
+            </div>
+          </div>,
+          document.body
+        )}
+    </>
+  );
+}

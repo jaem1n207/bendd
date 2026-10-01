@@ -7,32 +7,31 @@ import { type Route } from 'next';
 
 import { ExternalLink } from '@/components/ui/external-link';
 import { cn } from '@/lib/utils';
-import type { ItemMotionProps } from '../types/motion';
-import { NavigationItemTooltip } from './navigation-item-tooltip';
+import { NavigationItemTooltip } from '@/components/navigation/ui/navigation-item-tooltip';
 
 type MainNavigationItemProps = {
   slug: Route<''>;
   name: string;
   icon: ReactNode;
-} & ItemMotionProps;
+};
 
 export function MainNavigationItem({
   slug,
   name,
   icon,
-  ...motionProps
 }: MainNavigationItemProps) {
   const pathname = usePathname();
   const isActive = new RegExp(`^${slug}(\/|$)`).test(pathname);
 
   return (
-    <NavigationItemTooltip content={name} name={name} {...motionProps}>
+    <NavigationItemTooltip name={name}>
       <Link
         href={slug}
+        aria-current={isActive ? 'page' : undefined}
         aria-label={name}
         className="flex size-full items-center justify-center"
       >
-        <div className="absolute -top-[1px] -z-10 size-full rounded-full opacity-80 dark:bg-navigation-item-top-highlight" />
+        <div className="absolute -top-px -z-10 size-full rounded-full opacity-80 dark:bg-navigation-item-top-highlight" />
         {icon}
         <div
           className={cn(
@@ -49,22 +48,21 @@ type SocialNavigationItemProps = {
   href: string;
   name: string;
   icon: ReactNode;
-} & ItemMotionProps;
+};
 
 export function SocialNavigationItem({
   href,
   name,
   icon,
-  ...motionProps
 }: SocialNavigationItemProps) {
   return (
-    <NavigationItemTooltip content={name} name={name} {...motionProps}>
+    <NavigationItemTooltip name={name}>
       <ExternalLink
         href={href}
         aria-label={name}
         className="flex size-full items-center justify-center"
       >
-        <div className="absolute -top-[1px] -z-10 size-full rounded-full opacity-80 dark:bg-navigation-item-top-highlight" />
+        <div className="absolute -top-px -z-10 size-full rounded-full opacity-80 dark:bg-navigation-item-top-highlight" />
         {icon}
       </ExternalLink>
     </NavigationItemTooltip>
@@ -74,17 +72,16 @@ export function SocialNavigationItem({
 type SettingNavigationItemProps = {
   name: string;
   children: ReactNode;
-} & ItemMotionProps;
+};
 
 export function SettingNavigationItem({
   name,
   children,
-  ...motionProps
 }: SettingNavigationItemProps) {
   return (
-    <NavigationItemTooltip content={name} name={name} {...motionProps}>
+    <NavigationItemTooltip name={name}>
       <div className="flex size-full items-center justify-center">
-        <div className="absolute -top-[1px] -z-10 size-full rounded-full opacity-80 dark:bg-navigation-item-top-highlight" />
+        <div className="absolute -top-px -z-10 size-full rounded-full opacity-80 dark:bg-navigation-item-top-highlight" />
         {children}
       </div>
     </NavigationItemTooltip>

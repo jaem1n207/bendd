@@ -1,0 +1,226 @@
+.dock {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+  isolation: isolate;
+}
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid hsl(var(--input));
+  border-radius: 999px;
+  background: hsl(var(--background) / 0.94);
+  box-shadow:
+    0 3px 12px hsl(var(--foreground) / 0.05),
+    inset 0 1px 0 hsl(var(--foreground) / 0.05);
+  transform-origin: center bottom;
+}
+.viewport {
+  max-width: 100%;
+}
+.dock[data-dock-overflow='true'] .viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: 999px;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.viewport::-webkit-scrollbar {
+  display: none;
+}
+.rail {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  padding: 8px 10px 12px;
+}
+.item {
+  position: relative;
+  flex: 0 0 var(--dock-size);
+  width: var(--dock-size);
+  height: var(--dock-size);
+  transform-origin: center bottom;
+}
+.itemBody {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(
+    to top right,
+    hsl(var(--gray-200)),
+    hsl(var(--gray-300)),
+    hsl(var(--gray-200)),
+    hsl(var(--gray-300))
+  );
+  color: hsl(var(--gray-950));
+}
+.itemBody::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: hsl(var(--primary) / 0.1);
+  opacity: 0;
+  transition: opacity 140ms ease-out;
+}
+.item[data-dock-active] .itemBody::before {
+  opacity: 1;
+}
+.itemBody a,
+.itemBody button {
+  border-radius: inherit;
+}
+.itemBody a:focus-visible,
+.itemBody button:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
+}
+.itemBody svg {
+  width: 50%;
+  height: 50%;
+}
+.separator {
+  flex: 0 0 1px;
+  height: calc(var(--dock-size) * 0.65);
+  margin: 0 5px;
+  background: hsl(var(--border));
+}
+.tooltipAnchor {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+.tooltip {
+  position: relative;
+  left: 0;
+  width: max-content;
+  margin-left: -50%;
+  translate: -50% 0;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border));
+  border-radius: 9px;
+  background: hsl(var(--background) / 0.97);
+  color: hsl(var(--foreground) / 0.76);
+  padding: 5px 10px;
+  box-shadow: 0 3px 10px hsl(var(--foreground) / 0.05);
+  font:
+    500 12px/18px var(--font-sans),
+    sans-serif;
+}
+.tooltipText {
+  position: relative;
+  display: block;
+  white-space: nowrap;
+}
+.tooltipSizer {
+  visibility: hidden;
+}
+.tooltipLabel {
+  position: absolute;
+  inset: 0;
+  display: block;
+  text-align: center;
+}
+.controls {
+  display: grid;
+  gap: 18px;
+}
+.control {
+  display: grid;
+  gap: 8px;
+}
+.controlLabel {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.controlLabel output {
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--muted-foreground));
+}
+.control input {
+  width: 100%;
+  height: 20px;
+  accent-color: hsl(var(--foreground));
+  cursor: pointer;
+}
+.control input:focus-visible {
+  outline: 2px solid hsl(var(--foreground));
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.settings {
+  position: fixed;
+  bottom: calc(116px + env(safe-area-inset-bottom));
+  left: 50%;
+  translate: -50% 0;
+  z-index: 50;
+  width: min(300px, calc(100vw - 32px));
+  padding: 20px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 16px;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  box-shadow: 0 12px 40px hsl(var(--foreground) / 0.12);
+  font-family: var(--font-sans), sans-serif;
+}
+.settingsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.settingsHeader h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+.settingsHeader button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+.settingsHeader button:hover {
+  background: hsl(var(--muted));
+}
+.settingsFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  gap: 10px;
+  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+}
+.settingsFooter button {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .itemBody::before {
+    transition: none;
+  }
+}
+
+.hoverArea {
+  display: none;
+  position: absolute;
+  top: calc(var(--dock-size) - var(--dock-peak));
+  inset-inline: 0;
+  bottom: 0;
+  z-index: -2;
+  transform-origin: center bottom;
+}
+.dock[data-dock-hovering='true'] .hoverArea {
+  display: block;
+}

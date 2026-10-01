@@ -20,7 +20,7 @@ async function filesIn(directory) {
 // covers featured-title changes without adding the much larger article bodies.
 const homeFiles = (
   await Promise.all(
-    ['home', 'profile'].map(domain =>
+    ['home', 'profile', 'navigation'].map(domain =>
       filesIn(path.join(root, 'src/components', domain))
     )
   )

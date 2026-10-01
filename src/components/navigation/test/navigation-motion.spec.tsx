@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { motionValue } from 'motion/react';
+import { DockInput } from '@/components/navigation/consts/dock';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useNavigationItemAnimation } from '@/components/navigation/model/use-navigation-item-animation';
@@ -33,9 +33,6 @@ vi.mock('use-sound', () => ({ default: () => [state.play] }));
 function useItem(name = 'Home') {
   return useNavigationItemAnimation({
     name,
-    size: 40,
-    bounds: { x: 0, width: 40 },
-    mousex: motionValue(Infinity),
   });
 }
 
@@ -55,7 +52,7 @@ describe('navigation motion preference', () => {
       await act(() => result.current.handleClick());
       expect(state.play).toHaveBeenCalledOnce();
       expect(state.controls.start).not.toHaveBeenCalled();
-      expect(state.controls.set).toHaveBeenCalledWith({ top: 0 });
+      expect(state.controls.set).toHaveBeenCalledWith({ y: 0 });
     }
   );
 
@@ -63,10 +60,7 @@ describe('navigation motion preference', () => {
     const { result } = renderHook(() => useItem('Toggle sound'));
     expect(result.current.allowMotion).toBe(true);
     await act(() => result.current.handleClick());
-    expect(state.controls.start.mock.calls).toEqual([
-      [{ top: -20 }],
-      [{ top: 0 }],
-    ]);
+    expect(state.controls.start.mock.calls).toEqual([[{ y: -20 }], [{ y: 0 }]]);
     expect(state.play).not.toHaveBeenCalled();
   });
 
@@ -82,7 +76,7 @@ describe('navigation motion preference', () => {
     state.reducedMotion = true;
     rerender();
     expect(state.controls.stop).toHaveBeenCalled();
-    expect(state.controls.set).toHaveBeenCalledWith({ top: 0 });
+    expect(state.controls.set).toHaveBeenCalledWith({ y: 0 });
     state.reducedMotion = false;
     rerender();
     await act(async () => {
@@ -108,7 +102,7 @@ describe('navigation motion preference', () => {
       await Promise.all(pending);
     });
     expect(state.controls.start).toHaveBeenCalledTimes(4);
-    expect(state.controls.start).toHaveBeenLastCalledWith({ top: 0 });
+    expect(state.controls.start).toHaveBeenLastCalledWith({ y: 0 });
   });
 
   it('does not restart a bounce after unmount', async () => {
@@ -128,25 +122,11 @@ describe('navigation motion preference', () => {
     expect(state.controls.start).toHaveBeenCalledTimes(1);
   });
 
-  it('waits for a fresh pointer movement before exposing the spring again', () => {
-    const mousex = motionValue(Infinity);
-    const { result, rerender } = renderHook(() =>
-      useNavigationItemAnimation({
-        name: 'Home',
-        size: 40,
-        bounds: { x: 0, width: 40 },
-        mousex,
-      })
-    );
-    act(() => mousex.set(20));
-    expect(result.current.width).not.toBe(40);
-    state.reducedMotion = true;
-    rerender();
-    act(() => mousex.set(Infinity));
-    state.reducedMotion = false;
-    rerender();
-    expect(result.current.width).toBe(40);
-    act(() => mousex.set(21));
-    expect(result.current.width).not.toBe(40);
+  it('keeps keyboard activation still without disabling sound', async () => {
+    const { result } = renderHook(() => useItem());
+    await act(() => result.current.handleClick(DockInput.Keyboard));
+    expect(state.controls.start).not.toHaveBeenCalled();
+    expect(state.controls.set).toHaveBeenCalledWith({ y: 0 });
+    expect(state.play).toHaveBeenCalledOnce();
   });
 });

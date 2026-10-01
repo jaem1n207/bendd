@@ -3,38 +3,25 @@ import { type Route } from 'next';
 
 import { SoundSwitcher } from '@/components/sound';
 import { ThemeSwitcher } from '@/components/theme';
-import {
-  Book,
-  Bulb,
-  Gallery,
-  GitHub,
-  Home,
-  Mail,
-  Youtube,
-} from '@/components/ui/icons';
-import { Separator } from '@/components/ui/separator';
+import { Book, Bulb, GitHub, Home, Mail, Youtube } from '@/components/ui/icons';
+import styles from '@/components/navigation/ui/dock.module.css';
 import { siteMetadata } from '@/lib/site-metadata';
-import { NavigationAnimateTrigger } from './navigation-animate-trigger';
+import { NavigationAnimateTrigger } from '@/components/navigation/ui/navigation-animate-trigger';
 import {
   MainNavigationItem,
   SettingNavigationItem,
   SocialNavigationItem,
-} from './navigation-items';
+} from '@/components/navigation/ui/navigation-items';
 
 export function Navigation() {
   return (
     <>
-      <div className="dark:absolute dark:-top-px dark:-z-10 dark:h-px dark:w-[95%] dark:bg-navigation-highlight dark:opacity-20" />
       <NavigationAnimateTrigger>
         {mainItems.map(item => {
-          if (item.disabled) {
-            return null;
-          }
-
           return (
             <MainNavigationItem
               key={item.name}
-              slug={item.slug as Route<''>}
+              slug={item.slug}
               name={item.name}
               icon={item.icon}
             />
@@ -78,13 +65,7 @@ const mainItems = [
     slug: '/article',
     icon: <Book className={navigationItemSvg()} />,
   },
-  {
-    name: 'Photos',
-    slug: '/photo',
-    icon: <Gallery className={navigationItemSvg()} />,
-    disabled: true,
-  },
-];
+] satisfies { name: string; slug: Route; icon: React.ReactNode }[];
 
 const socialItems = [
   {
@@ -117,13 +98,10 @@ const settingsItems = [
 
 function StyledSeparator() {
   return (
-    <Separator
-      orientation="vertical"
-      className="mx-2 !h-9"
-      style={{
-        maskImage:
-          'linear-gradient(0deg, transparent, rgb(255, 255, 255) 16px, rgb(255, 255, 255) calc(100% - 16px), transparent)',
-      }}
+    <div
+      aria-hidden="true"
+      className={styles.separator}
+      data-dock-separator=""
     />
   );
 }

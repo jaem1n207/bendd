@@ -9,6 +9,7 @@ It contains the characters used in these short home annotations:
 - 내가 쓰려고 만든 도구
 - 안에서 스크롤해 보세요
 - 글자를 눌러 섞어 보세요
+- 도구를 눌러 보세요
 - 만들며 배운 걸 기록합니다.
 
 `HomeStudio` loads this face with `next/font/local`, using the

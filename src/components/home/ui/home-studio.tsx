@@ -14,6 +14,7 @@ import localFont from 'next/font/local';
 import type { ReactNode } from 'react';
 
 import { TextShuffleDemo } from '@/components/home/ui/craft-demos';
+import { DockDemo } from '@/components/home/ui/dock-demo';
 import { CodeSteps } from '@/components/home/ui/code-steps';
 import { ExtensionInstallMenu } from '@/components/home/ui/extension-install-menu';
 import { HomeMotion } from '@/components/home/ui/home-motion';
@@ -230,6 +231,29 @@ export function HomeStudio({
                         Rauno에서 영감을 받아 문자별 처리로 확장
                       </p>
                     </div>
+                  </article>
+                </div>
+                <div className={styles.craftEntry}>
+                  <MarginNote side="right">
+                    <span>도구를 눌러</span> <span>보세요</span>
+                  </MarginNote>
+                  <article
+                    className={styles.craft}
+                    data-reveal
+                    data-reveal-kind="craft"
+                  >
+                    <DockDemo />
+                    <div className={styles.craftTitle}>
+                      <h3>커서에 반응하는 Dock</h3>
+                    </div>
+                    <p>
+                      다가가는 아이콘과 이웃이 함께 커지고, 이름은 움직이는
+                      방향으로 이어집니다.
+                    </p>
+                    <p className={styles.craftCredit}>
+                      macOS Dock에서 영감을 받은 인터랙션 · 이 사이트의 탐색에도
+                      적용
+                    </p>
                   </article>
                 </div>
               </div>
