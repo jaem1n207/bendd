@@ -9,11 +9,11 @@ const shuffleMocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('@/components/article/lib/shuffle-letters', () => ({
+vi.mock('@/lib/shuffle-letters', () => ({
   shuffleLetters: shuffleMocks.shuffleLetters,
 }));
 
-import { shuffleLetters } from '@/components/article/lib/shuffle-letters';
+import { shuffleLetters } from '@/lib/shuffle-letters';
 import { MDXShuffleLettersDemo } from '@/mdx/components/shuffle-letters-demo/shuffle-letters-demo';
 
 function renderShuffleLettersDemo() {

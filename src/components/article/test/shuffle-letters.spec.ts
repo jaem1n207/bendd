@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { shuffleLetters } from '../lib/shuffle-letters';
+import { shuffleLetters } from '@/lib/shuffle-letters';
 
 const MAX_FRAMES = 1000;
 const FRAME_DURATION = 16;

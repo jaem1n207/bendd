@@ -5,7 +5,7 @@ import useSound from 'use-sound';
 
 import { ClientGate } from '@/components/client-gate';
 import { SoundMax, SoundMute } from '@/components/ui/icons';
-import { useSoundStore } from '../model/sound-store';
+import { useSoundStore } from '@/components/sound/model/sound-store';
 
 export function SoundSwitcher() {
   const isSoundEnabled = useSoundStore(state => state.isSoundEnabled);
@@ -26,7 +26,6 @@ export function SoundSwitcher() {
 
   return (
     <button
-      title="Toggle Sound"
       className="relative flex size-full items-center justify-center text-gray-950"
       onClick={handleSoundToggle}
     >

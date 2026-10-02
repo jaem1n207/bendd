@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 
-import { FluidHover } from '@/components/ui/fluid-hover';
-import styles from '@/app/home.module.css';
 import { JsonLdScript } from '@/components/structured-data';
-import { Typography } from '@/components/ui/typography';
+import { HomeStudio } from '@/components/home';
+import { readArticles } from '@/mdx/mdx';
 import { createHomeGraph } from '@/lib/structured-data';
 import { siteMetadata } from '@/lib/site-metadata';
 
@@ -31,187 +30,23 @@ const homeJsonLd = createHomeGraph({
   project: synchronizeTabScrollingProject,
 });
 
+const featuredArticleSlugs = [
+  'save-tokens-for-ai-agent',
+  'immediate-motion-component',
+  'naming-tokens-in-design',
+];
+
 export default function Home() {
+  const articles = readArticles();
+  const featuredArticles = featuredArticleSlugs.flatMap(slug => {
+    const article = articles.find(candidate => candidate.slug === slug);
+    return article ? [{ slug: article.slug, metadata: article.metadata }] : [];
+  });
+
   return (
-    <div className="relative mx-auto min-h-screen max-w-2xl overflow-hidden px-6 py-24 sm:pb-16 sm:pt-32 ">
+    <>
       <JsonLdScript data={homeJsonLd} />
-      <header className="mb-32 flex flex-col">
-        <Typography variant="h5" asChild>
-          <h1>이재민</h1>
-        </Typography>
-        <Typography variant="p" affects="muted" prose="removePMargin" asChild>
-          <p>소프트웨어 엔지니어</p>
-        </Typography>
-      </header>
-      <main>
-        <div className="mt-16 sm:mt-24">
-          <Typography
-            variant="p"
-            affects="large"
-            className="mb-5 block"
-            asChild
-          >
-            <span>소개</span>
-          </Typography>
-          <Typography variant="p" affects="muted" asChild>
-            <p className="break-keep">
-              누군가에게는 사소해 보일 수 있는 애니메이션과 마이크로 인터랙션이
-              유려한 사용자 경험의 핵심을 만듭니다.
-              <br />
-              살아있는 유기체처럼 자연스럽게 움직이면서도 접근성과 성능, 정확한
-              타이밍이 조화를 이루는 인터페이스는 시장에서 제품을 돋보이게 하는
-              요소입니다.
-              <br />
-              이러한 디테일에 대한 깊은 고민과 기술적 구현으로 사용자에게 예측
-              가능하면서도 즐거운 경험을 제공하고, 궁극적으로 혁신적인 사용자
-              경험으로 이어진다고 생각합니다.
-            </p>
-          </Typography>
-        </div>
-
-        <div className="mt-16 sm:mt-24">
-          <Typography
-            variant="p"
-            affects="large"
-            className="mb-5 block"
-            asChild
-          >
-            <span>프로젝트</span>
-          </Typography>
-          <div className="-mx-3">
-            <FluidHover highlightClassName="bg-gray-400 dark:bg-gray-200">
-              <div>
-                <a
-                  data-fluid-hover-item=""
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://jaem1n207.github.io/synchronize-tab-scrolling/"
-                  className={`${styles.pressableCard} group flex flex-col gap-2 rounded-xl p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Typography
-                      variant="p"
-                      affects="small"
-                      prose="removePMargin"
-                      asChild
-                    >
-                      <span>Synchronize Tab Scrolling</span>
-                    </Typography>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-muted-foreground transition-transform group-data-[fluid-hover-active]:-translate-y-0.5 group-data-[fluid-hover-active]:translate-x-0.5"
-                      aria-hidden="true"
-                    >
-                      <path d="m7 17 10-10" />
-                      <path d="M7 7h10v10" />
-                    </svg>
-                  </div>
-                  <Typography
-                    variant="p"
-                    affects="muted"
-                    prose="removePMargin"
-                    asChild
-                  >
-                    <span className="break-keep">
-                      여러 탭의 스크롤을 실시간으로 동기화하는 오픈소스 브라우저
-                      확장 프로그램입니다. 번역본 비교, 코드 리뷰, 문서 대조 등
-                      탭을 나란히 놓고 비교하는 작업에 유용합니다.
-                    </span>
-                  </Typography>
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
-                      Chrome
-                    </span>
-                    <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
-                      Firefox
-                    </span>
-                    <span className="rounded-md bg-gray-300 px-2 py-0.5 text-xs text-foreground/60">
-                      Edge
-                    </span>
-                  </div>
-                </a>
-              </div>
-            </FluidHover>
-            <FluidHover axis="x">
-              <div className="mt-2 flex items-center gap-3 px-3 text-sm">
-                <a
-                  data-fluid-hover-item=""
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://chromewebstore.google.com/detail/synchronize-tab-scrolling/phceoocamipnafpgnchbfhkdlbleeafc"
-                  className="select-none text-muted-foreground transition-colors data-[fluid-hover-active]:text-primary"
-                >
-                  Web Store
-                </a>
-                <span className="text-muted-foreground" aria-hidden="true">
-                  ·
-                </span>
-                <a
-                  data-fluid-hover-item=""
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://github.com/jaem1n207/synchronize-tab-scrolling"
-                  className="select-none text-muted-foreground transition-colors data-[fluid-hover-active]:text-primary"
-                >
-                  GitHub
-                </a>
-              </div>
-            </FluidHover>
-          </div>
-        </div>
-
-        <div className="mt-16 sm:mt-24">
-          <Typography
-            variant="p"
-            affects="large"
-            className="mb-5 block"
-            asChild
-          >
-            <span>기여</span>
-          </Typography>
-          <FluidHover highlightClassName="rounded-md bg-gray-400 dark:bg-gray-200">
-            <div className="-mx-3">
-              <a
-                data-fluid-hover-item=""
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://github.com/shuding/nextra/pull/2746"
-                className={`${styles.pressableCard} flex flex-col gap-1 rounded-md px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:py-3`}
-              >
-                <Typography
-                  variant="p"
-                  affects="small"
-                  prose="removePMargin"
-                  asChild
-                >
-                  <span>Nextra - Memory Leak Fix</span>
-                </Typography>
-                <Typography
-                  variant="p"
-                  affects="muted"
-                  prose="removePMargin"
-                  asChild
-                >
-                  <span>
-                    13.1K 스타의 Nextra에서 검색어에 연속된 공백이 포함될 때
-                    발생하는 메모리 누수를 수정했습니다. 정규식이 빈 문자열과
-                    매칭되어 무한 루프에 빠지는 문제를 해결하여 검색 기능을
-                    안정화했습니다.
-                  </span>
-                </Typography>
-              </a>
-            </div>
-          </FluidHover>
-        </div>
-      </main>
-    </div>
+      <HomeStudio articles={featuredArticles} />
+    </>
   );
 }

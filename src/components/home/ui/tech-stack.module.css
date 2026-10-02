@@ -1,0 +1,137 @@
+.groups {
+  padding-inline: var(--home-space);
+  margin-top: 22px;
+}
+
+.group {
+  display: grid;
+  grid-template-columns: 166px minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+  padding-block: 20px;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.heading {
+  padding-top: 9px;
+}
+
+.heading h3 {
+  font-size: 12px;
+  font-weight: 580;
+  line-height: 1.5;
+  letter-spacing: -0.015em;
+}
+
+.heading p {
+  margin-top: 4px;
+  color: hsl(var(--muted-foreground));
+  font-size: 11px;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: 4px 17px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding-block: 6px;
+  color: hsl(var(--foreground));
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.icon {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  flex: 0 0 23px;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+}
+
+.icon img {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.monochrome {
+  filter: grayscale(1) brightness(0.55);
+  opacity: 0.88;
+}
+
+.color {
+  opacity: 0;
+}
+
+:global(.dark) .monochrome {
+  filter: grayscale(1) brightness(0.55) invert(1);
+}
+
+:global(.dark) .icon[data-monochrome='true'] .color {
+  filter: invert(1);
+}
+
+:global(.dark) .icon[data-dark-contrast='true'] .color {
+  filter: brightness(2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .item:hover .monochrome {
+    opacity: 0;
+  }
+
+  .item:hover .color {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .icon img {
+      transition: opacity 150ms var(--home-ease);
+    }
+  }
+}
+
+@media (max-width: 620px) {
+  .group {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding-block: 18px;
+  }
+
+  .heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    padding-top: 0;
+  }
+
+  .heading p {
+    margin-top: 0;
+  }
+
+  .items {
+    gap: 3px 18px;
+  }
+
+  .item {
+    min-height: 44px;
+  }
+}

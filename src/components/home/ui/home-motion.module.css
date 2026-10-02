@@ -1,0 +1,39 @@
+@media (prefers-reduced-motion: no-preference) {
+  .root [data-reveal]:not([data-reveal-state]) {
+    /* Readable even when the bundle never arrives; hydration never re-hides it. */
+    animation: homeReadableFallback 0s linear 600ms backwards;
+  }
+
+  .root [data-reveal-state='initial'],
+  .root [data-reveal-state='pending'] {
+    opacity: 0;
+  }
+
+  .root [data-reveal-state='visible'] {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root [data-reveal],
+  .root [data-note-accent] {
+    animation: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}
+
+@keyframes homeReadableFallback {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.root [data-note-accent] {
+  transform-origin: 50% 70%;
+}

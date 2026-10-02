@@ -1,6 +1,6 @@
 'use client';
 
-import { shuffleLetters } from '@/components/article/lib/shuffle-letters';
+import { shuffleLetters } from '@/lib/shuffle-letters';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createMDXComponent } from '@/mdx/common/create-mdx-component';

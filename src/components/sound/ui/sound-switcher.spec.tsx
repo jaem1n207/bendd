@@ -9,7 +9,7 @@ vi.mock('use-sound', () => ({
   default: () => [vi.fn()],
 }));
 
-vi.mock('../model/sound-store', () => ({
+vi.mock('@/components/sound/model/sound-store', () => ({
   useSoundStore: (
     selector: (s: {
       isSoundEnabled: boolean;
@@ -32,7 +32,7 @@ vi.mock('@/components/ui/icons', () => ({
 }));
 
 import { track } from '@vercel/analytics';
-import { SoundSwitcher } from './sound-switcher';
+import { SoundSwitcher } from '@/components/sound/ui/sound-switcher';
 
 describe('SoundSwitcher — analytics deferral', () => {
   let originalRIC: typeof globalThis.requestIdleCallback;
@@ -54,7 +54,7 @@ describe('SoundSwitcher — analytics deferral', () => {
     }) as typeof globalThis.requestIdleCallback;
 
     render(<SoundSwitcher />);
-    fireEvent.click(screen.getByTitle('Toggle Sound'));
+    fireEvent.click(screen.getByRole('button', { name: 'Toggle sound' }));
 
     expect(track).not.toHaveBeenCalled();
     expect(idleCallbacks.length).toBe(1);
@@ -70,7 +70,7 @@ describe('SoundSwitcher — analytics deferral', () => {
     ) as unknown as typeof globalThis.requestIdleCallback;
 
     render(<SoundSwitcher />);
-    fireEvent.click(screen.getByTitle('Toggle Sound'));
+    fireEvent.click(screen.getByRole('button', { name: 'Toggle sound' }));
 
     expect(track).not.toHaveBeenCalled();
   });
@@ -81,7 +81,7 @@ describe('SoundSwitcher — analytics deferral', () => {
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
 
     render(<SoundSwitcher />);
-    fireEvent.click(screen.getByTitle('Toggle Sound'));
+    fireEvent.click(screen.getByRole('button', { name: 'Toggle sound' }));
 
     const deferredCall = setTimeoutSpy.mock.calls.find(
       ([, delay]) => delay === 0

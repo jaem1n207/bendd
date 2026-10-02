@@ -1,77 +1,32 @@
 'use client';
 
-import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
-import useMeasure from 'react-use-measure';
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { isTouchDevice } from '@/lib/detect';
+import { useNavigationSound } from '@/components/navigation/model/use-navigation-sound';
+import styles from '@/components/navigation/ui/dock.module.css';
 import { cn } from '@/lib/utils';
-import { DEFAULT_ITEM_SIZE } from '@/components/navigation/consts/size';
-import { useNavigationItemAnimation } from '@/components/navigation/model/use-navigation-item-animation';
-import type { ItemMotionProps } from '@/components/navigation/types/motion';
-
-type NavigationItemTooltipProps = {
-  name: string;
-  children: ReactNode;
-  content: ReactNode;
-  className?: string;
-} & ItemMotionProps;
 
 export function NavigationItemTooltip({
   name,
   children,
-  content,
   className,
-  ...props
-}: NavigationItemTooltipProps) {
-  const [ref, bounds] = useMeasure();
-  const { width, handleClick, controls, allowMotion } =
-    useNavigationItemAnimation({
-      name,
-      size: DEFAULT_ITEM_SIZE,
-      bounds,
-      ...props,
-    });
-
+}: {
+  name: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  const { handleClick } = useNavigationSound({ name });
   return (
-    <Tooltip delayDuration={50}>
-      <TooltipTrigger asChild>
-        <motion.div
-          ref={ref}
-          data-navigation-item=""
-          className={cn(
-            'relative top-0 aspect-square rounded-full bg-gray-300 bg-navigation-item text-gray-900/80 data-[fluid-hover-active]:text-gray-900 shrink-0',
-            className
-          )}
-          style={
-            isTouchDevice || !allowMotion
-              ? {
-                  width: DEFAULT_ITEM_SIZE,
-                }
-              : { width }
-          }
-          animate={controls}
-          initial={{ top: 0 }}
-          whileTap={allowMotion ? { top: 8 } : undefined}
-          transition={allowMotion ? undefined : { duration: 0 }}
-          onTap={handleClick}
-          tabIndex={-1}
-        >
-          {children}
-        </motion.div>
-      </TooltipTrigger>
-      <TooltipContent
-        side="top"
-        align="center"
-        className="mb-1 text-sm text-primary/60"
-      >
-        {content}
-      </TooltipContent>
-    </Tooltip>
+    <div
+      data-navigation-item=""
+      data-dock-label={name}
+      className={cn(styles.item, className)}
+      onClick={handleClick}
+    >
+      <div className={styles.itemBody}>
+        <span className={styles.itemSurface} aria-hidden="true" />
+        {children}
+      </div>
+    </div>
   );
 }
