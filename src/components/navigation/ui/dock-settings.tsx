@@ -1,7 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { motion, useIsPresent } from 'motion/react';
+import { motion, useIsPresent, usePresenceData } from 'motion/react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import {
@@ -45,10 +45,11 @@ export function DockSettings({
   onPreview: (setting: DockSetting, value: number | null) => void;
   onCommit: (setting: DockSetting, value: number) => void;
   onReset: () => void;
-  onClose: () => void;
+  onClose: (input: DockInput) => void;
 }) {
   const panel = useRef<HTMLElement>(null);
   const isPresent = useIsPresent();
+  const exitMode: unknown = usePresenceData();
   const [position, setPosition] = useState({
     left: PANEL_EDGE,
     top: PANEL_EDGE,
@@ -102,14 +103,14 @@ export function DockSettings({
       ) {
         return;
       }
-      onCloseRef.current();
+      onCloseRef.current(DockInput.Pointer);
     };
     const key = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') {
         return;
       }
       event.preventDefault();
-      onCloseRef.current();
+      onCloseRef.current(DockInput.Keyboard);
       anchor.trigger.focus({ preventScroll: true });
     };
     document.addEventListener('pointerdown', pointer);
@@ -119,7 +120,10 @@ export function DockSettings({
       document.removeEventListener('keydown', key);
     };
   }, [anchor, isPresent]);
-  const animated = mode === DockMotionMode.Animated;
+  const animated =
+    mode === DockMotionMode.Animated && anchor.input === DockInput.Pointer;
+  const exitAnimated =
+    mode === DockMotionMode.Animated && exitMode === DockMotionMode.Animated;
   return (
     <motion.section
       ref={panel}
@@ -148,11 +152,11 @@ export function DockSettings({
       }}
       exit={{
         opacity: 0,
-        scale: animated ? 0.98 : 1,
-        y: animated ? 2 : 0,
-        transition: { duration: animated ? 0.1 : 0 },
+        scale: exitAnimated ? 0.98 : 1,
+        y: exitAnimated ? 2 : 0,
+        transition: { duration: exitAnimated ? 0.1 : 0 },
       }}
-      data-motion={mode}
+      data-motion={isPresent || exitAnimated ? mode : DockMotionMode.Static}
       data-dock-input={anchor.input}
     >
       <div className={styles.settingsHeader}>
@@ -160,8 +164,10 @@ export function DockSettings({
         <button
           type="button"
           aria-label="Dock 설정 닫기"
-          onClick={() => {
-            onClose();
+          onClick={event => {
+            onClose(
+              event.detail === 0 ? DockInput.Keyboard : DockInput.Pointer
+            );
             anchor.trigger.focus({ preventScroll: true });
           }}
         >

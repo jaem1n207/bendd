@@ -75,6 +75,7 @@ export function DockSurface({
     setPortal(document.body);
   }, []);
   const [anchor, setAnchor] = useState<DockSettingsAnchor | null>(null);
+  const [exitInput, setExitInput] = useState(DockInput.Pointer);
   const [tooltip, setTooltip] = useState<DockTooltipState | null>(null);
   const id = useId();
   const reduced = usePrefersReducedMotion();
@@ -98,12 +99,16 @@ export function DockSurface({
       motion.current?.setPreferences(value);
     }
   }, []);
-  const close = useCallback(() => {
-    settingsOpen.current = false;
-    setAnchor(null);
-    setInteraction(DockInteraction.Idle);
-    apply(saved.current);
-  }, [apply, setInteraction]);
+  const close = useCallback(
+    (input: DockInput) => {
+      setExitInput(input);
+      settingsOpen.current = false;
+      setAnchor(null);
+      setInteraction(DockInteraction.Idle);
+      apply(saved.current);
+    },
+    [apply, setInteraction]
+  );
   const open = useCallback(
     (handle: HTMLElement, input: DockInput) => {
       settingsOpen.current = true;
@@ -253,7 +258,14 @@ export function DockSurface({
       </div>
       {portal &&
         createPortal(
-          <AnimatePresence>
+          <AnimatePresence
+            custom={
+              mode === DockMotionMode.Animated &&
+              exitInput === DockInput.Pointer
+                ? DockMotionMode.Animated
+                : DockMotionMode.Static
+            }
+          >
             {anchor && (
               <DockSettings
                 key={id}

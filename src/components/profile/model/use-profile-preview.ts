@@ -162,7 +162,12 @@ export function useProfilePreview() {
     panel.style.top = `${y}px`;
     panel.style.height = `${height}px`;
     panel.dataset.side = below ? 'bottom' : 'top';
-    panel.style.transformOrigin = `${Math.max(12, Math.min(width - 12, bounds.left + bounds.width / 2 - x))}px ${below ? '0' : `${height}px`}`;
+    const originX = Math.max(
+      12,
+      Math.min(width - 12, bounds.left + bounds.width / 2 - x)
+    );
+    const originY = below ? 0 : height;
+    panel.style.transformOrigin = `${originX}px ${originY}px`;
     const old = previous.current;
     previous.current = null;
     if (
@@ -172,12 +177,12 @@ export function useProfilePreview() {
     ) {
       return;
     }
+    const scaleX = old ? old.rect.width / width : 1;
+    const scaleY = old ? old.rect.height / height : 1;
+    // 트리거 기준점을 유지하면서 이전 화면 좌표와 크기에 맞춘다.
     const from = old
-      ? `translate(${old.rect.left - x}px, ${old.rect.top - y}px) scale(${old.rect.width / width}, ${old.rect.height / height})`
+      ? `translate(${old.rect.left - x + originX * (scaleX - 1)}px, ${old.rect.top - y + originY * (scaleY - 1)}px) scale(${scaleX}, ${scaleY})`
       : `translateY(${below ? -8 : 8}px) scale(.95)`;
-    if (old) {
-      panel.style.transformOrigin = '0 0';
-    }
     // Older browsers keep the same transition with a supported ease-out curve.
     const easing =
       typeof CSS !== 'undefined' &&

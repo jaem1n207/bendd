@@ -7,7 +7,12 @@ let reduced = false;
 let coarse = false;
 const subscribers = new Set<() => void>();
 const cancel = vi.fn();
-const animate = vi.fn(() => ({ cancel, onfinish: null }));
+const animate = vi.fn<
+  (
+    frames: Keyframe[] | PropertyIndexedKeyframes,
+    options?: number | KeyframeAnimationOptions
+  ) => Pick<Animation, 'cancel' | 'onfinish'>
+>(() => ({ cancel, onfinish: null }));
 const introObservers: IntroObserver[] = [];
 
 class IntroObserver implements IntersectionObserver {
@@ -405,5 +410,90 @@ describe('profile interactions', () => {
     const panel = screen.getByRole('region', { name: 'GitHub 미리보기' });
     fireEvent.scroll(panel);
     expect(screen.getByRole('region', { name: 'GitHub 미리보기' })).toBe(panel);
+  });
+});
+
+describe('reviewed profile motion regressions', () => {
+  it('keeps keyboard feedback static through activation and reset, then permits pointer feedback', () => {
+    render(<HomeProfile />);
+    const { feedback } = phrases();
+    fireEvent.click(feedback, { detail: 0 });
+    expect(feedback.dataset.input).toBe('keyboard');
+    expect(feedback.dataset.reacted).toBe('true');
+    expect(screen.getByRole('status').textContent).toBe('클릭에 반응했습니다.');
+    act(() => vi.advanceTimersByTime(620));
+    expect(feedback.hasAttribute('data-reacted')).toBe(false);
+    expect(feedback.dataset.input).toBe('keyboard');
+    fireEvent.click(feedback, { detail: 1 });
+    expect(feedback.dataset.input).toBe('pointer');
+    expect(feedback.dataset.reacted).toBe('true');
+  });
+
+  function switchPreview() {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(
+      function (this: HTMLElement) {
+        if (this.getAttribute('role') === 'region') {
+          return new DOMRect(
+            Number.parseFloat(this.style.left) || 0,
+            Number.parseFloat(this.style.top) || 0,
+            Number.parseFloat(this.style.width) || 306,
+            this.getAttribute('aria-label') === 'GitHub 미리보기' ? 200 : 260
+          );
+        }
+        return new DOMRect(
+          this.getAttribute('aria-label') === 'GitHub 프로필' ? 500 : 600,
+          500,
+          44,
+          44
+        );
+      }
+    );
+    render(<HomeProfile />);
+    const github = screen.getByRole('link', { name: 'GitHub 프로필' });
+    const youtube = screen.getByRole('link', { name: 'YouTube 채널' });
+    fireEvent.pointerEnter(github);
+    const panel = screen.getByRole('region', { name: 'GitHub 미리보기' });
+    const before = panel.getBoundingClientRect();
+    fireEvent.pointerEnter(youtube);
+    return { panel, youtube, before };
+  }
+
+  it('keeps the new trigger origin while preserving the first frame of a card morph', () => {
+    const { panel, before } = switchPreview();
+    expect(panel.style.transformOrigin).toBe('137px 260px');
+    const frames = animate.mock.calls[2]?.[0];
+    if (!Array.isArray(frames) || typeof frames[0]?.transform !== 'string') {
+      throw new Error('Missing preview morph keyframe');
+    }
+    const values = frames[0].transform
+      .match(/-?\d*\.?\d+(?:e[+-]?\d+)?/g)
+      ?.map(Number);
+    if (!values || values.length !== 4) {
+      throw new Error('Missing preview translation and scale');
+    }
+    const [x, y, scaleX, scaleY] = values;
+    const after = panel.getBoundingClientRect();
+    expect(after.left + x + 137 * (1 - scaleX)).toBeCloseTo(before.left);
+    expect(after.top + y + 260 * (1 - scaleY)).toBeCloseTo(before.top);
+    expect(after.width * scaleX).toBeCloseTo(before.width);
+    expect(after.height * scaleY).toBeCloseTo(before.height);
+  });
+
+  it('closes an interrupted card morph from its visible transform using the current trigger origin', () => {
+    const { panel, youtube } = switchPreview();
+    panel.style.transform = 'matrix(1.05, 0, 0, 0.92, -70, 5)';
+    panel.style.opacity = '0.8';
+    const visibleTransform = getComputedStyle(panel).transform;
+    fireEvent.pointerLeave(youtube);
+    act(() => vi.advanceTimersByTime(160));
+    expect(panel.style.transformOrigin).toBe('137px 260px');
+    expect(animate).toHaveBeenLastCalledWith(
+      [
+        { opacity: '0.8', transform: visibleTransform },
+        { opacity: 0, transform: 'scale(.97)' },
+      ],
+      { duration: 130, easing: 'ease-out' }
+    );
+    expect(cancel).toHaveBeenCalled();
   });
 });

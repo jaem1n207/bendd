@@ -201,7 +201,7 @@ test('commits the last captured slider value once and restores that value after 
 
 test.each(['pointercancel', 'lostpointercapture', 'blur', 'Escape'])(
   'cancels an uncommitted slider change on %s',
-  reason => {
+  async reason => {
     const { dock, slider, handle } = openSettings();
     const writes = vi.spyOn(Storage.prototype, 'setItem');
     emit(slider, 'pointerdown', { x: 420 });
@@ -209,7 +209,9 @@ test.each(['pointercancel', 'lostpointercapture', 'blur', 'Escape'])(
     if (reason === 'blur') {
       fireEvent.blur(window);
     } else if (reason === 'Escape') {
-      fireEvent.keyDown(slider, { key: 'Escape' });
+      await act(async () => {
+        fireEvent.keyDown(slider, { key: 'Escape' });
+      });
     } else {
       emit(slider, reason);
     }
@@ -309,7 +311,7 @@ test('opens settings without stealing pointer focus but focuses the slider for k
   );
 });
 
-test('keeps focus while switching the visible focus mode between mouse and keyboard', () => {
+test('keeps focus while switching the visible focus mode between mouse and keyboard', async () => {
   const { dock, handle, panel, slider } = openSettings();
   emit(slider, 'pointerdown', { x: 300 });
   emit(slider, 'pointerup', { x: 300 });
@@ -324,7 +326,9 @@ test('keeps focus while switching the visible focus mode between mouse and keybo
   emit(slider, 'pointerup', { x: 320 });
   expect(document.activeElement).toBe(slider);
   expect(panel.dataset.dockInput).toBe('pointer');
-  fireEvent.keyDown(slider, { key: 'Escape' });
+  await act(async () => {
+    fireEvent.keyDown(slider, { key: 'Escape' });
+  });
   expect(document.activeElement).toBe(handle);
   expect(dock.dataset.dockInput).toBe('keyboard');
   capture(handle);
@@ -334,7 +338,7 @@ test('keeps focus while switching the visible focus mode between mouse and keybo
   emit(handle, 'pointerup');
 });
 
-test('restores only the demo defaults and leaves saved site preferences alone', () => {
+test('restores only the demo defaults and leaves saved site preferences alone', async () => {
   const { dock, panel } = openSettings();
   fireEvent.change(within(panel).getByRole('slider', { name: 'Dock 크기' }), {
     target: { value: '56' },
@@ -342,7 +346,9 @@ test('restores only the demo defaults and leaves saved site preferences alone', 
   fireEvent.change(within(panel).getByRole('slider', { name: '아이콘 확대' }), {
     target: { value: '1.9' },
   });
-  fireEvent.keyDown(panel, { key: 'Escape' });
+  await act(async () => {
+    fireEvent.keyDown(panel, { key: 'Escape' });
+  });
   render(<DockDemo />);
   const demo = screen.getByRole('group', { name: 'Craft Dock 데모' });
   const separator = within(demo).getByRole('slider', {
@@ -371,4 +377,46 @@ test('restores only the demo defaults and leaves saved site preferences alone', 
     magnification: 1.9,
   });
   expect(writes).not.toHaveBeenCalled();
+});
+
+test('shows keyboard-opened settings at their final opacity and position immediately', () => {
+  render(site());
+  const handle = screen.getAllByRole('slider', { name: 'Dock 크기 조절' })[0];
+  fireEvent.keyDown(handle, { key: 'Enter' });
+  const panel = screen.getByRole('dialog', { name: 'Dock 설정' });
+  expect(panel.style.opacity).toBe('1');
+  expect(panel.style.transform).toBe('none');
+  expect(document.activeElement).toBe(
+    within(panel).getByRole('slider', { name: 'Dock 크기' })
+  );
+});
+
+test.each(['Escape', 'close button'])(
+  'disables a pointer-opened settings exit when dismissed by keyboard through %s',
+  async action => {
+    const { panel, handle } = openSettings();
+    await act(async () => {
+      if (action === 'Escape') {
+        fireEvent.keyDown(panel, { key: 'Escape' });
+      } else {
+        fireEvent.click(
+          within(panel).getByRole('button', { name: 'Dock 설정 닫기' }),
+          { detail: 0 }
+        );
+      }
+    });
+    expect(panel.dataset.motion).toBe('static');
+    expect(panel.getAttribute('aria-hidden')).toBe('true');
+    expect(document.activeElement).toBe(handle);
+  }
+);
+
+test('retains the short exit for pointer dismissal of settings', () => {
+  const { panel } = openSettings();
+  fireEvent.click(
+    within(panel).getByRole('button', { name: 'Dock 설정 닫기' }),
+    { detail: 1 }
+  );
+  expect(panel.dataset.motion).toBe('animated');
+  expect(panel.getAttribute('aria-hidden')).toBe('true');
 });

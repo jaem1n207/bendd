@@ -43,6 +43,7 @@ const links = {
 export function HomeProfile() {
   const preview = useProfilePreview();
   const [reacted, setReacted] = useState(false);
+  const [feedbackInput, setFeedbackInput] = useState(InputOrigin.Pointer);
   const [status, setStatus] = useState('');
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const rootRef = useRef<HTMLElement>(null);
@@ -60,18 +61,22 @@ export function HomeProfile() {
     timingMotion.current = [];
   }, []);
 
-  const playFeedback = useCallback((playback = ProfilePlayback.Manual) => {
-    clearTimeout(timer.current);
-    setReacted(true);
-    if (playback === ProfilePlayback.Manual) {
-      setStatus('클릭에 반응했습니다.');
-    }
-    // The automatic demonstration is 160ms in + 300ms hold + 160ms out.
-    timer.current = setTimeout(
-      () => setReacted(false),
-      playback === ProfilePlayback.Automatic ? 460 : 620
-    );
-  }, []);
+  const playFeedback = useCallback(
+    (playback = ProfilePlayback.Manual, origin = InputOrigin.Pointer) => {
+      clearTimeout(timer.current);
+      setFeedbackInput(origin);
+      setReacted(true);
+      if (playback === ProfilePlayback.Manual) {
+        setStatus('클릭에 반응했습니다.');
+      }
+      // The automatic demonstration is 160ms in + 300ms hold + 160ms out.
+      timer.current = setTimeout(
+        () => setReacted(false),
+        playback === ProfilePlayback.Automatic ? 460 : 620
+      );
+    },
+    []
+  );
   const stopFeedback = useCallback(() => {
     clearTimeout(timer.current);
     setReacted(false);
@@ -231,7 +236,15 @@ export function HomeProfile() {
               className={`${styles.phrase} ${styles.feedback}`}
               aria-label="클릭에 대한 피드백, 눌러서 반응 체험하기"
               data-reacted={reacted || undefined}
-              onClick={() => playFeedback()}
+              data-input={feedbackInput}
+              onClick={event =>
+                playFeedback(
+                  ProfilePlayback.Manual,
+                  event.detail === 0
+                    ? InputOrigin.Keyboard
+                    : InputOrigin.Pointer
+                )
+              }
             >
               <span>클릭에 대한 피드백</span>
             </button>
