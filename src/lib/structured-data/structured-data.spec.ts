@@ -139,8 +139,16 @@ describe('structured data graphs', () => {
     const softwareApplication = findNode(graph, 'SoftwareApplication');
 
     expect(website['@id']).toBe('https://bendd.me/#website');
+    expect(website.name).toBe('이재민 - 소프트웨어 엔지니어');
+    expect(website.alternateName).toContain('bendd');
     expect(website.publisher).toEqual({ '@id': 'https://bendd.me/#person' });
     expect(person['@id']).toBe('https://bendd.me/#person');
+    expect(person.alternateName).toEqual(
+      expect.arrayContaining(['bendd', 'jaem1n207'])
+    );
+    expect(profilePage.name).toBe(website.name);
+    expect(profilePage.description).toBe(website.description);
+    expect(profilePage.description).toContain('개발자 이재민(bendd)');
     expect(profilePage.isPartOf).toEqual({
       '@id': 'https://bendd.me/#website',
     });
