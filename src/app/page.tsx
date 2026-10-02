@@ -8,10 +8,9 @@ import { siteMetadata } from '@/lib/site-metadata';
 
 export const metadata: Metadata = {
   title: {
-    absolute: `${siteMetadata.author} - 소프트웨어 엔지니어`,
+    absolute: siteMetadata.homeTitle,
   },
-  description:
-    '작업하며 마주한 문제와 해결 과정을 정리해 공유합니다. 이 글이 누군가에게 도움이 되길 바랍니다.',
+  description: siteMetadata.description,
   alternates: {
     canonical: siteMetadata.siteUrl,
   },

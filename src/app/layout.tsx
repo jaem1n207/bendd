@@ -65,14 +65,14 @@ export const metadata = {
     },
   },
   title: {
-    default: `${siteMetadata.title} - 소프트웨어 엔지니어`,
+    default: siteMetadata.homeTitle,
     template: `%s • ${siteMetadata.title}`,
   },
   description: siteMetadata.description,
   openGraph: {
     type: 'website',
     url: siteMetadata.siteUrl,
-    siteName: `${siteMetadata.title} - 소프트웨어 엔지니어`,
+    siteName: siteMetadata.homeTitle,
   },
 } satisfies Metadata;
 

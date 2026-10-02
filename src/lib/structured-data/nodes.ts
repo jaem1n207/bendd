@@ -59,11 +59,11 @@ export const createWebsiteNode = ({
   '@type': 'WebSite',
   '@id': websiteId(),
   url: absoluteUrl(),
-  name: `${siteMetadata.author} - 소프트웨어 엔지니어`,
+  name: siteMetadata.homeTitle,
   ...(slim
     ? {}
     : {
-        alternateName: [siteMetadata.title, 'bendd.me'],
+        alternateName: [siteMetadata.title, siteMetadata.brand, 'bendd.me'],
         description: siteMetadata.description,
         inLanguage: siteMetadata.language,
         publisher: reference(personId()),
@@ -75,9 +75,10 @@ export const createPersonNode = (): Person => ({
   '@id': personId(),
   url: absoluteUrl(),
   name: siteMetadata.author,
-  alternateName: 'jaem1n207',
+  alternateName: [siteMetadata.brand, 'jaem1n207'],
   jobTitle: '소프트웨어 엔지니어',
-  description: '해야 하는 일 속에서 하고 싶은 의미를 찾는 소프트웨어 엔지니어',
+  description:
+    '사용자의 의도에 자연스럽게 반응하는 인터페이스를 만드는 소프트웨어 엔지니어입니다.',
   knowsLanguage: siteMetadata.language,
   sameAs: [siteMetadata.github, siteMetadata.youtube],
 });
@@ -103,9 +104,8 @@ export const createProfilePageNode = (): ProfilePage => ({
   '@type': 'ProfilePage',
   '@id': webpageId('/'),
   url: absoluteUrl(),
-  name: `${siteMetadata.author} - 소프트웨어 엔지니어`,
-  description:
-    '작업하며 마주한 문제와 해결 과정을 정리해 공유합니다. 이 글이 누군가에게 도움이 되길 바랍니다.',
+  name: siteMetadata.homeTitle,
+  description: siteMetadata.description,
   inLanguage: siteMetadata.language,
   isPartOf: reference(websiteId()),
   mainEntity: reference(personId()),
