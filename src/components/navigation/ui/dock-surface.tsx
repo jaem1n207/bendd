@@ -29,6 +29,7 @@ import {
   type DockTooltipState,
 } from '@/components/navigation/lib/dock-motion';
 import { trackDockInput } from '@/components/navigation/lib/dock-input';
+import { createDockPress } from '@/components/navigation/lib/dock-press';
 import { createDockResize } from '@/components/navigation/lib/dock-resize';
 import { DockContext } from '@/components/navigation/model/dock-context';
 import {
@@ -124,6 +125,7 @@ export function DockSurface({
       return;
     }
     const releaseInput = trackDockInput(root.current);
+    const releasePress = createDockPress(root.current);
     const driver = createDockResize({
       root: root.current,
       handles: Array.from(
@@ -143,6 +145,7 @@ export function DockSurface({
     resize.current = driver;
     return () => {
       releaseInput();
+      releasePress();
       driver.dispose();
       resize.current = null;
     };

@@ -29,5 +29,11 @@ export enum DockMotionMode {
   Static = 'static',
 }
 
+export enum DockPressState {
+  Pressed = 'pressed',
+  Released = 'released',
+  Cancelled = 'cancelled',
+}
+
 export const DOCK_STORAGE_KEY = 'dock-preferences';
 export const DOCK_INITIAL_SIZE_PROPERTY = '--site-dock-size';

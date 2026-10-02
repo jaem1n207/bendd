@@ -31,7 +31,7 @@ describe('navigation activation without click travel', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it.each([1, 0])(
-    'activates immediately with sound and no motion for click detail %i',
+    'activates immediately with sound and no bounce for click detail %i',
     detail => {
       const { button, activate } = renderItem();
       fireEvent.click(button, { detail });

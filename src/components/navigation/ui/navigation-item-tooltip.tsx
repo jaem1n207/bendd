@@ -23,7 +23,10 @@ export function NavigationItemTooltip({
       className={cn(styles.item, className)}
       onClick={handleClick}
     >
-      <div className={styles.itemBody}>{children}</div>
+      <div className={styles.itemBody}>
+        <span className={styles.itemSurface} aria-hidden="true" />
+        {children}
+      </div>
     </div>
   );
 }
