@@ -3,7 +3,7 @@
 import { motion, useAnimation, useInView } from 'motion/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 import { shouldPlayEntranceAnimation } from '@/components/article/lib/entrance-animation';
 import { shuffleLetters } from '@/lib/shuffle-letters';
@@ -11,11 +11,14 @@ import type { ArticleInfo } from '@/components/article/types/article';
 import { WithSound } from '@/components/sound';
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 import { cn } from '@/lib/utils';
+import styles from '@/components/article/ui/article-item.module.css';
 
-const ENTRANCE_STAGGER_SECONDS = 0.15;
-const ENTRANCE_DURATION_SECONDS = 1;
-const NAME_SHUFFLE_ITERATIONS = 10;
-const SUMMARY_SHUFFLE_ITERATIONS = 15;
+const ENTRANCE_STAGGER_SECONDS = 0.1;
+const ENTRANCE_DURATION_SECONDS = 0.3;
+const ENTRANCE_MAX_STAGGER_INDEX = 8;
+const SHUFFLE_ITERATIONS = 10;
+const SHUFFLE_FPS = 30;
+const MotionLink = motion.create(Link);
 
 function restoreText(element: HTMLElement | null, text: string) {
   if (!element) {
@@ -38,96 +41,120 @@ export function ArticleItem({
   const [shouldAnimate] = useState(() => shouldPlayEntranceAnimation(pathname));
   const prefersReducedMotion = usePrefersReducedMotion();
   const entranceConsumed = useRef(false);
+  const initiallyInViewport = useRef<boolean | undefined>(undefined);
   const itemRef = useRef<HTMLAnchorElement>(null);
-  const isInView = useInView(itemRef, { once: true, margin: '-100px 0px' });
+  const isInView = useInView(itemRef, { once: true });
   const nameRef = useRef<HTMLHeadingElement>(null);
   const summaryRef = useRef<HTMLSpanElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
   const publishedAtRef = useRef<HTMLSpanElement>(null);
-  const animateName = useAnimation();
-  const animateSummary = useAnimation();
-  const animateLine = useAnimation();
-  const animatePublishedAt = useAnimation();
+  const animateRow = useAnimation();
 
-  useEffect(() => {
-    const settle = () => {
+  useLayoutEffect(() => {
+    const item = itemRef.current;
+    if (!item) {
+      return;
+    }
+    const restoreContent = () => {
       restoreText(nameRef.current, name);
       restoreText(summaryRef.current, summary);
       restoreText(publishedAtRef.current, publishedAt);
-      if (lineRef.current) {
-        lineRef.current.style.opacity = '0.5';
-        lineRef.current.style.transform = 'scaleX(1)';
-      }
     };
-    // 예약된 Motion 렌더가 중단 전 opacity/scale을 복원하지 않도록 함께 정착한다.
-    animateName.set({ opacity: 1 });
-    animateSummary.set({ opacity: 1 });
-    animatePublishedAt.set({ opacity: 1 });
-    animateLine.set({ scaleX: 1, opacity: 0.5 });
-    settle();
+    const settle = () => {
+      restoreContent();
+      animateRow.set({ opacity: 1 });
+      item.style.opacity = '1';
+      item.dataset.entrance = 'visible';
+      item.dataset.lineEntrance = 'visible';
+    };
+    restoreContent();
 
-    if (prefersReducedMotion === true) {
-      entranceConsumed.current = true;
+    // 초기 HTML은 CSS가 표시를 보장하고, 확인된 환경에서만 셔플한다.
+    if (prefersReducedMotion === undefined) {
+      return;
     }
+    if (prefersReducedMotion || !shouldAnimate || entranceConsumed.current) {
+      entranceConsumed.current = true;
+      settle();
+      return;
+    }
+
+    if (initiallyInViewport.current === undefined) {
+      const bounds = item.getBoundingClientRect();
+      initiallyInViewport.current =
+        bounds.bottom > 0 && bounds.top < window.innerHeight;
+    }
+    // 늦게 도착한 JS가 이미 읽을 수 있는 텍스트를 다시 숨기지 않는다.
     if (
-      prefersReducedMotion !== false ||
-      !shouldAnimate ||
-      !isInView ||
-      entranceConsumed.current
+      item.dataset.entrance === 'pending' &&
+      getComputedStyle(item).opacity === '1'
     ) {
+      entranceConsumed.current = true;
+      settle();
+      return;
+    }
+    if (!isInView) {
+      item.dataset.entrance = 'waiting';
       return;
     }
 
     entranceConsumed.current = true;
-
-    const delay = index * ENTRANCE_STAGGER_SECONDS;
-    const duration = ENTRANCE_DURATION_SECONDS;
-    // 언마운트 후에도 셔플 애니메이션이 분리된 DOM을 계속 변경하지 않도록 정리
+    const staggerIndex = initiallyInViewport.current
+      ? Math.min(index, ENTRANCE_MAX_STAGGER_INDEX)
+      : 0;
+    const delay = staggerIndex * ENTRANCE_STAGGER_SECONDS;
     const cancelShuffles: Array<() => void> = [];
-
-    void animateName.start({
-      opacity: [0, 1],
-      transition: { duration, delay },
-    });
-    void animateSummary.start({
-      opacity: [0, 1],
-      transition: { duration, delay },
-    });
-    void animateLine.start({
-      scaleX: [0, 1],
-      opacity: [1, 0.5],
-      transition: { duration, delay, type: 'spring' },
-    });
-    void animatePublishedAt.start({
-      opacity: [0, 1],
-      transition: { duration, delay },
-    });
-    if (nameRef.current) {
-      cancelShuffles.push(
-        shuffleLetters(nameRef.current, {
-          iterations: NAME_SHUFFLE_ITERATIONS,
-        })
-      );
-    }
-
-    if (summaryRef.current) {
-      cancelShuffles.push(
-        shuffleLetters(summaryRef.current, {
-          iterations: SUMMARY_SHUFFLE_ITERATIONS,
-        })
-      );
-    }
-
-    if (publishedAtRef.current) {
-      cancelShuffles.push(shuffleLetters(publishedAtRef.current));
-    }
-
-    return () => {
-      [animateName, animateSummary, animateLine, animatePublishedAt].forEach(
-        control => control.stop()
-      );
+    let cancelled = false;
+    const stop = () => {
+      cancelled = true;
+      animateRow.stop();
       cancelShuffles.forEach(cancel => cancel());
       settle();
+    };
+
+    item.style.setProperty('--line-stagger-index', String(staggerIndex));
+    // 선은 300ms 행 페이드가 끝난 뒤에도 자체 키프레임을 유지한다.
+    item.dataset.lineEntrance = 'active';
+    item.dataset.entrance = 'active';
+    item.style.opacity = '0';
+    animateRow.set({ opacity: 0 });
+    void animateRow
+      .start({
+        opacity: [0, 1],
+        transition: {
+          type: 'tween',
+          ease: 'linear',
+          duration: ENTRANCE_DURATION_SECONDS,
+          delay,
+        },
+      })
+      .then(() => {
+        if (!cancelled) {
+          item.dataset.entrance = 'visible';
+        }
+      });
+
+    // 셔플은 행 지연과 별개로 함께 시작한다. 요약은 이 목록에서 따로 조정한다.
+    const shuffleTargets = [
+      nameRef.current,
+      summaryRef.current,
+      publishedAtRef.current,
+    ];
+    shuffleTargets.forEach(element => {
+      if (!element || getComputedStyle(element).display === 'none') {
+        return;
+      }
+      cancelShuffles.push(
+        shuffleLetters(element, {
+          iterations: SHUFFLE_ITERATIONS,
+          fps: SHUFFLE_FPS,
+        })
+      );
+    });
+
+    item.addEventListener('focus', stop);
+    return () => {
+      item.removeEventListener('focus', stop);
+      stop();
     };
   }, [
     isInView,
@@ -137,59 +164,54 @@ export function ArticleItem({
     name,
     summary,
     publishedAt,
-    nameRef,
-    summaryRef,
-    lineRef,
-    publishedAtRef,
-    animateName,
-    animateSummary,
-    animateLine,
-    animatePublishedAt,
+    animateRow,
   ]);
 
   return (
     <WithSound assetPath="/sounds/stapling.mp3">
-      <Link
+      <MotionLink
         ref={itemRef}
         data-fluid-hover-item=""
+        data-entrance={shouldAnimate ? 'pending' : 'visible'}
+        initial={false}
+        animate={animateRow}
         href={href}
         className={cn(
+          styles.item,
           'relative block w-full overflow-hidden rounded-xl px-3 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex sm:min-w-0 sm:items-center sm:gap-3'
         )}
       >
-        <motion.h2
+        <h2
           ref={nameRef}
-          animate={animateName}
-          className="min-w-0 shrink truncate text-sm font-medium md:text-base"
+          className="min-h-5 min-w-0 shrink truncate text-sm font-medium md:min-h-6 md:text-base"
         >
           {name}
-        </motion.h2>
+        </h2>
         {series && (
           <span className="shrink-0 whitespace-nowrap rounded-full bg-primary/10 px-2 py-0.5 text-xs tabular-nums text-primary">
             {series.name} #{series.order}
           </span>
         )}
-        <motion.span
+        <span
           ref={summaryRef}
-          animate={animateSummary}
           className="hidden min-w-0 shrink truncate text-sm text-muted-foreground sm:inline-block"
         >
           {summary}
-        </motion.span>
-        <motion.div
-          ref={lineRef}
-          animate={animateLine}
-          className="hidden h-px min-w-8 origin-left bg-gray-700 sm:inline-block sm:flex-1"
-          style={{ opacity: 0.5 }}
+        </span>
+        <div
+          aria-hidden="true"
+          className={cn(
+            styles.line,
+            'hidden min-w-8 sm:inline-block sm:flex-1'
+          )}
         />
-        <motion.span
+        <span
           ref={publishedAtRef}
-          animate={animatePublishedAt}
-          className="shrink-0 whitespace-nowrap text-sm tabular-nums text-muted-foreground"
+          className="inline-block min-h-5 shrink-0 whitespace-nowrap align-top text-sm tabular-nums text-muted-foreground"
         >
           {publishedAt}
-        </motion.span>
-      </Link>
+        </span>
+      </MotionLink>
     </WithSound>
   );
 }

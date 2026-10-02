@@ -1,0 +1,89 @@
+.line {
+  position: relative;
+}
+
+.line::before,
+.line::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+}
+
+.line::before {
+  z-index: 3;
+}
+
+.line::after {
+  background-color: hsl(var(--article-line-rest));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .item[data-entrance='pending'] {
+    /* JS가 늦거나 실패해도 600ms 뒤에는 원문을 읽을 수 있다. */
+    animation: readableFallback 0s linear 600ms backwards;
+  }
+
+  .item[data-entrance='waiting'] {
+    opacity: 0;
+  }
+
+  /* Rauno Projects: 폭과 색상을 함께 바꾸는 1초짜리 선 두 겹. */
+  .item[data-line-entrance='active'] .line::before {
+    width: 0;
+    animation: lineFlash 1s ease;
+    animation-delay: calc(var(--line-stagger-index, 0) * 100ms);
+    animation-fill-mode: forwards;
+  }
+
+  .item[data-line-entrance='active'] .line::after {
+    width: 0;
+    animation: lineDraw 1s ease;
+    animation-delay: calc(var(--line-stagger-index, 0) * 50ms);
+    animation-fill-mode: forwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
+@keyframes lineDraw {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: hsl(var(--article-line-highlight));
+  }
+  100% {
+    width: 100%;
+    background-color: hsl(var(--article-line-rest));
+  }
+}
+
+@keyframes lineFlash {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: hsl(var(--article-line-highlight));
+  }
+  100% {
+    width: 100%;
+    background-color: transparent;
+  }
+}
+
+@keyframes readableFallback {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
