@@ -88,7 +88,7 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "3.2.6",
+    "vitest": "4.1.11",
     "subset-font": "2.9.0"
   }
 }
