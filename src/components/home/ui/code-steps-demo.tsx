@@ -256,6 +256,7 @@ export function CodeStepsDemo({ steps }: { steps: CodeStep[] }) {
         style={viewportStyle}
         role="region"
         aria-label="스크롤로 읽는 코드 설명"
+        data-craft-cursor="스크롤해 설명 읽기"
         aria-describedby={instructionId}
         tabIndex={0}
         onKeyDown={handleKeyDown}
@@ -361,6 +362,8 @@ export function CodeStepsDemo({ steps }: { steps: CodeStep[] }) {
               <button
                 type="button"
                 aria-label="이전 설명"
+                data-cursor-label="이전 설명"
+                data-cursor-disabled-label="첫 설명입니다"
                 disabled={selection.index === 0}
                 onClick={event =>
                   navigateTo(
@@ -379,6 +382,7 @@ export function CodeStepsDemo({ steps }: { steps: CodeStep[] }) {
                     key={step.title}
                     type="button"
                     aria-label={`${index + 1}단계: ${step.title}`}
+                    data-cursor-label={`${index + 1}단계로 이동`}
                     aria-current={
                       index === selectedStop.stepIndex ? 'step' : undefined
                     }
@@ -398,6 +402,8 @@ export function CodeStepsDemo({ steps }: { steps: CodeStep[] }) {
               <button
                 type="button"
                 aria-label="다음 설명"
+                data-cursor-label="다음 설명"
+                data-cursor-disabled-label="마지막 설명입니다"
                 disabled={selection.index === stops.length - 1}
                 onClick={event =>
                   navigateTo(

@@ -1,0 +1,28 @@
+.cursor {
+  --cursor-ease: cubic-bezier(0.19, 1, 0.22, 1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 100ms var(--cursor-ease);
+}
+
+.cursor[data-cursor-visible='true'] {
+  opacity: 1;
+  transition-duration: 150ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor,
+  .cursor[data-cursor-visible='true'] {
+    transition-duration: 50ms;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor {
+    display: none;
+  }
+}

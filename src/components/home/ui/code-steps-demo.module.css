@@ -239,6 +239,7 @@
 
 .codeBase {
   position: relative;
+  cursor: text;
 }
 
 .codePane[data-focused='true'] .codeBase {
