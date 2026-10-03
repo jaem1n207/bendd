@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 기본 커서로 조작 종류를, Craft 배지로 구체적인 행동을 안내한다. */
+@media (hover: hover) and (pointer: fine) {
+  [data-craft-cursor] button:not(:disabled, [data-dock-separator]),
+  [data-craft-cursor-active='true']
+    button:not(:disabled, [data-dock-separator]) {
+    cursor: pointer;
+  }
+
+  [data-craft-cursor] button:disabled,
+  [data-craft-cursor-active='true'] button:disabled {
+    cursor: default;
+  }
+
+  html[data-craft-cursor-dragging='ns-resize'],
+  html[data-craft-cursor-dragging='ns-resize'] * {
+    cursor: ns-resize !important;
+  }
+
+  html[data-craft-cursor-dragging='ew-resize'],
+  html[data-craft-cursor-dragging='ew-resize'] * {
+    cursor: ew-resize !important;
+  }
+
+  [data-craft-cursor-active='true'] [data-dock-tooltip] {
+    visibility: hidden;
+  }
+}
+
 /* Tailwind 3 scroll-fade subset: y/x, responsive none, size and reveal variables.
  * Keep backgrounds and borders on the wrapper, outside the masked scroller.
  * Pair with useScrollFade to remove the mask when resized content fits.

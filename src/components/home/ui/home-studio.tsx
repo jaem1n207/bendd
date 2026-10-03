@@ -14,6 +14,7 @@ import localFont from 'next/font/local';
 import type { ReactNode } from 'react';
 
 import { TextShuffleDemo } from '@/components/home/ui/craft-demos';
+import { CraftCursorArea } from '@/components/home/ui/craft-cursor-area';
 import { DockDemo } from '@/components/home/ui/dock-demo';
 import { CodeSteps } from '@/components/home/ui/code-steps';
 import { ExtensionInstallMenu } from '@/components/home/ui/extension-install-menu';
@@ -184,7 +185,7 @@ export function HomeStudio({
                   작은 움직임을 직접 만져보세요
                 </p>
               </SectionHeading>
-              <div className={styles.crafts}>
+              <CraftCursorArea className={styles.crafts}>
                 <div className={styles.craftEntry}>
                   <MarginNote side="right">
                     <span>도구를 눌러</span> <span>보세요</span>
@@ -256,7 +257,7 @@ export function HomeStudio({
                     </div>
                   </article>
                 </div>
-              </div>
+              </CraftCursorArea>
             </section>
             <section
               className={styles.section}

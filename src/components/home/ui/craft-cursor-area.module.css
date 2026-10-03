@@ -1,0 +1,38 @@
+.badgePosition {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.badge {
+  width: max-content;
+  max-width: min(280px, calc(100vw - 24px));
+  padding: 6px 10px;
+  border: 1px solid hsl(var(--background) / 0.16);
+  border-radius: 10px;
+  background: hsl(var(--foreground));
+  color: hsl(var(--background));
+  box-shadow: 0 2px 8px hsl(var(--foreground) / 0.1);
+  font-family: var(--font-home-sans), var(--font-sans), sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  transform: scale(0.95);
+  transform-origin: top left;
+  transition: transform 100ms var(--cursor-ease);
+}
+
+:global([data-cursor-visible='true']) .badge {
+  transform: scale(1);
+  transition-duration: 150ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge,
+  :global([data-cursor-visible='true']) .badge {
+    transform: none;
+    transition: none;
+  }
+}

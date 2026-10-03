@@ -40,7 +40,14 @@ export function TextShuffleDemo() {
   };
 
   return (
-    <div className={`${styles.craftStage} ${styles.shuffleStage}`}>
+    <div
+      className={`${styles.craftStage} ${styles.shuffleStage}`}
+      data-craft-cursor={
+        reducedMotion
+          ? '동작 줄이기 사용 중'
+          : '글자에 올리거나 눌러 섞어 보세요'
+      }
+    >
       <span className={styles.stageLabel}>TEXT / UNICODE</span>
       <button
         type="button"
@@ -52,6 +59,9 @@ export function TextShuffleDemo() {
           }
         }}
         aria-label="텍스트 셔플 애니메이션 재생"
+        data-cursor-label={
+          reducedMotion ? '동작 줄이기 사용 중' : '클릭해 다시 섞기'
+        }
       >
         <span className={styles.shuffleText} data-label={ORIGINAL}>
           <span ref={text} aria-hidden="true">

@@ -28,7 +28,11 @@ export function DockDemo() {
   const [selected, setSelected] = useState('Files');
   return (
     <div className={styles.dockDemo}>
-      <div className={styles.dockStage} data-dock-boundary="">
+      <div
+        className={styles.dockStage}
+        data-dock-boundary=""
+        data-craft-cursor="아이콘 선택 · 구분선으로 크기 조절"
+      >
         <span className={styles.stageLabel}>DOCK / HOVER & RESIZE</span>
         <DockSurface
           size={size}
@@ -45,6 +49,7 @@ export function DockDemo() {
                   type="button"
                   aria-label={`${name} 데모`}
                   aria-pressed={selected === name}
+                  data-cursor-label="클릭해 선택"
                   className={styles.dockDemoButton}
                   onClick={() => setSelected(name)}
                 >
