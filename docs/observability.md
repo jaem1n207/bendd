@@ -3,14 +3,16 @@
 ## 연결
 
 운영 배포 커밋 `ecf202d`를 기준으로 구현했다. 기존 Vercel Analytics와
-Speed Insights는 유지한다. Hobby의 custom event·짧은 로그 보존 제약을
+Speed Insights는 유지한다. OG 이미지는 Sentry 추가 후 Hobby Edge 1MB 한도를
+넘으므로 Node.js 함수에서 생성한다. 로컬 폰트는 파일 시스템에서 읽는다. Hobby의 custom event·짧은 로그 보존 제약을
 Sentry SDK와 GA4로 보완한다.
 
 1. `.env.example`을 참고해 로컬 `.env.local`과 Vercel 환경 변수를 설정한다.
    DSN과 GA4 ID는 공개 값이다. Sentry 토큰은 소스나 채팅에 넣지 않는다.
 2. Sentry: Next.js 프로젝트 `bendd`의 DSN을 사용한다. Browser/Node/Edge를
    초기화한다. 초기 설정은 오류만 수집하고 tracing, replay, SDK logs를 끈다.
-   공개 환경·커밋 변수는 Vercel system variables 자동 노출 여부를 확인한다.
+   `NEXT_PUBLIC_VERCEL_ENV`는 Production/Preview별로 지정한다. Release는
+   공개 커밋 변수가 없으면 Sentry 빌드 플러그인의 Git revision 주입을 사용한다.
 3. Source maps는 `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`을 모두
    설정했을 때만 업로드한다. 토큰은 별도로 안전하게 설정한다.
 4. GA4: `bendd.me` 웹 스트림의 G- 측정 ID를 사용한다. 스트림의 향상된 측정을
@@ -109,6 +111,6 @@ GA4 맞춤 측정기준 6개(`content_path`, `target_path`, `demo_id`, `metric_n
 `navigation_path`, `metric_rating`)와 숫자 맞춤 측정항목 3개(`active_read_ms`,
 `metric_value`, `metric_delta`)를 등록하고 관리 화면의 저장 결과를 확인했다.
 Vercel `jaemins-crafts/bendd`의 Production·Preview에 공개 DSN, GA4 ID,
-`SENTRY_ORG`, `SENTRY_PROJECT`를 연결했다. 비밀 업로드 토큰은 생성/등록하지 않았다.
+`SENTRY_ORG`, `SENTRY_PROJECT`와 환경별 `NEXT_PUBLIC_VERCEL_ENV`를 연결했다. 비밀 업로드 토큰은 생성/등록하지 않았다.
 실제 발급된 값으로 운영 빌드도 통과했다. 실제 수집·브라우저 네트워크·운영 배포·정기 알림은 아직 검증/활성화하지
 않았다. 기본 설정 값이 비어 있으면 외부 계측은 시작되지 않는다.

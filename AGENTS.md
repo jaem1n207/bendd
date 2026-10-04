@@ -43,7 +43,7 @@ bendd/
 ├── public/                 # Images, sounds, videos
 └── src/
     ├── app/                # Next.js App Router (no nested layouts)
-    │   ├── api/og/         # Dynamic OG image gen (Edge Runtime)
+    │   ├── api/og/         # Dynamic OG image gen (Node.js Runtime)
     │   ├── api/feed/       # RSS feed (rewritten from /rss.xml by middleware)
     │   ├── article/[slug]/ # Blog article pages (SSG via generateStaticParams)
     │   ├── craft/[slug]/   # Craft pages (SSG via generateStaticParams)
@@ -77,7 +77,7 @@ bendd/
 | Security headers     | `next.config.mjs`                        | CSP allowlist — update when adding external services          |
 | Unit test            | Co-locate as `*.spec.{ts,tsx}` in `src/` | Vitest + jsdom                                                |
 | E2E test             | `tests/*.spec.ts`                        | Playwright, needs `pnpm build && pnpm start` first            |
-| OG image             | `src/app/api/og/route.tsx`               | Edge Runtime, 658 lines — reads `Sec-CH-Prefers-Color-Scheme` |
+| OG image             | `src/app/api/og/route.tsx`               | Node.js Runtime — reads `Sec-CH-Prefers-Color-Scheme` |
 
 ## Content System
 
@@ -94,7 +94,7 @@ Same frontmatter schema, different display formatters and route prefixes.
 - **Zustand persist**: localStorage with named keys (e.g., `sound-enabled`)
 - **Theme sync**: `useThemeManager` syncs next-themes with giscus iframe via `postMessage`
 - **Dynamic imports**: `ssr: false` must live in a Client Component wrapper; Server Component layouts import that wrapper
-- **OG images**: Dynamically generated at `/api/og` (Edge Runtime), not static files
+- **OG images**: Dynamically generated at `/api/og` (Node.js Runtime), not static files
 - **MDX security**: `blockJS: false` + `blockDangerousJS: true` (CVE-2026-0969) — do not change
 - **Middleware**: `/rss.xml` → rewrites to `/api/feed`; `/playground/*` → returns 404 to bots
 - **No nested layouts**: All routes share single root layout

@@ -1,3 +1,6 @@
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import {
   INTERNAL_SERVER_ERROR,
   reportRouteError,
@@ -7,11 +10,11 @@ import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
 import type { ReactElement } from 'react';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
-const interSemiBold = fetch(
-  new URL('./Inter-SemiBold.ttf', import.meta.url)
-).then(res => res.arrayBuffer());
+const interSemiBold = readFile(
+  join(process.cwd(), 'src/app/api/og/Inter-SemiBold.ttf')
+).then(font => new Uint8Array(font).buffer);
 
 export async function GET(req: NextRequest): Promise<Response | ImageResponse> {
   const startedAt = performance.now();

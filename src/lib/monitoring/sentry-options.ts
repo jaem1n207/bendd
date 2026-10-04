@@ -38,10 +38,12 @@ export function scrubErrorEvent(event: ErrorEvent): ErrorEvent {
 }
 
 export function getSentryOptions() {
+  const release = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
+
   return {
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
     environment: process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV,
-    release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
+    ...(release ? { release } : {}),
     sendDefaultPii: false,
     maxBreadcrumbs: 0,
     sampleRate: 1,
