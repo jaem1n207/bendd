@@ -173,6 +173,8 @@ pnpm incident:drill --run-authorized
 
 자료는 `~/.codex/automations/bendd-incident-drills/availability-.../`에 보존한다.
 중단된 실행은 자동 재실행하거나 새 디렉터리로 중복 모델을 호출하지 않는다. 기록과 실제 PR부터 확인한다.
+모델/이슈/PR 생성 전에 새 키 전파 대기 누락으로 중단한 경우만 `--run-authorized DIRECTORY --resume-before-model`로
+동일 Preview와 상태를 한 번 이어갈 수 있다. 첫 중단 기록을 보존하며 401/403·모델 실행·반복 재개는 거부한다.
 프로세스를 강제 종료하면 메모리의 키를 회수하는 finally가 실행되지 않을 수 있다. 정상 종료까지 기다리고
 중단 시 Vercel 설정의 실제 키 상태를 확인해 수동 회수한다. 기존 키를 삭제/재생성하지 않는다.
 

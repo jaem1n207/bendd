@@ -1,8 +1,38 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createDrillVercel, protectedPreviewFetch } from './drill-access.mjs';
-import { assertDrillMerge } from './drill.mjs';
+import { assertDrillMerge, assertBeforeModelResume } from './drill.mjs';
 import { REQUIRED_CHECKS } from './policy.mjs';
+
+test('pre-model propagation resume rejects access denial, model use, issues and repeated resume', () => {
+  const directory = '/fixture/drill';
+  const record = {
+    version: 1,
+    directory,
+    id: 'availability-123',
+    status: 'needs_action',
+    message: 'Preview redirects to protected or unexpected content; stop',
+    model_calls: 0,
+    access_revoked: true,
+    broken_sha: 'a'.repeat(40),
+    base_branch: 'drill/availability-123',
+    fix_branch: 'fix/drill-availability-123',
+    worktree: directory + '/fix',
+  };
+  assert.doesNotThrow(() => assertBeforeModelResume(record, directory));
+  for (const change of [
+    { message: 'Preview HTTP 403' },
+    { model_calls: 1 },
+    { issue: 12 },
+    { pr: 13 },
+    { access_revoked: false },
+    { resumed_at: '2026-10-05T00:00:00Z' },
+  ])
+    assert.throws(
+      () => assertBeforeModelResume({ ...record, ...change }, directory),
+      /no access denial or model retry/
+    );
+});
 
 test('drill cannot merge into main, another branch, another PR head or without exact gates', () => {
   const sha = 'a'.repeat(40);
@@ -77,7 +107,11 @@ test('drill cannot merge into main, another branch, another PR head or without e
 test('temporary access is revoked even when the model or preview fails and existing keys survive', async () => {
   const calls = [];
   let issued = false;
+  let propagated = false;
   const api = createDrillVercel({
+    propagate: async () => {
+      propagated = true;
+    },
     request: async (path, method = 'GET', body) => {
       calls.push({ path, method, body });
       if (method === 'GET')
@@ -100,6 +134,7 @@ test('temporary access is revoked even when the model or preview fails and exist
   });
   await assert.rejects(
     api.withTemporaryAccess(async () => {
+      assert.equal(propagated, true);
       throw new Error('model denied');
     }),
     /model denied/

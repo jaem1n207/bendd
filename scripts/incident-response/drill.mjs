@@ -107,8 +107,31 @@ async function gateData(pr, sha) {
   return { files, checks: checkResult.check_runs, statuses };
 }
 
-export async function runDrill(directory) {
-  const id = `availability-${Date.now()}`;
+export function assertBeforeModelResume(record, directory) {
+  if (
+    record?.version !== 1 ||
+    record.directory !== directory ||
+    !/^availability-[0-9]+$/.test(record.id ?? '') ||
+    record.status !== 'needs_action' ||
+    record.message !==
+      'Preview redirects to protected or unexpected content; stop' ||
+    record.model_calls !== 0 ||
+    record.resumed_at ||
+    record.issue ||
+    record.pr ||
+    record.access_revoked !== true ||
+    !FULL_SHA.test(record.broken_sha ?? '') ||
+    record.base_branch !== `drill/${record.id}` ||
+    record.fix_branch !== `fix/drill-${record.id}` ||
+    record.worktree !== join(directory, 'fix')
+  )
+    throw new Error(
+      'Only the preserved pre-model propagation stop can be resumed; no access denial or model retry'
+    );
+}
+
+export async function runDrill(directory, { resumeBeforeModel = false } = {}) {
+  let id = `availability-${Date.now()}`;
   if (!directory)
     directory = join(
       homedir(),
@@ -133,7 +156,7 @@ export async function runDrill(directory) {
       'Drill must use a separate directory outside the project and live responder'
     );
   const runPath = join(directory, 'drill.json');
-  const record = {
+  let record = {
     version: 1,
     id,
     directory,
@@ -142,9 +165,25 @@ export async function runDrill(directory) {
     model_calls: 0,
     access_revoked: false,
   };
-  await writeFile(runPath, JSON.stringify(record), { flag: 'wx', mode: 0o600 });
-  await mkdir(join(directory, 'results'), { mode: 0o700 });
-  await mkdir(join(directory, 'state'), { mode: 0o700 });
+  if (resumeBeforeModel) {
+    record = JSON.parse(await readFile(runPath, 'utf8'));
+    assertBeforeModelResume(record, directory);
+    try {
+      await readFile(join(directory, 'state/watcher.json'));
+      throw new Error('Do not resume an existing model dispatch');
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+    id = record.id;
+    await save(join(directory, 'results/first-stop.json'), record);
+  } else {
+    await writeFile(runPath, JSON.stringify(record), {
+      flag: 'wx',
+      mode: 0o600,
+    });
+    await mkdir(join(directory, 'results'), { mode: 0o700 });
+    await mkdir(join(directory, 'state'), { mode: 0o700 });
+  }
   await save(join(directory, 'config.json'), config);
   const persist = async update => {
     Object.assign(record, update);
@@ -162,54 +201,75 @@ export async function runDrill(directory) {
     if (production.state !== 'READY' || baseline.results.some(row => !row.ok))
       throw new Error('Production is not healthy; do not start a rehearsal');
     await requireSubscription(config);
-    await git(['fetch', 'origin', 'main']);
-    const mainSha = await git(['rev-parse', 'origin/main']);
-    if (!FULL_SHA.test(mainSha))
-      throw new Error('Missing immutable drill base');
     const base = join(directory, 'base');
     const worktree = join(directory, 'fix');
-    await git(['worktree', 'add', '-b', `drill/${id}`, base, mainSha]);
-    await symlink(
-      join(SOURCE_DIRECTORY, '..', '..', 'node_modules'),
-      join(base, 'node_modules')
-    );
-    const file = join(base, 'src/app/api/feed/route.ts');
-    const content = await readFile(file, 'utf8');
-    if (!content.includes('<rss xmlns:') || !content.includes('</rss>'))
-      throw new Error('Fault fixture no longer matches RSS route');
-    await writeFile(
-      file,
-      content
-        .replace('<rss xmlns:', '<feed xmlns:')
-        .replace('</rss>', '</feed>')
-    );
-    await git(['add', 'src/app/api/feed/route.ts'], base);
-    await git(
-      ['commit', '-m', 'test(drill): 리허설 전용 RSS 형식 오류 주입'],
-      base
-    );
-    const brokenSha = await git(['rev-parse', 'HEAD'], base);
-    await git(['push', 'origin', `HEAD:refs/heads/drill/${id}`], base);
-    await git([
-      'worktree',
-      'add',
-      '-b',
-      `fix/drill-${id}`,
-      worktree,
-      brokenSha,
-    ]);
-    await symlink(
-      join(SOURCE_DIRECTORY, '..', '..', 'node_modules'),
-      join(worktree, 'node_modules')
-    );
-    await persist({
-      main_sha: mainSha,
-      broken_sha: brokenSha,
-      base_branch: `drill/${id}`,
-      fix_branch: `fix/drill-${id}`,
-      worktree,
-      production_before: production,
-    });
+    let brokenSha = record.broken_sha;
+    if (resumeBeforeModel) {
+      if (
+        production.id !== record.production_before.id ||
+        production.sha !== record.production_before.sha
+      )
+        throw new Error('Production changed; do not resume this drill');
+      for (const [path, branch] of [
+        [base, `drill/${id}`],
+        [worktree, `fix/drill-${id}`],
+      ]) {
+        if (
+          (await git(['branch', '--show-current'], path)) !== branch ||
+          (await git(['rev-parse', 'HEAD'], path)) !== brokenSha ||
+          (await git(['status', '--porcelain'], path))
+        )
+          throw new Error('Rehearsal worktree changed; preserve it for review');
+      }
+      await persist({ status: 'preparing', resumed_at: stamp() });
+    } else {
+      await git(['fetch', 'origin', 'main']);
+      const mainSha = await git(['rev-parse', 'origin/main']);
+      if (!FULL_SHA.test(mainSha))
+        throw new Error('Missing immutable drill base');
+      await git(['worktree', 'add', '-b', `drill/${id}`, base, mainSha]);
+      await symlink(
+        join(SOURCE_DIRECTORY, '..', '..', 'node_modules'),
+        join(base, 'node_modules')
+      );
+      const file = join(base, 'src/app/api/feed/route.ts');
+      const content = await readFile(file, 'utf8');
+      if (!content.includes('<rss xmlns:') || !content.includes('</rss>'))
+        throw new Error('Fault fixture no longer matches RSS route');
+      await writeFile(
+        file,
+        content
+          .replace('<rss xmlns:', '<feed xmlns:')
+          .replace('</rss>', '</feed>')
+      );
+      await git(['add', 'src/app/api/feed/route.ts'], base);
+      await git(
+        ['commit', '-m', 'test(drill): 리허설 전용 RSS 형식 오류 주입'],
+        base
+      );
+      brokenSha = await git(['rev-parse', 'HEAD'], base);
+      await git(['push', 'origin', `HEAD:refs/heads/drill/${id}`], base);
+      await git([
+        'worktree',
+        'add',
+        '-b',
+        `fix/drill-${id}`,
+        worktree,
+        brokenSha,
+      ]);
+      await symlink(
+        join(SOURCE_DIRECTORY, '..', '..', 'node_modules'),
+        join(worktree, 'node_modules')
+      );
+      await persist({
+        main_sha: mainSha,
+        broken_sha: brokenSha,
+        base_branch: `drill/${id}`,
+        fix_branch: `fix/drill-${id}`,
+        worktree,
+        production_before: production,
+      });
+    }
     progress('waiting_for_fault_preview', { directory, branch: `drill/${id}` });
     const vercel = createDrillVercel();
     const broken = await waitFor('fault Preview', () =>
@@ -219,10 +279,30 @@ export async function runDrill(directory) {
     await vercel.withTemporaryAccess(
       async secret => {
         const probeUrl = async url => {
+          const redirects = [];
+          const protectedFetch = protectedPreviewFetch(url, secret);
           const report = await checkAvailability(
             url,
-            protectedPreviewFetch(url, secret)
+            async (request, options) => {
+              const response = await protectedFetch(request, options);
+              if (response.status >= 300 && response.status < 400) {
+                const location = response.headers.get('location');
+                const destination = location
+                  ? new URL(location, request)
+                  : null;
+                redirects.push({
+                  path: new URL(request).pathname,
+                  status: response.status,
+                  destination: destination
+                    ? destination.origin + destination.pathname
+                    : null,
+                });
+              }
+              return response;
+            }
           );
+          if (redirects.length)
+            await save(join(directory, 'results/redirects.json'), redirects);
           if (report.results.some(row => [401, 403].includes(row.status)))
             throw new Error('Preview HTTP 401/403; stop and request access');
           if (report.results.some(row => row.status >= 300 && row.status < 400))
@@ -625,7 +705,9 @@ if (isMain(import.meta.url)) {
       'A real drill needs explicit authorization and --run-authorized'
     );
   try {
-    await runDrill(process.argv[3]);
+    await runDrill(process.argv[3], {
+      resumeBeforeModel: process.argv[4] === '--resume-before-model',
+    });
   } catch {
     process.exitCode = 1;
   }

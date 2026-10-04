@@ -18,7 +18,9 @@ const exec = promisify(execFile);
 
 async function fixture(t) {
   const root = await mkdtemp(join(tmpdir(), 'bendd-install-test-'));
-  t.after(() => rm(root, { recursive: true, force: true }));
+  t.after(() =>
+    rm(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 })
+  );
   const repository = join(root, 'repo');
   const directory = join(root, 'runtime');
   const agents = join(root, 'LaunchAgents');

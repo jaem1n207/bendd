@@ -1,11 +1,15 @@
 import { readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
 
 const PROJECT = 'prj_dTKsVA4Kn1Ae6UDA5xw3eUa3Km82';
 const TEAM = 'jaemins-crafts';
 
-export function createDrillVercel({ request } = {}) {
+export function createDrillVercel({
+  request,
+  propagate = () => delay(1000),
+} = {}) {
   const get =
     request ??
     (async (path, method = 'GET', body) => {
@@ -88,6 +92,8 @@ export function createDrillVercel({ request } = {}) {
       );
     const secret = keys[0];
     try {
+      // Vercel's official CLI also waits 1s for a newly created secret to propagate.
+      await propagate();
       return await task(secret);
     } finally {
       // Revoke only this run's key. Never regenerate or delete someone else's access.
