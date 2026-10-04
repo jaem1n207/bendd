@@ -24,7 +24,8 @@
     "-----------------------------------------------": "",
     "cz": "czg checkbox",
     "prepare": "husky",
-    "fonts:home": "node scripts/generate-home-font.mjs"
+    "fonts:home": "node scripts/generate-home-font.mjs",
+    "test:availability": "node --test --test-timeout=10000 scripts/availability/*.test.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.20",
