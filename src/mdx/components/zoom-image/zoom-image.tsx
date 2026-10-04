@@ -203,7 +203,7 @@ function ZoomableImage({
     setIsOpen(false);
     setCloneAnimated(false);
     cloneAnimatedRef.current = false;
-  }, [zoomState]);
+  }, []);
 
   // 클론의 close transition 완료 후 정리
   const handleCloneTransitionEnd = useCallback(() => {

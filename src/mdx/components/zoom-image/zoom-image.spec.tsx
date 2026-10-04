@@ -78,9 +78,9 @@ describe('MDXZoomImage', () => {
 
     it('className을 전달한다', () => {
       render(
-        <MDXZoomImage src="/test.png" alt="테스트" className="custom-class" />
+        <MDXZoomImage src="/test.png" alt="테스트" className="opacity-70" />
       );
-      expect(screen.getByAltText('테스트').className).toContain('custom-class');
+      expect(screen.getByAltText('테스트').className).toContain('opacity-70');
     });
 
     it('cursor-zoom-in 클래스가 적용된다', () => {
@@ -654,9 +654,9 @@ describe('MDXZoomImage', () => {
 
     it('className을 전달한다', () => {
       render(
-        <MDXZoomImage src={svgDataUri} alt="SVG" className="custom-svg" />
+        <MDXZoomImage src={svgDataUri} alt="SVG" className="opacity-60" />
       );
-      expect(screen.getByAltText('SVG').className).toContain('custom-svg');
+      expect(screen.getByAltText('SVG').className).toContain('opacity-60');
     });
   });
 

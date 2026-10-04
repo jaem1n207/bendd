@@ -2,6 +2,7 @@ import { stripUrlDetails } from '@/lib/monitoring/privacy';
 
 export const CONSENT_KEY = 'bendd-analytics-consent-v1';
 export const CONSENT_EVENT = 'bendd:analytics-consent';
+export const ANALYTICS_COOKIE_SECONDS = 63_072_000;
 export const DEMO_EVENT = 'bendd:demo-complete';
 
 export enum AnalyticsConsent {
@@ -56,7 +57,7 @@ export function setConsent(consent: AnalyticsConsent) {
   try {
     localStorage.setItem(CONSENT_KEY, consent);
   } catch {
-    return;
+    return false;
   }
 
   syncTagConsent(consent);
@@ -75,6 +76,7 @@ export function setConsent(consent: AnalyticsConsent) {
   }
 
   window.dispatchEvent(new Event(CONSENT_EVENT));
+  return true;
 }
 
 let loadedId: string | null = null;
@@ -104,6 +106,9 @@ export function loadAnalytics() {
   window.gtag('js', new Date());
   window.gtag('config', id, {
     send_page_view: false,
+    cookie_domain: location.hostname,
+    cookie_expires: ANALYTICS_COOKIE_SECONDS,
+    cookie_update: true,
     allow_google_signals: false,
     allow_ad_personalization_signals: false,
     page_location: stripUrlDetails(location.href),

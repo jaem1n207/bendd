@@ -1,5 +1,6 @@
 import { withSentryConfig } from '@sentry/nextjs/config';
 import withBundleAnalyzer from '@next/bundle-analyzer';
+import { PHASE_PRODUCTION_BUILD } from 'next/constants.js';
 
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -73,21 +74,47 @@ const securityHeaders = [
   },
 ];
 
-export default withSentryConfig(bundleAnalyzer(nextConfig), {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  telemetry: false,
-  buildTimeInstrumentation: false,
-  webpack: {
-    treeshake: { removeDebugLogging: true, removeTracing: true },
-  },
-  silent: !process.env.CI,
-  sourcemaps: {
-    disable: !(
-      process.env.SENTRY_AUTH_TOKEN &&
-      process.env.SENTRY_ORG &&
-      process.env.SENTRY_PROJECT
-    ),
-  },
-});
+const SENTRY_UPLOAD_KEYS = [
+  'SENTRY_ORG',
+  'SENTRY_PROJECT',
+  'SENTRY_AUTH_TOKEN',
+];
+const VERCEL_DEPLOY_ENVS = ['production', 'preview'];
+
+/** @param {string} phase */
+export default function configureNext(phase) {
+  const missingKeys = SENTRY_UPLOAD_KEYS.filter(
+    key => !process.env[key]?.trim()
+  );
+  const isVercelDeployBuild =
+    phase === PHASE_PRODUCTION_BUILD &&
+    process.env.VERCEL === '1' &&
+    VERCEL_DEPLOY_ENVS.includes(process.env.VERCEL_ENV);
+
+  if (isVercelDeployBuild && missingKeys.length > 0) {
+    throw new Error(
+      `[Sentry source maps] Vercel ${process.env.VERCEL_ENV} 빌드 필수 설정 누락: ${missingKeys.join(', ')}. ` +
+        'Vercel의 해당 환경에 설정하세요. SENTRY_AUTH_TOKEN은 Sensitive 변수로 저장하세요.'
+    );
+  }
+
+  const sentryUploadEnabled = missingKeys.length === 0;
+
+  return withSentryConfig(bundleAnalyzer({ ...nextConfig }), {
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    telemetry: false,
+    buildTimeInstrumentation: false,
+    webpack: {
+      treeshake: { removeDebugLogging: true, removeTracing: true },
+    },
+    silent: !sentryUploadEnabled,
+    widenClientFileUpload: true,
+    useRunAfterProductionCompileHook: true,
+    sourcemaps: {
+      disable: !sentryUploadEnabled,
+      deleteSourcemapsAfterUpload: true,
+    },
+  });
+}
