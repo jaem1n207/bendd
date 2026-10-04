@@ -1,5 +1,6 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { access, mkdir, readFile, realpath, writeFile } from 'node:fs/promises';
+import { constants } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { promisify } from 'node:util';
 import { execFile } from 'node:child_process';
 import { openAppServer } from './app-server.mjs';
@@ -39,7 +40,7 @@ export function invocation(config, directory, worktree) {
       '--config',
       'sandbox_mode="workspace-write"',
       '--config',
-      `sandbox_workspace_write.writable_roots=${JSON.stringify([join(directory, 'state'), join(directory, 'results')])}`,
+      `sandbox_workspace_write.writable_roots=${JSON.stringify([worktree, join(directory, 'state'), join(directory, 'results')])}`,
       '--config',
       'service_tier="default"',
     ],
@@ -48,7 +49,34 @@ export function invocation(config, directory, worktree) {
   };
 }
 
-export async function requireSubscription(config, execute = execAsync) {
+export async function verifyCodexToolkit(executable) {
+  try {
+    const actual = await realpath(executable);
+    const root = dirname(dirname(actual));
+    const manifest = JSON.parse(
+      await readFile(join(root, 'codex-package.json'), 'utf8')
+    );
+    if (
+      manifest.layoutVersion !== 1 ||
+      manifest.version !== CODEX_CLI_VERSION ||
+      manifest.entrypoint !== 'bin/codex' ||
+      actual !== join(root, 'bin/codex')
+    )
+      throw new Error('Invalid official package layout');
+    await access(join(root, 'bin/codex-code-mode-host'), constants.X_OK);
+    return { version: manifest.version, root };
+  } catch {
+    throw new Error(
+      'Complete Codex CLI package with executable codex-code-mode-host required; stop before login/session/model request'
+    );
+  }
+}
+
+export async function requireSubscription(
+  config,
+  execute = execAsync,
+  verifyToolkit = verifyCodexToolkit
+) {
   let version;
   try {
     version = await execute(config.runtime.codex, ['--version'], {
@@ -63,6 +91,7 @@ export async function requireSubscription(config, execute = execAsync) {
   }
   if (version.stdout.trim() !== `codex-cli ${CODEX_CLI_VERSION}`)
     throw new Error('Codex CLI schema version changed; review before dispatch');
+  await verifyToolkit(config.runtime.codex);
   let status;
   try {
     status = await execute(config.runtime.codex, ['login', 'status'], {
@@ -167,6 +196,41 @@ export async function createIncidentSession(
   const account = await client.request('account/read', { refreshToken: false });
   if (account.account?.type !== 'chatgpt')
     throw new Error('Codex ChatGPT subscription required; no API fallback');
+  let cursor;
+  const catalog = [];
+  const seen = new Set();
+  for (let page = 0; page < 10; page++) {
+    const response = await client.request('model/list', {
+      limit: 100,
+      includeHidden: false,
+      ...(cursor ? { cursor } : {}),
+    });
+    if (!Array.isArray(response.data))
+      throw new Error('Invalid Codex model catalog; model not started');
+    catalog.push(...response.data);
+    if (response.nextCursor === null) break;
+    if (
+      typeof response.nextCursor !== 'string' ||
+      !response.nextCursor ||
+      seen.has(response.nextCursor) ||
+      page === 9
+    )
+      throw new Error(
+        'Invalid Codex model catalog pagination; model not started'
+      );
+    cursor = response.nextCursor;
+    seen.add(cursor);
+  }
+  const requested = catalog.filter(model => model?.model === 'gpt-6.1-sol');
+  if (
+    requested.length !== 1 ||
+    !requested[0].supportedReasoningEfforts?.some(
+      e => e.reasoningEffort === 'high'
+    )
+  )
+    throw new Error(
+      'Codex model catalog does not support gpt-6.1-sol / High for this account; no fallback or model request'
+    );
   const { project } = await client.request('project/read', {
     projectId: config.project_id,
   });
@@ -231,6 +295,7 @@ export async function createIncidentSession(
     project_id: thread.projectId,
     session_name: name,
     source: thread.source,
+    writable_roots: started.sandbox.writableRoots,
     model: started.model,
     reasoning_effort: started.reasoningEffort,
   };

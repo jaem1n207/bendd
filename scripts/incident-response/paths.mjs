@@ -4,7 +4,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const SOURCE_DIRECTORY = dirname(fileURLToPath(import.meta.url));
-export const CODEX_CLI_VERSION = '0.154.0';
+export const CODEX_CLI_VERSION = '0.160.0';
 
 export function isMain(moduleUrl) {
   if (!process.argv[1]) return false;

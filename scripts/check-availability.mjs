@@ -27,6 +27,19 @@ export async function checkAvailability(base = SITE_URL, fetcher = fetch) {
         });
         const bytes = new Uint8Array(await response.arrayBuffer());
         const contentType = response.headers.get('content-type') ?? '';
+        const safeCode = value =>
+          /^[A-Z][A-Za-z0-9_:.-]{0,127}$/.test(value ?? '') ? value : null;
+        const providerError = safeCode(response.headers.get('x-vercel-error'));
+        const upstreamError = safeCode(
+          response.headers.get('x-amzn-errortype')
+        );
+        const regions = [
+          ...new Set(
+            (response.headers.get('x-vercel-id') ?? '').match(
+              /\b[a-z]{3}\d\b/g
+            ) ?? []
+          ),
+        ];
         const contentOk = check.marker
           ? new TextDecoder().decode(bytes).includes(check.marker)
           : PNG_SIGNATURE.every((value, index) => bytes[index] === value);
@@ -40,6 +53,9 @@ export async function checkAvailability(base = SITE_URL, fetcher = fetch) {
           type_ok: contentType.includes(check.type),
           elapsed_ms: Math.round(performance.now() - started),
           content_ok: contentOk,
+          ...(providerError ? { provider_error: providerError } : {}),
+          ...(upstreamError ? { upstream_error: upstreamError } : {}),
+          ...(regions.length ? { provider_regions: regions } : {}),
         };
       } catch (error) {
         return {

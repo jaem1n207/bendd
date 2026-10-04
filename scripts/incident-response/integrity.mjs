@@ -13,6 +13,7 @@ export const SOURCE_FILES = [
   'app-server.mjs',
   'vercel-read.mjs',
   'watch.mjs',
+  'hosting.mjs',
   'paths.mjs',
   'integrity.mjs',
   'README.md',
@@ -24,6 +25,9 @@ export const SNAPSHOT_FILES = [
   'config.json',
   'launch-agent.plist',
 ];
+const PRE_HOSTING_SNAPSHOT_FILES = SNAPSHOT_FILES.filter(
+  name => name !== 'hosting.mjs'
+);
 
 export function sha256(bytes) {
   return createHash('sha256').update(bytes).digest('hex');
@@ -33,15 +37,18 @@ export async function verifySnapshot(sourceDirectory) {
   const manifest = JSON.parse(
     await readFile(join(sourceDirectory, 'manifest.json'), 'utf8')
   );
+  const expected = Object.hasOwn(manifest.sha256 ?? {}, 'hosting.mjs')
+    ? SNAPSHOT_FILES
+    : PRE_HOSTING_SNAPSHOT_FILES;
   if (
     manifest.version !== 2 ||
     !COMMIT.test(manifest.commit ?? '') ||
     !manifest.sha256 ||
-    Object.keys(manifest.sha256).length !== SNAPSHOT_FILES.length
+    Object.keys(manifest.sha256).length !== expected.length
   ) {
     throw new Error('Invalid pinned incident-response snapshot');
   }
-  for (const name of SNAPSHOT_FILES) {
+  for (const name of expected) {
     if (
       sha256(await readFile(join(sourceDirectory, name))) !==
       manifest.sha256[name]
