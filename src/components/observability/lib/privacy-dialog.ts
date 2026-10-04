@@ -11,13 +11,15 @@ export function containPrivacyDialog(panel: HTMLElement, close: () => void) {
   const previousInert = elements.map(element => element.inert === true);
   const previousOverflow = document.body.style.overflow;
   const previousPadding = document.body.style.paddingRight;
-  const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+  const bodyWidth = document.body.getBoundingClientRect().width;
   elements.forEach(element => {
     element.inert = true;
   });
   document.body.style.overflow = 'hidden';
-  if (scrollbar > 0 && document.documentElement.clientWidth > 0) {
-    document.body.style.paddingRight = `${parseFloat(getComputedStyle(document.body).paddingRight) + scrollbar}px`;
+  // Stable gutters remain after locking; compensate only actual layout growth.
+  const addedWidth = document.body.getBoundingClientRect().width - bodyWidth;
+  if (addedWidth > 0) {
+    document.body.style.paddingRight = `${parseFloat(getComputedStyle(document.body).paddingRight) + addedWidth}px`;
   }
 
   const focusFirst = () =>
