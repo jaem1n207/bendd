@@ -1,58 +1,24 @@
 'use client';
 
-import { useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 
-import {
-  hasModelContext,
-  registerWebMCPTools,
-} from '@/components/webmcp/lib/register-tool';
-import { useWebMCPTools } from '@/components/webmcp/model/use-webmcp-tools';
+import { hasModelContext } from '@/components/webmcp/lib/register-tool';
 
-const requestIdleFallback = (callback: IdleRequestCallback) =>
-  window.setTimeout(() => {
-    callback({
-      didTimeout: false,
-      timeRemaining: () => 0,
-    });
-  }, 0);
-
-function getDeclarativeToolNames(doc: Document) {
-  return new Set(
-    [...doc.querySelectorAll<HTMLFormElement>('form[toolname]')]
-      .map(form => form.getAttribute('toolname'))
-      .filter((name): name is string => Boolean(name))
-  );
-}
+const WebMCPRegistration = dynamic(
+  () =>
+    import('@/components/webmcp/ui/webmcp-registration').then(
+      module => module.WebMCPRegistration
+    ),
+  { ssr: false }
+);
 
 export function WebMCPProvider() {
-  const buildTools = useWebMCPTools();
+  const [supported, setSupported] = useState(false);
 
   useEffect(() => {
-    if (!hasModelContext()) {
-      return;
-    }
+    setSupported(hasModelContext());
+  }, []);
 
-    let cleanup = () => {};
-    const requestIdle = globalThis.requestIdleCallback ?? requestIdleFallback;
-    const cancelIdle = globalThis.cancelIdleCallback ?? window.clearTimeout;
-
-    const idleId = requestIdle(() => {
-      try {
-        const declarativeToolNames = getDeclarativeToolNames(document);
-        const tools = buildTools().filter(
-          tool => !declarativeToolNames.has(tool.name)
-        );
-        cleanup = registerWebMCPTools(tools);
-      } catch {
-        cleanup = () => {};
-      }
-    });
-
-    return () => {
-      cancelIdle(idleId);
-      cleanup();
-    };
-  }, [buildTools]);
-
-  return null;
+  return supported ? <WebMCPRegistration /> : null;
 }

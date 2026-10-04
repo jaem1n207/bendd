@@ -12,7 +12,7 @@ const preference = vi.hoisted(() => ({ reduced: false }));
 vi.mock('@/hooks/use-prefers-reduced-motion', () => ({
   usePrefersReducedMotion: () => preference.reduced,
 }));
-vi.mock('use-sound', () => ({ default: () => [vi.fn()] }));
+vi.mock('@/components/sound/lib/play-sound', () => ({ playSound: vi.fn() }));
 let frames: Map<number, FrameRequestCallback>;
 const tick = () => {
   const batch = [...frames.values()];

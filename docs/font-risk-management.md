@@ -29,14 +29,21 @@ weight 100–900을 유지하며 최초 파일은 90,912 bytes로 원본보다 9
 `HomeStudio`에서만 이 subset과 10,684-byte Gaegu 메모 폰트를
 `next/font/local`, `preload: true`, `display: 'block'`으로 선언한다.
 작은 파일을 HTML에서 일찍 발견하게 하여 시스템 폰트가 잠깐 보이는 FOUT를
-줄인다. 이미 preload하던 작은 Latin Fira Mono에도 `display: 'block'`을
+줄인다. 작은 Latin Fira Mono에도 `display: 'block'`을
 적용한다. 글꼴 대기 상태를 React state나 전체 페이지 visibility로 관리하지 않는다.
 네트워크가 극단적으로 느리거나 실패하면 브라우저의 유한한 block 기간 후
 fallback 텍스트가 표시된다.
 
 아래의 2 MB Pretendard `swap`/`preload: false` 정책은 전역 폰트와
 Article/Craft 본문에 계속 적용한다. 홈 subset은 `--font-home-sans`로
-격리하며, 포함하지 않은 글자는 원본 `--font-sans`로 fallback한다.
+격리하며, 포함하지 않은 글자는 공통 `--font-sans`로 fallback한다.
+
+공통 UI에는 같은 원본에서 생성한 `PretendardInterface.woff2` subset을
+우선 적용한다. `--font-sans`는 `--font-interface-sans`,
+`--font-content-sans` 순서로 구성하며, Dock의 숨김 안내문과 portal 메뉴도
+작은 subset으로 렌더링한다. UI subset에 없는 본문 글자는 기존 전체 폰트가
+담당한다. 두 공통 폰트는 모두 `swap` / `preload: false`를 유지한다.
+Fira Mono도 전체 굵기를 preload하지 않고 실제 사용한 굵기만 요청한다.
 손글씨는 작업물별 행동 안내를 포함한 짧은 한국어 메모 네 곳에만 한정한다. 생성 방법과 라이선스는
 `src/app/fonts/README.md`와 `public/fonts/README.md`에 기록한다.
 

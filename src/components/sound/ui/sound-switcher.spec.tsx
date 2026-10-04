@@ -5,9 +5,7 @@ vi.mock('@vercel/analytics', () => ({
   track: vi.fn(),
 }));
 
-vi.mock('use-sound', () => ({
-  default: () => [vi.fn()],
-}));
+vi.mock('@/components/sound/lib/play-sound', () => ({ playSound: vi.fn() }));
 
 vi.mock('@/components/sound/model/sound-store', () => ({
   useSoundStore: (
