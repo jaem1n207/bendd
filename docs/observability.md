@@ -112,5 +112,14 @@ GA4 맞춤 측정기준 6개(`content_path`, `target_path`, `demo_id`, `metric_n
 `metric_value`, `metric_delta`)를 등록하고 관리 화면의 저장 결과를 확인했다.
 Vercel `jaemins-crafts/bendd`의 Production·Preview에 공개 DSN, GA4 ID,
 `SENTRY_ORG`, `SENTRY_PROJECT`와 환경별 `NEXT_PUBLIC_VERCEL_ENV`를 연결했다. 비밀 업로드 토큰은 생성/등록하지 않았다.
-실제 발급된 값으로 운영 빌드도 통과했다. 실제 수집·브라우저 네트워크·운영 배포·정기 알림은 아직 검증/활성화하지
-않았다. 기본 설정 값이 비어 있으면 외부 계측은 시작되지 않는다.
+실제 발급된 값으로 운영 빌드도 통과했다. 최종 코드의 CI는 전체 테스트
+575개(63파일), 타입·린트·포맷·빌드와 CodeQL을 통과했다. OG Node.js 전환 후
+Vercel Preview가 READY가 되었고 로컬 폰트의 배포 tracing을 확인했다.
+
+Arc Preview 검증: 동의 전 Google 요청 0건, 허용 후 gtag/collect 요청과
+`page_view`, 30초 활성 읽기 후 `engaged_read`를 확인했다. 철회 후 GA 비활성화와
+쿠키 삭제를 확인했고 새 글로 이동해도 이벤트가 추가되지 않았다.
+Sentry 검사 오류는 `preview` 환경과 PR Git release로 실제 수신했다.
+GA4 관리 화면의 실시간 집계는 아직 확인 중이다. 운영 배포의 활성화와 응답
+확인은 별도로 수행한다. 정기 알림은 활성화하지 않았다.
+기본 설정 값이 비어 있으면 외부 계측은 시작되지 않는다.
