@@ -78,6 +78,77 @@ export function assertDrillMerge({
   });
 }
 
+export function drillMergeReadiness(input) {
+  if (input.pr?.mergeable === null || input.pr?.mergeable_state === 'unknown') {
+    // Validate every other gate while GitHub computes mergeability. This never authorizes a merge.
+    assertDrillMerge({
+      ...input,
+      pr: { ...input.pr, mergeable: true, mergeable_state: 'clean' },
+    });
+    return 'waiting';
+  }
+  assertDrillMerge(input);
+  return 'ready';
+}
+
+export async function syncPublishedDrill(git, { worktree, branch, sha }) {
+  const files = ['src/app/api/feed/route.ts', 'src/app/api/feed/route.spec.ts'];
+  if (!/^fix\/drill-[a-z0-9-]+$/.test(branch) || !FULL_SHA.test(sha)) {
+    throw new Error('Invalid published drill identity');
+  }
+  if ((await git(['branch', '--show-current'], worktree)) !== branch) {
+    throw new Error('Published drill branch changed');
+  }
+  const dirty = (await git(['status', '--porcelain'], worktree))
+    .split('\n')
+    .filter(Boolean);
+  if (
+    dirty.some(
+      line => !files.includes(line.trimStart().replace(/^[MADRCU?!]{1,2} /, ''))
+    )
+  ) {
+    throw new Error('Unrelated local changes; preserve drill worktree');
+  }
+  for (const file of files) {
+    const local = await git(['hash-object', file], worktree);
+    const published = await git(['rev-parse', `${sha}:${file}`], worktree);
+    if (local !== published) {
+      throw new Error('Local repair differs from published commit; preserve');
+    }
+  }
+  const old = await git(['rev-parse', 'HEAD'], worktree);
+  await git(['merge-base', '--is-ancestor', old, sha], worktree);
+  await git(['update-ref', `refs/heads/${branch}`, sha, old], worktree);
+  // Only align the index to already matching published files. Never rewrite local file contents.
+  await git(
+    ['restore', `--source=${sha}`, '--staged', '--', ...files],
+    worktree
+  );
+  if (await git(['status', '--porcelain'], worktree)) {
+    throw new Error('Published drill snapshot remains dirty; preserve');
+  }
+}
+
+export async function cleanupRemoteDrill(api, branch, sha) {
+  if (
+    !/^(drill\/|fix\/drill-)[a-z0-9-]+$/.test(branch) ||
+    !FULL_SHA.test(sha)
+  ) {
+    throw new Error('Invalid cleanup branch identity');
+  }
+  const refs = await api(`git/matching-refs/heads/${branch}`);
+  if (!Array.isArray(refs) || refs.length > 1) {
+    throw new Error('Cleanup remote branch identity is unknown');
+  }
+  if (refs.length === 0) {
+    return;
+  }
+  if (refs[0].ref !== `refs/heads/${branch}` || refs[0].object.sha !== sha) {
+    throw new Error('Cleanup remote branch changed; preserve');
+  }
+  await api(`git/refs/heads/${branch}`, 'DELETE');
+}
+
 async function waitFor(label, check, minutes = 20) {
   const deadline = Date.now() + minutes * 60_000;
   while (Date.now() < deadline) {
@@ -157,11 +228,45 @@ export function assertAuthorizedModelResume(record, directory) {
   return record.id;
 }
 
+export function assertToolkitResume(record, directory, feedback) {
+  if (
+    record?.version !== 1 ||
+    record.directory !== directory ||
+    !/^availability-[0-9]+$/.test(record.id ?? '') ||
+    record.status !== 'needs_action' ||
+    record.model_calls !== 1 ||
+    record.model_requests_total !== 2 ||
+    !Number.isSafeInteger(record.issue) ||
+    record.pr ||
+    record.access_revoked !== true ||
+    !record.authorized_retry_started_at ||
+    record.full_package_retry_at ||
+    record.full_package_retry_started_at ||
+    record.model_result?.exit_code !== 0 ||
+    record.model_result?.status !== 'completed' ||
+    record.model_result?.model !== 'gpt-6.1-sol' ||
+    record.model_result?.reasoning_effort !== 'high' ||
+    !record.model_result?.thread_id ||
+    record.retry_session_id !== record.model_result.thread_id ||
+    !feedback.includes('codex-code-mode-host') ||
+    !FULL_SHA.test(record.broken_sha ?? '') ||
+    record.base_branch !== `drill/${record.id}` ||
+    record.fix_branch !== `fix/drill-${record.id}` ||
+    record.worktree !== join(directory, 'fix')
+  ) {
+    throw new Error(
+      'Only one explicitly authorized full-package retry of the preserved toolkit stop is allowed'
+    );
+  }
+  return record.id;
+}
+
 export async function runDrill(
   directory,
   {
     resumeBeforeModel = false,
     resumeModelAuthorized = false,
+    resumeMode,
     codexExecutable,
   } = {}
 ) {
@@ -200,18 +305,32 @@ export async function runDrill(
     model_calls: 0,
     access_revoked: false,
   };
-  const resuming = resumeBeforeModel || resumeModelAuthorized;
-  const attemptDirectory = resumeModelAuthorized
-    ? join(directory, 'authorized-retry')
+  const toolkitResume = resumeMode === 'full-package-authorized';
+  const modelResume = resumeModelAuthorized || toolkitResume;
+  const resuming = resumeBeforeModel || modelResume;
+  const attemptDirectory = modelResume
+    ? join(directory, toolkitResume ? 'full-package-retry' : 'authorized-retry')
     : directory;
   if (resuming) {
     record = JSON.parse(await readFile(runPath, 'utf8'));
-    if (resumeModelAuthorized) {
+    if (modelResume) {
       if (!codexExecutable)
         throw new Error(
           'Authorized retry requires the explicitly verified CLI path'
         );
-      id = assertAuthorizedModelResume(record, directory);
+      if (toolkitResume) {
+        const feedback = await readFile(
+          join(
+            directory,
+            'authorized-retry/results',
+            `incident-${record.issue}-new.md`
+          ),
+          'utf8'
+        );
+        id = assertToolkitResume(record, directory, feedback);
+      } else {
+        id = assertAuthorizedModelResume(record, directory);
+      }
       try {
         await readFile(join(attemptDirectory, 'state/watcher.json'));
         throw new Error('Do not repeat an authorized model dispatch');
@@ -227,15 +346,36 @@ export async function runDrill(
         recursive: true,
         mode: 0o700,
       });
-      if (!record.authorized_retry_at)
+      if (toolkitResume) {
+        const first = JSON.parse(
+          await readFile(
+            join(directory, 'results/first-model-attempt.json'),
+            'utf8'
+          )
+        );
+        await writeFile(
+          join(directory, 'results/second-model-attempt.json'),
+          JSON.stringify(record, null, 2) + '\n',
+          { flag: 'wx', mode: 0o600 }
+        );
+        config.excluded_session_ids = [
+          ...(config.excluded_session_ids ?? []),
+          first.model_result.thread_id,
+          first.model_result.session_id,
+        ];
+        record.full_package_retry_at = stamp();
+      } else if (!record.authorized_retry_at) {
         await save(join(directory, 'results/first-model-attempt.json'), record);
+      }
       config.excluded_session_ids = [
         ...(config.excluded_session_ids ?? []),
         record.model_result.thread_id,
         record.model_result.session_id,
       ];
-      record.authorized_retry_at ??= stamp();
-      record.failed_model_requests = 1;
+      if (!toolkitResume) {
+        record.authorized_retry_at ??= stamp();
+      }
+      record.failed_model_requests = toolkitResume ? 2 : 1;
     } else {
       assertBeforeModelResume(record, directory);
       try {
@@ -408,7 +548,7 @@ export async function runDrill(
             throw new Error('Unexpected early recovery');
           },
         };
-        if (resumeModelAuthorized) {
+        if (modelResume) {
           issue = await githubApi(`issues/${record.issue}`);
           if (
             issue.state !== 'open' ||
@@ -560,6 +700,7 @@ export async function runDrill(
           alert: async () => {},
           runner: async input => {
             const prompt = `사용자는 Bendd 장애 대응 리허설과 테스트 PR 생성을 승인했습니다. 실제 운영 장애가 아닙니다. bendd 프로젝트의 새 세션, ChatGPT 구독, gpt-6.1-sol / High로 이 RSS 오류 한 건만 수정하세요.
+이 세션 자체가 제어기에 의해 새 Bendd 프로젝트 세션으로 생성·검증되었습니다. 추가 세션 생성 없이 이 세션의 실행·파일 편집 도구로 진행하세요.
 이슈 ${issue.html_url}; Preview ${broken.url}; 관측 결과 ${JSON.stringify(reports[1])}.
 현재 worktree ${worktree}, 브랜치 fix/drill-${id}는 RSS 오류를 주입한 drill/${id}에서 분리했습니다. 적용되는 AGENTS.md를 읽으세요. 원본 프로젝트, main, 제어 소스 ${SOURCE_DIRECTORY}, 서비스 설정/비밀 값은 변경하지 마세요. Preview 접근 키는 이 세션에 전달하지 않습니다.
 먼저 RSS 루트와 응답을 확인하는 의미 있는 회귀 검사를 src/app/api/feed/에 추가하고 실제 실패를 확인하세요. 실패 증거를 ${join(attemptDirectory, 'results/red.json')}에 {command,exit_code,stdout}로 저장하세요. 그 후 최소 수정과 같은 검사의 성공 증거를 ${join(attemptDirectory, 'results/green.json')}에 저장하세요. 인증/환경 변수 출력은 하지 마세요. pnpm만 사용하고 타입·lint·unit·build 등 적용되는 gate를 완료하세요. node_modules는 선언된 동일 lockfile 설치에 연결되어 있습니다.
@@ -572,11 +713,17 @@ ${join(attemptDirectory, 'results/fix.json')}에 {pr: 실제번호, head_sha: 40
               timeoutMs: 45 * 60_000,
               onSession: async session => {
                 await input.onSession(session);
-                if (resumeModelAuthorized)
+                if (toolkitResume) {
+                  await persist({
+                    full_package_retry_started_at: stamp(),
+                    full_package_session_id: session.thread_id,
+                  });
+                } else if (resumeModelAuthorized) {
                   await persist({
                     authorized_retry_started_at: stamp(),
                     retry_session_id: session.thread_id,
                   });
+                }
               },
             });
             await persist({
@@ -683,14 +830,18 @@ ${join(attemptDirectory, 'results/fix.json')}에 {pr: 실제번호, head_sha: 40
         if (fixedReport.results.some(row => !row.ok))
           throw new Error('Repair Preview did not recover all four routes');
         await save(join(directory, 'results/fixed-preview.json'), fixedReport);
-        const data = await gateData(record.pr, record.fix_sha);
-        const pr = await githubApi(`pulls/${record.pr}`);
-        assertDrillMerge({
-          ...data,
-          pr,
-          state: responseState,
-          sha: record.fix_sha,
-          id,
+        await waitFor('rehearsal mergeability', async () => {
+          const data = await gateData(record.pr, record.fix_sha);
+          const pr = await githubApi(`pulls/${record.pr}`);
+          return {
+            status: drillMergeReadiness({
+              ...data,
+              pr,
+              state: responseState,
+              sha: record.fix_sha,
+              id,
+            }),
+          };
         });
         const merged = await githubApi(`pulls/${record.pr}/merge`, 'PUT', {
           sha: record.fix_sha,
@@ -739,16 +890,9 @@ ${join(attemptDirectory, 'results/fix.json')}에 {pr: 실제번호, head_sha: 40
       throw new Error(
         'Production identity changed during rehearsal; inspect before claiming isolation'
       );
-    const report = `${marker(id)}\n\n## 장애 대응 리허설 결과\n\nPreview 전용 리허설을 완료했어요. 운영 장애나 운영 복구 시간이 아닙니다. 두 번의 실패·복구 관측 간격은 각각 2초로 단축했으며, 30분 예약 실행을 증명하지 않습니다.\n\n- 원인: ${record.root_cause}\n- 수정 PR: ${record.pr_url}\n- 장애 주입 커밋: \`${record.broken_sha}\`\n- 수정 커밋: \`${record.fix_sha}\`\n- 리허설 병합 커밋: \`${record.merge_sha}\`\n- 감지: ${koreanTime(record.detected_at)}\n- 모델 시작: ${koreanTime(record.model_started_at)}\n- PR 준비: ${koreanTime(record.model_finished_at)}\n- 병합: ${koreanTime(record.merged_at)}\n- 복구 확인: ${koreanTime(record.recovered_at)}\n- 감지부터 복구 확인: ${Math.round((Date.parse(record.recovered_at) - Date.parse(record.detected_at)) / 1000)}초\n- 모델 실행 요청: ${record.model_requests_total ?? 1}회 (첫 미지원 요청 ${record.failed_model_requests ?? 0}회, 수정 요청 1회) · ChatGPT 구독 · gpt-6.1-sol / High · 새 Bendd 세션\n- 세션: \`${record.model_result.thread_id}\`\n- 정상·완료 재점검 모델 호출: 0회\n- 필수 CI·CodeQL·Preview, RED/GREEN, 네 경로 복구: 통과\n- Production 배포 ID·SHA: 전후 동일\n- 임시 Preview 접근 키: 삭제 및 회수 확인\n\n실제 운영 bot 이슈의 출처·Production alias·지역별 업체 장애·3단계 모델 재개·실제 30분 예약 실행은 이 리허설에서 별도로 증명하지 않았어요. 회귀 검사와 실제 장애 증거를 구분해 기록합니다.\n`;
+    const report = `${marker(id)}\n\n## 장애 대응 리허설 결과\n\nPreview 전용 리허설을 완료했어요. 운영 장애나 운영 복구 시간이 아닙니다. 두 번의 실패·복구 관측 간격은 각각 2초로 단축했으며, 30분 예약 실행을 증명하지 않습니다.\n\n- 원인: ${record.root_cause}\n- 수정 PR: ${record.pr_url}\n- 장애 주입 커밋: \`${record.broken_sha}\`\n- 수정 커밋: \`${record.fix_sha}\`\n- 리허설 병합 커밋: \`${record.merge_sha}\`\n- 감지: ${koreanTime(record.detected_at)}\n- 모델 시작: ${koreanTime(record.model_started_at)}\n- PR 준비: ${koreanTime(record.model_finished_at)}\n- 병합: ${koreanTime(record.merged_at)}\n- 복구 확인: ${koreanTime(record.recovered_at)}\n- 감지부터 복구 확인: ${Math.round((Date.parse(record.recovered_at) - Date.parse(record.detected_at)) / 1000)}초\n- 모델 실행 요청: ${record.model_requests_total ?? 1}회 (기존 미완료 요청 ${record.failed_model_requests ?? 0}회, 수정 요청 1회) · ChatGPT 구독 · gpt-6.1-sol / High · 새 Bendd 세션\n- 세션: \`${record.model_result.thread_id}\`\n- 정상·완료 재점검 모델 호출: 0회\n- 필수 CI·CodeQL·Preview, RED/GREEN, 네 경로 복구: 통과\n- Production 배포 ID·SHA: 전후 동일\n- 임시 Preview 접근 키: 삭제 및 회수 확인\n\n실제 운영 bot 이슈의 출처·Production alias·지역별 업체 장애·3단계 모델 재개·실제 30분 예약 실행은 이 리허설에서 별도로 증명하지 않았어요. 회귀 검사와 실제 장애 증거를 구분해 기록합니다.\n`;
     await writeFile(join(directory, 'results/postmortem.md'), report, {
       mode: 0o600,
-    });
-    const comment = await githubApi(`issues/${record.issue}/comments`, 'POST', {
-      body: report,
-    });
-    await githubApi(`issues/${record.issue}`, 'PATCH', {
-      state: 'closed',
-      state_reason: 'completed',
     });
     // Only this run's fully merged rehearsal branches are cleaned up.
     await git([
@@ -756,26 +900,37 @@ ${join(attemptDirectory, 'results/fix.json')}에 {pr: 실제번호, head_sha: 40
       'origin',
       `refs/heads/drill/${id}:refs/remotes/origin/drill/${id}`,
     ]);
+    await syncPublishedDrill(git, {
+      worktree: join(directory, 'fix'),
+      branch: `fix/drill-${id}`,
+      sha: record.fix_sha,
+    });
     for (const [path, branch] of [
       [join(directory, 'fix'), `fix/drill-${id}`],
       [join(directory, 'base'), `drill/${id}`],
     ]) {
       if (await git(['status', '--porcelain'], path))
         throw new Error('Drill worktree is dirty; preserve it');
-      await git([
-        'fetch',
-        'origin',
-        `refs/heads/${branch}:refs/remotes/origin/${branch}`,
-      ]);
       const localSha = await git(['rev-parse', branch]);
       if (!FULL_SHA.test(localSha))
         throw new Error('Invalid cleanup branch SHA');
       await git(['merge-base', '--is-ancestor', localSha, record.merge_sha]);
-      await git(['branch', `--set-upstream-to=origin/${branch}`, branch]);
+      await git(['branch', `--set-upstream-to=origin/drill/${id}`, branch]);
       await git(['worktree', 'remove', path]);
       await git(['branch', '-d', branch]);
-      await githubApi(`git/refs/heads/${branch}`, 'DELETE');
+      await cleanupRemoteDrill(
+        githubApi,
+        branch,
+        branch === `fix/drill-${id}` ? record.fix_sha : record.merge_sha
+      );
     }
+    const comment = await githubApi(`issues/${record.issue}/comments`, 'POST', {
+      body: report,
+    });
+    await githubApi(`issues/${record.issue}`, 'PATCH', {
+      state: 'closed',
+      state_reason: 'completed',
+    });
     await persist({
       status: 'completed',
       finished_at: stamp(),
@@ -816,6 +971,10 @@ if (isMain(import.meta.url)) {
     await runDrill(process.argv[3], {
       resumeBeforeModel: process.argv[4] === '--resume-before-model',
       resumeModelAuthorized: process.argv[4] === '--resume-model-authorized',
+      resumeMode:
+        process.argv[4] === '--resume-full-package-authorized'
+          ? 'full-package-authorized'
+          : undefined,
       codexExecutable:
         process.argv[5] === '--codex' ? process.argv[6] : undefined,
     });

@@ -220,3 +220,21 @@ pnpm incident:drill --run-authorized DIRECTORY --resume-model-authorized --codex
 실제 허용된 결과 경로와 프롬프트가 일치한다. 공식 전체 패키지에서는 모델 없는
 `command/exec`에 네트워크를 차단하고 worktree·결과 폴더의 작은 임시 파일 생성/삭제를
 성공시켰다. 이 근거는 실제 모델의 코드 도구 사용·수정 PR·복구 성공과 구분한다.
+
+추가 승인 후 전체 패키지로 같은 이슈를 재개하려면 `--resume-full-package-authorized --codex VERIFIED_CLI_PATH`를
+사용한다. 이 경로는 보존된 두 번째 실행의 도구 누락 중단에만 한 번 허용하며, 두 이전 세션 ID와
+실행 기록을 보존한다. 결과는 `full-package-retry/results/`에 기록하고 운영 자동 재시도를 활성화하지 않는다.
+
+2026-10-05 전체 패키지의 독립 Bendd 세션에서 실제 RED → RSS 두 줄 수정 → GREEN 2개 → 전체 unit 626개를
+확인했다. [리허설 PR #161](https://github.com/jaem1n207/bendd/pull/161)의 같은 커밋에서
+CI build·CodeQL·Vercel을 통과한 뒤 리허설 브랜치에만 병합했고, 병합 Preview의 네 경로를 두 번 정상 관측했다.
+로컬 build의 Google Fonts DNS 실패는 보존했으며 CI build 성공과 구분한다.
+전체 모델 요청은 앞선 두 미완료 시도를 포함해 3회다. 완료 재점검은 0회이며 임시 키·리허설 브랜치·worktree를 정리했다.
+[완료 포스트모템](https://github.com/jaem1n207/bendd/issues/160#issuecomment-5985359911)에 시간·사용량·증거·검증 범위를 기록했다.
+
+GitHub가 PR base/ready 변경 후 병합 상태를 계산하는 `null`/`unknown` 동안은 다른 gate를 모두 유지하고 대기한다.
+실제 `true`/`clean` 상태와 같은 SHA의 모든 검사를 확인하기 전에는 병합하지 않는다.
+커넥터로 게시해 로컬 수정본이 남은 경우, 두 RSS 파일의 Git object hash가 게시 커밋과 일치하고
+현재 HEAD가 그 커밋의 조상일 때만 해당 리허설 브랜치와 index를 맞춘다. 다른 수정은 보존한다.
+GitHub가 병합 후 원격 수정 브랜치를 이미 삭제했다면 추가 삭제를 하지 않으며, 남아 있는 브랜치도 예상 SHA가 같을 때만 삭제한다.
+정리까지 성공한 뒤 이슈를 완료로 닫는다. 운영 설치와 전역 CLI는 별도 승인 전까지 변경하지 않는다.

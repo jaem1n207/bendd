@@ -1,12 +1,132 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { createDrillVercel, protectedPreviewFetch } from './drill-access.mjs';
 import {
   assertDrillMerge,
   assertBeforeModelResume,
   assertAuthorizedModelResume,
+  assertToolkitResume,
+  drillMergeReadiness,
+  syncPublishedDrill,
+  cleanupRemoteDrill,
 } from './drill.mjs';
 import { REQUIRED_CHECKS } from './policy.mjs';
+
+test('remote cleanup accepts an already deleted merged branch and preserves a changed branch', async () => {
+  const branch = 'fix/drill-fixture';
+  const sha = 'a'.repeat(40);
+  const calls = [];
+  const absent = async (path, method = 'GET') => {
+    calls.push({ path, method });
+    return [];
+  };
+  await cleanupRemoteDrill(absent, branch, sha);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].method, 'GET');
+  const api = async (path, method = 'GET') => {
+    calls.push({ path, method });
+    return [{ ref: `refs/heads/${branch}`, object: { sha } }];
+  };
+  await cleanupRemoteDrill(api, branch, sha);
+  assert.equal(calls.at(-1).method, 'DELETE');
+  const changed = async () => [
+    { ref: `refs/heads/${branch}`, object: { sha: 'b'.repeat(40) } },
+  ];
+  await assert.rejects(cleanupRemoteDrill(changed, branch, sha), /changed/);
+  await assert.rejects(cleanupRemoteDrill(api, 'main', sha), /Invalid/);
+});
+
+test('connector-published repair is fast-forwarded only when local files exactly match, preserving unrelated edits', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'bendd-drill-sync-'));
+  const git = async args =>
+    execFileSync('git', args, {
+      cwd: directory,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
+  const files = ['src/app/api/feed/route.ts', 'src/app/api/feed/route.spec.ts'];
+  try {
+    await git(['init', '-b', 'fix/drill-fixture']);
+    await git(['config', 'user.email', 'fixture@example.com']);
+    await git(['config', 'user.name', 'fixture']);
+    mkdirSync(join(directory, 'src/app/api/feed'), { recursive: true });
+    writeFileSync(join(directory, files[0]), '<feed>');
+    await git(['add', files[0]]);
+    await git(['commit', '-m', 'fixture']);
+    const old = await git(['rev-parse', 'HEAD']);
+    writeFileSync(join(directory, files[0]), '<rss>');
+    writeFileSync(join(directory, files[1]), 'test rss');
+    await git(['add', '--', ...files]);
+    await git(['commit', '-m', 'fix']);
+    const sha = await git(['rev-parse', 'HEAD']);
+    await git(['reset', '--mixed', old]);
+    const input = { worktree: directory, branch: 'fix/drill-fixture', sha };
+    writeFileSync(join(directory, 'unrelated.txt'), 'preserve');
+    await assert.rejects(syncPublishedDrill(git, input), /Unrelated/);
+    assert.equal(await git(['rev-parse', 'HEAD']), old);
+    rmSync(join(directory, 'unrelated.txt'));
+    writeFileSync(join(directory, files[0]), 'different');
+    await assert.rejects(syncPublishedDrill(git, input), /differs/);
+    assert.equal(await git(['rev-parse', 'HEAD']), old);
+    writeFileSync(join(directory, files[0]), '<rss>');
+    await syncPublishedDrill(git, input);
+    assert.equal(await git(['rev-parse', 'HEAD']), sha);
+    assert.equal(await git(['status', '--porcelain']), '');
+  } finally {
+    rmSync(directory, { recursive: true, force: true, maxRetries: 3 });
+  }
+});
+
+test('full-package retry preserves two attempts and permits only one known toolkit stop', () => {
+  const directory = '/fixture/drill';
+  const record = {
+    version: 1,
+    directory,
+    id: 'availability-123',
+    status: 'needs_action',
+    model_calls: 1,
+    model_requests_total: 2,
+    issue: 160,
+    access_revoked: true,
+    authorized_retry_started_at: 'previous',
+    retry_session_id: 'second',
+    broken_sha: 'a'.repeat(40),
+    base_branch: 'drill/availability-123',
+    fix_branch: 'fix/drill-availability-123',
+    worktree: directory + '/fix',
+    model_result: {
+      exit_code: 0,
+      status: 'completed',
+      model: 'gpt-6.1-sol',
+      reasoning_effort: 'high',
+      thread_id: 'second',
+    },
+  };
+  const feedback = 'codex-code-mode-host 파일이 없어 시작 실패';
+  assert.equal(assertToolkitResume(record, directory, feedback), record.id);
+  for (const change of [
+    { pr: 161 },
+    { full_package_retry_at: 'reserved' },
+    { full_package_retry_started_at: 'started' },
+    { access_revoked: false },
+    { model_requests_total: 3 },
+    { retry_session_id: 'another' },
+    { model_result: { ...record.model_result, status: 'failed' } },
+  ]) {
+    assert.throws(
+      () => assertToolkitResume({ ...record, ...change }, directory, feedback),
+      /full-package retry/
+    );
+  }
+  assert.throws(
+    () => assertToolkitResume(record, directory, 'HTTP 403'),
+    /full-package retry/
+  );
+});
 
 test('human-authorized model resume keeps the same drill and refuses a PR, successful turn or repeat', () => {
   const directory = '/fixture/drill';
@@ -125,6 +245,20 @@ test('drill cannot merge into main, another branch, another PR head or without e
     },
   };
   assert.equal(assertDrillMerge(input).sha, sha);
+  assert.equal(drillMergeReadiness(input), 'ready');
+  const calculating = {
+    ...input,
+    pr: { ...pr, mergeable: null, mergeable_state: 'unknown' },
+  };
+  assert.equal(drillMergeReadiness(calculating), 'waiting');
+  assert.throws(
+    () => drillMergeReadiness({ ...calculating, checks: [] }),
+    /Required check/
+  );
+  assert.throws(
+    () => drillMergeReadiness({ ...input, pr: { ...pr, mergeable: false } }),
+    /mismatch/
+  );
   for (const ref of ['main', 'drill/other'])
     assert.throws(
       () =>
