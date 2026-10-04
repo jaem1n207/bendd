@@ -130,7 +130,40 @@ export function assertBeforeModelResume(record, directory) {
     );
 }
 
-export async function runDrill(directory, { resumeBeforeModel = false } = {}) {
+export function assertAuthorizedModelResume(record, directory) {
+  if (
+    record?.version !== 1 ||
+    record.directory !== directory ||
+    !/^availability-[0-9]+$/.test(record.id ?? '') ||
+    record.status !== 'needs_action' ||
+    record.model_calls !== 1 ||
+    !Number.isSafeInteger(record.issue) ||
+    record.pr ||
+    record.access_revoked !== true ||
+    record.authorized_retry_at ||
+    record.model_result?.exit_code !== 1 ||
+    record.model_result?.status !== 'failed' ||
+    record.model_result?.model !== 'gpt-6.1-sol' ||
+    record.model_result?.reasoning_effort !== 'high' ||
+    !record.model_result?.thread_id ||
+    !FULL_SHA.test(record.broken_sha ?? '') ||
+    record.base_branch !== `drill/${record.id}` ||
+    record.fix_branch !== `fix/drill-${record.id}` ||
+    record.worktree !== join(directory, 'fix')
+  )
+    throw new Error(
+      'Only one explicitly authorized failed-model rehearsal resume is allowed; preserve prior evidence'
+    );
+}
+
+export async function runDrill(
+  directory,
+  {
+    resumeBeforeModel = false,
+    resumeModelAuthorized = false,
+    codexExecutable,
+  } = {}
+) {
   let id = `availability-${Date.now()}`;
   if (!directory)
     directory = join(
@@ -144,6 +177,7 @@ export async function runDrill(directory, { resumeBeforeModel = false } = {}) {
   const config = JSON.parse(
     await readFile(join(runtimeDirectory(), 'config.json'), 'utf8')
   );
+  if (codexExecutable) config.runtime.codex = await realpath(codexExecutable);
   const project = await realpath(config.project_path);
   await mkdir(directory, { recursive: true, mode: 0o700 });
   directory = await realpath(directory);
@@ -165,17 +199,40 @@ export async function runDrill(directory, { resumeBeforeModel = false } = {}) {
     model_calls: 0,
     access_revoked: false,
   };
-  if (resumeBeforeModel) {
+  const resuming = resumeBeforeModel || resumeModelAuthorized;
+  const attemptDirectory = resumeModelAuthorized
+    ? join(directory, 'authorized-retry')
+    : directory;
+  if (resuming) {
     record = JSON.parse(await readFile(runPath, 'utf8'));
-    assertBeforeModelResume(record, directory);
-    try {
-      await readFile(join(directory, 'state/watcher.json'));
-      throw new Error('Do not resume an existing model dispatch');
-    } catch (error) {
-      if (error.code !== 'ENOENT') throw error;
+    if (resumeModelAuthorized) {
+      if (!codexExecutable)
+        throw new Error(
+          'Authorized retry requires the explicitly verified CLI path'
+        );
+      assertAuthorizedModelResume(record, directory);
+      await mkdir(attemptDirectory, { mode: 0o700 });
+      await mkdir(join(attemptDirectory, 'state'), { mode: 0o700 });
+      await mkdir(join(attemptDirectory, 'results'), { mode: 0o700 });
+      await save(join(directory, 'results/first-model-attempt.json'), record);
+      config.excluded_session_ids = [
+        ...(config.excluded_session_ids ?? []),
+        record.model_result.thread_id,
+        record.model_result.session_id,
+      ];
+      record.authorized_retry_at = stamp();
+      record.failed_model_requests = 1;
+    } else {
+      assertBeforeModelResume(record, directory);
+      try {
+        await readFile(join(directory, 'state/watcher.json'));
+        throw new Error('Do not resume an existing model dispatch');
+      } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+      }
+      id = record.id;
+      await save(join(directory, 'results/first-stop.json'), record);
     }
-    id = record.id;
-    await save(join(directory, 'results/first-stop.json'), record);
   } else {
     await writeFile(runPath, JSON.stringify(record), {
       flag: 'wx',
@@ -184,7 +241,7 @@ export async function runDrill(directory, { resumeBeforeModel = false } = {}) {
     await mkdir(join(directory, 'results'), { mode: 0o700 });
     await mkdir(join(directory, 'state'), { mode: 0o700 });
   }
-  await save(join(directory, 'config.json'), config);
+  await save(join(attemptDirectory, 'config.json'), config);
   const persist = async update => {
     Object.assign(record, update);
     await save(runPath, record);
@@ -204,7 +261,7 @@ export async function runDrill(directory, { resumeBeforeModel = false } = {}) {
     const base = join(directory, 'base');
     const worktree = join(directory, 'fix');
     let brokenSha = record.broken_sha;
-    if (resumeBeforeModel) {
+    if (resuming) {
       if (
         production.id !== record.production_before.id ||
         production.sha !== record.production_before.sha
@@ -278,6 +335,7 @@ export async function runDrill(directory, { resumeBeforeModel = false } = {}) {
     await persist({ broken_preview: broken });
     await vercel.withTemporaryAccess(
       async secret => {
+        await persist({ access_revoked: false });
         const probeUrl = async url => {
           const redirects = [];
           const protectedFetch = protectedPreviewFetch(url, secret);
@@ -336,31 +394,52 @@ export async function runDrill(directory, { resumeBeforeModel = false } = {}) {
             throw new Error('Unexpected early recovery');
           },
         };
-        for (let index = 0; index < 2; index++) {
-          await runMonitor({
-            github: driver,
-            check: async () => {
-              const report = await probeUrl(broken.url);
-              if (
-                report.results.filter(row => !row.ok).length !== 1 ||
-                report.results.find(row => row.path === '/rss.xml').ok
-              )
-                throw new Error(
-                  'Fault is not restricted to the intended RSS content failure'
+        if (resumeModelAuthorized) {
+          issue = await githubApi(`issues/${record.issue}`);
+          if (
+            issue.state !== 'open' ||
+            issue.user.login !== OWNER ||
+            !issue.body.startsWith(marker(id)) ||
+            isIncident(issue)
+          )
+            throw new Error('Authorized retry issue identity mismatch');
+          const report = await probeUrl(broken.url);
+          if (
+            report.results.filter(row => !row.ok).length !== 1 ||
+            report.results.find(row => row.path === '/rss.xml').ok
+          )
+            throw new Error(
+              'Authorized retry no longer has the exact RSS fault'
+            );
+          reports.push(report, report);
+          await save(join(attemptDirectory, 'results/failure.json'), report);
+        } else {
+          for (let index = 0; index < 2; index++) {
+            await runMonitor({
+              github: driver,
+              check: async () => {
+                const report = await probeUrl(broken.url);
+                if (
+                  report.results.filter(row => !row.ok).length !== 1 ||
+                  report.results.find(row => row.path === '/rss.xml').ok
+                )
+                  throw new Error(
+                    'Fault is not restricted to the intended RSS content failure'
+                  );
+                reports.push(report);
+                return report;
+              },
+              save: async result => {
+                availability = result.state;
+                await save(
+                  join(directory, 'results', `failure-${index + 1}.json`),
+                  result
                 );
-              reports.push(report);
-              return report;
-            },
-            save: async result => {
-              availability = result.state;
-              await save(
-                join(directory, 'results', `failure-${index + 1}.json`),
-                result
-              );
-            },
-            runUrl: broken.url,
-          });
-          if (index === 0) await delay(2000);
+              },
+              runUrl: broken.url,
+            });
+            if (index === 0) await delay(2000);
+          }
         }
         if (!issue)
           throw new Error(
@@ -370,7 +449,11 @@ export async function runDrill(directory, { resumeBeforeModel = false } = {}) {
           issue_url: issue.html_url,
           preview: broken.url,
         });
-        const statePath = join(directory, 'state', `${issue.number}.json`);
+        const statePath = join(
+          attemptDirectory,
+          'state',
+          `${issue.number}.json`
+        );
         const rawIssue = async () => {
           const raw = await githubApi(`issues/${issue.number}`);
           if (
@@ -440,7 +523,7 @@ export async function runDrill(directory, { resumeBeforeModel = false } = {}) {
           )
         );
         const watcher = createWatcher({
-          directory,
+          directory: attemptDirectory,
           control,
           // Explicit drill adapter: a verified human-authored drill issue is projected for the unchanged watcher core.
           api: async path => {
@@ -476,6 +559,9 @@ ${join(directory, 'results/fix.json')}에 {pr: 실제번호, head_sha: 40자리 
             });
             await persist({
               model_calls: result.thread_id ? 1 : 0,
+              model_requests_total:
+                (record.failed_model_requests ?? 0) +
+                (result.thread_id ? 1 : 0),
               model_result: result,
               model_finished_at: stamp(),
             });
@@ -631,7 +717,7 @@ ${join(directory, 'results/fix.json')}에 {pr: 실제번호, head_sha: 40자리 
       throw new Error(
         'Production identity changed during rehearsal; inspect before claiming isolation'
       );
-    const report = `${marker(id)}\n\n## 장애 대응 리허설 결과\n\nPreview 전용 리허설을 완료했어요. 운영 장애나 운영 복구 시간이 아닙니다. 두 번의 실패·복구 관측 간격은 각각 2초로 단축했으며, 30분 예약 실행을 증명하지 않습니다.\n\n- 원인: ${record.root_cause}\n- 수정 PR: ${record.pr_url}\n- 장애 주입 커밋: \`${record.broken_sha}\`\n- 수정 커밋: \`${record.fix_sha}\`\n- 리허설 병합 커밋: \`${record.merge_sha}\`\n- 감지: ${koreanTime(record.detected_at)}\n- 모델 시작: ${koreanTime(record.model_started_at)}\n- PR 준비: ${koreanTime(record.model_finished_at)}\n- 병합: ${koreanTime(record.merged_at)}\n- 복구 확인: ${koreanTime(record.recovered_at)}\n- 감지부터 복구 확인: ${Math.round((Date.parse(record.recovered_at) - Date.parse(record.detected_at)) / 1000)}초\n- 모델 호출: 1회 · ChatGPT 구독 · gpt-6.1-sol / High · 새 Bendd 세션\n- 세션: \`${record.model_result.thread_id}\`\n- 정상·완료 재점검 모델 호출: 0회\n- 필수 CI·CodeQL·Preview, RED/GREEN, 네 경로 복구: 통과\n- Production 배포 ID·SHA: 전후 동일\n- 임시 Preview 접근 키: 삭제 및 회수 확인\n\n실제 운영 bot 이슈의 출처·Production alias·지역별 업체 장애·3단계 모델 재개·실제 30분 예약 실행은 이 리허설에서 별도로 증명하지 않았어요. 회귀 검사와 실제 장애 증거를 구분해 기록합니다.\n`;
+    const report = `${marker(id)}\n\n## 장애 대응 리허설 결과\n\nPreview 전용 리허설을 완료했어요. 운영 장애나 운영 복구 시간이 아닙니다. 두 번의 실패·복구 관측 간격은 각각 2초로 단축했으며, 30분 예약 실행을 증명하지 않습니다.\n\n- 원인: ${record.root_cause}\n- 수정 PR: ${record.pr_url}\n- 장애 주입 커밋: \`${record.broken_sha}\`\n- 수정 커밋: \`${record.fix_sha}\`\n- 리허설 병합 커밋: \`${record.merge_sha}\`\n- 감지: ${koreanTime(record.detected_at)}\n- 모델 시작: ${koreanTime(record.model_started_at)}\n- PR 준비: ${koreanTime(record.model_finished_at)}\n- 병합: ${koreanTime(record.merged_at)}\n- 복구 확인: ${koreanTime(record.recovered_at)}\n- 감지부터 복구 확인: ${Math.round((Date.parse(record.recovered_at) - Date.parse(record.detected_at)) / 1000)}초\n- 모델 실행 요청: ${record.model_requests_total ?? 1}회 (첫 미지원 요청 ${record.failed_model_requests ?? 0}회, 수정 요청 1회) · ChatGPT 구독 · gpt-6.1-sol / High · 새 Bendd 세션\n- 세션: \`${record.model_result.thread_id}\`\n- 정상·완료 재점검 모델 호출: 0회\n- 필수 CI·CodeQL·Preview, RED/GREEN, 네 경로 복구: 통과\n- Production 배포 ID·SHA: 전후 동일\n- 임시 Preview 접근 키: 삭제 및 회수 확인\n\n실제 운영 bot 이슈의 출처·Production alias·지역별 업체 장애·3단계 모델 재개·실제 30분 예약 실행은 이 리허설에서 별도로 증명하지 않았어요. 회귀 검사와 실제 장애 증거를 구분해 기록합니다.\n`;
     await writeFile(join(directory, 'results/postmortem.md'), report, {
       mode: 0o600,
     });
@@ -707,6 +793,9 @@ if (isMain(import.meta.url)) {
   try {
     await runDrill(process.argv[3], {
       resumeBeforeModel: process.argv[4] === '--resume-before-model',
+      resumeModelAuthorized: process.argv[4] === '--resume-model-authorized',
+      codexExecutable:
+        process.argv[5] === '--codex' ? process.argv[6] : undefined,
     });
   } catch {
     process.exitCode = 1;

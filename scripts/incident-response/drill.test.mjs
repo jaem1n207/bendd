@@ -1,8 +1,48 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createDrillVercel, protectedPreviewFetch } from './drill-access.mjs';
-import { assertDrillMerge, assertBeforeModelResume } from './drill.mjs';
+import {
+  assertDrillMerge,
+  assertBeforeModelResume,
+  assertAuthorizedModelResume,
+} from './drill.mjs';
 import { REQUIRED_CHECKS } from './policy.mjs';
+
+test('human-authorized model resume keeps the same drill and refuses a PR, successful turn or repeat', () => {
+  const directory = '/fixture/drill';
+  const record = {
+    version: 1,
+    directory,
+    id: 'availability-123',
+    status: 'needs_action',
+    model_calls: 1,
+    issue: 160,
+    access_revoked: true,
+    broken_sha: 'a'.repeat(40),
+    base_branch: 'drill/availability-123',
+    fix_branch: 'fix/drill-availability-123',
+    worktree: directory + '/fix',
+    model_result: {
+      exit_code: 1,
+      status: 'failed',
+      model: 'gpt-6.1-sol',
+      reasoning_effort: 'high',
+      thread_id: 'first-failed',
+    },
+  };
+  assert.doesNotThrow(() => assertAuthorizedModelResume(record, directory));
+  for (const change of [
+    { pr: 161 },
+    { authorized_retry_at: 'now' },
+    { access_revoked: false },
+    { model_calls: 2 },
+    { model_result: { ...record.model_result, status: 'completed' } },
+  ])
+    assert.throws(
+      () => assertAuthorizedModelResume({ ...record, ...change }, directory),
+      /one explicitly authorized/
+    );
+});
 
 test('pre-model propagation resume rejects access denial, model use, issues and repeated resume', () => {
   const directory = '/fixture/drill';
