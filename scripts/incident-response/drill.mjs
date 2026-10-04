@@ -140,7 +140,7 @@ export function assertAuthorizedModelResume(record, directory) {
     !Number.isSafeInteger(record.issue) ||
     record.pr ||
     record.access_revoked !== true ||
-    record.authorized_retry_at ||
+    record.authorized_retry_started_at ||
     record.model_result?.exit_code !== 1 ||
     record.model_result?.status !== 'failed' ||
     record.model_result?.model !== 'gpt-6.1-sol' ||
@@ -154,6 +154,7 @@ export function assertAuthorizedModelResume(record, directory) {
     throw new Error(
       'Only one explicitly authorized failed-model rehearsal resume is allowed; preserve prior evidence'
     );
+  return record.id;
 }
 
 export async function runDrill(
@@ -210,17 +211,30 @@ export async function runDrill(
         throw new Error(
           'Authorized retry requires the explicitly verified CLI path'
         );
-      assertAuthorizedModelResume(record, directory);
-      await mkdir(attemptDirectory, { mode: 0o700 });
-      await mkdir(join(attemptDirectory, 'state'), { mode: 0o700 });
-      await mkdir(join(attemptDirectory, 'results'), { mode: 0o700 });
-      await save(join(directory, 'results/first-model-attempt.json'), record);
+      id = assertAuthorizedModelResume(record, directory);
+      try {
+        await readFile(join(attemptDirectory, 'state/watcher.json'));
+        throw new Error('Do not repeat an authorized model dispatch');
+      } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+      }
+      await mkdir(attemptDirectory, { recursive: true, mode: 0o700 });
+      await mkdir(join(attemptDirectory, 'state'), {
+        recursive: true,
+        mode: 0o700,
+      });
+      await mkdir(join(attemptDirectory, 'results'), {
+        recursive: true,
+        mode: 0o700,
+      });
+      if (!record.authorized_retry_at)
+        await save(join(directory, 'results/first-model-attempt.json'), record);
       config.excluded_session_ids = [
         ...(config.excluded_session_ids ?? []),
         record.model_result.thread_id,
         record.model_result.session_id,
       ];
-      record.authorized_retry_at = stamp();
+      record.authorized_retry_at ??= stamp();
       record.failed_model_requests = 1;
     } else {
       assertBeforeModelResume(record, directory);
@@ -556,6 +570,14 @@ ${join(directory, 'results/fix.json')}에 {pr: 실제번호, head_sha: 40자리 
               ...input,
               prompt,
               timeoutMs: 45 * 60_000,
+              onSession: async session => {
+                await input.onSession(session);
+                if (resumeModelAuthorized)
+                  await persist({
+                    authorized_retry_started_at: stamp(),
+                    retry_session_id: session.thread_id,
+                  });
+              },
             });
             await persist({
               model_calls: result.thread_id ? 1 : 0,

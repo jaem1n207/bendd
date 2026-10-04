@@ -30,10 +30,10 @@ test('human-authorized model resume keeps the same drill and refuses a PR, succe
       thread_id: 'first-failed',
     },
   };
-  assert.doesNotThrow(() => assertAuthorizedModelResume(record, directory));
+  assert.equal(assertAuthorizedModelResume(record, directory), record.id);
   for (const change of [
     { pr: 161 },
-    { authorized_retry_at: 'now' },
+    { authorized_retry_started_at: 'now' },
     { access_revoked: false },
     { model_calls: 2 },
     { model_result: { ...record.model_result, status: 'completed' } },
