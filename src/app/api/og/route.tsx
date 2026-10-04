@@ -1,3 +1,7 @@
+import {
+  INTERNAL_SERVER_ERROR,
+  reportRouteError,
+} from '@/lib/monitoring/route-error';
 import { siteMetadata } from '@/lib/site-metadata';
 import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
@@ -10,6 +14,8 @@ const interSemiBold = fetch(
 ).then(res => res.arrayBuffer());
 
 export async function GET(req: NextRequest): Promise<Response | ImageResponse> {
+  const startedAt = performance.now();
+
   try {
     const { searchParams } = new URL(req.url);
     const isLight = req.headers.get('Sec-CH-Prefers-Color-Scheme') === 'light';
@@ -67,11 +73,9 @@ export async function GET(req: NextRequest): Promise<Response | ImageResponse> {
       }
     );
   } catch (e) {
-    if (!(e instanceof Error)) throw e;
-
-    console.log(e.message);
+    reportRouteError(e, req, startedAt);
     return new Response(`Failed to generate the image`, {
-      status: 500,
+      status: INTERNAL_SERVER_ERROR,
     });
   }
 }

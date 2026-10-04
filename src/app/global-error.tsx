@@ -1,6 +1,6 @@
 'use client';
 
-import { track } from '@vercel/analytics';
+import { reportBoundaryError } from '@/lib/monitoring/report-error';
 import { useEffect } from 'react';
 import Image from 'next/image';
 
@@ -13,9 +13,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    track('global error', {
-      error: error.message,
-    });
+    reportBoundaryError(error, 'global');
   }, [error]);
 
   return (
