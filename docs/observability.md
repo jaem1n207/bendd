@@ -13,8 +13,18 @@ Sentry SDK와 GA4로 보완한다.
    초기화한다. 초기 설정은 오류만 수집하고 tracing, replay, SDK logs를 끈다.
    `NEXT_PUBLIC_VERCEL_ENV`는 Production/Preview별로 지정한다. Release는
    공개 커밋 변수가 없으면 Sentry 빌드 플러그인의 Git revision 주입을 사용한다.
-3. Source maps는 `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`을 모두
-   설정했을 때만 업로드한다. 토큰은 별도로 안전하게 설정한다.
+3. Source maps는 Vercel Production·Preview 빌드에서 자동 업로드한다.
+   `SENTRY_ORG=jaemin`, `SENTRY_PROJECT=bendd`, `SENTRY_AUTH_TOKEN`이
+   누락되거나 공백이면 빌드를 중단한다. 조직 Auth Token의 `org:ci` 권한을
+   사용하고 Vercel Production·Preview의 Sensitive 환경 변수에 저장한다.
+   로컬 개발·GitHub CI는 토큰 없이 빌드하며, 로컬에서 직접 업로드할 때만
+   Git에서 제외되는 `.env.local`에 토큰을 설정한다. 토큰은 `NEXT_PUBLIC_` 변수로
+   만들지 않는다. 빌드 완료 훅에서 Browser/Node/Edge 산출물을 한 번에 업로드하며,
+   공유 client chunk도 포함한다. Debug ID로 JS와 map을 연결하고 release는 빌드
+   플러그인의 Git revision을 사용한다. 성공한 업로드 로그와 Sentry 프로젝트의
+   Source Maps artifact bundle을 확인한다. 업로드 실패를 무시하는 error handler는
+   두지 않는다. 업로드 후 브라우저 map을 제거하며 서버 map은 런타임 진단을 위해
+   유지한다. Vercel 변수 변경은 기존 배포를 바꾸지 않으므로 다음 빌드가 필요하다.
 4. GA4: `bendd.me` 웹 스트림의 G- 측정 ID를 사용한다. 스트림의 향상된 측정을
    **모두 끈다**. 자동 pageview·scroll·form 이벤트가 수동 이벤트와 겹치거나
    URL/input을 추가 수집하지 않도록 하기 위한 설정이다. Google Signals와
@@ -90,6 +100,8 @@ observer는 외부 전송 없이 로컬에서 등록하고, 전송 시 동의 �
 
 ## 근거
 
+- [Next.js 15 config phase](https://nextjs.org/docs/15/app/api-reference/config/next-config-js#phase)
+
 - [Sentry Next.js manual setup](https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/)
 - [GA4 manual page views](https://developers.google.com/analytics/devguides/collection/ga4/views)
 - [Web Vitals](https://github.com/GoogleChrome/web-vitals)
@@ -160,3 +172,88 @@ Arc 로컬 검증에서 1280px 안내 카드가 Dock을 가리는 것을 재현�
 현재 선택은 본문에서 제거하고 선택 버튼의 `aria-pressed`와 체크·문구로
 표시한다. 중첩된 `overflow: auto`와 `overscroll-behavior: contain`이 휠
 입력을 막는 것을 재현했으며, 설명의 스크롤 영역을 하나로 정리한다.
+
+## 소스맵 운영 절차
+
+자동 업로드의 실행 환경은 Vercel이다. MacBook 교체와 관계없이 Vercel에
+저장된 변수로 동작한다. 코드·의존성 버전·설정 예시는 Git에서 관리하고,
+토큰 원본은 접근을 제한한 비밀번호 관리자에서 관리한다.
+
+### 설정 위치
+
+| 변수                           | 용도                          | 저장 위치                                                              |
+| ------------------------------ | ----------------------------- | ---------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SENTRY_DSN`       | 앱 오류 수집에 쓰는 공개 주소 | Vercel Production·Preview, 필요하면 로컬 `.env.local`                  |
+| `SENTRY_ORG`, `SENTRY_PROJECT` | 업로드 목적지 `jaemin/bendd`  | Vercel Production·Preview, `.env.example`                              |
+| `SENTRY_AUTH_TOKEN`            | `org:ci` 조직 업로드 권한     | Vercel Production·Preview의 **Sensitive/Secret** 변수, 비밀번호 관리자 |
+
+`next.config.mjs`는 Next.js의 production build 단계와 Vercel 시스템 변수
+`VERCEL=1`, `VERCEL_ENV=production|preview`를 함께 확인한다. Vercel의
+시스템 환경 변수 노출을 유지한다. `CI=true`, 공개 환경 이름, `next dev`,
+`next start`만으로는 필수 설정 검증이 실행되지 않는다. 로컬에서도 세 업로드
+변수가 모두 있으면 업로드하므로, 평소 로컬 개발에는 토큰을 설정하지 않는다.
+
+### 새 MacBook에서 개발하기
+
+1. 저장소를 받고 `package.json`에 지정된 Node.js 24와 pnpm 버전을 준비한다.
+2. `pnpm install --frozen-lockfile`을 실행한다.
+3. `.env.example`을 `.env.local`로 복사한다. 로컬 오류 수집·분석이 필요할 때만
+   공개 DSN·측정 ID·환경 이름을 채운다. `SENTRY_AUTH_TOKEN`은 비워 둔다.
+4. `pnpm dev` 또는 `pnpm build`를 실행한다. 일반 개발에는 Vercel 연결이나
+   Sentry 업로드 토큰 복사가 필요하지 않다.
+
+[Sensitive/Secret 변수](https://vercel.com/docs/environment-variables/sensitive-environment-variables)는
+Vercel에서 원본 값을 다시 읽을 수 없으므로 `vercel env pull`을 토큰 백업으로 사용하지 않는다. 로컬 업로드가 꼭 필요하면
+비밀번호 관리자에서 토큰을 `.env.local`에 설정하고, 작업 후 로컬 사본을
+제거한다. 토큰을 `NEXT_PUBLIC_` 변수·셸 명령 인자·Git·채팅에 넣지 않는다.
+
+### 업로드 토큰 교체하기
+
+1. Sentry `jaemin` 조직에서 `org:ci` 업로드 토큰을 새로 만들고 용도와 발급일을
+   식별 가능한 이름으로 남긴다. 원본은 비밀번호 관리자에 저장한다.
+2. Vercel `jaemins-crafts/bendd`의 Production·Preview에서
+   `SENTRY_AUTH_TOKEN`을 새 값으로 교체한다. Sensitive 설정을 유지한다.
+3. 새 Preview 빌드에서 업로드 성공 로그, 해당 release의 artifact bundle과
+   Debug ID 연결, 실제 오류의 원본 파일·행 번호 복원을 확인한다.
+4. 검증 후 기존 토큰을 폐기한다. 검증 실패 시 기존 토큰으로 변수를 복구한다.
+   환경 변수 변경은 기존 배포에 소급 적용되지 않으므로 새 빌드로 확인한다.
+
+### 빌드·업로드 실패 대응
+
+- **설정 누락**: 오류에 표시된 변수 이름을 해당 Vercel 환경에서 확인한다.
+  빈 값·공백도 누락으로 처리한다. Production·Preview를 각각 확인한다.
+- **401/403**: 조직·프로젝트·토큰 권한을 확인한다. 접근이 거부되면 작업을
+  중단하고 관리자 또는 사용자에게 권한을 요청한다.
+- **네트워크·Sentry 장애**: 첫 실패 로그와 배포 ID를 남기고 서비스 상태를
+  확인한다. 원인을 해소한 뒤 다시 빌드한다. 업로드 실패를 무시하는
+  `errorHandler`나 소스맵 비활성화로 배포를 통과시키지 않는다.
+- **업로드 성공인데 원본 위치가 없음**: 오류와 artifact의 release·Debug ID가
+  같은지 확인한다. 다른 빌드의 map이나 예전 배포 오류와 혼동하지 않는다.
+
+처음 배포하거나 Sentry SDK를 바꾼 뒤에는 Preview에서 위 업로드 검증과
+브라우저 `.map` URL의 404, 브라우저 JS의 토큰 미포함을 확인한다.
+로컬 회귀 검사는 `pnpm test:unit --run src/lib/monitoring/sentry-build.spec.ts`로
+실행한다. 설정 로드 검사는 외부 업로드를 실행하지 않으며, 실제 업로드·오류
+복원을 대신하지 않는다.
+
+## 소스맵 업로드 검증
+
+2026-10-04: 사용자 설정 토큰으로 로컬 빌드의 실제 업로드를 확인했다.
+검증 release는 `bendd-sourcemap-verification-20261004`이며 운영 Git release와
+구분한다. Sentry Source Maps 화면에서 브라우저 106개 artifact(JS/map 53쌍),
+서버 74개 artifact(37쌍)를 확인했다. JS와 map의 Debug ID가 일치한다.
+빌드 성공 후 `.next/static`의 map은 0개이며, map URL은 404다. 서버 map
+37개는 유지한다. 브라우저 JS에 업로드 토큰이 포함되지 않는 것도 확인했다.
+
+사용자 승인으로 Vercel `jaemins-crafts/bendd`의 Production·Preview에
+`SENTRY_AUTH_TOKEN`을 Sensitive 변수로 등록하고 두 환경의 등록 결과를
+재조회했다. 기존 `SENTRY_ORG=jaemin`, `SENTRY_PROJECT=bendd`도 같은 범위에
+있다. 토큰과 Vercel 연결 파일은 Git에서 제외된다. 운영 재배포는 수행하지
+않았으며, 변경한 빌드 설정이 배포된 다음 빌드부터 자동 업로드된다.
+실제 오류의 원본 파일·행 번호 복원은 Preview 오류 수신으로 별도 확인한다.
+
+2026-10-04 유지보수 검증: 설정·release 회귀 검사 23개와 포맷 검사를
+통과했다. 실제 Next 빌드에서 Vercel Preview의 토큰 누락이 컴파일 전에
+차단되는 것을 확인했다. `CI=true`, `GITHUB_ACTIONS=true`인 토큰 없는
+운영 빌드도 타입·린트 검사를 포함해 통과했다. 기존 린트 경고는 남아 있다.
+이 검증에서는 외부 소스맵 업로드와 운영 배포를 실행하지 않았다.
