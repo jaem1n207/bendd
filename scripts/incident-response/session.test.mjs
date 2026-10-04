@@ -43,7 +43,7 @@ function fakeClient(options = {}) {
     modelProvider: 'openai',
     reasoningEffort: 'high',
     approvalsReviewer: 'auto_review',
-    sandbox: { type: 'workspaceWrite' },
+    sandbox: { type: 'workspaceWrite', writableRoots: ['/worktree'] },
     ...options.started,
   });
   return {
@@ -52,6 +52,18 @@ function fakeClient(options = {}) {
       calls.push({ method, params });
       if (method === 'account/read')
         return { account: { type: options.auth ?? 'chatgpt' } };
+      if (method === 'model/list')
+        return (
+          options.catalog ?? {
+            data: [
+              {
+                model: 'gpt-6.1-sol',
+                supportedReasoningEfforts: [{ reasoningEffort: 'high' }],
+              },
+            ],
+            nextCursor: null,
+          }
+        );
       if (method === 'project/read')
         return {
           project: options.project ?? {
@@ -180,6 +192,7 @@ for (const [name, options] of [
   ['picker still shows Max', { thread: { reasoningEffort: 'max' } }],
   ['different model', { started: { model: 'another-model' } }],
   ['disabled automatic review', { started: { approvalsReviewer: 'user' } }],
+  ['different worktree cwd', { started: { cwd: '/other' } }],
 ]) {
   test(`${name} stops before a model request`, async () => {
     const client = fakeClient(options);
@@ -224,6 +237,36 @@ test('API login or moved project is not replaced by a fallback thread', async ()
     assert.ok(!client.calls.some(call => call.method === 'thread/start'));
   }
 });
+
+for (const [name, catalog] of [
+  ['missing requested model', { data: [], nextCursor: null }],
+  [
+    'missing High',
+    {
+      data: [
+        {
+          model: 'gpt-6.1-sol',
+          supportedReasoningEfforts: [{ reasoningEffort: 'medium' }],
+        },
+      ],
+      nextCursor: null,
+    },
+  ],
+  ['invalid catalog', {}],
+])
+  test(`${name} prevents session creation and any model request`, async () => {
+    const client = fakeClient({ catalog });
+    await assert.rejects(
+      createIncidentSession(client, { config, worktree: '/worktree', action }),
+      /model catalog|gpt-6.1-sol.*High/
+    );
+    assert.equal(
+      client.calls.some(call =>
+        ['thread/start', 'turn/start'].includes(call.method)
+      ),
+      false
+    );
+  });
 
 test('persist verified new session before starting its High turn; save only final feedback', async t => {
   const directory = await mkdtemp(join(tmpdir(), 'bendd-session-test-'));
