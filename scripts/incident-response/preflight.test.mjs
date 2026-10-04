@@ -47,6 +47,16 @@ function fixture(options = {}) {
         };
       if (method === 'account/read')
         return { account: { type: options.auth ?? 'chatgpt' } };
+      if (method === 'model/list')
+        return {
+          data: [
+            {
+              model: 'gpt-6.1-sol',
+              supportedReasoningEfforts: [{ reasoningEffort: 'high' }],
+            },
+          ],
+          nextCursor: null,
+        };
       if (method === 'project/read') return { project };
       if (method === 'thread/start')
         return {

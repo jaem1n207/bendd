@@ -19,6 +19,8 @@
 - 실행은 ChatGPT 구독 로그인과 고정한 `gpt-6.1-sol` / `High`를 사용한다.
   API 키 환경 변수를 제거하고 공식 provider·ChatGPT 인증을 강제한다.
   실행마다 provider·모델·High·권한 설정을 명시하고 실제 응답을 검증한다.
+  세션 생성 전에 공식 `model/list`에서 이 계정의 gpt-6.1-sol과 High 지원을 확인한다.
+  지원 목록 누락·스키마/페이지 불일치면 새 세션·모델 요청 없이 중단하며 다른 모델로 대체하지 않는다.
   AGENTS.md와 실행 규칙은 적용한다.
   workspace-write와 자동 승인 검토를 사용한다. 승인 거부를 우회하지 않는다.
 - 매 모델 실행은 공식 Codex app-server stdio의 `thread/start`로 만든 독립된
@@ -224,7 +226,7 @@ checkpoint 저장이 실패하면 GitHub에서 실제 결과를 확인하며 새
   GitHub의 claim/PR/postmortem을 대조한다. 제어 코드 변경은 별도 사용자 요청에서만 한다.
 - 실제 장애 수정·병합은 처음 발생한 적합한 장애에서 검증한다. 설정 완료나
   가짜 API 테스트만으로 전체 무인 대응이 실제 운영에서 증명됐다고 말하지 않는다.
-- 앱 프로젝트 연결은 CLI 0.154.0의 공개 schema에서 확인한 experimental `projectId`
+- 앱 프로젝트 연결은 CLI 0.160.0의 공개 schema에서 확인한 experimental `projectId`
   필드를 사용한다. CLI 변경 시 schema·프로젝트 연결·High를 모델 실행 없이 먼저
   검증한다. 해당 필드/프로젝트가 사라졌다면 다른 프로젝트나 기존 세션으로 우회하지 않는다.
 

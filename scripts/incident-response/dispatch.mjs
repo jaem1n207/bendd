@@ -167,6 +167,41 @@ export async function createIncidentSession(
   const account = await client.request('account/read', { refreshToken: false });
   if (account.account?.type !== 'chatgpt')
     throw new Error('Codex ChatGPT subscription required; no API fallback');
+  let cursor;
+  const catalog = [];
+  const seen = new Set();
+  for (let page = 0; page < 10; page++) {
+    const response = await client.request('model/list', {
+      limit: 100,
+      includeHidden: false,
+      ...(cursor ? { cursor } : {}),
+    });
+    if (!Array.isArray(response.data))
+      throw new Error('Invalid Codex model catalog; model not started');
+    catalog.push(...response.data);
+    if (response.nextCursor === null) break;
+    if (
+      typeof response.nextCursor !== 'string' ||
+      !response.nextCursor ||
+      seen.has(response.nextCursor) ||
+      page === 9
+    )
+      throw new Error(
+        'Invalid Codex model catalog pagination; model not started'
+      );
+    cursor = response.nextCursor;
+    seen.add(cursor);
+  }
+  const requested = catalog.filter(model => model?.model === 'gpt-6.1-sol');
+  if (
+    requested.length !== 1 ||
+    !requested[0].supportedReasoningEfforts?.some(
+      e => e.reasoningEffort === 'high'
+    )
+  )
+    throw new Error(
+      'Codex model catalog does not support gpt-6.1-sol / High for this account; no fallback or model request'
+    );
   const { project } = await client.request('project/read', {
     projectId: config.project_id,
   });
