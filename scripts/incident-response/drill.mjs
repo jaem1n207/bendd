@@ -562,9 +562,9 @@ export async function runDrill(
             const prompt = `사용자는 Bendd 장애 대응 리허설과 테스트 PR 생성을 승인했습니다. 실제 운영 장애가 아닙니다. bendd 프로젝트의 새 세션, ChatGPT 구독, gpt-6.1-sol / High로 이 RSS 오류 한 건만 수정하세요.
 이슈 ${issue.html_url}; Preview ${broken.url}; 관측 결과 ${JSON.stringify(reports[1])}.
 현재 worktree ${worktree}, 브랜치 fix/drill-${id}는 RSS 오류를 주입한 drill/${id}에서 분리했습니다. 적용되는 AGENTS.md를 읽으세요. 원본 프로젝트, main, 제어 소스 ${SOURCE_DIRECTORY}, 서비스 설정/비밀 값은 변경하지 마세요. Preview 접근 키는 이 세션에 전달하지 않습니다.
-먼저 RSS 루트와 응답을 확인하는 의미 있는 회귀 검사를 src/app/api/feed/에 추가하고 실제 실패를 확인하세요. 실패 증거를 ${join(directory, 'results/red.json')}에 {command,exit_code,stdout}로 저장하세요. 그 후 최소 수정과 같은 검사의 성공 증거를 results/green.json에 저장하세요. 인증/환경 변수 출력은 하지 마세요. pnpm만 사용하고 타입·lint·unit·build 등 적용되는 gate를 완료하세요. node_modules는 선언된 동일 lockfile 설치에 연결되어 있습니다.
+먼저 RSS 루트와 응답을 확인하는 의미 있는 회귀 검사를 src/app/api/feed/에 추가하고 실제 실패를 확인하세요. 실패 증거를 ${join(attemptDirectory, 'results/red.json')}에 {command,exit_code,stdout}로 저장하세요. 그 후 최소 수정과 같은 검사의 성공 증거를 ${join(attemptDirectory, 'results/green.json')}에 저장하세요. 인증/환경 변수 출력은 하지 마세요. pnpm만 사용하고 타입·lint·unit·build 등 적용되는 gate를 완료하세요. node_modules는 선언된 동일 lockfile 설치에 연결되어 있습니다.
 커밋은 한국어 Conventional Commit입니다. fix/drill-${id}만 push하세요. PR은 제목에 [장애 리허설], 본문 첫 줄 ${marker(id)}, Assignee jaem1n207로 만드세요. 기존 CodeQL default setup 실행을 위해 base main의 Draft PR로 생성하세요. 이 Draft는 병합 금지이며 제어기가 검사 후 base를 drill/${id}로 전환합니다. 직접 병합·배포·PR ready·브랜치 삭제를 하지 마세요. 다른 PR을 만들지 마세요. 실제 원인과 RED/GREEN 검증 결과를 PR 본문에 설명하세요. PR 생성 직후 attach_artifact 도구가 있으면 연결하세요.
-${join(directory, 'results/fix.json')}에 {pr: 실제번호, head_sha: 40자리 실제커밋, root_cause: 짧은한국어원인}를 저장하세요. 없던 이슈/PR/테스트 성공을 지어내지 마세요. 401/403, 자동 승인 검토 거부, 구독 한도는 재시도·우회 없이 중단하고 필요한 사용자 조치를 최종 응답에 적으세요. 기존 세션 resume/fork나 메시지 전달은 하지 마세요. 최종 응답은 한국어로 실제 PR URL과 검증을 짧게 보고하세요.`;
+${join(attemptDirectory, 'results/fix.json')}에 {pr: 실제번호, head_sha: 40자리 실제커밋, root_cause: 짧은한국어원인}를 저장하세요. 없던 이슈/PR/테스트 성공을 지어내지 마세요. 401/403, 자동 승인 검토 거부, 구독 한도는 재시도·우회 없이 중단하고 필요한 사용자 조치를 최종 응답에 적으세요. 기존 세션 resume/fork나 메시지 전달은 하지 마세요. 최종 응답은 한국어로 실제 PR URL과 검증을 짧게 보고하세요.`;
             await persist({ model_started_at: stamp() });
             const result = await runProjectTurn({
               ...input,
@@ -589,7 +589,7 @@ ${join(directory, 'results/fix.json')}에 {pr: 실제번호, head_sha: 40자리 
             });
             if (result.exit_code !== 0) return result;
             const plan = JSON.parse(
-              await readFile(join(directory, 'results/fix.json'), 'utf8')
+              await readFile(join(attemptDirectory, 'results/fix.json'), 'utf8')
             );
             if (
               !Number.isSafeInteger(plan.pr) ||
@@ -613,7 +613,7 @@ ${join(directory, 'results/fix.json')}에 {pr: 실제번호, head_sha: 40자리 
             ]) {
               const proof = JSON.parse(
                 await readFile(
-                  join(directory, 'results', `${name}.json`),
+                  join(attemptDirectory, 'results', `${name}.json`),
                   'utf8'
                 )
               );

@@ -75,7 +75,10 @@ function fixture(options = {}) {
           modelProvider: 'openai',
           reasoningEffort: 'high',
           approvalsReviewer: 'auto_review',
-          sandbox: { type: 'workspaceWrite' },
+          sandbox: {
+            type: 'workspaceWrite',
+            writableRoots: [config.project_path],
+          },
         };
       throw new Error(`Unexpected request: ${method}`);
     },

@@ -43,7 +43,7 @@ function fakeClient(options = {}) {
     modelProvider: 'openai',
     reasoningEffort: 'high',
     approvalsReviewer: 'auto_review',
-    sandbox: { type: 'workspaceWrite' },
+    sandbox: { type: 'workspaceWrite', writableRoots: ['/worktree'] },
     ...options.started,
   });
   return {
@@ -192,6 +192,7 @@ for (const [name, options] of [
   ['picker still shows Max', { thread: { reasoningEffort: 'max' } }],
   ['different model', { started: { model: 'another-model' } }],
   ['disabled automatic review', { started: { approvalsReviewer: 'user' } }],
+  ['different worktree cwd', { started: { cwd: '/other' } }],
 ]) {
   test(`${name} stops before a model request`, async () => {
     const client = fakeClient(options);

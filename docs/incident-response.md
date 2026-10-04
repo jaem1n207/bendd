@@ -206,3 +206,17 @@ pnpm incident:drill --run-authorized DIRECTORY --resume-model-authorized --codex
 
 보고서에는 실패한 첫 모델 요청과 승인 후 수정 요청을 각각 기록한다. 구독 토큰 정보가 없는
 실패 요청을 사용량 0으로 추정하지 않는다. 현재 운영 CLI나 설치 버전을 자동 변경하지 않는다.
+
+2026-10-05 승인 재개에서는 모델이 실제 응답했지만 단일 CLI 바이너리에 `codex-code-mode-host`가
+포함되지 않아 코드 도구를 실행하지 못했다. 현재 사전 검사는 공식 **전체 패키지**의
+`codex-package.json`(고정 버전/레이아웃)과 실행 가능한 `bin/codex-code-mode-host`를 확인한다.
+전역 CLI의 최소 바이너리만 복사하지 않는다. 공식 release의 `codex-package-<architecture>.tar.gz`와
+공개 SHA-256 digest를 검증해 별도 디렉터리에 보관하고 해당 `bin/codex`를 사용한다.
+로그인 파일은 복사하지 않는다. 기존 설치와 운영 버전은 별도 활성화 승인 전까지 유지한다.
+
+모델 시작 전 세션의 cwd와 workspace-write 정책도 검증한다. API의 writableRoots는
+추가 경로이므로 현재 cwd가 목록에서 생략될 수 있으며, 실제 command/exec 쓰기 성공과 구분한다.
+리허설 재개의 RED/GREEN/fix.json은 해당 실행의 `authorized-retry/results/`를 사용해
+실제 허용된 결과 경로와 프롬프트가 일치한다. 공식 전체 패키지에서는 모델 없는
+`command/exec`에 네트워크를 차단하고 worktree·결과 폴더의 작은 임시 파일 생성/삭제를
+성공시켰다. 이 근거는 실제 모델의 코드 도구 사용·수정 PR·복구 성공과 구분한다.

@@ -27,6 +27,7 @@ import {
   initializeClient,
   invocation,
   requireSubscription,
+  verifyCodexToolkit,
 } from './dispatch.mjs';
 import { openAppServer } from './app-server.mjs';
 import {
@@ -207,6 +208,7 @@ async function validateCli(config) {
     throw new Error(
       `Codex CLI ${CODEX_CLI_VERSION} schema is required; review upgrades first`
     );
+  await verifyCodexToolkit(config.runtime.codex);
 }
 
 export async function preflightCandidate(

@@ -21,6 +21,8 @@
   실행마다 provider·모델·High·권한 설정을 명시하고 실제 응답을 검증한다.
   세션 생성 전에 공식 `model/list`에서 이 계정의 gpt-6.1-sol과 High 지원을 확인한다.
   지원 목록 누락·스키마/페이지 불일치면 새 세션·모델 요청 없이 중단하며 다른 모델로 대체하지 않는다.
+  공식 전체 CLI 패키지의 고정 버전·레이아웃·실행 가능한 code-mode-host를 로그인 전에 확인한다.
+  최소 바이너리만으로 실행하지 않는다. 세션의 cwd와 workspace-write 정책이 요청한 worktree와 일치하는지 검증한다.
   AGENTS.md와 실행 규칙은 적용한다.
   workspace-write와 자동 승인 검토를 사용한다. 승인 거부를 우회하지 않는다.
 - 매 모델 실행은 공식 Codex app-server stdio의 `thread/start`로 만든 독립된
