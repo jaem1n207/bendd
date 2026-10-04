@@ -52,7 +52,7 @@ export async function GET() {
 
   const generateRss = ({ title, description, lang, link, items }: Rss) => {
     return `<?xml version="1.0" encoding="UTF-8"?>
-      <rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+      <feed xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
         <channel>
           <title><![CDATA[${title}]]></title>
           <description><![CDATA[${description}]]></description>
@@ -75,7 +75,7 @@ export async function GET() {
             )
             .join('')}
         </channel>
-      </rss>`;
+      </feed>`;
   };
 
   return new Response(generateRss(rss), {
