@@ -1,7 +1,7 @@
 import { CHECKS } from '../check-availability.mjs';
 
 export const FAILURE_THRESHOLD = 2;
-export const MAX_GAP_MS = 45 * 60 * 1000;
+export const MAX_GAP_MS = 90 * 60 * 1000;
 export const STATE_VERSION = 1;
 const PATHS = CHECKS.map(check => check.path.split('?')[0]);
 
