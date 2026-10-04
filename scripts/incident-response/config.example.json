@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "repository": "jaem1n207/bendd",
+  "project_path": null,
+  "project_id": null,
+  "enabled_at": null,
+  "vercel_team": "jaemins-crafts",
+  "vercel_project_id": "prj_dTKsVA4Kn1Ae6UDA5xw3eUa3Km82",
+  "interval_minutes": 30,
+  "authentication": "ChatGPT subscription",
+  "api_billing": false,
+  "dispatch_mode": "incident-only",
+  "response_model": "gpt-6.1-sol",
+  "reasoning_effort": "high",
+  "session_mode": "new-project-thread",
+  "excluded_session_ids": [],
+  "scheduler_label": "so.bendd.incident-watch",
+  "scheduler_minutes": [12, 42],
+  "runtime": {
+    "node": null,
+    "codex": null,
+    "gh": null
+  }
+}

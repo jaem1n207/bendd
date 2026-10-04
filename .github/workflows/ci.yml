@@ -55,6 +55,15 @@ jobs:
       - name: Availability format
         run: pnpm exec prettier --check scripts/check-availability.mjs "scripts/availability/*.mjs" .github/workflows/availability.yml docs/observability.md
 
+      - name: Incident response tests
+        run: pnpm test:incident
+
+      - name: Incident response lint
+        run: pnpm exec eslint "scripts/incident-response/*.mjs"
+
+      - name: Incident response format
+        run: pnpm exec prettier --check "scripts/incident-response/*.{mjs,json,md}" docs/incident-response.md
+
       - name: Unit tests
         run: pnpm test:unit --run
 
