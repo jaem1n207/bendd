@@ -169,6 +169,20 @@ test('tampered snapshots cannot be activated', async t => {
   assert.equal(f.schedulerCalls.length, 0);
 });
 
+test('the known pre-hosting v2 snapshot remains verifiable for rollback', async t => {
+  const f = await fixture(t);
+  const prepared = await f.prepare();
+  const source = join(prepared.path, 'scripts', 'incident-response');
+  const path = join(source, 'manifest.json');
+  const manifest = JSON.parse(await readFile(path, 'utf8'));
+  delete manifest.sha256['hosting.mjs'];
+  await rm(join(source, 'hosting.mjs'));
+  await writeFile(path, JSON.stringify(manifest));
+  await verifySnapshot(source);
+  await writeFile(join(source, 'watch.mjs'), 'tampered');
+  await assert.rejects(verifySnapshot(source), /Trusted source changed/);
+});
+
 test('preparation rejects branch names and altered subscription/model settings', async t => {
   const f = await fixture(t);
   await assert.rejects(f.prepare('main'), /full commit/);

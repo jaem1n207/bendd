@@ -27,7 +27,9 @@ const probe = healthy => ({
   results: ['/', '/article/test', '/rss.xml', '/api/og'].map(path => ({
     path,
     ok: healthy,
-    status: healthy ? 200 : 500,
+    status: 200,
+    type_ok: true,
+    content_ok: healthy,
   })),
 });
 const completeChecks = () =>
@@ -87,7 +89,8 @@ async function fixture(t, options = {}) {
     updated_at: NOW,
   };
   const apiCalls = [];
-  const api = async path => {
+  const comments = [];
+  const api = async (path, method = 'GET', input) => {
     apiCalls.push(path);
     if (options.apiError) throw new Error(options.apiError);
     if (path === 'actions/workflows?per_page=100')
@@ -97,7 +100,22 @@ async function fixture(t, options = {}) {
     if (path === 'actions/runs/100') return run;
     if (path.startsWith('issues?')) return options.empty ? [] : [issue];
     if (path === `issues/${ISSUE}`) return issue;
-    if (path.startsWith(`issues/${ISSUE}/comments`)) return [];
+    if (path.startsWith(`issues/${ISSUE}/comments`)) {
+      if (method === 'POST') {
+        const comment = {
+          id: 1,
+          body: input.body,
+          user: { login: 'jaem1n207' },
+        };
+        comments.push(comment);
+        return comment;
+      }
+      return comments;
+    }
+    if (path === 'issues/comments/1' && method === 'PATCH') {
+      comments[0].body = input.body;
+      return comments[0];
+    }
     if (path === `pulls/${PR}`)
       return {
         number: PR,
@@ -169,6 +187,7 @@ async function fixture(t, options = {}) {
         : probe(options.healthy ?? false);
     },
     deployment: async () => options.deployment ?? { status: 'waiting' },
+    hosting: async () => options.hosting ?? { status: 'clear', affected: [] },
     alert: async () => {
       calls.alert += 1;
     },
@@ -188,7 +207,79 @@ async function fixture(t, options = {}) {
       );
     },
   });
-  return { directory, watcher, calls, apiCalls, config, control };
+  return { directory, watcher, calls, apiCalls, config, control, comments };
+}
+
+test('provider waiting records one GitHub explanation without marking the incident as claimed', async t => {
+  const f = await fixture(t, {
+    hosting: { status: 'provider_outage', affected: ['CDN'] },
+  });
+  await f.watcher.run();
+  await f.watcher.run();
+  assert.equal(f.comments.length, 1);
+  assert.ok(f.comments[0].body.includes('업체 복구'));
+  assert.ok(!f.comments[0].body.includes('<!-- bendd-codex-response:v1'));
+  assert.equal(await f.control.readState(ISSUE), null);
+  assert.equal(f.calls.codex.length, 0);
+});
+
+for (const [name, options] of [
+  [
+    'official hosting incident',
+    { hosting: { status: 'provider_outage', affected: ['CDN'] } },
+  ],
+  [
+    'unavailable hosting evidence',
+    { hosting: { status: 'unknown', affected: [] } },
+  ],
+  [
+    'ambiguous HTTP 500',
+    {
+      probe: () => ({
+        ...probe(false),
+        results: probe(false).results.map(row => ({ ...row, status: 500 })),
+      }),
+    },
+  ],
+  [
+    'platform error response',
+    {
+      probe: () => ({
+        ...probe(false),
+        results: probe(false).results.map(row => ({
+          ...row,
+          provider_error: 'INTERNAL_FUNCTION_INVOCATION_FAILED',
+        })),
+      }),
+    },
+  ],
+  [
+    'network timeout',
+    {
+      probe: () => ({
+        ...probe(false),
+        results: probe(false).results.map(row => ({
+          path: row.path,
+          ok: false,
+          error: 'TimeoutError',
+        })),
+      }),
+    },
+  ],
+]) {
+  test(`${name} defers without authentication, worktree, claim or Codex`, async t => {
+    const f = await fixture(t, options);
+    const result = await f.watcher.run();
+    assert.equal(result.codex_invocations_this_run, 0);
+    assert.equal(f.calls.auth, 0);
+    assert.equal(f.calls.prepare, 0);
+    assert.equal(f.calls.codex.length, 0);
+    assert.equal(result.decisions[0].status, 'defer');
+    await assert.rejects(
+      readFile(join(f.directory, 'state', `${ISSUE}.json`)),
+      { code: 'ENOENT' }
+    );
+  });
 }
 
 for (const [name, options] of [
@@ -217,7 +308,7 @@ test('verified ongoing outage dispatches once and completed state prevents dupli
   const first = await f.watcher.run();
   assert.equal(first.status, 'responded');
   assert.equal(first.codex_invocations_this_run, 1);
-  assert.equal(f.calls.codex[0].reason, 'active_outage');
+  assert.equal(f.calls.codex[0].reason, 'application_content_failure');
   assert.equal(f.calls.codex[0].action.state.phase, 'investigating');
   assert.equal((await f.control.readState(ISSUE)).phase, 'completed');
   assert.equal((await f.watcher.run()).codex_invocations_this_run, 0);
@@ -269,14 +360,6 @@ for (const [reason, options] of [
     'deployment_ready',
     { phase: 'awaiting_deploy', deployment: { status: 'ready' } },
   ],
-  [
-    'deployment_failed',
-    {
-      phase: 'awaiting_deploy',
-      deployment: { status: 'failed' },
-      nextPhase: 'needs_action',
-    },
-  ],
 ]) {
   test(`${reason} resumes only the existing response`, async t => {
     const f = await fixture(t, options);
@@ -286,6 +369,19 @@ for (const [reason, options] of [
     assert.equal(f.calls.codex[0].reason, reason);
   });
 }
+
+test('failed deployment requests human review without starting a report model', async t => {
+  const f = await fixture(t, {
+    phase: 'awaiting_deploy',
+    deployment: { status: 'failed' },
+  });
+  const result = await f.watcher.run();
+  assert.equal(result.status, 'needs_action');
+  assert.equal(result.codex_invocations_this_run, 0);
+  assert.equal(f.calls.codex.length, 0);
+  assert.equal(f.calls.auth, 0);
+  assert.equal((await f.control.readState(ISSUE)).phase, 'awaiting_deploy');
+});
 
 test('401/403 stops without model calls and stays latched until authorized unblock', async t => {
   const f = await fixture(t, {

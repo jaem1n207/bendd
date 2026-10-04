@@ -286,6 +286,40 @@ export function createControl({
     return state;
   }
 
+  async function recordDeferral(number, reason) {
+    const explanations = {
+      hosting_provider_outage:
+        '공식 Vercel 상태에서 관련 서비스 또는 지역 장애를 확인했어요. 업체 복구를 기다리며 코드 수정을 시작하지 않아요.',
+      hosting_evidence_unavailable:
+        '호스팅 상태를 확인할 증거가 부족해요. 정상이라고 가정해 자동 수정을 시작하지 않아요.',
+      platform_or_upstream_error:
+        '플랫폼 또는 외부 서비스 오류 응답을 받았어요. 앱 오류인지 업체 오류인지 확정하지 않고 자동 수정을 보류해요.',
+      unknown_failure_origin:
+        '500 응답·네트워크 실패 등의 원인을 앱 코드로 확정할 수 없어요. 원인 확인이 필요해요.',
+      deployment_failed_needs_review:
+        '배포 실패 원인을 확인해야 해요. 자동 재배포나 추가 모델 실행을 하지 않아요.',
+    };
+    if (!explanations[reason]) throw new Error('Unsupported deferral reason');
+    await trustedIssue(number);
+    const marker = `<!-- bendd-response-triage:v1 issue=${number} -->`;
+    const comments = await list(`issues/${number}/comments`);
+    const matches = comments.filter(
+      c => c.user?.login === OWNER && c.body?.startsWith(marker)
+    );
+    if (matches.length > 1)
+      throw new Error('Duplicate triage comments; inspect before writing');
+    const signature = `reason=${reason}`;
+    if (matches[0]?.body?.includes(signature)) return;
+    const body = `${marker}\n<!-- ${signature} -->\n\n${explanations[reason]}\n\n이번 점검의 Codex 호출: 0회. 이번 판단으로 수정 PR을 만들거나 병합하지 않았어요. 확인 시각: ${now().toISOString()}\n\n[공식 Vercel 상태](https://www.vercel-status.com/)`;
+    await api(
+      matches[0]
+        ? `issues/comments/${matches[0].id}`
+        : `issues/${number}/comments`,
+      matches[0] ? 'PATCH' : 'POST',
+      { body }
+    );
+  }
+
   async function checkpoint(number, update) {
     const state = await readState(number);
     if (
@@ -389,7 +423,16 @@ export function createControl({
     return next;
   }
 
-  return { poll, claim, checkpoint, mergeGate, merge, readState, unblock };
+  return {
+    poll,
+    claim,
+    checkpoint,
+    mergeGate,
+    merge,
+    readState,
+    unblock,
+    recordDeferral,
+  };
 }
 
 if (isMain(import.meta.url)) {

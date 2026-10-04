@@ -14,6 +14,7 @@ import {
   validNumber,
 } from './policy.mjs';
 import { createVercelReader } from './vercel-read.mjs';
+import { classifyFailure, readHosting } from './hosting.mjs';
 
 const ROOT = runtimeDirectory();
 const execAsync = promisify(execFile);
@@ -111,6 +112,7 @@ export function createWatcher({
   control = createControl({ directory, api }),
   probe = checkAvailability,
   deployment = createVercelReader().readiness,
+  hosting = readHosting,
   authenticate = requireSubscription,
   prepare = prepareWorktree,
   runner = runCodex,
@@ -176,7 +178,13 @@ export function createWatcher({
           reason: 'recovered_before_response',
           probe: result,
         };
-      return { status: 'ready', reason: 'active_outage', probe: result };
+      return {
+        ...classifyFailure(
+          result,
+          await hosting({ probe: result, phase: action.phase })
+        ),
+        probe: result,
+      };
     }
     if (action.phase === 'awaiting_checks') {
       const pr = await api(`pulls/${action.state.pr}`);
@@ -184,6 +192,14 @@ export function createWatcher({
         throw new Error('Response PR changed outside the guarded process');
       if (issue.state === 'closed')
         return { status: 'ready', reason: 'natural_recovery' };
+      const live = await probe();
+      if (validateProbe(live))
+        return { status: 'ready', reason: 'natural_recovery' };
+      const origin = classifyFailure(
+        live,
+        await hosting({ probe: live, phase: action.phase })
+      );
+      if (origin.status !== 'ready') return { ...origin, probe: live };
       const checks = await pages(
         `commits/${action.state.head_sha}/check-runs`,
         'check_runs'
@@ -203,6 +219,20 @@ export function createWatcher({
         return { status: 'waiting', reason: 'deployment_pending' };
       if (!['ready', 'failed'].includes(result.status))
         throw new Error('Invalid production readiness');
+      if (result.status === 'failed')
+        return {
+          status: 'defer',
+          reason: 'deployment_failed_needs_review',
+          deployment: result,
+        };
+      const live = await probe();
+      if (!validateProbe(live)) {
+        const origin = classifyFailure(
+          live,
+          await hosting({ probe: live, phase: action.phase })
+        );
+        if (origin.status !== 'ready') return { ...origin, probe: live };
+      }
       return {
         status: 'ready',
         reason:
@@ -304,6 +334,16 @@ export function createWatcher({
       for (const action of poll.actions) {
         const ready = await readiness(action);
         decisions.push({ issue: action.issue, phase: action.phase, ...ready });
+        if (ready.status === 'defer') {
+          if (dispatch && control.recordDeferral)
+            await control.recordDeferral(action.issue, ready.reason);
+          return finish(
+            ready.reason === 'hosting_provider_outage'
+              ? 'waiting'
+              : 'needs_action',
+            `Incident ${action.issue}: ${ready.reason}; Codex not invoked`
+          );
+        }
         if (ready.status !== 'ready' || !dispatch) continue;
         const key = `${action.issue}:${action.phase}:${action.state?.head_sha ?? 'initial'}`;
         if (watcher.dispatches[key])
@@ -344,6 +384,27 @@ export function createWatcher({
               reason: 'recovered_before_dispatch',
             });
             continue;
+          }
+          const origin = classifyFailure(
+            fresh,
+            await hosting({ probe: fresh, phase: action.phase })
+          );
+          if (origin.status !== 'ready') {
+            if (control.recordDeferral)
+              await control.recordDeferral(action.issue, origin.reason);
+            await control.checkpoint(action.issue, {
+              phase: 'needs_action',
+              reason: origin.reason,
+            });
+            decisions.push({
+              issue: action.issue,
+              phase: action.phase,
+              ...origin,
+            });
+            return finish(
+              'needs_action',
+              `Incident ${action.issue}: ${origin.reason} before dispatch; Codex not invoked`
+            );
           }
         }
         const started = now().toISOString();

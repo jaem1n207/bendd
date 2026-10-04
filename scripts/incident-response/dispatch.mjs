@@ -222,7 +222,7 @@ export async function createIncidentSession(
     awaiting_checks: '검증·병합',
     awaiting_deploy: '복구 확인·포스트모템',
   };
-  const name = `Bendd 장애 #${action.issue} · ${labels[action.phase] ?? '대응'}`;
+  const name = `Bendd 장애${action.kind === 'drill' ? ' 리허설' : ''} #${action.issue} · ${labels[action.phase] ?? '대응'}`;
   if (!ephemeral)
     await client.request('thread/name/set', { threadId: thread.id, name });
   return {
@@ -265,6 +265,35 @@ checks_failed 또는 deployment_failed 사유이면 새 수정/재시도/배포 
 최종 응답은 한국어로 짧게, 장애 이슈/PR/포스트모템 링크와 필요한 사용자 조치만 적으세요.
 
 ${runbook}`;
+  return runProjectTurn({
+    config,
+    directory,
+    worktree,
+    action,
+    prompt,
+    output,
+    forbiddenIds,
+    onSession,
+    onModelStart,
+    clientFactory,
+    timeoutMs,
+  });
+}
+
+// Both the production response and explicitly authorized drill use identical account/session/High guards.
+export async function runProjectTurn({
+  config,
+  directory,
+  worktree,
+  action,
+  prompt,
+  output,
+  forbiddenIds = [],
+  onSession = async () => {},
+  onModelStart = async () => {},
+  clientFactory = openAppServer,
+  timeoutMs = MAX_RUNTIME_MS,
+}) {
   const spec = invocation(config, directory, worktree);
   const summary = { usage: {}, failed: false, thread_id: null };
   await mkdir(join(directory, 'results'), { recursive: true, mode: 0o700 });
