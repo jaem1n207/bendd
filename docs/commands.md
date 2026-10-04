@@ -35,6 +35,7 @@ lint-staged 자동 처리 범위:
 ```bash
 pnpm test:unit    # Vitest (유닛 테스트)
 pnpm test:e2e     # Playwright (E2E 테스트)
+pnpm test:incident # 로컬 장애 대응·설치·롤백 검사 (모델 호출 없음)
 ```
 
 **Vitest**: 유틸 함수, 비즈니스 로직의 단위 테스트. `src/**/*.spec.{ts,tsx}` 파일 대상. jsdom 환경.

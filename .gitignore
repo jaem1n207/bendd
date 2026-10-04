@@ -83,3 +83,17 @@ skills-lock.json
 
 # Availability runner output
 .availability/
+
+# Local incident-response settings and operational data
+.incident-response/
+/scripts/incident-response/config.local.json
+/scripts/incident-response/config.json
+/scripts/incident-response/manifest.json
+/scripts/incident-response/installation.json
+/scripts/incident-response/activation.json
+/scripts/incident-response/launch-agent.plist
+/scripts/incident-response/state/
+/scripts/incident-response/results/
+/scripts/incident-response/worktrees/
+/scripts/incident-response/releases/
+/scripts/incident-response/legacy-backup/
