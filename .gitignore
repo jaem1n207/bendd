@@ -80,3 +80,6 @@ skills-lock.json
 .trae/
 .windsurf/
 .zencoder/
+
+# Availability runner output
+.availability/

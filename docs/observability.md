@@ -79,7 +79,72 @@ observer는 외부 전송 없이 로컬에서 등록하고, 전송 시 동의 �
   외부 전송 대신 gtag queue를 사용한다.
 - `node scripts/check-availability.mjs [https://bendd.me]`는 홈·인기 글·RSS·OG를
   점검한다. 상태뿐 아니라 HTML/RSS marker·PNG signature를 확인한다.
-  정기 실행이나 알림 서비스는 이 스크립트만으로 활성화되지 않는다.
+  단발 점검은 알림을 보내지 않는다. 정기 실행은 아래 워크플로에서 담당한다.
+
+## 정기 가용성 점검과 알림
+
+`.github/workflows/availability.yml`은 `main`에 병합된 뒤 GitHub Actions에서
+15분마다(UTC 매시 7·22·37·52분) 실행된다. MacBook과 Vercel Cron, 별도 서비스
+토큰에 의존하지 않는다. 한 실행에서 홈·대표 글·RSS·OG에 각각 최대 10초의
+외부 요청을 보내고 HTTP 200·콘텐츠 형식·HTML/RSS marker·PNG signature를
+확인한다. 지역별 가용성, 사용자 체감 지연, Sentry 오류나 GA4 참여 분석은
+이 점검의 범위가 아니다.
+
+1. **정상**: 실행 로그·Actions Summary·`availability-state` artifact에만 기록한다.
+2. **첫 실패**: 경로별 연속 실패 횟수를 기록하고 알림을 보내지 않는다.
+3. **같은 경로의 2회 연속 실패**: `jaem1n207`에게 배정한 장애 이슈를 한 번 연다.
+   이슈에 경로·HTTP/오류·콘텐츠 판정·응답 시간·점검 실행 링크를 남긴다.
+4. **장애 지속**: 열린 이슈가 있으면 추가 댓글·이슈를 만들지 않는다.
+5. **전체 경로 복구**: 같은 이슈에 복구 댓글을 한 번 남기고 닫는다.
+   댓글 저장 뒤 닫기가 실패해도 다음 실행에서 같은 댓글을 반복하지 않는다.
+
+선택한 채널은 GitHub 이슈와 GitHub 알림이다. 실제 이메일·모바일 알림 수신은
+사용자의 GitHub 알림 설정에 따른다. 이슈 배정으로 참여 알림 대상이 된다.
+정상 실행의 정기 보고나 매 실행 실패 댓글은 보내지 않는다. 장애 자체는
+워크플로 실패로 처리하지 않고, GitHub API·권한·상태 파일 오류는 실행을
+실패시켜 점검 시스템 문제와 사이트 장애를 구분한다. API 실패를 정상으로
+간주하거나 접근 오류를 반복 재시도하지 않는다.
+
+### 상태 보존과 중복 방지
+
+- 직전 완료 실행의 `state.json`을 artifact에서 읽는다. 알림 API가 실패한
+  실행도 저장된 상태를 사용할 수 있다. 체크 후 알림 전에 상태를 저장하고,
+  artifact 업로드는 실패 시에도 실행한다. 보존 기간은 7일이다.
+- 최초 실행·artifact 삭제/만료·직전 실행에 artifact가 없는 경우 실패 횟수를
+  새로 시작한다. 이전 점검과 간격이 45분을 넘으면 같은 방식으로 초기화한다.
+  API 접근 거부·다운로드 실패·손상된 JSON은 초기화로 숨기지 않고 중단한다.
+- 열린 `github-actions[bot]` 이슈의 전용 marker로 장애를 식별한다. 상태 기록을
+  잃어도 열린 장애 이슈를 중복 생성하지 않으며, 현재 전체 성공을 확인한 뒤
+  복구할 수 있다. 사람이 만든 이슈·PR은 수정하지 않는다.
+- 실행은 concurrency로 직렬화하고 실행 중인 점검을 취소하지 않는다.
+  GitHub의 대기 실행 병합·스케줄 지연으로 점검 간격은 늘어날 수 있다.
+- 장애 이슈를 수동으로 닫아도 점검은 꺼지지 않는다. 다음 확정 실패에서 새
+  이슈가 열릴 수 있다. 중지는 워크플로 비활성화를 사용한다.
+
+### 운영과 복구
+
+- 필요한 권한은 `contents: read`, `actions: read`, `issues: write`이다.
+  실행 단계의 일회성 `GITHUB_TOKEN`만 사용하며 checkout에 인증을 남기지 않는다.
+  정기 점검에는 의존성 설치·앱 빌드·Sentry 토큰이 필요하지 않다.
+- 수동 실행: GitHub → Actions → Availability → Run workflow → `main`.
+  다른 브랜치에는 알림을 보내지 않는다. 새 PR의 테스트는 가짜 GitHub driver와
+  응답을 사용하므로 실제 장애 이슈나 댓글을 만들지 않는다.
+- 로컬 검사: `pnpm test:availability`와 `node scripts/check-availability.mjs`.
+  전자는 외부 요청 없이 상태 전환·HTTP/내용 오류·권한 실패·댓글 중복을 검사한다.
+  후자는 실제 사이트를 한 번 확인하지만 알림/상태 저장은 하지 않는다.
+- 실패한 실행은 Actions 로그와 마지막 artifact를 확인한다. 권한 오류는
+  저장소 Actions 설정을 확인하고, 손상된 artifact만 삭제한 뒤 다시 실행한다.
+  과거 artifact로 임의 복구해 연속 실패를 추정하지 않는다.
+- 비활성화: Actions → Availability → Disable workflow. 코드 복구는 이 PR을
+  revert한다. 이미 생성한 이슈는 남으며 기존 앱/배포에는 변경이 없다.
+
+GitHub schedule은 기본 브랜치에서만 실행되며 정확한 실행 시각을 보장하지
+않는다. 공개 저장소는 활동이 60일 없으면 정기 실행이 자동 비활성화될 수
+있으므로 Actions의 활성 상태를 운영 점검에 포함한다. 엄격한 가용성 SLA가
+필요해지면 별도 모니터링 서비스로 이전한다.
+([GitHub schedule 동작](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule),
+[artifact](https://docs.github.com/en/actions/tutorials/store-and-share-data),
+[이슈 API](https://docs.github.com/en/rest/issues/issues))
 
 ## 주간 기준선
 

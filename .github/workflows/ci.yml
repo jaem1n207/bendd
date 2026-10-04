@@ -46,6 +46,15 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
+      - name: Availability tests
+        run: pnpm test:availability
+
+      - name: Availability lint
+        run: pnpm exec eslint scripts/check-availability.mjs "scripts/availability/*.mjs"
+
+      - name: Availability format
+        run: pnpm exec prettier --check scripts/check-availability.mjs "scripts/availability/*.mjs" .github/workflows/availability.yml docs/observability.md
+
       - name: Unit tests
         run: pnpm test:unit --run
 
