@@ -9,7 +9,7 @@ import {
   NotebookPen,
   type LucideIcon,
 } from 'lucide-react';
-import Link from 'next/link';
+import { IntentLink as Link } from '@/components/ui/intent-link';
 import localFont from 'next/font/local';
 import type { ReactNode } from 'react';
 

@@ -144,6 +144,7 @@
 
 @layer base {
   :root {
+    --font-sans: var(--font-interface-sans), var(--font-content-sans);
     scrollbar-gutter: stable;
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;

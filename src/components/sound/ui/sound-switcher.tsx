@@ -1,7 +1,7 @@
 'use client';
 
 import { track } from '@vercel/analytics';
-import useSound from 'use-sound';
+import { playSound } from '@/components/sound/lib/play-sound';
 
 import { ClientGate } from '@/components/client-gate';
 import { SoundMax, SoundMute } from '@/components/ui/icons';
@@ -11,11 +11,8 @@ export function SoundSwitcher() {
   const isSoundEnabled = useSoundStore(state => state.isSoundEnabled);
   const toggleSoundEnabled = useSoundStore(state => state.toggleSoundEnabled);
 
-  const [playUnmuteSound] = useSound('/sounds/unmute.mp3');
-  const [playMuteSound] = useSound('/sounds/mute.mp3');
-
   const handleSoundToggle = () => {
-    isSoundEnabled ? playMuteSound() : playUnmuteSound();
+    playSound(isSoundEnabled ? '/sounds/mute.mp3' : '/sounds/unmute.mp3');
     toggleSoundEnabled();
     const rIC =
       globalThis.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 0));

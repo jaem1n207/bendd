@@ -25,14 +25,23 @@ const fontPretendard = localFont({
   display: 'swap',
   preload: false,
   weight: '100 900',
-  variable: '--font-sans',
+  variable: '--font-content-sans',
   fallback: ['system-ui', 'Apple SD Gothic Neo', 'Malgun Gothic', 'sans-serif'],
+});
+
+const fontInterface = localFont({
+  src: './fonts/PretendardInterface.woff2',
+  display: 'swap',
+  preload: false,
+  weight: '100 900',
+  variable: '--font-interface-sans',
+  adjustFontFallback: false,
 });
 
 const fontMono = FontMono({
   subsets: ['latin'],
   display: 'block',
-  preload: true,
+  preload: false,
   variable: '--font-mono',
   weight: ['400', '500', '700'],
 });
@@ -90,6 +99,7 @@ export default function RootLayout({
       className={cn(
         'bg-background text-foreground',
         fontPretendard.variable,
+        fontInterface.variable,
         fontMono.variable
       )}
       dir="ltr"

@@ -1,8 +1,15 @@
 'use client';
 
-import { Children, cloneElement, isValidElement, type ReactNode } from 'react';
-import useSound from 'use-sound';
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  type MouseEvent,
+  type MouseEventHandler,
+  type ReactNode,
+} from 'react';
 
+import { playSound } from '@/components/sound/lib/play-sound';
 import { useSoundStore } from '@/components/sound/model/sound-store';
 
 type WithSoundProps = {
@@ -10,31 +17,20 @@ type WithSoundProps = {
   assetPath: string;
 };
 
-type ClickableChildProps = {
-  onClick?: () => void;
-};
-
 export function WithSound({ children, assetPath }: WithSoundProps) {
   const child = Children.only(children);
 
   const isSoundEnabled = useSoundStore(state => state.isSoundEnabled);
-  const [playClickSound] = useSound(assetPath, {
-    soundEnabled: isSoundEnabled,
-  });
-
-  const processChild = (child: ReactNode): ReactNode => {
-    if (isValidElement<ClickableChildProps>(child)) {
-      return cloneElement(child, {
-        onClick: () => {
-          child.props.onClick?.();
-          playClickSound();
-        },
-      });
-    }
+  if (!isValidElement<{ onClick?: MouseEventHandler }>(child)) {
     return child;
-  };
+  }
 
-  const processedChild = processChild(child);
-
-  return processedChild;
+  return cloneElement(child, {
+    onClick: (event: MouseEvent) => {
+      child.props.onClick?.(event);
+      if (isSoundEnabled) {
+        playSound(assetPath);
+      }
+    },
+  });
 }

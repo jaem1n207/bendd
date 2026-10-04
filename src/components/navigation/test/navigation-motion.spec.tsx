@@ -14,8 +14,10 @@ vi.mock('motion/react', async importOriginal => ({
 vi.mock('@/hooks/use-prefers-reduced-motion', () => ({
   usePrefersReducedMotion: () => false,
 }));
-vi.mock('@/components/sound', () => ({ useSoundStore: () => true }));
-vi.mock('use-sound', () => ({ default: () => [state.play] }));
+vi.mock('@/components/sound', () => ({
+  useSoundStore: () => true,
+  playSound: state.play,
+}));
 
 function renderItem(name = 'Home') {
   const activate = vi.fn();

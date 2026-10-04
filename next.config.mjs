@@ -2,6 +2,14 @@ import { withSentryConfig } from '@sentry/nextjs/config';
 import withBundleAnalyzer from '@next/bundle-analyzer';
 import { PHASE_PRODUCTION_BUILD } from 'next/constants.js';
 
+const PUBLIC_ASSET_CACHE =
+  'public, max-age=86400, stale-while-revalidate=604800';
+const CACHED_ASSET_PATHS = [
+  '/sounds/:path*',
+  '/images/tech-stack/:path*',
+  '/images/profile/:path*',
+];
+
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
@@ -21,6 +29,10 @@ const nextConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      ...CACHED_ASSET_PATHS.map(source => ({
+        source,
+        headers: [{ key: 'Cache-Control', value: PUBLIC_ASSET_CACHE }],
+      })),
     ];
   },
   eslint: {

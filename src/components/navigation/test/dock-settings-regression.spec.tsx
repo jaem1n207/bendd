@@ -16,7 +16,7 @@ vi.mock('motion/react', async importOriginal => ({
 vi.mock('@/hooks/use-prefers-reduced-motion', () => ({
   usePrefersReducedMotion: () => false,
 }));
-vi.mock('use-sound', () => ({ default: () => [vi.fn()] }));
+vi.mock('@/components/sound/lib/play-sound', () => ({ playSound: vi.fn() }));
 
 beforeEach(() => {
   motion.animate.mockClear();
