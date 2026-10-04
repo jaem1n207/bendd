@@ -26,7 +26,7 @@ export function getVisibleTheme(doc: Document = document) {
 export function useWebMCPTools() {
   const pathname = usePathname();
   const router = useRouter();
-  const { resolvedTheme, setTheme } = useTheme();
+  const { setTheme } = useTheme();
   const isSoundEnabled = useSoundStore(state => state.isSoundEnabled);
   const setSoundEnabled = useSoundStore(state => state.setSoundEnabled);
 
@@ -152,12 +152,5 @@ export function useWebMCPTools() {
     const available = new Set<string>(handlers.listPageActions().actions);
 
     return tools.filter(tool => available.has(tool.name));
-  }, [
-    isSoundEnabled,
-    pathname,
-    resolvedTheme,
-    router,
-    setSoundEnabled,
-    setTheme,
-  ]);
+  }, [isSoundEnabled, pathname, router, setSoundEnabled, setTheme]);
 }

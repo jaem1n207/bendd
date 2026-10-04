@@ -8,6 +8,8 @@ import {
 } from 'next/constants';
 import { describe, expect, test } from 'vitest';
 
+type EnvOverrides = Partial<NodeJS.ProcessEnv>;
+
 const EXIT_SUCCESS = 0;
 const CONFIG_OK = 'CONFIG_OK';
 const TOKEN_SENTINEL = 'test-secret-never-print';
@@ -40,7 +42,7 @@ const LOAD_CONFIG = `
   }
 `;
 
-function loadConfig(env: NodeJS.ProcessEnv, phase = PHASE_PRODUCTION_BUILD) {
+function loadConfig(env: EnvOverrides, phase = PHASE_PRODUCTION_BUILD) {
   const cleanEnv = Object.fromEntries(
     Object.entries(process.env).filter(
       ([key]) =>
@@ -57,7 +59,12 @@ function loadConfig(env: NodeJS.ProcessEnv, phase = PHASE_PRODUCTION_BUILD) {
     ['--input-type=module', '-e', LOAD_CONFIG],
     {
       cwd: process.cwd(),
-      env: { ...cleanEnv, ...env, TEST_NEXT_PHASE: phase },
+      env: {
+        ...cleanEnv,
+        ...env,
+        NODE_ENV: env.NODE_ENV ?? process.env.NODE_ENV,
+        TEST_NEXT_PHASE: phase,
+      },
       encoding: 'utf8',
       timeout: 10_000,
     }
@@ -108,6 +115,13 @@ describe('Sentry 배포 빌드 필수 설정', () => {
     });
   }
 
+  test('NODE_ENV가 없는 부분 환경 설정도 전달할 수 있다', () => {
+    const result = loadConfig({ CI: 'true', NODE_ENV: undefined });
+
+    expect(result.status).toBe(EXIT_SUCCESS);
+    expect(result.stdout).toContain(CONFIG_OK);
+  });
+
   test('누락된 모든 변수 이름을 한 번에 안내한다', () => {
     const result = loadConfig({ VERCEL: '1', VERCEL_ENV: 'production' });
 
@@ -117,7 +131,7 @@ describe('Sentry 배포 빌드 필수 설정', () => {
     }
   });
 
-  const tokenFreeBuilds: { name: string; env: NodeJS.ProcessEnv }[] = [
+  const tokenFreeBuilds: { name: string; env: EnvOverrides }[] = [
     { name: '로컬 빌드', env: {} },
     { name: 'GitHub CI', env: { CI: 'true', GITHUB_ACTIONS: 'true' } },
     {

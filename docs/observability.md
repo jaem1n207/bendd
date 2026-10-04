@@ -193,6 +193,27 @@ Arc 로컬 검증에서 1280px 안내 카드가 Dock을 가리는 것을 재현�
 `next start`만으로는 필수 설정 검증이 실행되지 않는다. 로컬에서도 세 업로드
 변수가 모두 있으면 업로드하므로, 평소 로컬 개발에는 토큰을 설정하지 않는다.
 
+### Sentry CLI 의존성 패치
+
+`sentry@0.45.0`을 Next.js 빌드 플러그인에서 반복 호출하면 CLI 내부
+텔레메트리가 호출마다 `SIGTERM` 리스너를 남긴다. Vercel에서는 Node.js의
+`MaxListenersExceededWarning`이 발생하며, `SENTRY_CLI_NO_TELEMETRY=1`로도
+리스너 등록이 멈추지 않는다.
+
+`patches/sentry@0.45.0.patch`는 CJS·ESM의 라이브러리 호출에서만 CLI 자체
+텔레메트리 초기화를 건너뛴다. CLI 명령 실행과 인증, release 생성·확정,
+소스맵 업로드, 앱의 Sentry 오류 수집 설정은 유지한다. 리스너 한도를 높이거나
+경고 출력을 숨기지 않는다. 단독 CLI 실행은 패치 대상이 아니다.
+
+패치는 `pnpm-workspace.yaml`과 lockfile로 고정하고 CI의 frozen install에서
+적용한다. Sentry 의존성을 갱신할 때 다음 순서로 확인한다.
+
+1. 상위 버전에서 라이브러리 호출의 리스너 누적이 해결됐는지 확인한다.
+2. `sentry-cli.spec.ts`의 CJS·ESM 반복 호출 검사를 통과하는지 확인한다.
+3. Vercel Preview에서 release 처리·소스맵 업로드 성공과 빌드 경고가 없는지 확인한다.
+4. 상위 버전에서 문제가 해결되면 패치와 `patchedDependencies` 등록을 제거하고
+   lockfile을 갱신한다. 버전만 바꾸고 기존 패치를 재사용하지 않는다.
+
 ### 새 MacBook에서 개발하기
 
 1. 저장소를 받고 `package.json`에 지정된 Node.js 24와 pnpm 버전을 준비한다.
