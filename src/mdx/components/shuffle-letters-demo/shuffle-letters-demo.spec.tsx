@@ -13,6 +13,10 @@ vi.mock('@/lib/shuffle-letters', () => ({
   shuffleLetters: shuffleMocks.shuffleLetters,
 }));
 
+const reportComplete = vi.hoisted(() => vi.fn());
+vi.mock('@/components/observability', () => ({
+  useDemoCompletion: () => reportComplete,
+}));
 import { shuffleLetters } from '@/lib/shuffle-letters';
 import { MDXShuffleLettersDemo } from '@/mdx/components/shuffle-letters-demo/shuffle-letters-demo';
 
@@ -89,6 +93,19 @@ describe('MDXShuffleLettersDemo WebMCP integration', () => {
     expect(
       screen.getByLabelText('fps (1-60)').getAttribute('toolparamdescription')
     ).toBe('Animation frames per second. Use 1 through 60.');
+  });
+
+  it('완료 callback에서만 참여 이벤트를 보고한다', () => {
+    renderShuffleLettersDemo();
+    fireEvent.submit(
+      screen.getByRole('form', { name: 'Shuffle letters playground' })
+    );
+    expect(reportComplete).not.toHaveBeenCalled();
+    const options = vi.mocked(shuffleLetters).mock.calls[0][1];
+    const element = vi.mocked(shuffleLetters).mock.calls[0][0];
+    act(() => options?.onComplete?.(element));
+    expect(reportComplete).toHaveBeenCalledWith();
+    expect(reportComplete).toHaveBeenCalledTimes(1);
   });
 
   it('runs visible animation when the WebMCP custom event is dispatched', () => {

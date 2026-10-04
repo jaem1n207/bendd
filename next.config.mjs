@@ -1,3 +1,4 @@
+import { withSentryConfig } from '@sentry/nextjs/config';
 import withBundleAnalyzer from '@next/bundle-analyzer';
 
 const bundleAnalyzer = withBundleAnalyzer({
@@ -32,7 +33,7 @@ const nextConfig = {
 
 const ContentSecurityPolicy = `
     default-src 'self' vercel.live;
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' cdn.vercel-insights.com vercel.live va.vercel-scripts.com giscus.app;
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' cdn.vercel-insights.com vercel.live va.vercel-scripts.com giscus.app https://www.googletagmanager.com;
     style-src 'self' 'unsafe-inline' giscus.app;
     img-src * blob: data:;
     media-src 'self';
@@ -72,4 +73,21 @@ const securityHeaders = [
   },
 ];
 
-export default bundleAnalyzer(nextConfig);
+export default withSentryConfig(bundleAnalyzer(nextConfig), {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  telemetry: false,
+  buildTimeInstrumentation: false,
+  webpack: {
+    treeshake: { removeDebugLogging: true, removeTracing: true },
+  },
+  silent: !process.env.CI,
+  sourcemaps: {
+    disable: !(
+      process.env.SENTRY_AUTH_TOKEN &&
+      process.env.SENTRY_ORG &&
+      process.env.SENTRY_PROJECT
+    ),
+  },
+});

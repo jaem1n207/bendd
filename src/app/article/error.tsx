@@ -1,6 +1,6 @@
 'use client';
 
-import { track } from '@vercel/analytics';
+import { reportBoundaryError } from '@/lib/monitoring/report-error';
 import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -14,9 +14,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    track('article page error', {
-      error: error.message,
-    });
+    reportBoundaryError(error, 'article');
   }, [error]);
 
   return (

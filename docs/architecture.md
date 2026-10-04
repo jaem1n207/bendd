@@ -85,7 +85,7 @@ src/components/{domain}/model/    <- 직접 import 금지
 
 ### OG 이미지 생성
 
-`/api/og` 엔드포인트가 **Edge Runtime**에서 동적으로 OG 이미지를 생성한다:
+`/api/og` 엔드포인트가 **Node.js Runtime**에서 동적으로 OG 이미지를 생성한다:
 
 - `Sec-CH-Prefers-Color-Scheme` 헤더로 클라이언트 색상 스킴 감지
 - Inter 폰트를 ArrayBuffer로 로드

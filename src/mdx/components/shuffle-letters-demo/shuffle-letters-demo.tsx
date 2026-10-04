@@ -1,5 +1,7 @@
 'use client';
 
+import { useDemoCompletion } from '@/components/observability';
+
 import { shuffleLetters } from '@/lib/shuffle-letters';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -68,6 +70,7 @@ function ShuffleLettersDemo({
   initialIterations = 15,
   initialFps = 40,
 }: ShuffleLettersDemoProps) {
+  const reportComplete = useDemoCompletion('shuffle-letters');
   const [text, setText] = useState(initialText);
   const [iterations, setIterations] = useState(initialIterations);
   const [fps, setFps] = useState(initialFps);
@@ -107,6 +110,7 @@ function ShuffleLettersDemo({
         iterations: nextIterations,
         fps: nextFps,
         onComplete: () => {
+          reportComplete();
           setIsAnimating(false);
           clearAnimationRef.current = null;
         },
@@ -114,7 +118,7 @@ function ShuffleLettersDemo({
 
       return true;
     },
-    []
+    [reportComplete]
   );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

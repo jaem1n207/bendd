@@ -1,6 +1,6 @@
 'use client';
 
-import { track } from '@vercel/analytics';
+import { reportBoundaryError } from '@/lib/monitoring/report-error';
 import { useEffect } from 'react';
 import Image from 'next/image';
 
@@ -13,37 +13,33 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    track('global error', {
-      error: error.message,
-    });
+    reportBoundaryError(error, 'root');
   }, [error]);
 
   return (
-    <html>
-      <body>
-        <section className="flex h-screen flex-col items-center justify-center space-y-4">
-          <div className="relative size-96">
-            <Image
-              src="/rabbit.svg"
-              alt="primary character"
-              draggable={false}
-              className="dark:invert"
-              fill
-              priority
-            />
-          </div>
-          <Typography variant="h1">예상하지 못한 문제가 발생했어요.</Typography>
-          <Typography variant="p" asChild>
-            <p>
-              일시적인 장애이거나 네트워크 문제일 수 있어요. 해당 문제는 확인 및
-              대응 중이니 잠시 후 다시 시도해주세요.
-            </p>
-          </Typography>
-          <Typography variant="p" affects="muted" asChild>
-            <p>{error.message}</p>
-          </Typography>
-        </section>
-      </body>
-    </html>
+    <>
+      <section className="flex h-screen flex-col items-center justify-center space-y-4">
+        <div className="relative size-96">
+          <Image
+            src="/rabbit.svg"
+            alt="primary character"
+            draggable={false}
+            className="dark:invert"
+            fill
+            priority
+          />
+        </div>
+        <Typography variant="h1">예상하지 못한 문제가 발생했어요.</Typography>
+        <Typography variant="p" asChild>
+          <p>
+            일시적인 장애이거나 네트워크 문제일 수 있어요. 해당 문제는 확인 및
+            대응 중이니 잠시 후 다시 시도해주세요.
+          </p>
+        </Typography>
+        <Typography variant="p" affects="muted" asChild>
+          <p>{error.message}</p>
+        </Typography>
+      </section>
+    </>
   );
 }

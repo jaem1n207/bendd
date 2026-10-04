@@ -4,6 +4,8 @@ import type { Metadata } from 'next';
 import { Fira_Mono as FontMono } from 'next/font/google';
 import localFont from 'next/font/local';
 
+import { WebVitalsTracker } from '@/components/observability';
+
 import { Navigation, PathnameHistoryTracker } from '@/components/navigation';
 import {
   BrowserDetector,
@@ -120,6 +122,7 @@ export default function RootLayout({
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
+        <WebVitalsTracker />
       </body>
     </html>
   );

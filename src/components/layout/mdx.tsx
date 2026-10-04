@@ -1,3 +1,7 @@
+import {
+  AnalyticsConsentControl,
+  EngagementTracker,
+} from '@/components/observability';
 import { CornerUpLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -103,6 +107,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         {seriesInfo && <SeriesNavigationTop {...seriesInfo} />}
         <article
           data-content-font="pretendard"
+          data-engagement-content=""
           className={cn(
             'prose prose-slate mb-24 dark:prose-invert md:mb-40',
             styles.contentArticle,
@@ -112,6 +117,8 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
           <CustomMDX source={post.content} />
         </article>
         {seriesInfo && <SeriesNavigationBottom {...seriesInfo} />}
+        <EngagementTracker />
+        <AnalyticsConsentControl />
         <Giscus />
       </section>
     </main>
