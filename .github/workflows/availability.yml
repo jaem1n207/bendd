@@ -41,5 +41,6 @@ jobs:
         with:
           name: availability-state
           path: .availability/*.json
+          include-hidden-files: true
           retention-days: 7
           if-no-files-found: ignore
