@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useRef, type ComponentProps } from 'react';
 
 type IntentLinkProps<T extends string> = Omit<
-  ComponentProps<typeof Link<T>>,
+  ComponentProps<typeof Link>,
   'href' | 'prefetch'
 > & { href: Route<T> };
 
