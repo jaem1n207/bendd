@@ -638,3 +638,23 @@ test('refreshing a delayed monitor does not starve an already verified incident'
   assert.equal(result.actions[0].issue, ISSUE);
   assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
 });
+
+test('unverifiable queued run metadata stops before another workflow request', async t => {
+  const f = await fixture(t, {
+    now: '2026-10-05T02:00:00.000Z',
+    issues: [],
+    pendingRuns: [
+      {
+        ...makeRun(),
+        id: 101,
+        path: '.github/workflows/other.yml',
+        status: 'queued',
+      },
+    ],
+  });
+  assert.equal(
+    (await f.control.poll({ mode: 'dispatch' })).status,
+    'needs_action'
+  );
+  assert.ok(f.calls.every(c => c.method === 'GET'));
+});

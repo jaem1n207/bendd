@@ -156,10 +156,20 @@ export function createControl({
           'Invalid or excessive Availability queue; do not dispatch'
         );
       }
-      pending.push(
-        ...response.workflow_runs.filter(
-          run => isMonitorRun(run) && run.status !== 'completed'
+      if (
+        response.workflow_runs.some(
+          run =>
+            !isMonitorRun(run) ||
+            !validNumber(run.id) ||
+            (run.status !== 'completed' && !states.includes(run.status))
         )
+      ) {
+        throw new Error(
+          'Untrusted Availability queue metadata; do not dispatch'
+        );
+      }
+      pending.push(
+        ...response.workflow_runs.filter(run => run.status !== 'completed')
       );
     }
     for (const run of pending) {
