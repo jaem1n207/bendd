@@ -3,7 +3,7 @@
 ## Purpose and placement
 
 The globe is a personal greeting that connects the visitor to Jaemin in Seoul.
-Place it after `HomeProfile` and before Projects. Use a teal/blue/violet dotted globe,
+Place it after `HomeProfile` and before Projects. Use continent-specific paired colors for the dotted globe,
 the existing rabbit asset for Seoul, and a small point for the visitor. Match
 light and dark themes using the site's HSL color tokens.
 
@@ -13,12 +13,12 @@ The globe belongs to the home's entrance sequence. Its heading opts into that
 sequence on **every home entry**, including client-side returns and reloads;
 other home content retains its existing first-visit policy.
 
-The heading uses the existing 900 ms blur/opacity/8 px rise. After the heading
-finishes, the figure appears with opacity 0 → 1 over **120 ms**, without vertical
-movement or blur, using `cubic-bezier(0.19, 1, 0.22, 1)`. Particle assembly and the
-full 4600 ms journey begin **after the figure is fully visible**. Keep the journey
-clock at zero during this fade so the bare globe and scattered particles remain
-visible for the entire assembly. Other home entrance tokens remain unchanged.
+The heading retains the home's 900 ms blur/opacity/8 px rise. A 100 ms gap
+leads into the approved Settle scene. Its 120 ms opacity entrance overlaps the
+opening particle motion; the figure does not move or blur. The scene uses the
+same 1000–6600 ms timeline as the selected study. Slow location/mask loading may
+delay its start without skipping assembly. The nonzero time count starts at
+route arrival, 6000 ms, and runs for 600 ms once its row is visible.
 
 Prepare the location and land mask near the viewport. Start the figure only when
 the heading is visible, the scene is ready, at least half the stage is in view,
@@ -41,29 +41,34 @@ motion, and readable content without JavaScript.
 
 ## Internal timeline
 
-Times below are measured from the end of the figure's 120 ms entrance. The rest of the page
-remains usable and its sections do not wait for this journey to finish.
+Times include the 900 ms home heading and the 100 ms gap. The rest of the page
+remains usable throughout the sequence.
 
-| Elapsed      | Action                                                                                                                       | Easing                                                            |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| 0–1000 ms    | Start with a bare globe and scattered colored particles. Assemble the continents while rotating and approaching the visitor. | Particles `(0.22, 1, 0.36, 1)`; camera `(0.645, 0.045, 0.355, 1)` |
-| 1000–1200 ms | Hold the visitor's location                                                                                                  | Static                                                            |
-| 1200–3000 ms | Slowly depart, rotate and zoom out to frame both endpoints; stop smoothly                                                    | `(0.645, 0.045, 0.355, 1)`                                        |
-| 3000–4600 ms | Distant visitors: extend a raised 3D route. Nearby visitors: reveal the shared vicinity and finish the distance count.       | Route/count `(0.3, 0.6, 0.4, 1)`; shared UI `(0.23, 1, 0.32, 1)`  |
+| Elapsed      | Action                                                                                                     |
+| ------------ | ---------------------------------------------------------------------------------------------------------- |
+| 0–1000 ms    | Home heading, then a short gap.                                                                            |
+| 1000–1240 ms | Globe, coastlines, and airborne grains enter together.                                                     |
+| 1240–2800 ms | Scale and yaw ease to rest while individual grains land; the upper-left cloud joins the same trajectories. |
+| 2080–2800 ms | As the scale settles, smoothly fade the coastlines while the last grains land.                             |
+| 2800–3000 ms | Reveal the visitor where visible over the completed point map.                                             |
+| 3000–4400 ms | Move from the Atlantic assembly view to frame the visitor and Seoul.                                       |
+| 4400–6000 ms | Draw the raised route and count the distance, or reveal the shared nearby cluster.                         |
+| 6000–6600 ms | Count the actual nonzero time difference; unlock dragging at completion.                                   |
 
-The camera approaches from scale 0.68 to at most 1.2. Cap that peak by the
-stage aspect ratio so the globe silhouette stays inside both stage dimensions;
-apply the same cap to the final framing. Avoid an oversized close-up that clips
-the sphere into a rectangular map.
+Particle settlement now takes 1800 ms, 40% less than the selected study's initial
+3000 ms. Scale, yaw, incoming grains, and lighting keep their relative cues.
+The contour handoff overlaps the last 720 ms of settlement, with zero fade
+velocity at both ends. Later phases and the 12-second gradient cycle are unchanged.
 
-The route retains its 1600 ms duration, but uses `(0.3, 0.6, 0.4, 1)` so it reaches
-about 71% after 600 ms and continues visibly toward arrival. The distance label
-uses the same progress; the time-difference counter still starts after arrival.
-
-Particles keep the color of their destination continent throughout assembly.
-After arrival the globe stays still; only a distant route's spatial teal/blue/violet
-gradient circulates, with a seamless 12-second period. Theme-specific HSL tokens
-keep the land and route readable in light and dark mode.
+The full motion, lighting, paired color references, and particle behavior are
+recorded in [the selected Settle study](home-connection-globe-settle.md).
+The scene keeps that selected choreography, while the home owns heading reveal,
+IP location, accessible copy, actual time-zone calculation, and pointer/keyboard
+interaction. The comparison route and its fixture controls are removed.
+After arrival only a distant route's spatial teal/blue/violet gradient moves,
+with a seamless 12-second cycle. It freezes at its current phase for reduced
+motion and while the scene/tab is inactive. Completed ambient frames reuse the
+cached geometry and do not recalculate markers or update React on every tick.
 
 The distance label follows the growing route's head using the same progress.
 It settles above the rabbit at arrival. Camera, points, route, and markers use
@@ -103,10 +108,10 @@ State clearly that IP estimates can differ from the real location.
 
 For visitors within 50 km of Seoul, use the selected “같은 반경” direction.
 Keep the same particle assembly and camera journey. Once the camera settles at
-3000 ms, show a shared avatar capsule above the Seoul surface point and three
+4400 ms, show a shared avatar capsule above the Seoul surface point and three
 subtle concentric ellipses beneath it. The capsule enters in 250 ms; the rings
 expand in 220 ms with 32 ms stagger, finishing within 284 ms. Finish the measured
-distance count on the existing 4600 ms timeline, including `0 m`.
+distance count on the 6000 ms arrival, including `0 m`.
 
 The halo denotes a shared vicinity, not a scaled geographic radius. It adds no
 route geometry and does not displace either coordinate. Keep the cluster anchored
@@ -148,7 +153,8 @@ COBE 2.0.1's bundled land mask is redistributed unchanged with its MIT license i
 12,000 candidate samples on narrow screens and 22,000 on larger ones. DPR is
 capped at 2. The broad continent colors are visual regions, not border data.
 
-Particle positions interpolate in a vertex shader. Route geometry is built only
+Particle positions interpolate in a vertex shader. The final caption fades in at route arrival, alongside the actual time difference;
+the server-rendered greeting stays hidden during assembly. Route geometry is built only
 when the viewport changes; the fragment shader provides the moving gradient and
 sphere occlusion. HTML marker projection uses the same camera. SVG retains a
 readable route only if WebGL is unavailable. Load everything near the viewport;
@@ -172,7 +178,7 @@ header; never substitute the device time zone. Use the current instant and IANA
 zone rules, including daylight saving and 30/45-minute offsets. Invalid or absent
 time-zone metadata omits this row while preserving valid location coordinates.
 
-After the 4600 ms journey and only once the row is in view, nonzero differences
+At the 6000 ms route arrival and only once the row is in view, nonzero differences
 count from zero to the actual value in **600 ms**, with `(0.19, 1, 0.22, 1)` easing.
 Use “서울은 {difference} 빠르네요.” when Seoul is ahead and “느리네요.” when behind.
 Whole-hour differences count hours; fractional differences retain minutes. Keep

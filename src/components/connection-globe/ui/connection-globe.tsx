@@ -23,7 +23,7 @@ export function ConnectionGlobe() {
   const location = useVisitorLocation(
     near ? GlobeReadiness.Ready : GlobeReadiness.Waiting
   );
-  const { ready, complete, presented, fallback } = useGlobeScene(
+  const { ready, complete, connected, presented, fallback } = useGlobeScene(
     stageRef,
     location.location,
     near && location.status !== 'loading'
@@ -96,6 +96,9 @@ export function ConnectionGlobe() {
         >
           <div className={styles.waiting} />
           <div className={styles.scene} aria-hidden="true">
+            <div className={styles.auraBoundary}>
+              <div className={styles.aura} data-globe-aura />
+            </div>
             <div className={styles.canvas} data-canvas-host />
             <div className={styles.fallbackGlobe} data-fallback-globe>
               <span />
@@ -225,11 +228,11 @@ export function ConnectionGlobe() {
           연결이 완료되면 방향키로 지구본을 회전할 수 있습니다. Home 키로 처음
           구도로 돌아갑니다.
         </span>
-        <figcaption className={styles.caption}>
+        <figcaption className={styles.caption} data-globe-caption>
           <p aria-live="polite" aria-atomic="true" className={styles.message}>
             {location.status === 'unavailable' ? (
               '방문자님의 위치를 확인하지 못했지만, 서울에서 반갑게 인사드려요.'
-            ) : complete && distance ? (
+            ) : connected && distance ? (
               <>
                 지금 우리는 <strong>약 {distance}</strong> 떨어져 있네요.
               </>
@@ -240,13 +243,13 @@ export function ConnectionGlobe() {
           <TimeDifference
             timeZone={location.location?.timeZone}
             readiness={
-              complete && presented
+              connected && presented
                 ? GlobeReadiness.Ready
                 : GlobeReadiness.Waiting
             }
           />
           {distance && !nearby && (
-            <p className={styles.connectionNote} data-visible={complete}>
+            <p className={styles.connectionNote} data-visible={connected}>
               그래도 웹에서는 이렇게 빠르게 만날 수 있죠.
             </p>
           )}

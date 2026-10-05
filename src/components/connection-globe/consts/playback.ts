@@ -4,6 +4,7 @@ export enum GlobeReadiness {
 }
 
 export const GLOBE_ENTRANCE_MS = 120;
+export const GLOBE_START_GAP_MS = 100;
 export const REDUCED_FADE_MS = 150;
 export const TIME_DIFFERENCE_MS = 600;
 export const VISIBLE_FRACTION = 0.5;

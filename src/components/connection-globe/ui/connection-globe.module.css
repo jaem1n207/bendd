@@ -1,34 +1,54 @@
 .section {
   --globe-base: 215 22% 97%;
   --globe-rim: 220 18% 89%;
-  --globe-land-0: 212 38% 44%;
-  --globe-land-1: 187 34% 40%;
-  --globe-land-2: 225 30% 51%;
-  --globe-land-3: 251 28% 52%;
-  --globe-land-4: 235 35% 49%;
-  --globe-land-5: 178 31% 39%;
-  --globe-land-6: 218 19% 62%;
+  --globe-land-0-a: 16 48% 46%;
+  --globe-land-0-b: 185 48% 38%;
+  --globe-land-1-a: 142 42% 35%;
+  --globe-land-1-b: 42 60% 44%;
+  --globe-land-2-a: 32 50% 43%;
+  --globe-land-2-b: 245 39% 47%;
+  --globe-land-3-a: 220 54% 48%;
+  --globe-land-3-b: 38 15% 49%;
+  --globe-land-4-a: 153 29% 43%;
+  --globe-land-4-b: 5 54% 49%;
+  --globe-land-5-a: 199 50% 42%;
+  --globe-land-5-b: 344 50% 55%;
+  --globe-land-6-a: 191 28% 49%;
+  --globe-land-6-b: 215 25% 54%;
   --globe-route-0: 182 64% 32%;
   --globe-route-1: 218 69% 47%;
   --globe-route-2: 263 57% 52%;
   --globe-nearby: 185 57% 36%;
+  --globe-aura-0: 179 75% 75%;
+  --globe-aura-1: 219 83% 81%;
+  --globe-aura-2: 263 72% 82%;
   padding: 54px 0 4px;
   text-align: center;
 }
 :global(.dark) .section {
   --globe-base: 225 15% 10%;
   --globe-rim: 226 16% 17%;
-  --globe-land-0: 211 36% 65%;
-  --globe-land-1: 185 32% 58%;
-  --globe-land-2: 225 31% 66%;
-  --globe-land-3: 251 32% 69%;
-  --globe-land-4: 235 34% 68%;
-  --globe-land-5: 177 30% 58%;
-  --globe-land-6: 220 18% 49%;
+  --globe-land-0-a: 16 55% 67%;
+  --globe-land-0-b: 185 42% 61%;
+  --globe-land-1-a: 142 40% 61%;
+  --globe-land-1-b: 42 55% 65%;
+  --globe-land-2-a: 32 49% 64%;
+  --globe-land-2-b: 245 45% 70%;
+  --globe-land-3-a: 220 54% 69%;
+  --globe-land-3-b: 38 14% 72%;
+  --globe-land-4-a: 153 30% 64%;
+  --globe-land-4-b: 5 56% 67%;
+  --globe-land-5-a: 199 50% 66%;
+  --globe-land-5-b: 344 51% 71%;
+  --globe-land-6-a: 191 31% 68%;
+  --globe-land-6-b: 215 30% 74%;
   --globe-route-0: 180 63% 63%;
   --globe-route-1: 213 83% 72%;
   --globe-route-2: 263 75% 76%;
   --globe-nearby: 181 61% 65%;
+  --globe-aura-0: 180 63% 42%;
+  --globe-aura-1: 219 70% 50%;
+  --globe-aura-2: 263 65% 53%;
 }
 
 .eyebrow {
@@ -501,4 +521,46 @@
 }
 .interactionHint[data-visible='true'] {
   opacity: 1;
+}
+
+.auraBoundary {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    hsl(var(--foreground)) 12%,
+    hsl(var(--foreground)) 88%,
+    transparent
+  );
+}
+.aura {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 100%;
+  aspect-ratio: 1;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9);
+  mask-image: radial-gradient(
+    closest-side,
+    hsl(var(--foreground)) 48%,
+    transparent 100%
+  );
+  background: radial-gradient(
+      ellipse at 25% 57%,
+      hsl(var(--globe-aura-0) / 0.9),
+      hsl(var(--globe-aura-0) / 0) 64%
+    ),
+    radial-gradient(
+      ellipse at 55% 26%,
+      hsl(var(--globe-aura-1) / 0.95),
+      hsl(var(--globe-aura-1) / 0) 65%
+    ),
+    radial-gradient(
+      ellipse at 76% 64%,
+      hsl(var(--globe-aura-2) / 0.9),
+      hsl(var(--globe-aura-2) / 0) 64%
+    );
 }

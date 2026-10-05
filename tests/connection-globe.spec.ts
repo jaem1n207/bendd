@@ -199,10 +199,21 @@ test('waits for the home heading before revealing and playing the globe', async 
     'cubic-bezier(0.19, 1, 0.22, 1)'
   );
   await expect(figure).toHaveAttribute('data-observed-transforms', 'none,none');
-  await expect(figure).toHaveAttribute('data-max-entrance-elapsed', '0');
+  expect(
+    Number(await figure.getAttribute('data-max-entrance-elapsed'))
+  ).toBeGreaterThanOrEqual(1000);
+  expect(
+    Number(await figure.getAttribute('data-max-entrance-elapsed'))
+  ).toBeLessThan(1250);
+  await expect(stage.locator('canvas')).toHaveAttribute(
+    'data-coastlines',
+    /^[1-9]\d*$/
+  );
   await expect(stage).toHaveAttribute('data-phase', 'camera');
   await expect(figure).toHaveAttribute('data-globe-entrance', 'visible');
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
 });
 
 test('keeps the loading globe hidden after the heading until location is ready', async ({
@@ -232,7 +243,9 @@ test('keeps the loading globe hidden after the heading until location is ready',
     /entering|visible/
   );
   await expect(stage).toHaveAttribute('data-phase', 'camera');
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
 });
 
 test('starts a full journey after a fast mobile scroll skips the pending heading', async ({
@@ -260,7 +273,9 @@ test('starts a full journey after a fast mobile scroll skips the pending heading
     /entering|visible/
   );
   await expect(stage).toHaveAttribute('data-phase', 'camera');
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   await expect(
     section.getByRole('button', { name: '방문자와 재민의 공유 반경 다시 재생' })
   ).toBeVisible();
@@ -312,7 +327,9 @@ test('waits for the land mask before showing the reduced-motion point globe', as
   await expect(stage).toHaveAttribute('data-ready', 'false');
   releaseMask();
   await expect(stage).toHaveAttribute('data-ready', 'true');
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   await expect(stage.locator('canvas')).toHaveAttribute(
     'data-renderer',
     'particles-3d'
@@ -333,7 +350,9 @@ test('connects the visitor to Seoul, settles the counter beside the favicon, and
     'data-progress',
     /^(0\.[1-9]|0\.0*[1-9])/
   );
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   await expect(stage).toHaveAttribute('data-fallback', 'false');
   await expect(section.locator('figcaption')).toContainText('약 9,029km');
   await expect(section.locator('figcaption')).toContainText(
@@ -350,12 +369,26 @@ test('connects the visitor to Seoul, settles the counter beside the favicon, and
   await expect(page).toHaveURL(`${baseURL}/article`);
   await page.getByRole('link', { name: 'Home', exact: true }).click();
   await stage.scrollIntoViewIfNeeded();
+  await expect(stage).toHaveAttribute('data-ready', 'true');
+  await expect(section.locator('figure')).toHaveAttribute(
+    'data-globe-entrance',
+    /entering|visible/
+  );
   await expect(stage).toHaveAttribute('data-phase', 'camera');
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   await page.reload();
   await stage.scrollIntoViewIfNeeded();
+  await expect(stage).toHaveAttribute('data-ready', 'true');
+  await expect(section.locator('figure')).toHaveAttribute(
+    'data-globe-entrance',
+    /entering|visible/
+  );
   await expect(stage).toHaveAttribute('data-phase', 'camera');
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
 });
 
 test('pauses outside the viewport and resumes the same journey', async ({
@@ -371,12 +404,14 @@ test('pauses outside the viewport and resumes the same journey', async ({
   const paused = await sampleClock(stage);
   expect(new Set(paused).size).toBe(1);
   expect(paused[0]).toBeGreaterThan(0);
-  expect(paused[0]).toBeLessThan(4600);
+  expect(paused[0]).toBeLessThan(6600);
   await stage.scrollIntoViewIfNeeded();
   await expect
     .poll(async () => Number(await stage.getAttribute('data-elapsed')))
     .toBeGreaterThan(paused[0]);
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
 });
 
 test('arrives at one shared Seoul location and replays the halo without dragging', async ({
@@ -389,7 +424,9 @@ test('arrives at one shared Seoul location and replays the halo without dragging
   );
   const arrivalFrames = await sampleClock(stage);
   expect(arrivalFrames.at(-1)).toBeGreaterThan(arrivalFrames[0]);
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   await expect(stage).toHaveAttribute('data-nearby', 'true');
   await expect(section.locator('[data-nearby-distance-value]')).toBeVisible();
   await expect(section.locator('figcaption')).toContainText('약 0m');
@@ -447,7 +484,9 @@ for (const width of [390, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'light' });
     const { section, stage } = await openGlobe(page, nearbySeoul);
-    await expect(stage).toHaveAttribute('data-phase', 'complete');
+    await expect(stage).toHaveAttribute('data-phase', 'complete', {
+      timeout: 10000,
+    });
     await expect(stage).toHaveAttribute('data-nearby', 'true');
     await expect(stage.locator('canvas')).toHaveCount(1);
     await expect(stage.locator('[data-local-map]')).toHaveCount(0);
@@ -547,7 +586,9 @@ test('does not replay the shared greeting when reduced motion is turned off', as
   const { section, stage } = await openGlobe(page, nearbySeoul);
   await expect(stage).toHaveAttribute('data-phase', 'camera');
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   const button = section.getByRole('button', {
     name: '방문자와 재민의 공유 반경 다시 재생',
   });
@@ -600,7 +641,9 @@ test('reduced motion stays at the final frame on mobile and preserves it across 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'light' });
   const { section, stage } = await openGlobe(page);
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   await expect(section.locator('figure')).toHaveAttribute(
     'data-test-fade-duration',
     '150'
@@ -613,12 +656,14 @@ test('reduced motion stays at the final frame on mobile and preserves it across 
     'data-test-fade-opacity',
     '0,1'
   );
-  expect(new Set(await sampleClock(stage))).toEqual(new Set([4600]));
+  expect(new Set(await sampleClock(stage))).toEqual(new Set([6600]));
   await expect(section.locator('[data-distance-value]')).toBeVisible();
   await page.getByRole('button', { name: '테마 전환' }).click();
   await expect(page.locator('html')).toHaveClass(/dark/);
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
-  expect(new Set(await sampleClock(stage))).toEqual(new Set([4600]));
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
+  expect(new Set(await sampleClock(stage))).toEqual(new Set([6600]));
   const width = await page.evaluate(() => ({
     page: document.documentElement.scrollWidth,
     viewport: window.innerWidth,
@@ -636,10 +681,12 @@ for (const [name, location] of Object.entries({
     const { stage } = await openGlobe(page, location);
     await expect(stage).toHaveAttribute('data-phase', 'camera');
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await expect(stage).toHaveAttribute('data-phase', 'complete');
-    expect(new Set(await sampleClock(stage))).toEqual(new Set([4600]));
+    await expect(stage).toHaveAttribute('data-phase', 'complete', {
+      timeout: 10000,
+    });
+    expect(new Set(await sampleClock(stage))).toEqual(new Set([6600]));
     await page.emulateMedia({ reducedMotion: 'no-preference' });
-    expect(new Set(await sampleClock(stage))).toEqual(new Set([4600]));
+    expect(new Set(await sampleClock(stage))).toEqual(new Set([6600]));
   });
 }
 
@@ -674,7 +721,9 @@ test('retains the distance and route when WebGL is unavailable', async ({
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const { section, stage } = await openGlobe(page);
   await expect(stage).toHaveAttribute('data-fallback', 'true');
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   await expect(section.locator('[data-fallback-globe]')).toBeVisible();
   await expect(section.locator('[data-distance-value]')).toBeVisible();
 });
@@ -722,7 +771,9 @@ test('fits antipodal markers and the arrival label on a narrow screen', async ({
     latitude: -seoul.latitude,
     longitude: seoul.longitude - 180,
   });
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   const stageBox = await requiredBox(stage);
   for (const locator of [
     section.locator('[data-distance-value]'),
@@ -753,7 +804,9 @@ test('unlocks dragging after the intro and stops after the short inertia', async
   );
   await expect(stage).not.toHaveAttribute('data-grabbing', 'true');
   await page.mouse.up();
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   await expect(stage).toHaveAttribute('data-interactive', 'true');
   const before = await stage.getAttribute('data-camera');
   const routeBefore = await stage
@@ -776,7 +829,9 @@ test('unlocks dragging after the intro and stops after the short inertia', async
   const resting = await stage.getAttribute('data-camera');
   await sampleClock(stage);
   await expect(stage).toHaveAttribute('data-camera', resting ?? '');
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   await stage.focus();
   await page.keyboard.press('Home');
   await expect(stage).toHaveAttribute('data-camera', before ?? '');
@@ -788,7 +843,9 @@ test('keeps only the color flow moving after arrival and pauses it out of view',
   page,
 }) => {
   const { stage } = await openGlobe(page);
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   const camera = await stage.getAttribute('data-camera');
   const color = await stage.getAttribute('data-color-time');
   await expect(stage).not.toHaveAttribute('data-color-time', color ?? '');
@@ -803,9 +860,10 @@ test('keeps only the color flow moving after arrival and pauses it out of view',
   await stage.scrollIntoViewIfNeeded();
   await expect(stage).not.toHaveAttribute('data-color-time', paused ?? '');
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await expect(stage).toHaveAttribute('data-color-time', '0');
   await sampleClock(stage);
-  await expect(stage).toHaveAttribute('data-color-time', '0');
+  const reducedColor = await stage.getAttribute('data-color-time');
+  await sampleClock(stage);
+  await expect(stage).toHaveAttribute('data-color-time', reducedColor ?? '');
 });
 
 test('releases a grabbed globe when WebGL is lost and retains the readable fallback', async ({
@@ -860,7 +918,10 @@ test('counts a nonzero time difference after arrival with stable numeric width',
   const samples = await observeTimeCount(page);
   expect(samples.values[0]).toBe('0시간 0분');
   expect(new Set(samples.values).size).toBeGreaterThan(3);
-  expect(new Set(samples.phases)).toEqual(new Set(['complete']));
+  expect(samples.phases).toContain('arrived');
+  expect(
+    samples.phases.every(phase => phase === 'arrived' || phase === 'complete')
+  ).toBe(true);
   expect(samples.duration).toBeGreaterThan(450);
   expect(samples.duration).toBeLessThan(850);
   expect(
@@ -885,7 +946,9 @@ test('fades the exact same-time-zone copy for 150ms without a numeric counter', 
   await recordEntrances(page);
   await page.setViewportSize({ width: 390, height: 844 });
   const { section, stage } = await openGlobe(page, seoul);
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   const row = section.locator('[data-time-difference]');
   await row.scrollIntoViewIfNeeded();
   await expect(row).toHaveAttribute('data-time-state', 'complete');
@@ -935,7 +998,9 @@ test('waits for the caption to enter the viewport after the journey completes', 
       window.scrollY + element.getBoundingClientRect().top - 150
     )
   );
-  await expect(stage).toHaveAttribute('data-phase', 'complete');
+  await expect(stage).toHaveAttribute('data-phase', 'complete', {
+    timeout: 10000,
+  });
   const row = section.locator('[data-time-difference]');
   await expect(row).toHaveAttribute('data-time-state', 'waiting');
   await row.scrollIntoViewIfNeeded();

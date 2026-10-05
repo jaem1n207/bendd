@@ -5,15 +5,16 @@ import { useEffect, useLayoutEffect, useState, type RefObject } from 'react';
 
 import {
   clamp,
-  createJourney,
   distanceInMeters,
-  DURATION_MS,
   formatDistance,
-  ROUTE_START_MS,
   SEOUL,
   type Camera,
   type Point,
 } from '@/components/connection-globe/lib/geometry';
+import {
+  createSettleJourney,
+  SETTLE_TIMING,
+} from '@/components/connection-globe/lib/choreography';
 import type {
   Color,
   GlobePalette,
@@ -22,6 +23,7 @@ import type {
 import {
   GlobeReadiness,
   GLOBE_ENTRANCE_MS,
+  GLOBE_START_GAP_MS,
   REDUCED_FADE_MS,
   VISIBLE_FRACTION,
   COLOR_CYCLE_MS,
@@ -47,7 +49,8 @@ function readPalette(stage: HTMLElement): GlobePalette {
   return {
     base: color('base'),
     rim: color('rim'),
-    land: Array.from({ length: 7 }, (_, i) => color(`land-${i}`)),
+    land: Array.from({ length: 7 }, (_, i) => color(`land-${i}-a`)),
+    landAccent: Array.from({ length: 7 }, (_, i) => color(`land-${i}-b`)),
     route: Array.from({ length: 3 }, (_, i) => color(`route-${i}`)),
   };
 }
@@ -62,6 +65,7 @@ export function useGlobeScene(
 ) {
   const [ready, setReady] = useState(false);
   const [complete, setComplete] = useState(false);
+  const [connected, setConnected] = useState(false);
   const [presented, setPresented] = useState(false);
   const [fallback, setFallback] = useState(false);
   useLayoutEffect(() => {
@@ -86,6 +90,8 @@ export function useGlobeScene(
     const heading = stage
       .closest('[data-connection-globe]')
       ?.querySelector<HTMLElement>('[data-globe-heading]');
+    const aura = stage.querySelector<HTMLElement>('[data-globe-aura]');
+    const caption = figure?.querySelector<HTMLElement>('[data-globe-caption]');
     const host = stage.querySelector<HTMLDivElement>('[data-canvas-host]');
     const overlay = stage.querySelector<SVGSVGElement>('[data-route-overlay]');
     const path = stage.querySelector<SVGPathElement>('[data-route-path]');
@@ -122,6 +128,7 @@ export function useGlobeScene(
     }
     setReady(false);
     setComplete(false);
+    setConnected(false);
     setPresented(false);
     setFallback(false);
     anchor.dataset.introduced = 'false';
@@ -134,15 +141,16 @@ export function useGlobeScene(
     let finished = preference.matches || !location;
     let sharedIntroduced = false;
     let entered = false;
-    let entranceComplete = false;
     let entranceReduced = false;
     let entranceAnimation: Animation | undefined;
-    let elapsed = finished ? DURATION_MS : 0;
+    let connected = finished;
+    let elapsed = finished ? SETTLE_TIMING.duration : SETTLE_TIMING.appearance;
     let colorTime = 0;
     let width = stage.clientWidth,
       height = stage.clientHeight;
-    let journey = createJourney(location, width, height);
+    let journey = createSettleJourney(location, width, height);
     let palette = readPalette(stage);
+    let lastScene: ReturnType<typeof journey.sample> | undefined;
     let globe: ParticleGlobe | undefined;
     let animation: AnimationPlaybackControls | undefined;
     let colors: AnimationPlaybackControls | undefined;
@@ -163,29 +171,64 @@ export function useGlobeScene(
     canvas.style.cssText = 'display:block;width:100%;height:100%';
     host.replaceChildren(canvas);
 
+    const render = () => {
+      if (!lastScene || disposed) {
+        return;
+      }
+      globe?.render(
+        lastScene,
+        palette,
+        colorTime,
+        width,
+        height,
+        lastScene.motion
+      );
+      stage.dataset.colorTime = colorTime.toFixed(0);
+    };
     const draw = (time: number) => {
       elapsed = time;
       if (!width || !height || disposed) {
         return;
       }
       const scene = journey.sample(time, manualCamera);
-      globe?.render(
-        scene,
-        palette,
-        preference.matches ? 0 : colorTime,
-        width,
-        height
-      );
+      lastScene = scene;
+      render();
+      if (aura) {
+        aura.style.opacity = String(scene.motion.glowOpacity);
+        aura.style.transform = `translate(-50%, -50%) scale(${scene.motion.glowScale * scene.camera.scale})`;
+      }
+      // The distance is already readable beside the route. Reveal the stable
+      // summary at arrival, without flashing the server-rendered greeting.
+      if (caption) {
+        caption.style.opacity = String(
+          !location
+            ? 1
+            : clamp((time - SETTLE_TIMING.arrival) / REDUCED_FADE_MS)
+        );
+      }
+      if (!connected && time >= SETTLE_TIMING.arrival) {
+        connected = true;
+        setConnected(true);
+      }
+      if (
+        time >= SETTLE_TIMING.connectionStart &&
+        !preference.matches &&
+        inView &&
+        document.visibilityState !== 'hidden' &&
+        colors?.state === 'paused'
+      ) {
+        colors.play();
+      }
       stage.dataset.phase = scene.phase;
       stage.dataset.elapsed = time.toFixed(0);
       stage.dataset.progress = scene.routeProgress.toFixed(4);
       stage.dataset.formation = scene.formationProgress.toFixed(4);
-      stage.dataset.colorTime = (preference.matches ? 0 : colorTime).toFixed(0);
       stage.dataset.camera = `${scene.camera.phi.toFixed(5)},${scene.camera.theta.toFixed(5)}`;
       stage.dataset.nearby = String(scene.nearby);
       position(anchor, scene.destination);
-      const arrival = clamp((time - ROUTE_START_MS) / 160);
-      const sharedArrival = scene.nearby && time >= ROUTE_START_MS;
+      const arrival = clamp((time - SETTLE_TIMING.connectionStart) / 160);
+      const sharedArrival =
+        scene.nearby && time >= SETTLE_TIMING.connectionStart;
       const sharedVisible = sharedArrival && scene.destination.visible;
       anchor.style.opacity = sharedVisible ? String(arrival) : '0';
       anchor.style.visibility = sharedVisible ? 'visible' : 'hidden';
@@ -199,20 +242,23 @@ export function useGlobeScene(
       }
       overlay.setAttribute('viewBox', `0 0 ${width} ${height}`);
       path.setAttribute('d', scene.route);
-      path.style.opacity = location && time > ROUTE_START_MS ? '1' : '0';
+      path.style.opacity =
+        location && time > SETTLE_TIMING.connectionStart ? '1' : '0';
       position(visitorMarker, scene.visitorMarker);
       position(seoulMarker, location ? scene.seoulMarker : scene.destination);
       visitorMarker.style.opacity =
         location && scene.visitorMarker.visible && !sharedArrival
-          ? String(clamp((time - 780) / 180))
+          ? String(scene.motion.visitor)
           : '0';
       seoulMarker.style.opacity =
         !scene.nearby && scene.seoulMarker.visible
-          ? String(!location ? 1 : clamp((time - 2500) / 250))
+          ? String(!location ? 1 : scene.motion.destination)
           : '0';
       position(counter, {
         x: scene.label.x,
-        y: scene.label.y + 8 * (1 - clamp((time - ROUTE_START_MS) / 1600)),
+        y:
+          scene.label.y +
+          8 * (1 - clamp((time - SETTLE_TIMING.connectionStart) / 1600)),
       });
       counter.style.opacity =
         location && !scene.nearby && scene.head.visible ? String(arrival) : '0';
@@ -237,7 +283,6 @@ export function useGlobeScene(
       }
     };
     const finishEntrance = () => {
-      entranceComplete = true;
       setPresented(true);
       if (figure) {
         figure.dataset.globeEntrance = 'visible';
@@ -277,6 +322,7 @@ export function useGlobeScene(
         ],
         {
           duration: preference.matches ? REDUCED_FADE_MS : GLOBE_ENTRANCE_MS,
+          delay: preference.matches ? 0 : GLOBE_START_GAP_MS,
           easing: GLOBE_EASING,
           fill: 'both',
         }
@@ -310,20 +356,17 @@ export function useGlobeScene(
         animation?.pause();
         colors?.pause();
         stopInertia();
-        draw(DURATION_MS);
+        draw(SETTLE_TIMING.duration);
         setComplete(true);
         if (canPlay) {
           enter();
         }
       } else if (canPlay) {
         enter();
-        if (!entranceComplete) {
-          return;
-        }
         if (!finished) {
           animation?.play();
         }
-        if (globe && location) {
+        if (globe && location && elapsed >= SETTLE_TIMING.connectionStart) {
           colors?.play();
         }
         if (inertia?.state === 'paused') {
@@ -365,7 +408,7 @@ export function useGlobeScene(
     const resize = () => {
       width = stage.clientWidth;
       height = stage.clientHeight;
-      journey = createJourney(location, width, height);
+      journey = createSettleJourney(location, width, height);
       if (manualCamera) {
         manualCamera.scale = journey.finalCamera.scale;
       }
@@ -558,15 +601,17 @@ export function useGlobeScene(
                 }
                 colorTime = time;
                 if (finished) {
-                  draw(elapsed);
+                  render();
                 }
               },
             })
           : undefined;
       animation =
         location && !finished
-          ? animate(0, DURATION_MS, {
-              duration: DURATION_MS / 1000,
+          ? animate(SETTLE_TIMING.appearance, SETTLE_TIMING.duration, {
+              duration:
+                (SETTLE_TIMING.duration - SETTLE_TIMING.appearance) / 1000,
+              delay: GLOBE_START_GAP_MS / 1000,
               ease: 'linear',
               autoplay: false,
               onUpdate: time => {
@@ -579,7 +624,7 @@ export function useGlobeScene(
                   return;
                 }
                 finished = true;
-                draw(DURATION_MS);
+                draw(SETTLE_TIMING.duration);
                 setComplete(true);
               },
             })
@@ -587,6 +632,7 @@ export function useGlobeScene(
       draw(elapsed);
       setReady(true);
       setComplete(finished);
+      setConnected(connected);
       updatePlayback();
     };
     void initialize();
@@ -617,5 +663,5 @@ export function useGlobeScene(
       host.replaceChildren();
     };
   }, [stageRef, location, readiness]);
-  return { ready, complete, presented, fallback };
+  return { ready, complete, connected, presented, fallback };
 }

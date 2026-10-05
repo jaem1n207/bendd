@@ -182,14 +182,16 @@ export function timelineAt(elapsed: number) {
 export function createJourney(
   visitor: Coordinates | null,
   width: number,
-  height: number
+  height: number,
+  formationOrigin?: Coordinates
 ) {
   const from = toVector(visitor ?? SEOUL),
     to = toVector(SEOUL);
   const meters = visitor ? distanceInMeters(visitor, SEOUL) : 0;
   const nearby = visitor !== null && meters <= NEARBY_DISTANCE_METERS;
-  const start = cameraFor(from);
-  const approachScale = MAX_APPROACH_SCALE * Math.min(1, width / height);
+  const start = cameraFor(formationOrigin ? toVector(formationOrigin) : from);
+  const approachScale =
+    (formationOrigin ? 1.08 : MAX_APPROACH_SCALE) * Math.min(1, width / height);
   const middle = greatCircle(from, to, 0.5);
   let end = cameraFor(nearby ? to : middle, start.phi);
   if (visitor && !nearby) {
