@@ -40,6 +40,8 @@ function makeRun() {
     head_sha: SHA,
     repository: { full_name: REPOSITORY },
     event: 'schedule',
+    status: 'completed',
+    created_at: NOW,
     conclusion: 'success',
     updated_at: NOW,
   };
@@ -122,8 +124,21 @@ async function fixture(t, options = {}) {
         ],
       };
     }
+    if (path === 'actions/workflows/1/dispatches') {
+      const error =
+        typeof options.dispatchError === 'function'
+          ? options.dispatchError()
+          : options.dispatchError;
+      if (error) throw new Error(error);
+      return null;
+    }
     if (path.startsWith('actions/workflows/1/runs')) {
-      return { workflow_runs: [run] };
+      const items = path.includes('status=completed')
+        ? options.noRun
+          ? []
+          : [run]
+        : options.pendingRuns ?? [run];
+      return { workflow_runs: items, total_count: items.length };
     }
     if (path.startsWith('issues?')) {
       return options.issues ?? [issue];
@@ -157,10 +172,14 @@ async function fixture(t, options = {}) {
   return {
     directory,
     calls,
+    run,
     control: createControl({
       directory,
       api,
-      now: () => new Date(options.now ?? NOW),
+      now: () =>
+        new Date(
+          typeof options.now === 'function' ? options.now() : options.now ?? NOW
+        ),
     }),
   };
 }
@@ -429,3 +448,193 @@ for (const [name, mutate] of [
     assert.throws(() => assertMerge(input));
   });
 }
+
+test('overdue Availability requests one main workflow run without treating it as an app incident', async t => {
+  const f = await fixture(t, { now: '2026-10-05T02:00:00.000Z', issues: [] });
+  const result = await f.control.poll({ mode: 'dispatch' });
+  assert.equal(result.status, 'waiting');
+  assert.deepEqual(
+    f.calls.filter(c => c.method === 'POST'),
+    [
+      {
+        path: 'actions/workflows/1/dispatches',
+        method: 'POST',
+        input: { ref: 'main' },
+      },
+    ]
+  );
+  assert.ok(!f.calls.some(c => c.path.startsWith('issues')));
+});
+
+test('accepted Availability dispatch is not repeated while its run is unobserved', async t => {
+  const f = await fixture(t, { now: '2026-10-05T02:00:00.000Z', issues: [] });
+  await f.control.poll({ mode: 'dispatch' });
+  assert.equal((await f.control.poll({ mode: 'dispatch' })).status, 'waiting');
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+});
+
+test('queued Availability prevents another dispatch during scheduler delay', async t => {
+  const queued = {
+    ...makeRun(),
+    id: 101,
+    status: 'queued',
+    conclusion: null,
+    created_at: '2026-10-05T01:59:00.000Z',
+  };
+  const f = await fixture(t, {
+    now: '2026-10-05T02:00:00.000Z',
+    pendingRuns: [queued],
+    issues: [],
+  });
+  assert.equal((await f.control.poll({ mode: 'dispatch' })).status, 'waiting');
+  assert.ok(f.calls.every(c => c.method === 'GET'));
+});
+
+test('a fresh healthy Availability run keeps dispatch polling read-only', async t => {
+  const f = await fixture(t, { issues: [] });
+  assert.equal((await f.control.poll({ mode: 'dispatch' })).status, 'healthy');
+  assert.ok(f.calls.every(c => c.method === 'GET'));
+});
+
+test('check mode never dispatches an overdue Availability run', async t => {
+  const f = await fixture(t, { now: '2026-10-05T02:00:00.000Z', issues: [] });
+  assert.equal(
+    (await f.control.poll({ mode: 'check' })).status,
+    'needs_action'
+  );
+  assert.ok(f.calls.every(c => c.method === 'GET'));
+});
+
+test('a missing initial run can request Availability but a failed run cannot be retried', async t => {
+  const first = await fixture(t, { noRun: true, issues: [] });
+  assert.equal(
+    (await first.control.poll({ mode: 'dispatch' })).status,
+    'waiting'
+  );
+  assert.equal(first.calls.filter(c => c.method === 'POST').length, 1);
+  const failed = await fixture(t, {
+    run: { ...makeRun(), conclusion: 'failure' },
+    issues: [],
+  });
+  assert.equal(
+    (await failed.control.poll({ mode: 'dispatch' })).status,
+    'needs_action'
+  );
+  assert.ok(failed.calls.every(c => c.method === 'GET'));
+});
+
+test('successive 30-minute ticks refresh the monitor once per tick when schedule stays absent', async t => {
+  let time = '2026-10-05T02:00:00.000Z';
+  const f = await fixture(t, { now: () => time, issues: [] });
+  await f.control.poll({ mode: 'dispatch' });
+  f.run.id = 101;
+  f.run.updated_at = '2026-10-05T02:00:25.000Z';
+  time = '2026-10-05T02:30:00.000Z';
+  assert.equal((await f.control.poll({ mode: 'dispatch' })).status, 'waiting');
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 2);
+});
+
+test('an accepted request that never creates an observable run requires review instead of another dispatch', async t => {
+  let time = '2026-10-05T02:00:00.000Z';
+  const f = await fixture(t, { now: () => time, issues: [] });
+  await f.control.poll({ mode: 'dispatch' });
+  time = '2026-10-05T02:30:00.000Z';
+  const result = await f.control.poll({ mode: 'dispatch' });
+  assert.equal(result.status, 'needs_action');
+  assert.match(result.message, /not observed/);
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+});
+
+test('ambiguous dispatch failure is preserved and retried only after authorized unblock', async t => {
+  let error = 'GitHub command failed; stop and check authentication or network';
+  let time = '2026-10-05T02:00:00.000Z';
+  const f = await fixture(t, {
+    now: () => time,
+    dispatchError: () => error,
+    issues: [],
+  });
+  assert.equal(
+    (await f.control.poll({ mode: 'dispatch' })).status,
+    'needs_action'
+  );
+  error = null;
+  assert.equal(
+    (await f.control.poll({ mode: 'dispatch' })).status,
+    'needs_action'
+  );
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+  const path = join(f.directory, 'state', 'availability-refresh.json');
+  const failed = JSON.parse(await readFile(path, 'utf8'));
+  assert.equal(failed.status, 'needs_action');
+  assert.match(failed.error, /GitHub command failed/);
+  time = '2026-10-05T02:30:00.000Z';
+  await f.control.unblock();
+  const authorized = JSON.parse(await readFile(path, 'utf8'));
+  assert.equal(authorized.error, failed.error);
+  assert.equal(authorized.status, 'retry_authorized');
+  assert.equal((await f.control.poll({ mode: 'dispatch' })).status, 'waiting');
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 2);
+});
+
+for (const status of [401, 403]) {
+  test(`Availability dispatch HTTP ${status} latches without access retries`, async t => {
+    const f = await fixture(t, {
+      now: '2026-10-05T02:00:00.000Z',
+      issues: [],
+      dispatchError: `GitHub HTTP ${status}; stop and request access`,
+    });
+    assert.equal((await f.control.poll({ mode: 'dispatch' })).blocked, true);
+    const count = f.calls.length;
+    assert.equal((await f.control.poll({ mode: 'dispatch' })).blocked, true);
+    assert.equal(f.calls.length, count);
+  });
+}
+
+test('invalid request state is preserved through polling and unblock', async t => {
+  const f = await fixture(t, { now: '2026-10-05T02:00:00.000Z', issues: [] });
+  await f.control.poll({ mode: 'dispatch' });
+  const path = join(f.directory, 'state', 'availability-refresh.json');
+  const malformed = JSON.stringify({ version: 99, status: 'needs_action' });
+  await writeFile(path, malformed);
+  assert.equal(
+    (await f.control.poll({ mode: 'dispatch' })).status,
+    'needs_action'
+  );
+  await assert.rejects(
+    f.control.unblock(),
+    /Invalid Availability request state/
+  );
+  assert.equal(await readFile(path, 'utf8'), malformed);
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+});
+
+test('a stalled queued run and future timestamp do not create more workflows', async t => {
+  const queued = { ...makeRun(), id: 101, status: 'queued', conclusion: null };
+  const f = await fixture(t, {
+    now: '2026-10-05T02:00:00.000Z',
+    pendingRuns: [queued],
+    issues: [],
+  });
+  assert.equal(
+    (await f.control.poll({ mode: 'dispatch' })).status,
+    'needs_action'
+  );
+  assert.ok(f.calls.every(c => c.method === 'GET'));
+  const future = await fixture(t, {
+    now: '2026-10-04T23:00:00.000Z',
+    issues: [],
+  });
+  assert.equal(
+    (await future.control.poll({ mode: 'dispatch' })).status,
+    'needs_action'
+  );
+  assert.ok(future.calls.every(c => c.method === 'GET'));
+});
+
+test('refreshing a delayed monitor does not starve an already verified incident', async t => {
+  const f = await fixture(t, { now: '2026-10-05T00:30:00.000Z' });
+  const result = await f.control.poll({ mode: 'dispatch' });
+  assert.equal(result.status, 'action');
+  assert.equal(result.actions[0].issue, ISSUE);
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+});

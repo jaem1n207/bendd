@@ -5,6 +5,7 @@ import { isMain, runtimeDirectory } from './paths.mjs';
 import { promisify } from 'node:util';
 import {
   MAX_MONITOR_GAP_MS,
+  MONITOR_REFRESH_AFTER_MS,
   MAX_RESPONSE_AGE_MS,
   OWNER,
   PHASES,
@@ -135,8 +136,143 @@ export function createControl({
     return state;
   }
 
-  async function poll() {
+  async function requestAvailability(workflow, latest) {
+    if (!validNumber(workflow.id) || (latest && !validNumber(latest.id))) {
+      throw new Error('Invalid Availability workflow identity');
+    }
+    const states = ['queued', 'in_progress', 'waiting', 'pending', 'requested'];
+    const pending = [];
+    for (const status of states) {
+      const response = await api(
+        `actions/workflows/${workflow.id}/runs?branch=main&status=${status}&per_page=100`
+      );
+      if (
+        !Array.isArray(response.workflow_runs) ||
+        !Number.isSafeInteger(response.total_count) ||
+        response.total_count !== response.workflow_runs.length ||
+        response.total_count > PAGE_SIZE
+      ) {
+        throw new Error(
+          'Invalid or excessive Availability queue; do not dispatch'
+        );
+      }
+      pending.push(
+        ...response.workflow_runs.filter(
+          run => isMonitorRun(run) && run.status !== 'completed'
+        )
+      );
+    }
+    for (const run of pending) {
+      const age = now().getTime() - Date.parse(run.created_at);
+      if (
+        !states.includes(run.status) ||
+        !Number.isFinite(age) ||
+        age < 0 ||
+        age > MAX_MONITOR_GAP_MS
+      ) {
+        throw new Error(
+          'Availability queue is stale or invalid; do not dispatch another run'
+        );
+      }
+    }
+    if (pending.length) {
+      return reportStatus(
+        'waiting',
+        'Availability is already queued or running'
+      );
+    }
+    const path = join(directory, 'state', 'availability-refresh.json');
+    const previous = await readJson(path);
+    if (previous) {
+      const age = now().getTime() - Date.parse(previous.requested_at);
+      if (
+        previous.version !== 1 ||
+        previous.workflow_id !== workflow.id ||
+        ![
+          'requesting',
+          'requested',
+          'observed',
+          'needs_action',
+          'retry_authorized',
+        ].includes(previous.status) ||
+        !Number.isFinite(age) ||
+        age < 0 ||
+        (previous.baseline_run_id !== null &&
+          !validNumber(previous.baseline_run_id))
+      ) {
+        throw new Error('Invalid Availability request state; do not reset');
+      }
+      if (['requesting', 'needs_action'].includes(previous.status)) {
+        throw new Error(
+          'Availability dispatch outcome needs review; no automatic retry'
+        );
+      }
+      if (previous.status === 'requested') {
+        const observed =
+          latest &&
+          latest.id !== previous.baseline_run_id &&
+          Date.parse(latest.updated_at) >= Date.parse(previous.requested_at);
+        if (!observed && age >= MONITOR_REFRESH_AFTER_MS) {
+          throw new Error(
+            'Requested Availability run was not observed; no automatic retry'
+          );
+        }
+        if (!observed) {
+          return reportStatus(
+            'waiting',
+            'Waiting for requested Availability run'
+          );
+        }
+        await saveJson(path, {
+          ...previous,
+          status: 'observed',
+          observed_run_id: latest.id,
+        });
+      }
+      if (age < MONITOR_REFRESH_AFTER_MS) {
+        return reportStatus(
+          'waiting',
+          'Waiting for requested Availability run'
+        );
+      }
+    }
+    const request = {
+      version: 1,
+      workflow_id: workflow.id,
+      baseline_run_id: latest?.id ?? null,
+      requested_at: now().toISOString(),
+      status: 'requesting',
+    };
+    // Persist intent before the POST: a timeout or process exit cannot silently repeat it.
+    await saveJson(path, request);
     try {
+      await api(`actions/workflows/${workflow.id}/dispatches`, 'POST', {
+        ref: 'main',
+      });
+      await saveJson(path, { ...request, status: 'requested' });
+    } catch (error) {
+      await saveJson(path, {
+        ...request,
+        status: 'needs_action',
+        error: error.message,
+      });
+      throw error;
+    }
+    return reportStatus(
+      'waiting',
+      'Requested Availability run after schedule delay',
+      {
+        requested_at: request.requested_at,
+        baseline_run_id: request.baseline_run_id,
+      }
+    );
+  }
+
+  async function poll({ mode = 'check' } = {}) {
+    try {
+      if (!['check', 'dispatch'].includes(mode)) {
+        throw new Error('Invalid polling mode');
+      }
       const monitor = await readJson(join(directory, 'state', 'monitor.json'));
       if (monitor?.blocked === true) {
         return reportStatus('needs_action', monitor.message, { blocked: true });
@@ -161,24 +297,41 @@ export function createControl({
       const runs = await api(
         `actions/workflows/${workflow.id}/runs?branch=main&status=completed&per_page=5`
       );
-      const latest = runs.workflow_runs?.find(isMonitorRun);
+      if (!Array.isArray(runs.workflow_runs)) {
+        throw new Error('Invalid completed Availability run list');
+      }
+      const latest = runs.workflow_runs.find(isMonitorRun);
       if (!latest) {
+        if (mode === 'dispatch') {
+          return await requestAvailability(workflow, null);
+        }
         return reportStatus(
           'waiting',
           'First availability run has not completed'
         );
       }
       const age = now().getTime() - Date.parse(latest.updated_at);
-      if (
-        !Number.isFinite(age) ||
-        age < 0 ||
-        age > MAX_MONITOR_GAP_MS ||
-        latest.conclusion !== 'success'
-      ) {
+      if (!Number.isFinite(age) || age < 0 || latest.conclusion !== 'success') {
         return reportStatus(
           'needs_action',
           'Availability run failed or is older than 90 minutes',
           { run_url: latest.html_url }
+        );
+      }
+      let refresh = null;
+      if (mode === 'dispatch' && age > MONITOR_REFRESH_AFTER_MS) {
+        refresh = await requestAvailability(workflow, latest);
+      }
+      if (age > MAX_MONITOR_GAP_MS) {
+        if (refresh) {
+          return refresh;
+        }
+        return reportStatus(
+          'needs_action',
+          'Availability run failed or is older than 90 minutes',
+          {
+            run_url: latest.html_url,
+          }
         );
       }
       const issues = await list(
@@ -234,6 +387,9 @@ export function createControl({
           state,
         });
       }
+      if (!actions.length && refresh) {
+        return refresh;
+      }
       return reportStatus(
         actions.length ? 'action' : 'healthy',
         actions.length
@@ -249,6 +405,24 @@ export function createControl({
   }
 
   async function unblock() {
+    const path = join(directory, 'state', 'availability-refresh.json');
+    const request = await readJson(path);
+    if (request && ['requesting', 'needs_action'].includes(request.status)) {
+      if (
+        request.version !== 1 ||
+        !validNumber(request.workflow_id) ||
+        !Number.isFinite(Date.parse(request.requested_at)) ||
+        (request.baseline_run_id !== null &&
+          !validNumber(request.baseline_run_id))
+      ) {
+        throw new Error('Invalid Availability request state; do not reset');
+      }
+      await saveJson(path, {
+        ...request,
+        status: 'retry_authorized',
+        authorized_at: now().toISOString(),
+      });
+    }
     return reportStatus('waiting', 'User authorized an access recheck', {
       blocked: false,
     });
