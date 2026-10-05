@@ -138,11 +138,22 @@ export function HomeMotion({ children }: { children: ReactNode }) {
     }
     if (
       media.matches ||
-      !initialVisit.current ||
       typeof IntersectionObserver !== 'function' ||
       typeof HTMLElement.prototype.animate !== 'function'
     ) {
       showAll();
+      return;
+    }
+
+    // 지도 제목만 홈 방문마다 재생하고 기존 섹션의 방문 정책은 유지한다.
+    const visiting = elements.filter(element => {
+      if (initialVisit.current || element.dataset.revealRepeat === 'visit') {
+        return true;
+      }
+      show(element);
+      return false;
+    });
+    if (!visiting.length) {
       return;
     }
 
@@ -322,7 +333,7 @@ export function HomeMotion({ children }: { children: ReactNode }) {
 
     // Finish all geometry/style reads before changing state. A late bundle must
     // never hide text which the CSS fallback has already made readable.
-    const visibility = elements.map(element => ({
+    const visibility = visiting.map(element => ({
       element,
       inViewport: isInViewport(element.getBoundingClientRect()),
       alreadyVisible:

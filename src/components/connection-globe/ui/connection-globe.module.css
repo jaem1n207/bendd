@@ -1,0 +1,566 @@
+.section {
+  --globe-base: 215 22% 97%;
+  --globe-rim: 220 18% 89%;
+  --globe-land-0-a: 16 48% 46%;
+  --globe-land-0-b: 185 48% 38%;
+  --globe-land-1-a: 142 42% 35%;
+  --globe-land-1-b: 42 60% 44%;
+  --globe-land-2-a: 32 50% 43%;
+  --globe-land-2-b: 245 39% 47%;
+  --globe-land-3-a: 220 54% 48%;
+  --globe-land-3-b: 38 15% 49%;
+  --globe-land-4-a: 153 29% 43%;
+  --globe-land-4-b: 5 54% 49%;
+  --globe-land-5-a: 199 50% 42%;
+  --globe-land-5-b: 344 50% 55%;
+  --globe-land-6-a: 191 28% 49%;
+  --globe-land-6-b: 215 25% 54%;
+  --globe-route-0: 182 64% 32%;
+  --globe-route-1: 218 69% 47%;
+  --globe-route-2: 263 57% 52%;
+  --globe-nearby: 185 57% 36%;
+  --globe-aura-0: 179 75% 75%;
+  --globe-aura-1: 219 83% 81%;
+  --globe-aura-2: 263 72% 82%;
+  padding: 54px 0 4px;
+  text-align: center;
+}
+:global(.dark) .section {
+  --globe-base: 225 15% 10%;
+  --globe-rim: 226 16% 17%;
+  --globe-land-0-a: 16 55% 67%;
+  --globe-land-0-b: 185 42% 61%;
+  --globe-land-1-a: 142 40% 61%;
+  --globe-land-1-b: 42 55% 65%;
+  --globe-land-2-a: 32 49% 64%;
+  --globe-land-2-b: 245 45% 70%;
+  --globe-land-3-a: 220 54% 69%;
+  --globe-land-3-b: 38 14% 72%;
+  --globe-land-4-a: 153 30% 64%;
+  --globe-land-4-b: 5 56% 67%;
+  --globe-land-5-a: 199 50% 66%;
+  --globe-land-5-b: 344 51% 71%;
+  --globe-land-6-a: 191 31% 68%;
+  --globe-land-6-b: 215 30% 74%;
+  --globe-route-0: 180 63% 63%;
+  --globe-route-1: 213 83% 72%;
+  --globe-route-2: 263 75% 76%;
+  --globe-nearby: 181 61% 65%;
+  --globe-aura-0: 180 63% 42%;
+  --globe-aura-1: 219 70% 50%;
+  --globe-aura-2: 263 65% 53%;
+}
+
+.eyebrow {
+  color: hsl(var(--muted-foreground));
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.19em;
+}
+
+.section .heading h2 {
+  margin-top: 12px;
+  font-size: clamp(19px, 3.5vw, 24px);
+  font-weight: 550;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.figure {
+  margin: 0;
+  /* Keep server-rendered content readable when hydration is delayed or fails. */
+  animation: globeReadableFallback 0s linear 600ms backwards;
+}
+
+.figure[data-globe-entrance] {
+  animation: none;
+}
+
+.figure[data-globe-entrance='waiting'] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes globeReadableFallback {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.stage {
+  position: relative;
+  height: clamp(320px, 57vw, 414px);
+  overflow: hidden;
+  isolation: isolate;
+  contain: layout paint;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+  outline-offset: -5px;
+}
+
+.canvas,
+.scene,
+.waiting {
+  position: absolute;
+  inset: 0;
+}
+
+.scene {
+  opacity: 0;
+}
+
+.stage[data-ready='true'] .scene {
+  opacity: 1;
+}
+.stage[data-ready='true'] .waiting {
+  opacity: 0;
+}
+
+.waiting {
+  width: 244px;
+  height: 244px;
+  margin: auto;
+  border: 1px solid hsl(var(--border) / 0.55);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    hsl(var(--muted) / 0.45),
+    transparent 72%
+  );
+}
+
+/* Home's general icon selector sets every SVG to 16px; restore the scene's canvas. */
+.stage .overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.route {
+  fill: none;
+  stroke: hsl(var(--globe-route-1));
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.marker,
+.distancePosition {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.visitorPin {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 2px solid hsl(var(--background));
+  border-radius: 50%;
+  background: hsl(var(--foreground));
+  box-shadow: 0 0 0 1px hsl(var(--foreground) / 0.35);
+  transform: translate(-50%, -50%);
+}
+
+.rabbitPin {
+  position: absolute;
+  display: grid;
+  width: 39px;
+  height: 39px;
+  place-items: center;
+  border: 1px solid hsl(var(--border));
+  border-radius: 50%;
+  background: hsl(var(--background) / 0.96);
+  box-shadow: 0 2px 8px hsl(var(--foreground) / 0.04);
+  transform: translate(-50%, -50%);
+}
+
+.visitorName {
+  position: absolute;
+  left: 0;
+  top: 12px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: hsl(var(--background) / 0.88);
+  color: hsl(var(--foreground));
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.distance {
+  position: absolute;
+  display: block;
+  padding: 5px 9px;
+  border: 1px solid hsl(var(--border) / 0.8);
+  border-radius: 7px;
+  background: hsl(var(--background) / 0.94);
+  color: hsl(var(--foreground));
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+}
+
+.caption {
+  padding: 0 12px;
+}
+
+.message {
+  min-height: 24px;
+  color: hsl(var(--muted-foreground));
+  font-size: 13px;
+  line-height: 1.8;
+  word-break: keep-all;
+  text-wrap: balance;
+}
+
+.message strong,
+.timeDifference strong {
+  color: hsl(var(--foreground));
+  font-weight: 550;
+}
+.timeDifference,
+.connectionNote {
+  color: hsl(var(--muted-foreground));
+  font-size: 13px;
+  line-height: 1.8;
+  font-variant-numeric: tabular-nums;
+}
+.timeValue {
+  display: inline-grid;
+  text-align: right;
+}
+.timeValue > span {
+  grid-area: 1 / 1;
+}
+.timeMeasure {
+  visibility: hidden;
+}
+.timeDifference[data-time-state='waiting'] {
+  opacity: 0;
+  visibility: hidden;
+}
+.connectionNote[data-visible='false'] {
+  visibility: hidden;
+}
+.note {
+  display: block;
+  color: hsl(var(--muted-foreground) / 0.8);
+  font-size: 10px;
+}
+
+.fallbackGlobe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: none;
+  width: 250px;
+  height: 250px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.fallbackGlobe span {
+  position: absolute;
+  inset: 0 27%;
+  border: 1px solid hsl(var(--border));
+  border-radius: 50%;
+}
+.fallbackGlobe span:nth-child(2) {
+  inset: 27% 0;
+}
+.fallbackGlobe span:nth-child(3) {
+  inset: 10% 0;
+}
+.stage[data-fallback='true'] .fallbackGlobe {
+  display: block;
+}
+.stage[data-fallback='true'] .canvas {
+  visibility: hidden;
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding-top: 42px;
+  }
+  .message {
+    min-height: 24px;
+    font-size: 12px;
+  }
+  .timeDifference,
+  .connectionNote {
+    font-size: 12px;
+  }
+  .caption {
+    padding-inline: 4px;
+  }
+}
+
+.anchorPin {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: hsl(var(--globe-nearby));
+  box-shadow: 0 0 0 4px hsl(var(--background) / 0.7);
+  transform: translate(-50%, -50%);
+}
+
+.nearbyAnchor {
+  visibility: hidden;
+  opacity: 0;
+}
+.stage[data-ready='false'] .nearbyAnchor {
+  visibility: hidden !important;
+}
+.sharedRings {
+  position: absolute;
+  left: -55px;
+  top: -29px;
+  width: 110px;
+  height: 58px;
+}
+.sharedRings > span {
+  position: absolute;
+  inset: 0;
+  border: 1px solid hsl(var(--globe-nearby) / 0.23);
+  border-radius: 50%;
+  background: hsl(var(--globe-nearby) / 0.04);
+}
+.sharedRings > span:nth-child(2) {
+  inset: 9px 16px;
+}
+.sharedRings > span:nth-child(3) {
+  inset: 18px 32px;
+}
+.sharedButton {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 13px 5px 5px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 999px;
+  background: hsl(var(--background) / 0.97);
+  box-shadow: 0 8px 22px hsl(var(--foreground) / 0.08);
+  transform: translate(-50%, -65px);
+  pointer-events: auto;
+  cursor: pointer;
+}
+.sharedButton:disabled {
+  pointer-events: none;
+  cursor: default;
+}
+.stage .sharedButton:focus-visible {
+  outline: 2px solid hsl(var(--globe-nearby));
+  outline-offset: 5px;
+  border-radius: 999px;
+}
+.sharedPeople {
+  display: flex;
+  align-items: center;
+}
+.sharedVisitor,
+.sharedHost {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 39px;
+  height: 39px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 50%;
+  background: hsl(var(--background));
+  box-shadow: 0 2px 7px hsl(var(--foreground) / 0.04);
+}
+.sharedVisitor {
+  color: hsl(var(--globe-nearby));
+}
+.stage .sharedVisitor svg {
+  width: 22px;
+  height: 22px;
+}
+.sharedHost {
+  margin-left: -10px;
+}
+.sharedNames {
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 500;
+}
+.sharedNames > span {
+  padding: 0 4px;
+  color: hsl(var(--muted-foreground));
+}
+.sharedLabel {
+  position: absolute;
+  top: 43px;
+  left: 0;
+  width: 210px;
+  transform: translateX(-50%);
+}
+.sharedLabel strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 550;
+  letter-spacing: -0.025em;
+}
+.sharedLabel > span {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: hsl(var(--background) / 0.88);
+  color: hsl(var(--muted-foreground));
+  font-size: 10px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .nearbyAnchor[data-rings-animate='true'] .sharedRings > span {
+    animation: sharedBloom 220ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+  .nearbyAnchor[data-rings-animate='true'] .sharedRings > span:nth-child(2) {
+    animation-delay: 32ms;
+  }
+  .nearbyAnchor[data-rings-animate='true'] .sharedRings > span:nth-child(3) {
+    animation-delay: 64ms;
+  }
+  .nearbyAnchor[data-introduced='true'] .sharedButton {
+    animation: sharedEnter 250ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+  .nearbyAnchor[data-introduced='true'] .sharedLabel {
+    animation: sharedLabelEnter 220ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+  .stage[data-paused='true'] .nearbyAnchor * {
+    animation-play-state: paused;
+  }
+  .sharedPeople > span,
+  .sharedRings {
+    transition: transform 220ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .sharedButton:enabled:is(:hover, :focus-visible) .sharedVisitor {
+    transform: translateX(-2px);
+  }
+  .sharedButton:enabled:is(:hover, :focus-visible) .sharedHost {
+    transform: translateX(2px);
+  }
+  .nearbyAnchor:has(.sharedButton:enabled:is(:hover, :focus-visible))
+    .sharedRings {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes sharedBloom {
+  from {
+    transform: scale(0.45);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes sharedEnter {
+  from {
+    transform: translate(-50%, -57px) scale(0.94);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -65px) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes sharedLabelEnter {
+  from {
+    transform: translate(-50%, 5px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+.connectionNote {
+  display: block;
+}
+
+.stage[data-fallback='false'] .overlay {
+  visibility: hidden;
+}
+.stage[data-interactive='true'] {
+  cursor: grab;
+}
+.stage[data-grabbing='true'] {
+  cursor: grabbing;
+}
+.stage:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  border-radius: 12px;
+}
+.interactionHint {
+  margin: -5px 0 10px;
+  color: hsl(var(--muted-foreground) / 0.75);
+  font-size: 10px;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+  pointer-events: none;
+}
+.interactionHint[data-visible='true'] {
+  opacity: 1;
+}
+
+.auraBoundary {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    hsl(var(--foreground)) 12%,
+    hsl(var(--foreground)) 88%,
+    transparent
+  );
+}
+.aura {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 100%;
+  aspect-ratio: 1;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9);
+  mask-image: radial-gradient(
+    closest-side,
+    hsl(var(--foreground)) 48%,
+    transparent 100%
+  );
+  background: radial-gradient(
+      ellipse at 25% 57%,
+      hsl(var(--globe-aura-0) / 0.9),
+      hsl(var(--globe-aura-0) / 0) 64%
+    ),
+    radial-gradient(
+      ellipse at 55% 26%,
+      hsl(var(--globe-aura-1) / 0.95),
+      hsl(var(--globe-aura-1) / 0) 65%
+    ),
+    radial-gradient(
+      ellipse at 76% 64%,
+      hsl(var(--globe-aura-2) / 0.9),
+      hsl(var(--globe-aura-2) / 0) 64%
+    );
+}

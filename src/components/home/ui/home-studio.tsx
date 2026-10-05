@@ -23,6 +23,7 @@ import styles from '@/components/home/ui/home-studio.module.css';
 import { ScrollSyncDemo } from '@/components/home/ui/scroll-sync-demo';
 import { TechStack } from '@/components/home/ui/tech-stack';
 import { HomeProfile } from '@/components/profile';
+import { ConnectionGlobe } from '@/components/connection-globe';
 import { GitHub } from '@/components/ui/icons';
 import type { Article } from '@/mdx/mdx';
 
@@ -128,6 +129,7 @@ export function HomeStudio({
             <span className={styles.profileKicker}>A PERSONAL WORKSPACE</span>
           </div>
           <HomeProfile />
+          <ConnectionGlobe />
           <main id="home-content">
             <section
               className={styles.section}
