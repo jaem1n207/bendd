@@ -30,10 +30,13 @@ export const DURATION_MS = ROUTE_START_MS + ROUTE_MS;
 export const EARTH_RADIUS_METERS = 6371008.8;
 export const NEARBY_DISTANCE_METERS = 50000;
 export const GLOBE_RADIUS = 0.8;
+const INITIAL_CAMERA_SCALE = 0.68;
+const MAX_APPROACH_SCALE = 1.2;
+const FINAL_CAMERA_SCALE = 1.06;
 const RADIANS = Math.PI / 180;
 const cameraEase = cubicBezier(0.645, 0.045, 0.355, 1);
 const formationEase = cubicBezier(0.22, 1, 0.36, 1);
-const routeEase = cubicBezier(0.19, 1, 0.22, 1);
+const routeEase = cubicBezier(0.3, 0.6, 0.4, 1);
 const numberFormat = new Intl.NumberFormat('ko-KR');
 
 export function clamp(value: number, min = 0, max = 1) {
@@ -186,6 +189,7 @@ export function createJourney(
   const meters = visitor ? distanceInMeters(visitor, SEOUL) : 0;
   const nearby = visitor !== null && meters <= NEARBY_DISTANCE_METERS;
   const start = cameraFor(from);
+  const approachScale = MAX_APPROACH_SCALE * Math.min(1, width / height);
   const middle = greatCircle(from, to, 0.5);
   let end = cameraFor(nearby ? to : middle, start.phi);
   if (visitor && !nearby) {
@@ -223,7 +227,12 @@ export function createJourney(
     ...fitPoints.map(point => Math.abs(point.y - height / 2)),
     1e-9
   );
-  end.scale = Math.min(1.06, (width / 2 - 62) / maxX, (height / 2 - 82) / maxY);
+  end.scale = Math.min(
+    FINAL_CAMERA_SCALE,
+    approachScale,
+    (width / 2 - 62) / maxX,
+    (height / 2 - 82) / maxY
+  );
   // Nearby people share a UI cluster at Seoul, not a fabricated travel route.
   const routes = !visitor || nearby ? [] : [surfaceRoute];
   const rotation = Math.atan2(
@@ -241,7 +250,9 @@ export function createJourney(
         0.12 * (1 - approachProgress) +
         (end.theta - start.theta) * cameraProgress,
       scale:
-        0.68 + 1.82 * approachProgress + (end.scale - 2.5) * cameraProgress,
+        INITIAL_CAMERA_SCALE +
+        (approachScale - INITIAL_CAMERA_SCALE) * approachProgress +
+        (end.scale - approachScale) * cameraProgress,
     };
     const origin = project(from, camera, width, height);
     const destination = project(to, camera, width, height);

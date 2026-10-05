@@ -49,7 +49,16 @@ remains usable and its sections do not wait for this journey to finish.
 | 0–1000 ms    | Start with a bare globe and scattered colored particles. Assemble the continents while rotating and approaching the visitor. | Particles `(0.22, 1, 0.36, 1)`; camera `(0.645, 0.045, 0.355, 1)` |
 | 1000–1200 ms | Hold the visitor's location                                                                                                  | Static                                                            |
 | 1200–3000 ms | Slowly depart, rotate and zoom out to frame both endpoints; stop smoothly                                                    | `(0.645, 0.045, 0.355, 1)`                                        |
-| 3000–4600 ms | Distant visitors: extend a raised 3D route. Nearby visitors: reveal the shared vicinity and finish the distance count.       | Route/count `(0.19, 1, 0.22, 1)`; shared UI `(0.23, 1, 0.32, 1)`  |
+| 3000–4600 ms | Distant visitors: extend a raised 3D route. Nearby visitors: reveal the shared vicinity and finish the distance count.       | Route/count `(0.3, 0.6, 0.4, 1)`; shared UI `(0.23, 1, 0.32, 1)`  |
+
+The camera approaches from scale 0.68 to at most 1.2. Cap that peak by the
+stage aspect ratio so the globe silhouette stays inside both stage dimensions;
+apply the same cap to the final framing. Avoid an oversized close-up that clips
+the sphere into a rectangular map.
+
+The route retains its 1600 ms duration, but uses `(0.3, 0.6, 0.4, 1)` so it reaches
+about 71% after 600 ms and continues visibly toward arrival. The distance label
+uses the same progress; the time-difference counter still starts after arrival.
 
 Particles keep the color of their destination continent throughout assembly.
 After arrival the globe stays still; only a distant route's spatial teal/blue/violet

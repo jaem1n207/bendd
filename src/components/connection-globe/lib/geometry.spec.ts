@@ -2,10 +2,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  createJourney,
   distanceInMeters,
   DURATION_MS,
   formatDistance,
   greatCircle,
+  GLOBE_RADIUS,
+  ROUTE_START_MS,
   sceneAt,
   SEOUL,
   timelineAt,
@@ -95,7 +98,7 @@ describe('connection globe geography', () => {
       expect(final.destination.y).toBeCloseTo(160);
       expect(
         sceneAt(visitor, 320, 320, 1000).camera.scale / final.camera.scale
-      ).toBeGreaterThan(2);
+      ).toBeGreaterThan(1);
     }
   );
 
@@ -143,12 +146,41 @@ describe('connection globe geography', () => {
     expect(timelineAt(1100).phase).toBe('origin');
     expect(timelineAt(2999).routeProgress).toBe(0);
     expect(timelineAt(3000).cameraProgress).toBe(1);
-    expect(timelineAt(3300).routeProgress).toBeGreaterThan(0.5);
+    expect(timelineAt(3300).routeProgress).toBeGreaterThan(0);
     expect(timelineAt(4600)).toMatchObject({
       phase: 'complete',
       cameraProgress: 1,
       routeProgress: 1,
     });
+  });
+
+  it.each([
+    { width: 760, height: 414 },
+    { width: 320, height: 320 },
+    { width: 256, height: 320 },
+  ])(
+    'keeps the globe silhouette inside the stage throughout the intro: %j',
+    viewport => {
+      for (const visitor of [visitors[0], SEOUL]) {
+        const journey = createJourney(visitor, viewport.width, viewport.height);
+        for (let elapsed = 0; elapsed <= DURATION_MS; elapsed += 100) {
+          const scene = journey.sample(elapsed);
+          const diameter = GLOBE_RADIUS * scene.camera.scale * viewport.height;
+          expect(diameter).toBeLessThanOrEqual(viewport.width);
+          expect(diameter).toBeLessThanOrEqual(viewport.height);
+        }
+      }
+    }
+  );
+
+  it('keeps the route visibly advancing instead of spending its end almost still', () => {
+    const early = timelineAt(ROUTE_START_MS + 600).routeProgress;
+    const settling = timelineAt(DURATION_MS - 400).routeProgress;
+    expect(early).toBeGreaterThan(0.5);
+    expect(early).toBeLessThan(0.8);
+    expect(settling).toBeGreaterThan(early);
+    expect(settling).toBeLessThan(0.98);
+    expect(timelineAt(DURATION_MS).routeProgress).toBe(1);
   });
 
   it('keeps the raised route in world space when manually rotating the camera', () => {
