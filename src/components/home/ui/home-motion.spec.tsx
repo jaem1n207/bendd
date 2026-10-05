@@ -232,6 +232,51 @@ afterEach(() => {
 });
 
 describe('home entrance motion', () => {
+  it('replays an opted-in globe heading on home return while keeping the profile visible', () => {
+    const content = (
+      <HomeMotion>
+        <p data-reveal data-top="100">
+          기존 프로필
+        </p>
+        <h2 data-reveal data-reveal-repeat="visit" data-top="200">
+          지도 제목
+        </h2>
+      </HomeMotion>
+    );
+    const first = render(content);
+    first.unmount();
+    animate.mockClear();
+    animatedElements.length = 0;
+    render(content);
+    expect(screen.getByText('기존 프로필').dataset.revealState).toBe('visible');
+    expect(screen.getByText('지도 제목').dataset.revealState).toBe('initial');
+    expect(animate).toHaveBeenCalledTimes(1);
+    expect(animatedElements[0]).toBe(screen.getByText('지도 제목'));
+  });
+
+  it('waits for an offscreen repeat heading on return and respects reduced motion', () => {
+    const first = render(<Content />);
+    first.unmount();
+    animate.mockClear();
+    render(
+      <HomeMotion>
+        <h2 data-reveal data-reveal-repeat="visit" data-top="1200">
+          늦게 보이는 지도
+        </h2>
+      </HomeMotion>
+    );
+    const heading = screen.getByText('늦게 보이는 지도');
+    expect(heading.dataset.revealState).toBe('pending');
+    expect(animate).not.toHaveBeenCalled();
+    currentObserver().intersect(heading);
+    expect(heading.dataset.revealState).toBe('entering');
+    act(() => {
+      reducedMotion = true;
+      subscribers.forEach(notify => notify());
+    });
+    expect(heading.dataset.revealState).toBe('visible');
+  });
+
   it('connects a completed profile entrance to its demo and skips a client return', () => {
     vi.useFakeTimers();
     const view = render(
