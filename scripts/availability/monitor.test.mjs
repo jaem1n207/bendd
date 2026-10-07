@@ -8,7 +8,7 @@ import { runMonitor } from './monitor.mjs';
 import { advanceState, MAX_GAP_MS, parseState } from './state.mjs';
 
 const START = Date.parse('2026-10-05T00:00:00Z');
-const INTERVAL = 30 * 60 * 1000;
+const INTERVAL = 60 * 60 * 1000;
 function report(failed = [], offset = 0) {
   return {
     checked_at: new Date(START + offset).toISOString(),
@@ -102,7 +102,7 @@ test('success resets a suspected failure and new outage can alert after recovery
   );
 });
 
-test('30-minute cadence preserves the streak after one delayed interval', () => {
+test('hourly cadence preserves the streak after one delayed interval', () => {
   const first = advanceState(null, report(['/']));
   const second = advanceState(first, report(['/'], INTERVAL * 2));
   assert.equal(second.failures['/'], 2);

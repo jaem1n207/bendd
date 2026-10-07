@@ -38,12 +38,21 @@ import {
   verifySnapshot,
 } from './integrity.mjs';
 import { CODEX_CLI_VERSION, isMain, runtimeDirectory } from './paths.mjs';
-import { REPOSITORY, WORKFLOW_PATH } from './policy.mjs';
+import {
+  MONITOR_INTERVAL_MINUTES,
+  REPOSITORY,
+  WORKFLOW_PATH,
+} from './policy.mjs';
 import { createVercelReader } from './vercel-read.mjs';
 import { assertProjectRemote } from './repository.mjs';
 
 const exec = promisify(execFile);
 const LABEL = 'so.bendd.incident-watch';
+// Keep the reviewed legacy cadence valid for preparing and rolling back pinned releases.
+const SCHEDULES = new Map([
+  [30, [12, 42]],
+  [MONITOR_INTERVAL_MINUTES, [12]],
+]);
 const LEGACY_FILES = [
   'policy.mjs',
   'control.mjs',
@@ -95,9 +104,10 @@ function assertConfig(config, { projectRequired = true } = {}) {
     config.response_model !== 'gpt-6.1-sol' ||
     config.reasoning_effort !== 'high' ||
     config.session_mode !== 'new-project-thread' ||
-    config.interval_minutes !== 30 ||
+    !SCHEDULES.has(config.interval_minutes) ||
     config.scheduler_label !== LABEL ||
-    JSON.stringify(config.scheduler_minutes) !== '[12,42]' ||
+    JSON.stringify(config.scheduler_minutes) !==
+      JSON.stringify(SCHEDULES.get(config.interval_minutes)) ||
     !isAbsolute(config.project_path ?? '') ||
     !Number.isFinite(Date.parse(config.enabled_at)) ||
     (projectRequired &&
@@ -167,8 +177,7 @@ ${string(join(directory, 'current', 'scripts', 'incident-response', 'watch.mjs')
 <key>WorkingDirectory</key>${string(directory)}
 <key>RunAtLoad</key><true/>
 <key>StartCalendarInterval</key><array>
-<dict><key>Minute</key><integer>12</integer></dict>
-<dict><key>Minute</key><integer>42</integer></dict>
+${config.scheduler_minutes.map(minute => `<dict><key>Minute</key><integer>${minute}</integer></dict>`).join('\n')}
 </array>
 <key>EnvironmentVariables</key><dict>
 <key>PATH</key>${string(path)}
@@ -361,6 +370,13 @@ export async function prepareRelease({
       codex: await executable('codex'),
       gh: await executable('gh'),
     },
+  };
+  assertConfig(config, { projectRequired: false });
+  // Cadence belongs to the pinned release; identity and operational history stay local.
+  config = {
+    ...config,
+    interval_minutes: template.interval_minutes,
+    scheduler_minutes: template.scheduler_minutes,
   };
   assertConfig(config, { projectRequired: false });
   config = await preflight(config, directory);

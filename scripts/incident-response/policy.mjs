@@ -3,9 +3,11 @@ export const OWNER = 'jaem1n207';
 export const INCIDENT_MARKER = '<!-- bendd-availability-incident:v1 -->';
 export const RESPONSE_MARKER = '<!-- bendd-codex-response:v1';
 export const WORKFLOW_PATH = '.github/workflows/availability.yml';
-// Five-minute margin keeps successive 30-minute ticks eligible despite job completion jitter.
-export const MONITOR_REFRESH_AFTER_MS = 25 * 60 * 1000;
-export const MAX_MONITOR_GAP_MS = 90 * 60 * 1000;
+export const MONITOR_INTERVAL_MINUTES = 60;
+// Five-minute margin keeps hourly ticks eligible despite job completion jitter.
+export const MONITOR_REFRESH_AFTER_MS =
+  (MONITOR_INTERVAL_MINUTES - 5) * 60 * 1000;
+export const MAX_MONITOR_GAP_MS = 3 * MONITOR_INTERVAL_MINUTES * 60 * 1000;
 export const MAX_RESPONSE_AGE_MS = 24 * 60 * 60 * 1000;
 export const REQUIRED_CHECKS = [
   'Verify',

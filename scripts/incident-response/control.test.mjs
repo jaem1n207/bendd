@@ -255,7 +255,7 @@ test('access denial is actionable once and never becomes healthy', async t => {
 test('disabled monitoring and a stale run cannot trigger code repair', async t => {
   const disabled = await fixture(t, { workflowState: 'disabled_manually' });
   assert.equal((await disabled.control.poll()).status, 'needs_action');
-  const stale = await fixture(t, { now: '2026-10-05T01:31:00.000Z' });
+  const stale = await fixture(t, { now: '2026-10-05T03:01:00.000Z' });
   assert.equal((await stale.control.poll()).status, 'needs_action');
 });
 
@@ -450,7 +450,7 @@ for (const [name, mutate] of [
 }
 
 test('overdue Availability requests one main workflow run without treating it as an app incident', async t => {
-  const f = await fixture(t, { now: '2026-10-05T02:00:00.000Z', issues: [] });
+  const f = await fixture(t, { now: '2026-10-05T04:00:00.000Z', issues: [] });
   const result = await f.control.poll({ mode: 'dispatch' });
   assert.equal(result.status, 'waiting');
   assert.deepEqual(
@@ -496,8 +496,15 @@ test('a fresh healthy Availability run keeps dispatch polling read-only', async 
   assert.ok(f.calls.every(c => c.method === 'GET'));
 });
 
+test('a half-hour-old healthy result does not create an extra hourly check', async t => {
+  const f = await fixture(t, { now: '2026-10-05T00:30:00.000Z', issues: [] });
+  const result = await f.control.poll({ mode: 'dispatch' });
+  assert.equal(result.status, 'healthy');
+  assert.ok(f.calls.every(call => call.method === 'GET'));
+});
+
 test('check mode never dispatches an overdue Availability run', async t => {
-  const f = await fixture(t, { now: '2026-10-05T02:00:00.000Z', issues: [] });
+  const f = await fixture(t, { now: '2026-10-05T04:00:00.000Z', issues: [] });
   assert.equal(
     (await f.control.poll({ mode: 'check' })).status,
     'needs_action'
@@ -523,13 +530,13 @@ test('a missing initial run can request Availability but a failed run cannot be 
   assert.ok(failed.calls.every(c => c.method === 'GET'));
 });
 
-test('successive 30-minute ticks refresh the monitor once per tick when schedule stays absent', async t => {
+test('successive hourly ticks refresh the monitor once per tick when schedule stays absent', async t => {
   let time = '2026-10-05T02:00:00.000Z';
   const f = await fixture(t, { now: () => time, issues: [] });
   await f.control.poll({ mode: 'dispatch' });
   f.run.id = 101;
   f.run.updated_at = '2026-10-05T02:00:25.000Z';
-  time = '2026-10-05T02:30:00.000Z';
+  time = '2026-10-05T03:00:00.000Z';
   assert.equal((await f.control.poll({ mode: 'dispatch' })).status, 'waiting');
   assert.equal(f.calls.filter(c => c.method === 'POST').length, 2);
 });
@@ -538,7 +545,7 @@ test('an accepted request that never creates an observable run requires review i
   let time = '2026-10-05T02:00:00.000Z';
   const f = await fixture(t, { now: () => time, issues: [] });
   await f.control.poll({ mode: 'dispatch' });
-  time = '2026-10-05T02:30:00.000Z';
+  time = '2026-10-05T03:00:00.000Z';
   const result = await f.control.poll({ mode: 'dispatch' });
   assert.equal(result.status, 'needs_action');
   assert.match(result.message, /not observed/);
@@ -567,7 +574,7 @@ test('ambiguous dispatch failure is preserved and retried only after authorized 
   const failed = JSON.parse(await readFile(path, 'utf8'));
   assert.equal(failed.status, 'needs_action');
   assert.match(failed.error, /GitHub command failed/);
-  time = '2026-10-05T02:30:00.000Z';
+  time = '2026-10-05T03:00:00.000Z';
   await f.control.unblock();
   const authorized = JSON.parse(await readFile(path, 'utf8'));
   assert.equal(authorized.error, failed.error);
@@ -611,7 +618,7 @@ test('invalid request state is preserved through polling and unblock', async t =
 test('a stalled queued run and future timestamp do not create more workflows', async t => {
   const queued = { ...makeRun(), id: 101, status: 'queued', conclusion: null };
   const f = await fixture(t, {
-    now: '2026-10-05T02:00:00.000Z',
+    now: '2026-10-05T04:00:00.000Z',
     pendingRuns: [queued],
     issues: [],
   });
@@ -632,7 +639,7 @@ test('a stalled queued run and future timestamp do not create more workflows', a
 });
 
 test('refreshing a delayed monitor does not starve an already verified incident', async t => {
-  const f = await fixture(t, { now: '2026-10-05T00:30:00.000Z' });
+  const f = await fixture(t, { now: '2026-10-05T01:00:00.000Z' });
   const result = await f.control.poll({ mode: 'dispatch' });
   assert.equal(result.status, 'action');
   assert.equal(result.actions[0].issue, ISSUE);
