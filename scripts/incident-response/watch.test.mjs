@@ -87,6 +87,9 @@ async function fixture(t, options = {}) {
     event: 'schedule',
     conclusion: 'success',
     updated_at: NOW,
+    status: 'completed',
+    created_at: NOW,
+    ...options.run,
   };
   const apiCalls = [];
   const comments = [];
@@ -95,8 +98,10 @@ async function fixture(t, options = {}) {
     if (options.apiError) throw new Error(options.apiError);
     if (path === 'actions/workflows?per_page=100')
       return { workflows: [{ id: 1, path: WORKFLOW_PATH, state: 'active' }] };
+    if (path === 'actions/workflows/1/dispatches' && method === 'POST')
+      return null;
     if (path.startsWith('actions/workflows/1/runs?'))
-      return { workflow_runs: [run] };
+      return { workflow_runs: [run], total_count: 1 };
     if (path === 'actions/runs/100') return run;
     if (path.startsWith('issues?')) return options.empty ? [] : [issue];
     if (path === `issues/${ISSUE}`) return issue;
@@ -526,4 +531,32 @@ test('skipped required checks cannot become ready', () => {
   const checks = completeChecks();
   checks[0].conclusion = 'skipped';
   assert.equal(checksReadiness(checks, statuses, SHA), 'failed');
+});
+
+test('scheduler fallback dispatches Availability without auth, worktree, or model calls', async t => {
+  const f = await fixture(t, {
+    empty: true,
+    run: { updated_at: '2026-10-04T22:00:00.000Z' },
+  });
+  const result = await f.watcher.run();
+  assert.equal(result.status, 'waiting');
+  assert.equal(
+    f.apiCalls.filter(p => p === 'actions/workflows/1/dispatches').length,
+    1
+  );
+  assert.equal(f.calls.auth, 0);
+  assert.equal(f.calls.prepare, 0);
+  assert.equal(f.calls.codex.length, 0);
+});
+
+test('read-only watcher check leaves delayed monitoring unchanged without model or workflow dispatch', async t => {
+  const f = await fixture(t, {
+    empty: true,
+    run: { updated_at: '2026-10-04T22:00:00.000Z' },
+  });
+  const result = await f.watcher.run({ dispatch: false });
+  assert.equal(result.status, 'needs_action');
+  assert.ok(!f.apiCalls.includes('actions/workflows/1/dispatches'));
+  assert.equal(f.calls.auth, 0);
+  assert.equal(f.calls.codex.length, 0);
 });

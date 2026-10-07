@@ -324,7 +324,9 @@ export function createWatcher({
         !config.project_id
       )
         throw new Error('Invalid incident-only subscription configuration');
-      const poll = await control.poll();
+      const poll = await control.poll({
+        mode: dispatch ? 'dispatch' : 'check',
+      });
       if (['healthy', 'waiting'].includes(poll.status))
         return finish(poll.status, poll.message);
       if (poll.status === 'needs_action')

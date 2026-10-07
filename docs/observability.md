@@ -87,7 +87,7 @@ observer는 외부 전송 없이 로컬에서 등록하고, 전송 시 동의 �
 ## 정기 가용성 점검과 알림
 
 `.github/workflows/availability.yml`은 `main`에 병합된 뒤 GitHub Actions에서
-30분마다(한국 시간 매시 7·37분) 실행된다. MacBook과 Vercel Cron, 별도 서비스
+30분마다(한국 시간 매시 7·37분) 실행되도록 예약된다. 실제 생성은 지연·누락될 수 있다. MacBook과 Vercel Cron, 별도 서비스
 토큰에 의존하지 않는다. 한 실행에서 홈·대표 글·RSS·OG에 각각 최대 10초의
 외부 요청을 보내고 HTTP 200·콘텐츠 형식·HTML/RSS marker·PNG signature를
 확인한다. 지역별 가용성, 사용자 체감 지연, Sentry 오류나 GA4 참여 분석은
@@ -359,3 +359,11 @@ Vercel에서 원본 값을 다시 읽을 수 없으므로 `vercel env pull`을 �
 차단되는 것을 확인했다. `CI=true`, `GITHUB_ACTIONS=true`인 토큰 없는
 운영 빌드도 타입·린트 검사를 포함해 통과했다. 기존 린트 경고는 남아 있다.
 이 검증에서는 외부 소스맵 업로드와 운영 배포를 실행하지 않았다.
+
+로컬 대응기의 매시 12·42분 점검은 GitHub 결과가 늦으면 같은 Availability를 main에서 요청한다.
+최신 성공 결과의 25분 기준은 30분 tick의 실행 시간 여유이며 별도의 25분 스케줄이 아니다.
+대기 중인 실행과 저장된 request intent를 확인해 중복 요청을 막는다.
+기존 bot 이슈·연속 실패 판정·복구 알림은 유지하며 점검 갱신에 Codex를 호출하지 않는다.
+읽기 전용 점검·실패한 실행·인증 거부·불명확한 요청은 자동 재시도하지 않는다.
+Mac 또는 GitHub 실행 시스템이 중단되면 이 보완도 지연될 수 있다.
+상세 운영 규칙은 [장애 대응 문서](incident-response.md#github-예약-지연-보완)를 따른다.
