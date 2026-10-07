@@ -324,7 +324,7 @@ export function createControl({
       if (!Number.isFinite(age) || age < 0 || latest.conclusion !== 'success') {
         return reportStatus(
           'needs_action',
-          'Availability run failed or is older than 90 minutes',
+          'Availability run failed or is older than 180 minutes',
           { run_url: latest.html_url }
         );
       }
@@ -338,7 +338,7 @@ export function createControl({
         }
         return reportStatus(
           'needs_action',
-          'Availability run failed or is older than 90 minutes',
+          'Availability run failed or is older than 180 minutes',
           {
             run_url: latest.html_url,
           }

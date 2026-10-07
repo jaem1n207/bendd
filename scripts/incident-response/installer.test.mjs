@@ -146,7 +146,110 @@ test('activation and rollback preserve state, results, and worktrees byte for by
   );
   assert.match(plist, /BENDD_INCIDENT_HOME/);
   assert.match(plist, /<integer>12<\/integer>/);
-  assert.match(plist, /<integer>42<\/integer>/);
+  assert.doesNotMatch(plist, /<integer>42<\/integer>/);
+});
+
+test('an hourly release migrates the legacy cadence and can roll back without losing operational state', async t => {
+  const f = await fixture(t);
+  const templatePath = join(
+    f.repository,
+    'scripts',
+    'incident-response',
+    'config.example.json'
+  );
+  const template = JSON.parse(await readFile(templatePath, 'utf8'));
+  await writeFile(
+    templatePath,
+    JSON.stringify({
+      ...template,
+      interval_minutes: 30,
+      scheduler_minutes: [12, 42],
+      excluded_session_ids: ['setup-chat'],
+    })
+  );
+  await f.git('add', '.');
+  await f.git(
+    '-c',
+    'commit.gpgsign=false',
+    'commit',
+    '-m',
+    'fixture legacy cadence'
+  );
+  const legacy = await f.git('rev-parse', 'HEAD');
+  await f.prepare(legacy);
+  await f.activate(legacy);
+  const before = await readFile(join(f.directory, 'config.json'), 'utf8');
+  const oldConfig = JSON.parse(before);
+  await mkdir(join(f.directory, 'state'), { recursive: true });
+  const state = '{"dispatches":{"321":{"status":"finished"}}}';
+  await writeFile(join(f.directory, 'state', 'sentinel'), state);
+  await writeFile(
+    templatePath,
+    JSON.stringify({
+      ...template,
+      interval_minutes: 60,
+      scheduler_minutes: [12],
+    })
+  );
+  await f.git('add', '.');
+  await f.git(
+    '-c',
+    'commit.gpgsign=false',
+    'commit',
+    '-m',
+    'fixture hourly cadence'
+  );
+  const hourly = await f.git('rev-parse', 'HEAD');
+  const prepared = await f.prepare(hourly);
+  const config = JSON.parse(
+    await readFile(
+      join(prepared.path, 'scripts', 'incident-response', 'config.json'),
+      'utf8'
+    )
+  );
+  assert.equal(config.interval_minutes, 60);
+  assert.deepEqual(config.scheduler_minutes, [12]);
+  assert.equal(config.enabled_at, oldConfig.enabled_at);
+  assert.deepEqual(config.excluded_session_ids, oldConfig.excluded_session_ids);
+  assert.equal(
+    await readFile(join(f.directory, 'config.json'), 'utf8'),
+    before
+  );
+  await f.activate(hourly);
+  const plist = await readFile(
+    join(f.agents, 'so.bendd.incident-watch.plist'),
+    'utf8'
+  );
+  assert.match(plist, /<integer>12<\/integer>/);
+  assert.doesNotMatch(plist, /<integer>42<\/integer>/);
+  const restored = await f.rollback();
+  assert.equal(restored.version, legacy);
+  assert.equal(
+    await readFile(join(f.directory, 'config.json'), 'utf8'),
+    before
+  );
+  assert.equal(
+    await readFile(join(f.directory, 'state', 'sentinel'), 'utf8'),
+    state
+  );
+  assert.match(
+    await readFile(join(f.agents, 'so.bendd.incident-watch.plist'), 'utf8'),
+    /<integer>42<\/integer>/
+  );
+});
+
+test('preparation rejects an unrecognized cadence before migration', async t => {
+  const f = await fixture(t);
+  const configFile = join(f.repository, 'invalid-cadence.json');
+  await writeFile(
+    configFile,
+    JSON.stringify({ interval_minutes: 30, scheduler_minutes: [12] })
+  );
+  await assert.rejects(
+    f.prepare(f.version, { configFile }),
+    /subscription configuration/
+  );
+  assert.equal(f.preflights(), 0);
 });
 
 test('active or stale watcher locks prevent activation without removing the lock', async t => {

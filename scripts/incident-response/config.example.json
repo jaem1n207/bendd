@@ -6,7 +6,7 @@
   "enabled_at": null,
   "vercel_team": "jaemins-crafts",
   "vercel_project_id": "prj_dTKsVA4Kn1Ae6UDA5xw3eUa3Km82",
-  "interval_minutes": 30,
+  "interval_minutes": 60,
   "authentication": "ChatGPT subscription",
   "api_billing": false,
   "dispatch_mode": "incident-only",
@@ -15,7 +15,7 @@
   "session_mode": "new-project-thread",
   "excluded_session_ids": [],
   "scheduler_label": "so.bendd.incident-watch",
-  "scheduler_minutes": [12, 42],
+  "scheduler_minutes": [12],
   "runtime": {
     "node": null,
     "codex": null,

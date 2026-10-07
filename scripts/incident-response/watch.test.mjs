@@ -552,7 +552,7 @@ test('scheduler fallback dispatches Availability without auth, worktree, or mode
 test('read-only watcher check leaves delayed monitoring unchanged without model or workflow dispatch', async t => {
   const f = await fixture(t, {
     empty: true,
-    run: { updated_at: '2026-10-04T22:00:00.000Z' },
+    run: { updated_at: '2026-10-04T20:00:00.000Z' },
   });
   const result = await f.watcher.run({ dispatch: false });
   assert.equal(result.status, 'needs_action');
