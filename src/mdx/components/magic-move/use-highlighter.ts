@@ -1,40 +1,41 @@
 import { useEffect, useState } from 'react';
-import type { HighlighterCore } from 'shiki';
+import type { HighlighterCore } from 'shiki/core';
 
-export function useHighlighter(): HighlighterCore | undefined {
-  const [highlighter, setHighlighter] = useState<HighlighterCore>();
+export function useHighlighter(lang: string): HighlighterCore | undefined {
+  const [ready, setReady] = useState<{
+    lang: string;
+    highlighter: HighlighterCore;
+  }>();
 
   useEffect(() => {
+    let disposed = false;
+    let highlighter: HighlighterCore | undefined;
+    setReady(undefined);
     async function initializeHighlighter() {
-      const { createHighlighterCore, createOnigurumaEngine } = await import(
-        'shiki'
+      const { createMagicMoveHighlighter } = await import(
+        '@/mdx/components/magic-move/highlighter'
       );
-      const getWasm = await import('shiki/wasm');
-      const [vitesseDark, githubLight] = await Promise.all([
-        import('shiki/themes/vitesse-dark.mjs'),
-        import('shiki/themes/github-light.mjs'),
-      ]);
-      const newHighlighter = await createHighlighterCore({
-        themes: [vitesseDark, githubLight],
-        langs: [
-          import('shiki/langs/typescript.mjs'),
-          import('shiki/langs/javascript.mjs'),
-          import('shiki/langs/html.mjs'),
-          import('shiki/langs/css.mjs'),
-          import('shiki/langs/scss.mjs'),
-          import('shiki/langs/json.mjs'),
-          import('shiki/langs/shell.mjs'),
-          import('shiki/langs/markdown.mjs'),
-          import('shiki/langs/yaml.mjs'),
-          import('shiki/langs/svelte.mjs'),
-        ],
-        engine: createOnigurumaEngine(getWasm),
-      });
-      setHighlighter(newHighlighter);
+      if (disposed) {
+        return;
+      }
+      highlighter = await createMagicMoveHighlighter(lang);
+      if (disposed) {
+        highlighter.dispose();
+        return;
+      }
+      setReady({ lang, highlighter });
     }
 
-    initializeHighlighter();
-  }, []);
+    void initializeHighlighter().catch(error => {
+      if (!disposed) {
+        console.error('MagicMove highlighter initialization failed', error);
+      }
+    });
+    return () => {
+      disposed = true;
+      highlighter?.dispose();
+    };
+  }, [lang]);
 
-  return highlighter;
+  return ready?.lang === lang ? ready.highlighter : undefined;
 }

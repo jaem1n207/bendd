@@ -155,7 +155,7 @@ function MagicMove({ codeSnippets, lang }: MagicMoveProps) {
     }))
   );
 
-  const highlighter = useHighlighter();
+  const highlighter = useHighlighter(lang);
   const displayedContent = steps[displayedStep]?.content;
 
   return (
