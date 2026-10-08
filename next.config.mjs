@@ -12,6 +12,7 @@ const CACHED_ASSET_PATHS = [
 
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: false,
 });
 
 /** @type {import('next').NextConfig} */

@@ -7,10 +7,7 @@ import {
   LOCATION_TIMEOUT_MS,
 } from '@/components/connection-globe/consts/playback';
 
-import {
-  VisitorLocationResponseSchema,
-  type VisitorLocation,
-} from '@/lib/visitor-location';
+import type { VisitorLocation } from '@/lib/visitor-location';
 
 type LocationState =
   | { status: 'loading'; location: null }
@@ -44,6 +41,15 @@ export function useVisitorLocation(readiness: GlobeReadiness) {
           throw new Error('Location unavailable');
         }
         const body: unknown = await response.json();
+        if (disposed) {
+          return;
+        }
+        const { VisitorLocationResponseSchema } = await import(
+          '@/lib/visitor-location'
+        );
+        if (disposed) {
+          return;
+        }
         const result = VisitorLocationResponseSchema.safeParse(body);
         if (disposed) {
           return;
