@@ -24,6 +24,9 @@ const nextConfig = {
   },
   serverExternalPackages: ['@shikijs/twoslash'],
   typedRoutes: true,
+  experimental: {
+    agentUpgrade: 'latest',
+  },
   headers() {
     return [
       {
@@ -36,10 +39,8 @@ const nextConfig = {
       })),
     ];
   },
-  eslint: {
-    dirs: ['src'],
-  },
   images: {
+    qualities: [75, 80],
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },

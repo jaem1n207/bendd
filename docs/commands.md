@@ -13,6 +13,8 @@ pnpm clean        # .next 빌드 아티팩트 제거
 
 `pnpm start`는 반드시 `pnpm build` 이후에 실행해야 한다. 빌드 없이 실행하면 이전 빌드 결과로 서빙되어 혼란을 유발한다.
 
+개발·프로덕션 빌드는 `--webpack`을 명시한다. Next.js 16의 기본 Turbopack 대신 기존 Sentry·번들 분석 설정을 유지한다.
+
 ## 코드 품질
 
 ```bash
@@ -22,6 +24,8 @@ pnpm format       # Prettier 포맷팅
 pnpm format:check # 포맷팅 검사만 (수정 없음)
 pnpm check-types  # TypeScript 타입 체크
 ```
+
+ESLint 9은 `eslint.config.mjs`를 사용한다. Hooks 검사는 기존 `rules-of-hooks`·`exhaustive-deps`를 유지한다. Compiler 추가 규칙은 별도 작업으로 적용한다.
 
 **실행 순서**: `lint:fix` -> `format` -> `check-types`. 단, pre-commit hook(lint-staged)이 커밋 시 자동으로 타입 체크와 MDX 포맷팅을 실행하므로 수동 실행은 필요할 때만 한다.
 

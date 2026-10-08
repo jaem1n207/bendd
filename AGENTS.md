@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> Canonical AI agent instructions for **bendd.me** — a Next.js 15 (App Router) personal blog.
+> Canonical AI agent instructions for **bendd.me** — a Next.js 16 (App Router) personal blog.
 > This file is the index. Detailed docs in [`docs/`](docs/).
 
 ## Critical Rules
@@ -44,10 +44,10 @@ bendd/
 └── src/
     ├── app/                # Next.js App Router (no nested layouts)
     │   ├── api/og/         # Dynamic OG image gen (Node.js Runtime)
-    │   ├── api/feed/       # RSS feed (rewritten from /rss.xml by middleware)
+    │   ├── api/feed/       # RSS feed (rewritten from /rss.xml by proxy)
     │   ├── article/[slug]/ # Blog article pages (SSG via generateStaticParams)
     │   ├── craft/[slug]/   # Craft pages (SSG via generateStaticParams)
-    │   └── playground/     # Interactive demos (hidden from bots via middleware)
+    │   └── playground/     # Interactive demos (hidden from bots via proxy)
     ├── components/         # Domain-based components (barrel export pattern)
     │   ├── article/        #   Article list/item display
     │   ├── comments/       #   Giscus integration
@@ -65,19 +65,19 @@ bendd/
 
 ## Where to Look
 
-| Task                 | Location                                 | Notes                                                         |
-| -------------------- | ---------------------------------------- | ------------------------------------------------------------- |
-| Add blog article     | `content/{category}/`                    | Must pass `MetadataSchema` validation                         |
-| Add craft content    | `craft/`                                 | Uses `readCraftArticles()` + `formatCraftsForDisplay()`       |
-| New MDX component    | `src/mdx/components/{name}/`             | Register in `src/mdx/custom-mdx.tsx`                          |
-| New domain component | `src/components/{domain}/`               | Must have `index.ts` barrel export                            |
-| Add shadcn component | `src/components/ui/`                     | `pnpm dlx shadcn@latest add <name>`                           |
-| Modify routing       | `src/app/`                               | Check `src/middleware.ts` for rewrites                        |
-| Change colors        | `src/globals.css` + `tailwind.config.ts` | HSL in both `:root` and `.dark`                               |
-| Security headers     | `next.config.mjs`                        | CSP allowlist — update when adding external services          |
-| Unit test            | Co-locate as `*.spec.{ts,tsx}` in `src/` | Vitest + jsdom                                                |
-| E2E test             | `tests/*.spec.ts`                        | Playwright, needs `pnpm build && pnpm start` first            |
-| OG image             | `src/app/api/og/route.tsx`               | Node.js Runtime — reads `Sec-CH-Prefers-Color-Scheme` |
+| Task                 | Location                                 | Notes                                                   |
+| -------------------- | ---------------------------------------- | ------------------------------------------------------- |
+| Add blog article     | `content/{category}/`                    | Must pass `MetadataSchema` validation                   |
+| Add craft content    | `craft/`                                 | Uses `readCraftArticles()` + `formatCraftsForDisplay()` |
+| New MDX component    | `src/mdx/components/{name}/`             | Register in `src/mdx/custom-mdx.tsx`                    |
+| New domain component | `src/components/{domain}/`               | Must have `index.ts` barrel export                      |
+| Add shadcn component | `src/components/ui/`                     | `pnpm dlx shadcn@latest add <name>`                     |
+| Modify routing       | `src/app/`                               | Check `src/proxy.ts` for rewrites                       |
+| Change colors        | `src/globals.css` + `tailwind.config.ts` | HSL in both `:root` and `.dark`                         |
+| Security headers     | `next.config.mjs`                        | CSP allowlist — update when adding external services    |
+| Unit test            | Co-locate as `*.spec.{ts,tsx}` in `src/` | Vitest + jsdom                                          |
+| E2E test             | `tests/*.spec.ts`                        | Playwright, needs `pnpm build && pnpm start` first      |
+| OG image             | `src/app/api/og/route.tsx`               | Node.js Runtime — reads `Sec-CH-Prefers-Color-Scheme`   |
 
 ## Content System
 
@@ -96,7 +96,7 @@ Same frontmatter schema, different display formatters and route prefixes.
 - **Dynamic imports**: `ssr: false` must live in a Client Component wrapper; Server Component layouts import that wrapper
 - **OG images**: Dynamically generated at `/api/og` (Node.js Runtime), not static files
 - **MDX security**: `blockJS: false` + `blockDangerousJS: true` (CVE-2026-0969) — do not change
-- **Middleware**: `/rss.xml` → rewrites to `/api/feed`; `/playground/*` → returns 404 to bots
+- **Proxy**: `/rss.xml` → rewrites to `/api/feed`; `/playground/*` → returns 404 to bots
 - **No nested layouts**: All routes share single root layout
 
 ## Code Map
@@ -183,3 +183,13 @@ an infrastructure issue, not code — verify with `pnpm build && pnpm start` loc
 | Path       | AGENTS.md                              | Focus                                                     |
 | ---------- | -------------------------------------- | --------------------------------------------------------- |
 | `src/mdx/` | [src/mdx/AGENTS.md](src/mdx/AGENTS.md) | MDX processor internals, component registry, plugin chain |
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
