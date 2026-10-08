@@ -36,8 +36,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local env files
-.env*.local
+# 환경 파일과 로컬 Sentry 인증 설정
+.env
+.env.*
+!.env.example
+.sentryclirc
+.sentryclirc.*
 
 # vercel
 .vercel

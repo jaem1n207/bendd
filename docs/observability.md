@@ -10,12 +10,15 @@ Speed Insights는 유지한다. OG 이미지는 Sentry 추가 후 Hobby Edge 1MB
 넘으므로 Node.js 함수에서 생성한다. 로컬 폰트는 파일 시스템에서 읽는다. Hobby의 custom event·짧은 로그 보존 제약을
 Sentry SDK와 GA4로 보완한다.
 
-1. `.env.example`을 참고해 로컬 `.env.local`과 Vercel 환경 변수를 설정한다.
-   DSN과 GA4 ID는 공개 값이다. Sentry 토큰은 소스나 채팅에 넣지 않는다.
+1. 일반 로컬 개발·빌드는 환경 파일 없이 실행할 수 있다. 로컬 계측을 확인할
+   때만 `.env.example`을 `.env.local`로 복사한다. Vercel 설정은 아래
+   [설정 위치](#설정-위치)를 따른다. DSN과 GA4 ID는 공개 값이다.
+   Sentry 토큰은 소스나 채팅에 넣지 않는다.
 2. Sentry: Next.js 프로젝트 `bendd`의 DSN을 사용한다. Browser/Node/Edge를
    초기화한다. 초기 설정은 오류만 수집하고 tracing, replay, SDK logs를 끈다.
    `NEXT_PUBLIC_VERCEL_ENV`는 Production/Preview별로 지정한다. Release는
-   공개 커밋 변수가 없으면 Sentry 빌드 플러그인의 Git revision 주입을 사용한다.
+   Sentry 빌드 플러그인의 Git revision 주입을 사용한다. 수동 공개 커밋
+   변수로 덮어쓰지 않는다.
 3. Source maps는 Vercel Production·Preview 빌드에서 자동 업로드한다.
    `SENTRY_ORG=jaemin`, `SENTRY_PROJECT=bendd`, `SENTRY_AUTH_TOKEN`이
    누락되거나 공백이면 빌드를 중단한다. 조직 Auth Token의 `org:ci` 권한을
@@ -182,6 +185,9 @@ GitHub schedule은 기본 브랜치에서만 실행되며 정확한 실행 시�
 
 ## 로컬 검증 기록
 
+아래는 날짜별 과거 검증 기록이다. 현재 설정과 운영 절차는
+[소스맵 운영 절차](#소스맵-운영-절차)를 따른다.
+
 2026-10-04: 타입·린트·포맷·운영 빌드, 전체 단위 테스트 568개 및 이후 추가한
 계측 회귀 검사를 통과했다. 외부 홈·인기 글·RSS·OG 단발 점검도 통과했다.
 SDK의 debug/tracing 코드는 build-time에 제거했다. Next.js 빌드 표시 기준,
@@ -257,7 +263,7 @@ Arc 로컬 검증에서 1280px 안내 카드가 Dock을 가리는 것을 재현�
 | 변수                           | 용도                          | 저장 위치                                                              |
 | ------------------------------ | ----------------------------- | ---------------------------------------------------------------------- |
 | `NEXT_PUBLIC_SENTRY_DSN`       | 앱 오류 수집에 쓰는 공개 주소 | Vercel Production·Preview, 필요하면 로컬 `.env.local`                  |
-| `SENTRY_ORG`, `SENTRY_PROJECT` | 업로드 목적지 `jaemin/bendd`  | Vercel Production·Preview, `.env.example`                              |
+| `SENTRY_ORG`, `SENTRY_PROJECT` | 업로드 목적지 `jaemin/bendd`  | Vercel Production·Preview                                              |
 | `SENTRY_AUTH_TOKEN`            | `org:ci` 조직 업로드 권한     | Vercel Production·Preview의 **Sensitive/Secret** 변수, 비밀번호 관리자 |
 
 `next.config.mjs`는 Next.js의 production build 단계와 Vercel 시스템 변수
@@ -265,6 +271,25 @@ Arc 로컬 검증에서 1280px 안내 카드가 Dock을 가리는 것을 재현�
 시스템 환경 변수 노출을 유지한다. `CI=true`, 공개 환경 이름, `next dev`,
 `next start`만으로는 필수 설정 검증이 실행되지 않는다. 로컬에서도 세 업로드
 변수가 모두 있으면 업로드하므로, 평소 로컬 개발에는 토큰을 설정하지 않는다.
+
+`.env.example`은 로컬 계측용 공개 변수만 포함한다. DSN·GA4 ID를 비우면
+해당 서비스는 수집하지 않는다. 로컬 환경 이름은 `development`로 두어
+운영 오류와 구분한다. Git은 `.env`, `.env.*`, `.sentryclirc*`를 제외하며
+`.env.example`만 추적한다.
+
+로컬에서 소스맵을 직접 업로드해야 할 때만 `.env.local`에 아래 항목을
+임시로 추가한다. 토큰 원본은 비밀번호 관리자에서 입력하고, 업로드 후
+세 항목을 제거한다. 공개 계측 변수와 다른 서비스 설정은 유지한다.
+
+```dotenv
+SENTRY_ORG=jaemin
+SENTRY_PROJECT=bendd
+SENTRY_AUTH_TOKEN=
+```
+
+GitHub CI는 토큰 없이 빌드하므로 별도 Sentry Secret이 필요하지 않다.
+앱의 release는 빌드 플러그인이 주입한다. 이전 로컬 설정에 남아 있는
+`NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA`는 제거한다.
 
 ### Sentry CLI 의존성 패치
 
@@ -304,7 +329,8 @@ Sentry 의존성을 갱신할 때 다음 순서로 확인한다.
 1. 저장소를 받고 `package.json`에 지정된 Node.js 24와 pnpm 버전을 준비한다.
 2. `pnpm install --frozen-lockfile`을 실행한다.
 3. `.env.example`을 `.env.local`로 복사한다. 로컬 오류 수집·분석이 필요할 때만
-   공개 DSN·측정 ID·환경 이름을 채운다. `SENTRY_AUTH_TOKEN`은 비워 둔다.
+   공개 DSN·측정 ID를 채운다. 환경 이름은 `development`를 유지하고
+   업로드 토큰은 추가하지 않는다.
 4. `pnpm dev` 또는 `pnpm build`를 실행한다. 일반 개발에는 Vercel 연결이나
    Sentry 업로드 토큰 복사가 필요하지 않다.
 
@@ -371,3 +397,15 @@ Vercel에서 원본 값을 다시 읽을 수 없으므로 `vercel env pull`을 �
 읽기 전용 점검·실패한 실행·인증 거부·불명확한 요청은 자동 재시도하지 않는다.
 Mac 또는 GitHub 실행 시스템이 중단되면 이 보완도 지연될 수 있다.
 상세 운영 규칙은 [장애 대응 문서](incident-response.md#github-예약-지연-보완)를 따른다.
+
+## 2026-10-08 토큰 교체 후 Production 검증
+
+Vercel Production·Preview의 `SENTRY_AUTH_TOKEN`이 교체된 것을 확인했다.
+Production 배포 `dpl_F3tnhG2GekD9UAixqbNNLxdZVsRd`는 Git 커밋 `5d945f7`을
+빌드했으며 `READY`, 함수 리전 `icn1`이다. 빌드 로그에서
+`Successfully uploaded source maps to Sentry`를 확인했다.
+
+이 기록은 Production 업로드 성공을 확인한다. 해당 빌드의 artifact bundle과
+실제 오류의 원본 파일·행 번호 복원은 Sentry 화면에서 별도 확인해야 한다.
+
+[Production 배포](https://vercel.com/jaemins-crafts/bendd/F3tnhG2GekD9UAixqbNNLxdZVsRd)
