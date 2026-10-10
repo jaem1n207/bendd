@@ -255,8 +255,7 @@ test.describe('이미지 줌', () => {
       await img.click();
 
       const dialog = page.getByRole('dialog');
-      const ariaLabel = await dialog.getAttribute('aria-label');
-      expect(ariaLabel).toBe(FIRST_IMAGE_ALT);
+      await expect(dialog).toHaveAttribute('aria-label', FIRST_IMAGE_ALT);
     });
 
     test('줌 열리면 alt 텍스트가 캡션으로 표시된다', async ({ page }) => {
@@ -264,9 +263,12 @@ test.describe('이미지 줌', () => {
       await img.click();
       await expect(page.getByRole('dialog')).toBeVisible();
 
-      // 캡션이 보이는지 확인
-      const caption = page.getByRole('dialog').locator('span');
-      await expect(caption).toContainText(FIRST_IMAGE_ALT);
+      const caption = page.getByText(FIRST_IMAGE_ALT, { exact: true });
+      await expect(caption).toBeVisible();
+      await expect(caption).toHaveCSS('opacity', '1');
+
+      await page.keyboard.press('Escape');
+      await expect(caption).toHaveCount(0);
     });
   });
 
