@@ -95,6 +95,13 @@ async function fixture(t, options = {}) {
   const comments = [];
   const api = async (path, method = 'GET', input) => {
     apiCalls.push(path);
+    if (
+      options.readinessError &&
+      path === `issues/${ISSUE}` &&
+      apiCalls.filter(value => value === path).length === 2
+    ) {
+      throw options.readinessError;
+    }
     if (options.apiError) throw new Error(options.apiError);
     if (path === 'actions/workflows?per_page=100')
       return { workflows: [{ id: 1, path: WORKFLOW_PATH, state: 'active' }] };
@@ -212,7 +219,16 @@ async function fixture(t, options = {}) {
       );
     },
   });
-  return { directory, watcher, calls, apiCalls, config, control, comments };
+  return {
+    directory,
+    watcher,
+    calls,
+    apiCalls,
+    config,
+    control,
+    comments,
+    api,
+  };
 }
 
 test('provider waiting records one GitHub explanation without marking the incident as claimed', async t => {
@@ -558,5 +574,65 @@ test('read-only watcher check leaves delayed monitoring unchanged without model 
   assert.equal(result.status, 'needs_action');
   assert.ok(!f.apiCalls.includes('actions/workflows/1/dispatches'));
   assert.equal(f.calls.auth, 0);
+  assert.equal(f.calls.codex.length, 0);
+});
+
+test('two overlapping watchers share the real lock and send one Availability request', async t => {
+  const f = await fixture(t, { empty: true });
+  const now = () => new Date('2026-10-05T02:00:00.000Z');
+  const real = createControl({ directory: f.directory, api: f.api, now });
+  let release;
+  let started;
+  const gate = new Promise(resolve => {
+    release = resolve;
+  });
+  const active = new Promise(resolve => {
+    started = resolve;
+  });
+  const control = {
+    poll: async options => {
+      started();
+      await gate;
+      return real.poll(options);
+    },
+  };
+  const options = {
+    directory: f.directory,
+    control,
+    now,
+    integrity: async () => {},
+    authenticate: async () =>
+      assert.fail('Availability refresh must not authenticate a model'),
+    runner: async () =>
+      assert.fail('Availability refresh must not invoke a model'),
+  };
+  const one = createWatcher(options);
+  const two = createWatcher(options);
+  const first = one.run();
+  await active;
+  assert.equal((await two.run()).status, 'busy');
+  release();
+  assert.equal((await first).status, 'waiting');
+  assert.equal(
+    f.apiCalls.filter(path => path === 'actions/workflows/1/dispatches').length,
+    1
+  );
+});
+
+test('authentication loss during readiness latches and retains structured diagnostics', async t => {
+  const error = Object.assign(
+    new Error('GitHub authentication unavailable; stop and request access'),
+    { diagnostic: { category: 'access', http_status: null, exit_code: 4 } }
+  );
+  const f = await fixture(t, { readinessError: error });
+  const result = await f.watcher.run();
+  const state = JSON.parse(
+    await readFile(join(f.directory, 'state', 'watcher.json'), 'utf8')
+  );
+  assert.equal(state.blocked, true);
+  assert.equal(result.diagnostic.category, 'access');
+  const count = f.apiCalls.length;
+  await f.watcher.run();
+  assert.equal(f.apiCalls.length, count);
   assert.equal(f.calls.codex.length, 0);
 });

@@ -427,7 +427,7 @@ export async function prepareRelease({
     for (const name of SNAPSHOT_FILES)
       hashes[name] = sha256(await readFile(join(source, name)));
     await writeJson(join(source, 'manifest.json'), {
-      version: 2,
+      version: 3,
       commit,
       sha256: hashes,
     });
