@@ -253,7 +253,7 @@ export function createWatcher({
     };
     let calls = 0;
     const decisions = [];
-    async function finish(status, message, blocked = false) {
+    async function finish(status, message, blocked = false, diagnostic = null) {
       const fingerprint = `${status}:${message}`;
       const priorAlert = canSaveWatcher
         ? watcher
@@ -269,6 +269,7 @@ export function createWatcher({
           fingerprint,
           checked_at: now().toISOString(),
           decisions,
+          diagnostic,
         };
         await saveJson(watcherPath, watcher);
       } else {
@@ -287,6 +288,7 @@ export function createWatcher({
         codex_invocations_this_run: calls,
         codex_invocations_total: watcher?.codex_invocations ?? 0,
         notify: shouldNotify,
+        ...(diagnostic ? { diagnostic } : {}),
       };
     }
     try {
@@ -329,8 +331,14 @@ export function createWatcher({
       });
       if (['healthy', 'waiting'].includes(poll.status))
         return finish(poll.status, poll.message);
-      if (poll.status === 'needs_action')
-        return finish('needs_action', poll.message, poll.blocked === true);
+      if (poll.status === 'needs_action') {
+        return finish(
+          'needs_action',
+          poll.message,
+          poll.blocked === true,
+          poll.diagnostic
+        );
+      }
       if (poll.status !== 'action' || !Array.isArray(poll.actions))
         throw new Error('Invalid monitor decision');
       for (const action of poll.actions) {
@@ -495,9 +503,11 @@ export function createWatcher({
       return finish(
         'needs_action',
         error.message,
-        /HTTP (?:401|403)|already dispatched|dispatch limit|Codex|checkpoint|worktree|login|source changed|configuration|manifest/i.test(
-          error.message
-        )
+        error.diagnostic?.category === 'access' ||
+          /HTTP (?:401|403)|already dispatched|dispatch limit|Codex|checkpoint|worktree|login|source changed|configuration|manifest/i.test(
+            error.message
+          ),
+        error.diagnostic
       );
     } finally {
       if (ownsLock) await rm(lockPath);

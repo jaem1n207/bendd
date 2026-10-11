@@ -280,12 +280,27 @@ test('the known pre-hosting v2 snapshot remains verifiable for rollback', async 
   const source = join(prepared.path, 'scripts', 'incident-response');
   const path = join(source, 'manifest.json');
   const manifest = JSON.parse(await readFile(path, 'utf8'));
+  manifest.version = 2;
+  delete manifest.sha256['github.mjs'];
+  await rm(join(source, 'github.mjs'));
   delete manifest.sha256['hosting.mjs'];
   await rm(join(source, 'hosting.mjs'));
   await writeFile(path, JSON.stringify(manifest));
   await verifySnapshot(source);
   await writeFile(join(source, 'watch.mjs'), 'tampered');
   await assert.rejects(verifySnapshot(source), /Trusted source changed/);
+});
+
+test('a v3 snapshot cannot omit the GitHub driver from its integrity manifest', async t => {
+  const f = await fixture(t);
+  const prepared = await f.prepare();
+  const source = join(prepared.path, 'scripts', 'incident-response');
+  const path = join(source, 'manifest.json');
+  const manifest = JSON.parse(await readFile(path, 'utf8'));
+  assert.equal(manifest.version, 3);
+  delete manifest.sha256['github.mjs'];
+  await writeFile(path, JSON.stringify(manifest));
+  await assert.rejects(verifySnapshot(source), /Invalid pinned/);
 });
 
 test('preparation rejects branch names and altered subscription/model settings', async t => {

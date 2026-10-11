@@ -8,6 +8,7 @@ export const SOURCE_FILES = [
   'policy.mjs',
   'repository.mjs',
   'control.mjs',
+  'github.mjs',
   'report.mjs',
   'dispatch.mjs',
   'app-server.mjs',
@@ -37,11 +38,15 @@ export async function verifySnapshot(sourceDirectory) {
   const manifest = JSON.parse(
     await readFile(join(sourceDirectory, 'manifest.json'), 'utf8')
   );
-  const expected = Object.hasOwn(manifest.sha256 ?? {}, 'hosting.mjs')
-    ? SNAPSHOT_FILES
-    : PRE_HOSTING_SNAPSHOT_FILES;
+  const expected =
+    manifest.version === 3
+      ? SNAPSHOT_FILES
+      : (Object.hasOwn(manifest.sha256 ?? {}, 'hosting.mjs')
+          ? SNAPSHOT_FILES
+          : PRE_HOSTING_SNAPSHOT_FILES
+        ).filter(name => name !== 'github.mjs');
   if (
-    manifest.version !== 2 ||
+    ![2, 3].includes(manifest.version) ||
     !COMMIT.test(manifest.commit ?? '') ||
     !manifest.sha256 ||
     Object.keys(manifest.sha256).length !== expected.length

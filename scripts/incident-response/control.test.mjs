@@ -111,7 +111,9 @@ async function fixture(t, options = {}) {
   const api = async (path, method = 'GET', input) => {
     calls.push({ path, method, input });
     if (options.error) {
-      throw new Error(options.error);
+      throw options.error instanceof Error
+        ? options.error
+        : new Error(options.error);
     }
     if (path === 'actions/workflows?per_page=100') {
       return {
@@ -130,7 +132,7 @@ async function fixture(t, options = {}) {
           ? options.dispatchError()
           : options.dispatchError;
       if (error) throw new Error(error);
-      return null;
+      return options.dispatchReceipt ?? null;
     }
     if (path.startsWith('actions/workflows/1/runs')) {
       const items = path.includes('status=completed')
@@ -146,8 +148,15 @@ async function fixture(t, options = {}) {
     if (path === `issues/${ISSUE}`) {
       return issue;
     }
-    if (path === 'actions/runs/100') {
-      return run;
+    if (
+      path === 'actions/runs/100' ||
+      path === `actions/runs/${run.id}` ||
+      path === `actions/runs/${options.receiptRun?.id}`
+    ) {
+      if (options.receiptError) {
+        throw options.receiptError;
+      }
+      return options.receiptRun ?? run;
     }
     if (path.startsWith(`issues/${ISSUE}/comments`)) {
       return options.comments ?? [];
@@ -664,4 +673,203 @@ test('unverifiable queued run metadata stops before another workflow request', a
     'needs_action'
   );
   assert.ok(f.calls.every(c => c.method === 'GET'));
+});
+
+test('ambiguous dispatch recovers from a later trusted run without another POST', async t => {
+  let time = '2026-10-05T02:00:00.000Z';
+  const f = await fixture(t, {
+    now: () => time,
+    issues: [],
+    dispatchError:
+      'GitHub command failed; stop and check authentication or network',
+  });
+  await f.control.poll({ mode: 'dispatch' });
+  f.run.id = 101;
+  f.run.event = 'workflow_dispatch';
+  f.run.created_at = '2026-10-05T02:00:02.000Z';
+  f.run.updated_at = '2026-10-05T02:00:20.000Z';
+  time = '2026-10-05T02:01:00.000Z';
+  assert.equal((await f.control.poll({ mode: 'dispatch' })).status, 'healthy');
+  const request = JSON.parse(
+    await readFile(
+      join(f.directory, 'state', 'availability-refresh.json'),
+      'utf8'
+    )
+  );
+  assert.equal(request.status, 'observed');
+  assert.equal(request.observed_run_id, 101);
+  assert.match(request.error, /GitHub command failed/);
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+});
+
+test('a delayed run clears an old review marker before the next refresh becomes due', async t => {
+  let time = '2026-10-05T02:00:00.000Z';
+  const f = await fixture(t, {
+    now: () => time,
+    issues: [],
+    dispatchError:
+      'GitHub command failed; stop and check authentication or network',
+  });
+  await f.control.poll({ mode: 'dispatch' });
+  f.run.id = 101;
+  f.run.created_at = '2026-10-05T02:30:00.000Z';
+  f.run.updated_at = '2026-10-05T02:30:20.000Z';
+  time = '2026-10-05T03:30:00.000Z';
+  await f.control.poll({ mode: 'check' });
+  const request = JSON.parse(
+    await readFile(
+      join(f.directory, 'state', 'availability-refresh.json'),
+      'utf8'
+    )
+  );
+  assert.equal(request.status, 'observed');
+  assert.equal(request.observed_run_id, 101);
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+});
+
+test('dispatch saves the returned run ID before polling it without another request', async t => {
+  let time = '2026-10-05T02:00:00.000Z';
+  const run = {
+    ...makeRun(),
+    id: 200,
+    event: 'workflow_dispatch',
+    status: 'queued',
+    conclusion: null,
+    created_at: time,
+    updated_at: time,
+  };
+  const f = await fixture(t, {
+    now: () => time,
+    issues: [],
+    dispatchReceipt: { workflow_run_id: 200 },
+    receiptRun: run,
+  });
+  await f.control.poll({ mode: 'dispatch' });
+  const path = join(f.directory, 'state', 'availability-refresh.json');
+  assert.equal(JSON.parse(await readFile(path, 'utf8')).run_id, 200);
+  time = '2026-10-05T02:01:00.000Z';
+  assert.equal((await f.control.poll({ mode: 'dispatch' })).status, 'waiting');
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+});
+
+test('an identified run stuck beyond the monitor gap requires review without redispatch', async t => {
+  let time = '2026-10-05T02:00:00.000Z';
+  const run = {
+    ...makeRun(),
+    id: 200,
+    event: 'workflow_dispatch',
+    status: 'queued',
+    conclusion: null,
+    created_at: time,
+    updated_at: time,
+  };
+  const f = await fixture(t, {
+    now: () => time,
+    issues: [],
+    dispatchReceipt: { workflow_run_id: 200 },
+    receiptRun: run,
+  });
+  await f.control.poll({ mode: 'dispatch' });
+  time = '2026-10-05T06:00:00.000Z';
+  assert.equal(
+    (await f.control.poll({ mode: 'dispatch' })).status,
+    'needs_action'
+  );
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+});
+
+test('a returned run that is not visible yet waits without another POST', async t => {
+  let time = '2026-10-05T02:00:00.000Z';
+  const run = {
+    ...makeRun(),
+    id: 200,
+    event: 'workflow_dispatch',
+    status: 'queued',
+    conclusion: null,
+    created_at: time,
+    updated_at: time,
+  };
+  const missing = Object.assign(
+    new Error('GitHub request failed: not_found (HTTP 404)'),
+    { diagnostic: { http_status: 404, category: 'not_found' } }
+  );
+  const f = await fixture(t, {
+    now: () => time,
+    issues: [],
+    dispatchReceipt: { workflow_run_id: 200 },
+    receiptRun: run,
+    receiptError: missing,
+  });
+  await f.control.poll({ mode: 'dispatch' });
+  time = '2026-10-05T02:01:00.000Z';
+  assert.equal((await f.control.poll({ mode: 'dispatch' })).status, 'waiting');
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+});
+
+test('a failed identified run cannot be hidden by another successful run', async t => {
+  let time = '2026-10-05T02:00:00.000Z';
+  const run = {
+    ...makeRun(),
+    id: 200,
+    event: 'workflow_dispatch',
+    status: 'completed',
+    conclusion: 'failure',
+    created_at: time,
+    updated_at: '2026-10-05T02:00:30.000Z',
+  };
+  const f = await fixture(t, {
+    now: () => time,
+    issues: [],
+    dispatchReceipt: { workflow_run_id: 200 },
+    receiptRun: run,
+  });
+  await f.control.poll({ mode: 'dispatch' });
+  f.run.id = 201;
+  f.run.created_at = '2026-10-05T02:01:00.000Z';
+  f.run.updated_at = '2026-10-05T02:01:30.000Z';
+  time = '2026-10-05T02:02:00.000Z';
+  assert.equal(
+    (await f.control.poll({ mode: 'dispatch' })).status,
+    'needs_action'
+  );
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+});
+
+test('a mismatched workflow receipt never permits another POST', async t => {
+  let time = '2026-10-05T02:00:00.000Z';
+  const run = {
+    ...makeRun(),
+    id: 200,
+    workflow_id: 999,
+    event: 'workflow_dispatch',
+    status: 'queued',
+    conclusion: null,
+    created_at: time,
+    updated_at: time,
+  };
+  const f = await fixture(t, {
+    now: () => time,
+    issues: [],
+    dispatchReceipt: { workflow_run_id: 200 },
+    receiptRun: run,
+  });
+  await f.control.poll({ mode: 'dispatch' });
+  time = '2026-10-05T02:01:00.000Z';
+  assert.equal(
+    (await f.control.poll({ mode: 'dispatch' })).status,
+    'needs_action'
+  );
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 1);
+});
+
+test('CLI authentication diagnostics latch even without an HTTP response', async t => {
+  const error = Object.assign(
+    new Error('GitHub authentication unavailable; stop and request access'),
+    { diagnostic: { category: 'access', http_status: null } }
+  );
+  const f = await fixture(t, { error, issues: [] });
+  assert.equal((await f.control.poll()).blocked, true);
+  const count = f.calls.length;
+  assert.equal((await f.control.poll()).blocked, true);
+  assert.equal(f.calls.length, count);
 });

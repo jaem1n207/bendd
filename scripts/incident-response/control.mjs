@@ -1,8 +1,9 @@
-import { execFile } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { isMain, runtimeDirectory } from './paths.mjs';
-import { promisify } from 'node:util';
+import { githubApi, logDiagnostic } from './github.mjs';
+export { githubApi } from './github.mjs';
 import {
   MAX_MONITOR_GAP_MS,
   MONITOR_REFRESH_AFTER_MS,
@@ -24,32 +25,8 @@ import {
 const ROOT = runtimeDirectory();
 const MAX_PAGES = 20;
 const PAGE_SIZE = 100;
-const execAsync = promisify(execFile);
-
-export async function githubApi(path, method = 'GET', input) {
-  const args = ['api', `repos/${REPOSITORY}/${path}`, '--method', method];
-  if (input !== undefined) {
-    args.push('--input', '-');
-  }
-  try {
-    const pending = execAsync('gh', args, {
-      timeout: 30_000,
-      maxBuffer: 8 * 1024 * 1024,
-    });
-    if (input !== undefined) {
-      pending.child.stdin.end(JSON.stringify(input));
-    }
-    const { stdout } = await pending;
-    return stdout ? JSON.parse(stdout) : null;
-  } catch (error) {
-    const status = error.stderr?.match(/HTTP (\d{3})/)?.[1];
-    throw new Error(
-      status
-        ? `GitHub HTTP ${status}; stop and request access`
-        : 'GitHub command failed; stop and check authentication or network'
-    );
-  }
-}
+const TIMESTAMP_PRECISION_MS = 1000;
+const HTTP_NOT_FOUND = 404;
 
 export function createControl({
   directory = ROOT,
@@ -109,7 +86,146 @@ export function createControl({
       checked_at: now().toISOString(),
     };
     await saveJson(path, { ...result, fingerprint });
+    if (previous?.fingerprint !== fingerprint) {
+      logDiagnostic(directory, {
+        event: 'monitor.transition',
+        status,
+        from_status: previous?.status,
+      });
+    }
     return result;
+  }
+
+  async function readRefresh(workflow) {
+    const request = await readJson(
+      join(directory, 'state', 'availability-refresh.json')
+    );
+    if (!request) {
+      return null;
+    }
+    const age = now().getTime() - Date.parse(request.requested_at);
+    if (
+      request.version !== 1 ||
+      request.workflow_id !== workflow.id ||
+      ![
+        'requesting',
+        'requested',
+        'observed',
+        'needs_action',
+        'retry_authorized',
+      ].includes(request.status) ||
+      !Number.isFinite(age) ||
+      age < 0 ||
+      (request.baseline_run_id !== null &&
+        !validNumber(request.baseline_run_id)) ||
+      (request.run_id !== undefined && !validNumber(request.run_id))
+    ) {
+      throw new Error('Invalid Availability request state; do not reset');
+    }
+    return request;
+  }
+
+  async function reconcileRefresh(workflow, latest) {
+    const request = await readRefresh(workflow);
+    if (!request || ['observed', 'retry_authorized'].includes(request.status)) {
+      return { latest };
+    }
+    if (
+      request.error_diagnostic?.category === 'access' ||
+      /HTTP (?:401|403)/.test(request.error ?? '')
+    ) {
+      throw Object.assign(new Error(request.error), {
+        diagnostic: request.error_diagnostic,
+      });
+    }
+    let run = latest;
+    let evidence = 'later_monitor_run';
+    if (request.run_id) {
+      try {
+        run = await api(`actions/runs/${request.run_id}`);
+      } catch (error) {
+        if (error.diagnostic?.http_status !== HTTP_NOT_FOUND) {
+          throw error;
+        }
+        if (
+          now().getTime() - Date.parse(request.requested_at) >
+          MAX_MONITOR_GAP_MS
+        ) {
+          throw new Error(
+            'Identified Availability run is missing; no automatic retry'
+          );
+        }
+        return { latest, waiting: true };
+      }
+      evidence = 'run_receipt';
+      if (
+        !isMonitorRun(run) ||
+        run.id !== request.run_id ||
+        run.event !== 'workflow_dispatch' ||
+        (run.workflow_id !== undefined && run.workflow_id !== workflow.id)
+      ) {
+        throw new Error(
+          'Untrusted Availability request receipt; do not dispatch'
+        );
+      }
+    }
+    if (
+      !run ||
+      run.id === request.baseline_run_id ||
+      Date.parse(run.updated_at) +
+        (request.run_id ? TIMESTAMP_PRECISION_MS : 0) <
+        Date.parse(request.requested_at)
+    ) {
+      return { latest };
+    }
+    const updated = Date.parse(run.updated_at);
+    if (!Number.isFinite(updated) || updated > now().getTime()) {
+      throw new Error('Invalid Availability observation time; do not dispatch');
+    }
+    if (run.status !== 'completed') {
+      if (
+        !['queued', 'in_progress', 'waiting', 'pending', 'requested'].includes(
+          run.status
+        )
+      ) {
+        throw new Error('Invalid Availability receipt status; do not dispatch');
+      }
+      const created = Date.parse(run.created_at);
+      if (
+        !Number.isFinite(created) ||
+        created > now().getTime() ||
+        now().getTime() - created > MAX_MONITOR_GAP_MS
+      ) {
+        throw new Error(
+          'Identified Availability queue is stale or invalid; do not dispatch another run'
+        );
+      }
+      return { latest, waiting: true };
+    }
+    await saveJson(join(directory, 'state', 'availability-refresh.json'), {
+      ...request,
+      status: 'observed',
+      observed_run_id: run.id,
+      observed_at: now().toISOString(),
+      evidence,
+      conclusion: run.conclusion,
+    });
+    logDiagnostic(directory, {
+      event: 'availability.observed',
+      request_id: request.request_id,
+      workflow_id: workflow.id,
+      run_id: run.id,
+      evidence,
+      status: 'observed',
+      conclusion: run.conclusion,
+    });
+    if (run.conclusion !== 'success') {
+      return { latest: run };
+    }
+    return {
+      latest:
+        !latest || updated >= Date.parse(latest.updated_at) ? run : latest,
+    };
   }
 
   async function trustedIssue(number) {
@@ -252,19 +368,45 @@ export function createControl({
       baseline_run_id: latest?.id ?? null,
       requested_at: now().toISOString(),
       status: 'requesting',
+      request_id: randomUUID(),
     };
     // Persist intent before the POST: a timeout or process exit cannot silently repeat it.
     await saveJson(path, request);
+    logDiagnostic(directory, {
+      event: 'availability.intent',
+      request_id: request.request_id,
+      workflow_id: workflow.id,
+      status: 'requesting',
+    });
     try {
-      await api(`actions/workflows/${workflow.id}/dispatches`, 'POST', {
-        ref: 'main',
+      const receipt = await api(
+        `actions/workflows/${workflow.id}/dispatches`,
+        'POST',
+        {
+          ref: 'main',
+        },
+        { requestId: request.request_id }
+      );
+      if (receipt !== null && !validNumber(receipt?.workflow_run_id)) {
+        throw new Error(
+          'Unverifiable Availability dispatch receipt; no automatic retry'
+        );
+      }
+      const run = receipt ? { run_id: receipt.workflow_run_id } : {};
+      await saveJson(path, { ...request, ...run, status: 'requested' });
+      logDiagnostic(directory, {
+        event: 'availability.requested',
+        request_id: request.request_id,
+        workflow_id: workflow.id,
+        run_id: run.run_id,
+        status: 'requested',
       });
-      await saveJson(path, { ...request, status: 'requested' });
     } catch (error) {
       await saveJson(path, {
         ...request,
         status: 'needs_action',
         error: error.message,
+        ...(error.diagnostic ? { error_diagnostic: error.diagnostic } : {}),
       });
       throw error;
     }
@@ -310,7 +452,15 @@ export function createControl({
       if (!Array.isArray(runs.workflow_runs)) {
         throw new Error('Invalid completed Availability run list');
       }
-      const latest = runs.workflow_runs.find(isMonitorRun);
+      let latest = runs.workflow_runs.find(isMonitorRun);
+      const reconciled = await reconcileRefresh(workflow, latest);
+      latest = reconciled.latest;
+      if (reconciled.waiting) {
+        return reportStatus(
+          'waiting',
+          'Waiting for the identified Availability run'
+        );
+      }
       if (!latest) {
         if (mode === 'dispatch') {
           return await requestAvailability(workflow, null);
@@ -409,7 +559,10 @@ export function createControl({
       );
     } catch (error) {
       return reportStatus('needs_action', error.message, {
-        blocked: /HTTP (?:401|403)/.test(error.message),
+        blocked:
+          error.diagnostic?.category === 'access' ||
+          /HTTP (?:401|403)/.test(error.message),
+        ...(error.diagnostic ? { diagnostic: error.diagnostic } : {}),
       });
     }
   }
