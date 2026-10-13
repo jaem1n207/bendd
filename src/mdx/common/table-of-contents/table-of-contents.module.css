@@ -34,14 +34,26 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   transition:
-    opacity 220ms ease,
-    transform 260ms ease;
+    opacity 120ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 140ms cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.nav:hover .label,
-.nav:focus-within .label {
+.section[data-depth='1'] .label {
+  margin-right: 10px;
+  font-size: 11px;
+}
+
+.nav:hover .section[data-depth='0'] .label,
+.nav:focus-within .section[data-depth='0'] .label,
+.section[data-depth='1']:hover .label,
+.section[data-depth='1']:focus-visible .label {
   opacity: 1;
   transform: translateX(0);
+}
+
+.section:hover,
+.section:focus-visible {
+  z-index: 1;
 }
 
 .section:hover .label,
@@ -77,6 +89,11 @@
   content: '';
 }
 
+.section[data-depth='1'] .track::before {
+  left: 7.5px;
+  width: 1px;
+}
+
 .fill {
   position: absolute;
   top: 0;
@@ -87,11 +104,23 @@
   background-color: hsl(var(--foreground));
 }
 
+.section[data-depth='1'] .fill {
+  left: 7.5px;
+  width: 1px;
+}
+
 .nav:hover .track::before,
 .nav:hover .fill,
 .nav:focus-within .track::before,
 .nav:focus-within .fill {
   width: 3px;
+}
+
+.nav:hover .section[data-depth='1'] .track::before,
+.nav:hover .section[data-depth='1'] .fill,
+.nav:focus-within .section[data-depth='1'] .track::before,
+.nav:focus-within .section[data-depth='1'] .fill {
+  width: 1px;
 }
 
 @media (min-width: 1280px) {

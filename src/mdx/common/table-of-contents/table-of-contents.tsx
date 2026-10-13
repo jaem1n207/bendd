@@ -5,7 +5,7 @@ import { type PointerEvent, useEffect, useState } from 'react';
 import styles from '@/mdx/common/table-of-contents/table-of-contents.module.css';
 
 const DOCUMENT_ID = 'BenddDoc';
-const HEADING_SELECTOR = 'h2[id]';
+const HEADING_SELECTOR = 'h2[id], h3[id]';
 const READING_OFFSET_PX = 112;
 const READING_VIEWPORT_RATIO = 0.2;
 const PERCENT = 100;
@@ -14,6 +14,7 @@ const BOTTOM_TOLERANCE_PX = 1;
 type Section = {
   id: string;
   title: string;
+  depth: number;
   top: number;
   height: number;
   progress: number;
@@ -84,14 +85,15 @@ function measureSections(title: string): Section[] {
     .map(heading => ({
       id: heading.id,
       title: heading.textContent?.trim() || heading.id,
+      depth: heading.tagName === 'H3' ? 1 : 0,
       position: heading.getBoundingClientRect().top + scrollY,
     }))
     .filter(heading => heading.position > start && heading.position < end)
     .sort((a, b) => a.position - b.position);
   const boundaries = [
-    { id: DOCUMENT_ID, title, position: start },
+    { id: DOCUMENT_ID, title, depth: 0, position: start },
     ...headings,
-    { id: '', title: '', position: end },
+    { id: '', title: '', depth: 0, position: end },
   ];
   const readingPosition =
     scrollY +
@@ -104,6 +106,7 @@ function measureSections(title: string): Section[] {
     return {
       id: section.id,
       title: section.title,
+      depth: section.depth,
       top: ((section.position - start) / total) * PERCENT,
       height: ((next - section.position) / total) * PERCENT,
       progress: atBottom
@@ -172,6 +175,7 @@ export function TableOfContents({ title }: { title: string }) {
           aria-label={section.title}
           aria-current={index === activeIndex ? 'location' : undefined}
           data-passed={section.progress === 1}
+          data-depth={section.depth}
         >
           <span className={styles.label}>{section.title}</span>
           <span

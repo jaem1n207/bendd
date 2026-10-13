@@ -102,6 +102,34 @@ describe('TableOfContents', () => {
     ).toBe(`${(300 / 700) * 100}%`);
   });
 
+  it('adds h3 headings as subordinate rail segments in reading order', () => {
+    const subheading = document.createElement('h3');
+    subheading.id = 'subsection';
+    subheading.textContent = '첫 하위 구간';
+    article.querySelector('#second')!.before(subheading);
+    place(subheading, 1800);
+    vi.spyOn(subheading, 'getClientRects').mockReturnValue({
+      length: 1,
+    } as DOMRectList);
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    const links = screen.getAllByRole('link');
+    expect(links.map(link => link.getAttribute('aria-label'))).toEqual([
+      '글 제목',
+      '첫 구간',
+      '첫 하위 구간',
+      '두 번째 구간',
+    ]);
+    expect(links[1].style.height).toBe('15%');
+    expect(links[2].style.top).toBe('40%');
+    expect(links[2].style.height).toBe('20%');
+    expect(links[1].getAttribute('data-depth')).toBe('0');
+    expect(links[2].getAttribute('data-depth')).toBe('1');
+    expect(links[2].getAttribute('href')).toBe('#subsection');
+  });
+
   it('fills every segment at the bottom of the page', () => {
     place(article, 1200, 3800);
     Object.defineProperty(document.documentElement, 'scrollHeight', {
