@@ -46,7 +46,7 @@
 }
 
 .nav:hover .section[data-depth='0'] .label,
-.nav:focus-within .section[data-depth='0'] .label,
+.nav:has(:focus-visible) .section[data-depth='0'] .label,
 .section[data-depth='1']:hover .label,
 .section[data-depth='1']:focus-visible .label {
   opacity: 1;
@@ -113,15 +113,15 @@
 
 .nav:hover .track::before,
 .nav:hover .fill,
-.nav:focus-within .track::before,
-.nav:focus-within .fill {
+.nav:has(:focus-visible) .track::before,
+.nav:has(:focus-visible) .fill {
   width: 3px;
 }
 
 .nav:hover .section[data-depth='1'] .track::before,
 .nav:hover .section[data-depth='1'] .fill,
-.nav:focus-within .section[data-depth='1'] .track::before,
-.nav:focus-within .section[data-depth='1'] .fill {
+.nav:has(:focus-visible) .section[data-depth='1'] .track::before,
+.nav:has(:focus-visible) .section[data-depth='1'] .fill {
   width: 1px;
 }
 
