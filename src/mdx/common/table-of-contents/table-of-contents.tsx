@@ -8,6 +8,9 @@ const DOCUMENT_ID = 'BenddDoc';
 const HEADING_SELECTOR = 'h2[id], h3[id]';
 const READING_OFFSET_PX = 112;
 const READING_VIEWPORT_RATIO = 0.2;
+const RAIL_VIEWPORT_RATIO = 0.72;
+const MIN_LINK_HEIGHT_PX = 4;
+const MIN_GROUP_HEIGHT_PX = 12;
 const PERCENT = 100;
 const BOTTOM_TOLERANCE_PX = 1;
 
@@ -18,6 +21,13 @@ type Section = {
   top: number;
   height: number;
   progress: number;
+  count: number;
+};
+
+type ArticleBounds = {
+  article: HTMLElement;
+  start: number;
+  end: number;
 };
 
 function getMaxScrollY() {
@@ -27,9 +37,33 @@ function getMaxScrollY() {
   return Math.max(0, scrollHeight - window.innerHeight);
 }
 
+function getReadingOffset() {
+  return Math.min(
+    READING_OFFSET_PX,
+    window.innerHeight * READING_VIEWPORT_RATIO
+  );
+}
+
+function getArticleBounds(): ArticleBounds | null {
+  const doc = document.getElementById(DOCUMENT_ID);
+  const article = doc?.querySelector<HTMLElement>('article');
+  if (!doc || !article) {
+    return null;
+  }
+
+  const scrollY = window.scrollY;
+  const start = doc.getBoundingClientRect().top + scrollY;
+  const end = Math.max(
+    article.getBoundingClientRect().bottom + scrollY,
+    start + 1
+  );
+  return { article, start, end };
+}
+
 function scrollFromRail(event: PointerEvent<HTMLSpanElement>) {
   const nav = event.currentTarget.closest('nav');
-  if (!nav) {
+  const bounds = getArticleBounds();
+  if (!nav || !bounds) {
     return;
   }
 
@@ -39,7 +73,12 @@ function scrollFromRail(event: PointerEvent<HTMLSpanElement>) {
   }
 
   const fraction = Math.min(1, Math.max(0, (event.clientY - top) / height));
-  window.scrollTo(0, fraction * getMaxScrollY());
+  const readingPosition = bounds.start + fraction * (bounds.end - bounds.start);
+  const scrollY = Math.min(
+    getMaxScrollY(),
+    Math.max(0, readingPosition - getReadingOffset())
+  );
+  window.scrollTo(0, scrollY);
 }
 
 function handleRailPointerDown(event: PointerEvent<HTMLSpanElement>) {
@@ -65,19 +104,14 @@ function handleRailPointerEnd(event: PointerEvent<HTMLSpanElement>) {
 }
 
 function measureSections(title: string): Section[] {
-  const doc = document.getElementById(DOCUMENT_ID);
-  const article = doc?.querySelector('article');
-  if (!doc || !article) {
+  const bounds = getArticleBounds();
+  if (!bounds) {
     return [];
   }
 
+  const { article, start, end } = bounds;
   const scrollY = window.scrollY;
   const atBottom = scrollY >= getMaxScrollY() - BOTTOM_TOLERANCE_PX;
-  const start = doc.getBoundingClientRect().top + scrollY;
-  const end = Math.max(
-    article.getBoundingClientRect().bottom + scrollY,
-    start + 1
-  );
   const headings = Array.from(
     article.querySelectorAll<HTMLHeadingElement>(HEADING_SELECTOR)
   )
@@ -90,14 +124,17 @@ function measureSections(title: string): Section[] {
     }))
     .filter(heading => heading.position > start && heading.position < end)
     .sort((a, b) => a.position - b.position);
+
+  if (headings.length === 0) {
+    return [];
+  }
+
   const boundaries = [
     { id: DOCUMENT_ID, title, depth: 0, position: start },
     ...headings,
     { id: '', title: '', depth: 0, position: end },
   ];
-  const readingPosition =
-    scrollY +
-    Math.min(READING_OFFSET_PX, window.innerHeight * READING_VIEWPORT_RATIO);
+  const readingPosition = scrollY + getReadingOffset();
   const total = end - start;
 
   return boundaries.slice(0, -1).map((section, index) => {
@@ -115,12 +152,69 @@ function measureSections(title: string): Section[] {
             1,
             Math.max(0, (readingPosition - section.position) / length)
           ),
+      count: 1,
     };
   });
 }
 
+function mergeSections(sections: Section[]): Section {
+  const first = sections[0];
+  const height = sections.reduce((sum, section) => sum + section.height, 0);
+  const consumed = sections.reduce(
+    (sum, section) => sum + section.height * section.progress,
+    0
+  );
+  return {
+    ...first,
+    title:
+      sections.length === 1
+        ? first.title
+        : `${first.title} 외 ${sections.length - 1}개 구간`,
+    height,
+    progress: height > 0 ? consumed / height : 0,
+    count: sections.length,
+  };
+}
+
+function groupSections(sections: Section[]): Section[] {
+  const railHeight = Math.max(window.innerHeight * RAIL_VIEWPORT_RATIO, 1);
+  const linkHeight = (MIN_LINK_HEIGHT_PX / railHeight) * PERCENT;
+  if (sections.every(section => section.height >= linkHeight)) {
+    return sections;
+  }
+
+  const groupHeight = (MIN_GROUP_HEIGHT_PX / railHeight) * PERCENT;
+  const grouped: Section[] = [];
+  let groupStart = 0;
+
+  for (let index = 1; index < sections.length; index++) {
+    const distance = sections[index].top - sections[groupStart].top;
+    const remaining = PERCENT - sections[index].top;
+    if (distance < groupHeight || remaining < groupHeight) {
+      continue;
+    }
+
+    grouped.push(mergeSections(sections.slice(groupStart, index)));
+    groupStart = index;
+  }
+
+  grouped.push(mergeSections(sections.slice(groupStart)));
+  return grouped;
+}
+
+function getActiveIndex(sections: Section[]) {
+  let activeIndex = 0;
+  sections.forEach((section, index) => {
+    if (section.progress > 0) {
+      activeIndex = index;
+    }
+  });
+  return activeIndex;
+}
+
 export function TableOfContents({ title }: { title: string }) {
   const [sections, setSections] = useState<Section[]>([]);
+  const [isFullListOpen, setIsFullListOpen] = useState(false);
 
   useEffect(() => {
     let frame = 0;
@@ -134,7 +228,9 @@ export function TableOfContents({ title }: { title: string }) {
       }
     };
 
-    const article = document.querySelector('#BenddDoc article');
+    const article = document
+      .getElementById(DOCUMENT_ID)
+      ?.querySelector('article');
     const observer = article ? new ResizeObserver(schedule) : null;
     if (article && observer) {
       observer.observe(article);
@@ -157,27 +253,68 @@ export function TableOfContents({ title }: { title: string }) {
     return null;
   }
 
-  let activeIndex = 0;
-  sections.forEach((section, index) => {
-    if (section.progress > 0) {
-      activeIndex = index;
-    }
-  });
+  const railSections = groupSections(sections);
+  const isDense = railSections.length < sections.length;
+  const activeRailIndex = getActiveIndex(railSections);
+  const activeSectionIndex = getActiveIndex(sections);
 
   return (
     <nav className={styles.nav} aria-label="글 목차">
-      {sections.map((section, index) => (
+      {isDense && (
+        <button
+          type="button"
+          className={styles.fullListToggle}
+          aria-expanded={isFullListOpen}
+          aria-controls={isFullListOpen ? 'toc-full-list' : undefined}
+          onClick={() => setIsFullListOpen(open => !open)}
+        >
+          {isFullListOpen ? '목차 닫기' : `전체 목차 (${sections.length})`}
+        </button>
+      )}
+      {isDense && isFullListOpen && (
+        <div
+          id="toc-full-list"
+          className={styles.fullList}
+          role="region"
+          aria-label="전체 목차"
+          data-toc-full-list=""
+        >
+          {sections.map((section, index) => (
+            <a
+              key={section.id}
+              href={`#${section.id}`}
+              data-depth={section.depth}
+              aria-current={
+                index === activeSectionIndex ? 'location' : undefined
+              }
+              onClick={() => setIsFullListOpen(false)}
+            >
+              {section.title}
+            </a>
+          ))}
+        </div>
+      )}
+      {railSections.map((section, index) => (
         <a
           key={section.id}
           href={`#${section.id}`}
           className={styles.section}
           style={{ top: `${section.top}%`, height: `${section.height}%` }}
           aria-label={section.title}
-          aria-current={index === activeIndex ? 'location' : undefined}
+          aria-current={index === activeRailIndex ? 'location' : undefined}
           data-passed={section.progress === 1}
           data-depth={section.depth}
+          data-group-size={section.count}
+          data-toc-rail-link=""
         >
           <span className={styles.label}>{section.title}</span>
+          <span
+            className={styles.tooltip}
+            data-toc-tooltip=""
+            aria-hidden="true"
+          >
+            {section.title}
+          </span>
           <span
             className={styles.track}
             aria-hidden="true"

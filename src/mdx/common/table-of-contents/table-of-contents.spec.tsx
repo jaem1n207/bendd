@@ -155,7 +155,7 @@ describe('TableOfContents', () => {
     }
   });
 
-  it('uses the rail to scroll to a proportional page position', () => {
+  it('maps the rail to the article when content follows it', () => {
     Object.defineProperty(document.documentElement, 'scrollHeight', {
       configurable: true,
       value: 4000,
@@ -177,7 +177,7 @@ describe('TableOfContents', () => {
     } as DOMRect);
     const track = screen
       .getByRole('link', { name: '첫 구간' })
-      .querySelector('[aria-hidden]') as HTMLElement;
+      .querySelector('[aria-hidden] > span')?.parentElement as HTMLElement;
     track.setPointerCapture = vi.fn();
 
     const pointerDown = new MouseEvent('pointerdown', {
@@ -188,7 +188,7 @@ describe('TableOfContents', () => {
     Object.defineProperty(pointerDown, 'pointerId', { value: 1 });
     fireEvent(track, pointerDown);
     expect(track.setPointerCapture).toHaveBeenCalledWith(1);
-    expect(scrollTo).toHaveBeenCalledWith(0, 1500);
+    expect(scrollTo).toHaveBeenCalledWith(0, 1888);
   });
 
   it('marks only passed sections for highlighted labels', () => {
@@ -247,5 +247,66 @@ describe('TableOfContents', () => {
         .getByRole('link', { name: '바뀐 구간' })
         .getAttribute('aria-current')
     ).toBe('location');
+  });
+
+  it('hides the rail when the article has no headings', () => {
+    article.replaceChildren();
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    expect(screen.queryByRole('navigation', { name: '글 목차' })).toBeNull();
+  });
+
+  it('exposes complete long labels to pointer and keyboard users', () => {
+    const title =
+      '모바일과 데스크톱에서 읽기 진행과 목차 링크를 함께 동기화하는 방법?';
+    const heading =
+      'https://example.com/workspaces/acme/projects/q3-launch/docs/9f8e7d6c5b4a';
+    article.querySelector('#first')!.textContent = heading;
+
+    render(<TableOfContents title={title} />);
+    flushFrame();
+
+    const titleLink = screen.getByRole('link', { name: title });
+    const headingLink = screen.getByRole('link', { name: heading });
+    expect(titleLink.querySelector('[data-toc-tooltip]')?.textContent).toBe(
+      title
+    );
+    expect(headingLink.querySelector('[data-toc-tooltip]')?.textContent).toBe(
+      heading
+    );
+  });
+
+  it('groups a dense rail and keeps every heading in an expandable list', () => {
+    place(article, 1200, 3200);
+    const fragment = document.createDocumentFragment();
+    for (let index = 0; index < 1000; index++) {
+      const heading = document.createElement('h3');
+      heading.id = `section-${index}`;
+      heading.textContent = `참고 항목 ${index}`;
+      place(heading, 1201 + index * 2);
+      vi.spyOn(heading, 'getClientRects').mockReturnValue({
+        length: 1,
+      } as DOMRectList);
+      fragment.appendChild(heading);
+    }
+    article.replaceChildren(fragment);
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    const rail = screen.getByRole('navigation', { name: '글 목차' });
+    const railLinks = rail.querySelectorAll('a[data-toc-rail-link]');
+    expect(railLinks.length).toBeLessThan(100);
+    expect(railLinks.length).toBeGreaterThan(1);
+    expect(
+      [...railLinks].every(
+        link => parseFloat((link as HTMLElement).style.height) > 1.5
+      )
+    ).toBe(true);
+
+    fireEvent.click(screen.getByRole('button', { name: /전체 목차/ }));
+    expect(rail.querySelectorAll('[data-toc-full-list] a')).toHaveLength(1001);
   });
 });
