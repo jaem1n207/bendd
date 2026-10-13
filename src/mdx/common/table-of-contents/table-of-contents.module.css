@@ -6,9 +6,9 @@
   display: none;
   width: 280px;
   height: 72vh;
-  --toc-label-max-width: 220px;
+  --toc-label-max-width: 228px;
   transform: translateY(-50%);
-  font-family: var(--font-sans, system-ui), sans-serif;
+  font-family: system-ui, var(--font-sans, sans-serif);
 }
 
 .section {
@@ -30,7 +30,9 @@
   opacity: 0;
   transform: translateX(4px);
   font-size: 12px;
+  font-weight: 400;
   line-height: 1.25;
+  letter-spacing: -0.01em;
   text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -41,7 +43,6 @@
 
 .section[data-depth='1'] .label {
   margin-right: 10px;
-  font-size: 11px;
 }
 
 .nav:hover .section[data-depth='0'] .label,
@@ -84,21 +85,21 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 7px;
+  right: 8px;
   width: 2px;
   background-color: hsl(var(--foreground) / 0.16);
   content: '';
 }
 
 .section[data-depth='1'] .track::before {
-  left: 7.5px;
+  right: 8.5px;
   width: 1px;
 }
 
 .fill {
   position: absolute;
   top: 0;
-  left: 7px;
+  right: 8px;
   display: block;
   width: 2px;
   border-radius: inherit;
@@ -106,7 +107,7 @@
 }
 
 .section[data-depth='1'] .fill {
-  left: 7.5px;
+  right: 8.5px;
   width: 1px;
 }
 

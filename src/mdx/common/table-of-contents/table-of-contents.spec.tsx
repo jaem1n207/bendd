@@ -25,6 +25,7 @@ describe('TableOfContents', () => {
   };
 
   beforeEach(() => {
+    window.history.replaceState(null, '', window.location.pathname);
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 });
     Object.defineProperty(window, 'innerHeight', {
       configurable: true,
@@ -100,6 +101,44 @@ describe('TableOfContents', () => {
     expect(
       (first.querySelector('[aria-hidden] > span') as HTMLElement).style.height
     ).toBe(`${(300 / 700) * 100}%`);
+  });
+
+  it('smoothly scrolls to the clicked heading and updates its hash', () => {
+    const target = article.querySelector<HTMLElement>('#second')!;
+    target.scrollIntoView = vi.fn();
+    const pushState = vi.spyOn(window.history, 'pushState');
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false }))
+    );
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    fireEvent.click(screen.getByRole('link', { name: '두 번째 구간' }));
+    expect(target.scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+    expect(pushState).toHaveBeenCalledWith(null, '', '#second');
+  });
+
+  it('respects reduced motion when scrolling from the table of contents', () => {
+    const target = article.querySelector<HTMLElement>('#first')!;
+    target.scrollIntoView = vi.fn();
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true }))
+    );
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    fireEvent.click(screen.getByRole('link', { name: '첫 구간' }));
+    expect(target.scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'auto',
+      block: 'start',
+    });
   });
 
   it('adds h3 headings as subordinate rail segments in reading order', () => {
@@ -306,5 +345,16 @@ describe('TableOfContents', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /전체 목차/ }));
     expect(rail.querySelectorAll('[data-toc-full-list] a')).toHaveLength(1001);
+
+    const target = article.querySelector<HTMLElement>('#section-999')!;
+    target.scrollIntoView = vi.fn();
+    fireEvent.click(
+      rail.querySelector('[data-toc-full-list] a[href="#section-999"]')!
+    );
+    expect(target.scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+    expect(rail.querySelector('[data-toc-full-list]')).toBeNull();
   });
 });

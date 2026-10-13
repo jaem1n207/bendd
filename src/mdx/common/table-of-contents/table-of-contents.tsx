@@ -1,6 +1,6 @@
 'use client';
 
-import { type PointerEvent, useEffect, useState } from 'react';
+import { type MouseEvent, type PointerEvent, useEffect, useState } from 'react';
 
 import styles from '@/mdx/common/table-of-contents/table-of-contents.module.css';
 
@@ -101,6 +101,35 @@ function handleRailPointerEnd(event: PointerEvent<HTMLSpanElement>) {
   if (event.currentTarget.hasPointerCapture(event.pointerId)) {
     event.currentTarget.releasePointerCapture(event.pointerId);
   }
+}
+
+function handleSectionClick(event: MouseEvent<HTMLAnchorElement>, id: string) {
+  if (
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  ) {
+    return;
+  }
+
+  const target = document.getElementById(id);
+  if (!target) {
+    return;
+  }
+
+  event.preventDefault();
+  const hash = `#${encodeURIComponent(id)}`;
+  if (window.location.hash !== hash) {
+    window.history.pushState(null, '', hash);
+  }
+  target.scrollIntoView({
+    behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      ? 'auto'
+      : 'smooth',
+    block: 'start',
+  });
 }
 
 function measureSections(title: string): Section[] {
@@ -287,7 +316,10 @@ export function TableOfContents({ title }: { title: string }) {
               aria-current={
                 index === activeSectionIndex ? 'location' : undefined
               }
-              onClick={() => setIsFullListOpen(false)}
+              onClick={event => {
+                handleSectionClick(event, section.id);
+                setIsFullListOpen(false);
+              }}
             >
               {section.title}
             </a>
@@ -306,6 +338,7 @@ export function TableOfContents({ title }: { title: string }) {
           data-depth={section.depth}
           data-group-size={section.count}
           data-toc-rail-link=""
+          onClick={event => handleSectionClick(event, section.id)}
         >
           <span className={styles.label}>{section.title}</span>
           <span
