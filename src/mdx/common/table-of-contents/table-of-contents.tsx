@@ -10,9 +10,15 @@ const READING_OFFSET_PX = 112;
 const READING_VIEWPORT_RATIO = 0.2;
 const RAIL_VIEWPORT_RATIO = 0.72;
 const MIN_LINK_HEIGHT_PX = 4;
-const MIN_GROUP_HEIGHT_PX = 12;
+const MIN_GROUP_HEIGHT_PX = 20;
+const MIN_SCROLL_DURATION_MS = 220;
+const MAX_SCROLL_DURATION_MS = 500;
+const SCROLL_PIXELS_PER_MS = 8;
 const PERCENT = 100;
 const BOTTOM_TOLERANCE_PX = 1;
+
+let sectionScrollFrame = 0;
+let removeScrollInterruption: (() => void) | null = null;
 
 type Section = {
   id: string;
@@ -103,6 +109,67 @@ function handleRailPointerEnd(event: PointerEvent<HTMLSpanElement>) {
   }
 }
 
+function cancelSectionScroll() {
+  if (sectionScrollFrame) {
+    cancelAnimationFrame(sectionScrollFrame);
+    sectionScrollFrame = 0;
+  }
+  removeScrollInterruption?.();
+  removeScrollInterruption = null;
+}
+
+function animateSectionScroll(target: HTMLElement) {
+  cancelSectionScroll();
+
+  const start = window.scrollY;
+  const scrollMargin =
+    parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+  const destination = Math.min(
+    getMaxScrollY(),
+    Math.max(0, target.getBoundingClientRect().top + start - scrollMargin)
+  );
+  const distance = destination - start;
+  if (Math.abs(distance) < 1) {
+    window.scrollTo(0, destination);
+    return;
+  }
+
+  const duration = Math.min(
+    MAX_SCROLL_DURATION_MS,
+    Math.max(
+      MIN_SCROLL_DURATION_MS,
+      MIN_SCROLL_DURATION_MS + Math.abs(distance) / SCROLL_PIXELS_PER_MS
+    )
+  );
+  const interrupt = () => cancelSectionScroll();
+  window.addEventListener('wheel', interrupt, { passive: true });
+  window.addEventListener('touchstart', interrupt, { passive: true });
+  window.addEventListener('pointerdown', interrupt, { passive: true });
+  window.addEventListener('keydown', interrupt);
+  removeScrollInterruption = () => {
+    window.removeEventListener('wheel', interrupt);
+    window.removeEventListener('touchstart', interrupt);
+    window.removeEventListener('pointerdown', interrupt);
+    window.removeEventListener('keydown', interrupt);
+  };
+
+  let startedAt: number | null = null;
+  const step = (time: number) => {
+    if (startedAt === null) {
+      startedAt = time;
+    }
+    const progress = Math.min(1, (time - startedAt) / duration);
+    const eased = 1 - (1 - progress) ** 3;
+    window.scrollTo(0, start + distance * eased);
+    if (progress < 1) {
+      sectionScrollFrame = requestAnimationFrame(step);
+    } else {
+      cancelSectionScroll();
+    }
+  };
+  sectionScrollFrame = requestAnimationFrame(step);
+}
+
 function handleSectionClick(event: MouseEvent<HTMLAnchorElement>, id: string) {
   if (
     event.button !== 0 ||
@@ -124,12 +191,15 @@ function handleSectionClick(event: MouseEvent<HTMLAnchorElement>, id: string) {
   if (window.location.hash !== hash) {
     window.history.pushState(null, '', hash);
   }
-  target.scrollIntoView({
-    behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-      ? 'auto'
-      : 'smooth',
-    block: 'start',
-  });
+  if (
+    event.detail === 0 ||
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  ) {
+    cancelSectionScroll();
+    target.scrollIntoView({ behavior: 'instant', block: 'start' });
+    return;
+  }
+  animateSectionScroll(target);
 }
 
 function measureSections(title: string): Section[] {
@@ -273,6 +343,7 @@ export function TableOfContents({ title }: { title: string }) {
         cancelAnimationFrame(frame);
       }
       observer?.disconnect();
+      cancelSectionScroll();
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
     };

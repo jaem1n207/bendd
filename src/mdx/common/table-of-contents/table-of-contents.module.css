@@ -29,7 +29,7 @@
   max-width: var(--toc-label-max-width);
   opacity: 0;
   transform: translateX(4px);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.25;
   letter-spacing: -0.01em;
@@ -160,7 +160,7 @@
   border-radius: 6px;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -187,7 +187,7 @@
   display: block;
   padding: 7px 12px;
   color: hsl(var(--muted-foreground));
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.4;
   overflow-wrap: anywhere;
   text-decoration: none;

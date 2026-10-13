@@ -8,11 +8,12 @@ describe('TableOfContents', () => {
   let article: HTMLElement;
   let pendingFrame: FrameRequestCallback | undefined;
 
-  const flushFrame = () => {
+  const flushFrameAt = (time: number) => {
     const callback = pendingFrame;
     pendingFrame = undefined;
-    act(() => callback?.(0));
+    act(() => callback?.(time));
   };
+  const flushFrame = () => flushFrameAt(0);
 
   const place = (element: Element, top: number, bottom = top) => {
     vi.spyOn(element, 'getBoundingClientRect').mockImplementation(
@@ -103,9 +104,8 @@ describe('TableOfContents', () => {
     ).toBe(`${(300 / 700) * 100}%`);
   });
 
-  it('smoothly scrolls to the clicked heading and updates its hash', () => {
-    const target = article.querySelector<HTMLElement>('#second')!;
-    target.scrollIntoView = vi.fn();
+  it('finishes a mouse click with a short smooth scroll and updates its hash', () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
     const pushState = vi.spyOn(window.history, 'pushState');
     vi.stubGlobal(
       'matchMedia',
@@ -115,28 +115,86 @@ describe('TableOfContents', () => {
     render(<TableOfContents title="글 제목" />);
     flushFrame();
 
-    fireEvent.click(screen.getByRole('link', { name: '두 번째 구간' }));
-    expect(target.scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start',
+    fireEvent.click(screen.getByRole('link', { name: '두 번째 구간' }), {
+      detail: 1,
     });
     expect(pushState).toHaveBeenCalledWith(null, '', '#second');
+    flushFrame();
+    flushFrameAt(240);
+    expect(scrollTo).toHaveBeenCalled();
+    const middle = scrollTo.mock.lastCall?.[1] as number;
+    expect(middle).toBeGreaterThan(0);
+    expect(middle).toBeLessThan(2200);
+    flushFrameAt(520);
+    expect(scrollTo).toHaveBeenLastCalledWith(0, 2200);
   });
 
-  it('respects reduced motion when scrolling from the table of contents', () => {
-    const target = article.querySelector<HTMLElement>('#first')!;
-    target.scrollIntoView = vi.fn();
+  it('keeps the heading clear of the sticky header during the scroll', () => {
+    const target = article.querySelector<HTMLElement>('#second')!;
+    target.style.scrollMarginTop = '112px';
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
     vi.stubGlobal(
       'matchMedia',
-      vi.fn(() => ({ matches: true }))
+      vi.fn(() => ({ matches: false }))
     );
 
     render(<TableOfContents title="글 제목" />);
     flushFrame();
+    fireEvent.click(screen.getByRole('link', { name: '두 번째 구간' }), {
+      detail: 1,
+    });
+    flushFrame();
+    flushFrameAt(520);
+    expect(scrollTo).toHaveBeenLastCalledWith(0, 2088);
+  });
 
-    fireEvent.click(screen.getByRole('link', { name: '첫 구간' }));
+  it('allows a wheel gesture to interrupt an animated click', () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false }))
+    );
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+    fireEvent.click(screen.getByRole('link', { name: '두 번째 구간' }), {
+      detail: 1,
+    });
+    flushFrame();
+    flushFrameAt(100);
+    const callsBeforeWheel = scrollTo.mock.calls.length;
+    fireEvent.wheel(window);
+    flushFrameAt(520);
+    expect(scrollTo).toHaveBeenCalledTimes(callsBeforeWheel);
+  });
+
+  it('moves immediately for keyboard activation or reduced motion', () => {
+    const target = article.querySelector<HTMLElement>('#first')!;
+    target.scrollIntoView = vi.fn();
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false }))
+    );
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+    fireEvent.click(screen.getByRole('link', { name: '첫 구간' }), {
+      detail: 0,
+    });
     expect(target.scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'auto',
+      behavior: 'instant',
+      block: 'start',
+    });
+
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true }))
+    );
+    fireEvent.click(screen.getByRole('link', { name: '첫 구간' }), {
+      detail: 1,
+    });
+    expect(target.scrollIntoView).toHaveBeenLastCalledWith({
+      behavior: 'instant',
       block: 'start',
     });
   });
@@ -339,22 +397,21 @@ describe('TableOfContents', () => {
     expect(railLinks.length).toBeGreaterThan(1);
     expect(
       [...railLinks].every(
-        link => parseFloat((link as HTMLElement).style.height) > 1.5
+        link => parseFloat((link as HTMLElement).style.height) > 2.5
       )
     ).toBe(true);
 
     fireEvent.click(screen.getByRole('button', { name: /전체 목차/ }));
     expect(rail.querySelectorAll('[data-toc-full-list] a')).toHaveLength(1001);
 
-    const target = article.querySelector<HTMLElement>('#section-999')!;
-    target.scrollIntoView = vi.fn();
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
     fireEvent.click(
-      rail.querySelector('[data-toc-full-list] a[href="#section-999"]')!
+      rail.querySelector('[data-toc-full-list] a[href="#section-999"]')!,
+      { detail: 1 }
     );
-    expect(target.scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start',
-    });
+    flushFrame();
+    flushFrameAt(520);
+    expect(scrollTo).toHaveBeenCalled();
     expect(rail.querySelector('[data-toc-full-list]')).toBeNull();
   });
 });
