@@ -413,18 +413,25 @@ export function TableOfContents({ title }: { title: string }) {
         >
           <span className={styles.label}>{section.title}</span>
           <span
-            className={styles.track}
+            className={styles.railHitArea}
             aria-hidden="true"
+            data-toc-rail-hit-area=""
             onPointerDown={handleRailPointerDown}
             onPointerMove={handleRailPointerMove}
             onPointerUp={handleRailPointerEnd}
             onPointerCancel={handleRailPointerEnd}
-            onClick={event => event.preventDefault()}
+            onClick={event => {
+              event.preventDefault();
+              event.stopPropagation();
+            }}
           >
-            <span
-              className={styles.fill}
-              style={{ height: `${section.progress * PERCENT}%` }}
-            />
+            <span className={styles.track}>
+              <span
+                className={styles.fill}
+                data-toc-rail-fill=""
+                style={{ height: `${section.progress * PERCENT}%` }}
+              />
+            </span>
           </span>
         </a>
       ))}

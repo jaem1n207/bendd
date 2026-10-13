@@ -100,7 +100,7 @@ describe('TableOfContents', () => {
     flushFrame();
     expect(first.getAttribute('aria-current')).toBe('location');
     expect(
-      (first.querySelector('[aria-hidden] > span') as HTMLElement).style.height
+      (first.querySelector('[data-toc-rail-fill]') as HTMLElement).style.height
     ).toBe(`${(300 / 700) * 100}%`);
   });
 
@@ -247,12 +247,12 @@ describe('TableOfContents', () => {
 
     for (const link of screen.getAllByRole('link')) {
       expect(
-        (link.querySelector('[aria-hidden] > span') as HTMLElement).style.height
+        (link.querySelector('[data-toc-rail-fill]') as HTMLElement).style.height
       ).toBe('100%');
     }
   });
 
-  it('maps the rail to the article when content follows it', () => {
+  it('maps clicks and drags across the whole rail without following section links', () => {
     Object.defineProperty(document.documentElement, 'scrollHeight', {
       configurable: true,
       value: 4000,
@@ -262,6 +262,7 @@ describe('TableOfContents', () => {
       value: 1000,
     });
     const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    const pushState = vi.spyOn(window.history, 'pushState');
 
     render(<TableOfContents title="글 제목" />);
     flushFrame();
@@ -272,20 +273,32 @@ describe('TableOfContents', () => {
       bottom: 820,
       height: 720,
     } as DOMRect);
-    const track = screen
-      .getByRole('link', { name: '첫 구간' })
-      .querySelector('[aria-hidden] > span')?.parentElement as HTMLElement;
-    track.setPointerCapture = vi.fn();
+    const hitArea = rail.querySelector<HTMLElement>('[data-toc-rail-hit-area]');
+    expect(hitArea).not.toBeNull();
+    hitArea!.setPointerCapture = vi.fn();
+    hitArea!.hasPointerCapture = vi.fn(() => true);
+    hitArea!.releasePointerCapture = vi.fn();
 
-    const pointerDown = new MouseEvent('pointerdown', {
-      bubbles: true,
-      button: 0,
-      clientY: 460,
-    });
-    Object.defineProperty(pointerDown, 'pointerId', { value: 1 });
-    fireEvent(track, pointerDown);
-    expect(track.setPointerCapture).toHaveBeenCalledWith(1);
-    expect(scrollTo).toHaveBeenCalledWith(0, 1888);
+    const pointerEvent = (type: string, clientY: number) => {
+      const event = new MouseEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientY,
+      });
+      Object.defineProperty(event, 'pointerId', { value: 1 });
+      fireEvent(hitArea!, event);
+    };
+    pointerEvent('pointerdown', 460);
+    pointerEvent('pointermove', 640);
+    pointerEvent('pointerup', 640);
+    fireEvent.click(hitArea!, { detail: 1 });
+
+    expect(scrollTo.mock.calls).toEqual([
+      [0, 1888],
+      [0, 2388],
+    ]);
+    expect(pushState).not.toHaveBeenCalled();
+    expect(window.location.hash).toBe('');
   });
 
   it('marks only passed sections for highlighted labels', () => {

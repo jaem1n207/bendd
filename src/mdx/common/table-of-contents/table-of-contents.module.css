@@ -13,12 +13,12 @@
 
 .section {
   position: absolute;
-  right: 4px;
+  right: 0;
   left: 16px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 16px;
+  gap: 12px;
   min-height: 4px;
   color: hsl(var(--muted-foreground));
   text-decoration: none;
@@ -68,17 +68,26 @@
   outline-offset: 2px;
 }
 
-.track {
+.railHitArea {
   position: relative;
   display: block;
   flex: none;
+  width: 24px;
+  height: 100%;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.track {
+  position: absolute;
+  top: 0;
+  right: 4px;
   width: 16px;
   height: calc(100% - 3px);
   min-height: 2px;
   overflow: hidden;
   border-radius: 999px;
-  cursor: ns-resize;
-  touch-action: none;
+  pointer-events: none;
 }
 
 .track::before {
