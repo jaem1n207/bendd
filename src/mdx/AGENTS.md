@@ -93,7 +93,7 @@ getSeriesBadges(articles);
 
 ## Table of Contents
 
-`common/table-of-contents/` measures the visible article `h2` headings on scroll and resize, then renders proportional right-edge segments with reading progress. The article title is the first segment. It queries live DOM so replaced headings are reflected on the next update. The rail appears at 1280px and above.
+`common/table-of-contents/` measures the visible article `h2` headings on scroll and resize, then renders proportional right-edge segments with reading progress. The article title is the first segment. It queries live DOM so replaced headings are reflected on the next update. The rail appears at 1280px and above, where the native page scrollbar is hidden. Its track supports proportional pointer scrolling, and completed section labels use the foreground color. At the document bottom, every segment is filled.
 
 - `client-table-of-contents.tsx`: Client boundary and deferred rendering
 - `table-of-contents.tsx`: Section measurement, progress, and accessible anchor links

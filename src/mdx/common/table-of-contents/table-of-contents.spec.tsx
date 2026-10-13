@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TableOfContents } from '@/mdx/common/table-of-contents/table-of-contents';
@@ -26,6 +26,14 @@ describe('TableOfContents', () => {
 
   beforeEach(() => {
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 });
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      value: 1000,
+    });
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      value: 5000,
+    });
     vi.stubGlobal(
       'ResizeObserver',
       class {
@@ -92,6 +100,98 @@ describe('TableOfContents', () => {
     expect(
       (first.querySelector('[aria-hidden] > span') as HTMLElement).style.height
     ).toBe(`${(300 / 700) * 100}%`);
+  });
+
+  it('fills every segment at the bottom of the page', () => {
+    place(article, 1200, 3800);
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      value: 4000,
+    });
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      value: 1000,
+    });
+    Object.defineProperty(window, 'scrollY', {
+      configurable: true,
+      value: 3000,
+    });
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    for (const link of screen.getAllByRole('link')) {
+      expect(
+        (link.querySelector('[aria-hidden] > span') as HTMLElement).style.height
+      ).toBe('100%');
+    }
+  });
+
+  it('uses the rail to scroll to a proportional page position', () => {
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      value: 4000,
+    });
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      value: 1000,
+    });
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    const rail = screen.getByRole('navigation', { name: '글 목차' });
+    vi.spyOn(rail, 'getBoundingClientRect').mockReturnValue({
+      top: 100,
+      bottom: 820,
+      height: 720,
+    } as DOMRect);
+    const track = screen
+      .getByRole('link', { name: '첫 구간' })
+      .querySelector('[aria-hidden]') as HTMLElement;
+    track.setPointerCapture = vi.fn();
+
+    const pointerDown = new MouseEvent('pointerdown', {
+      bubbles: true,
+      button: 0,
+      clientY: 460,
+    });
+    Object.defineProperty(pointerDown, 'pointerId', { value: 1 });
+    fireEvent(track, pointerDown);
+    expect(track.setPointerCapture).toHaveBeenCalledWith(1);
+    expect(scrollTo).toHaveBeenCalledWith(0, 1500);
+  });
+
+  it('marks only passed sections for highlighted labels', () => {
+    Object.defineProperty(window, 'scrollY', {
+      configurable: true,
+      value: 1688,
+    });
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    expect(
+      screen.getByRole('link', { name: '글 제목' }).getAttribute('data-passed')
+    ).toBe('true');
+    expect(
+      screen.getByRole('link', { name: '첫 구간' }).getAttribute('data-passed')
+    ).toBe('false');
+    expect(
+      screen
+        .getByRole('link', { name: '두 번째 구간' })
+        .getAttribute('data-passed')
+    ).toBe('false');
+
+    Object.defineProperty(window, 'scrollY', {
+      configurable: true,
+      value: 2300,
+    });
+    act(() => window.dispatchEvent(new Event('scroll')));
+    flushFrame();
+    expect(
+      screen.getByRole('link', { name: '첫 구간' }).getAttribute('data-passed')
+    ).toBe('true');
   });
 
   it('reads replaced headings on the next scroll and updates the active section', () => {

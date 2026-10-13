@@ -12,7 +12,7 @@
 
 .section {
   position: absolute;
-  right: 12px;
+  right: 4px;
   left: 16px;
   display: flex;
   align-items: center;
@@ -45,7 +45,7 @@
 }
 
 .section:hover .label,
-.section[aria-current='location'] .label {
+.section[data-passed='true'] .label {
   color: hsl(var(--foreground));
 }
 
@@ -58,24 +58,39 @@
   position: relative;
   display: block;
   flex: none;
-  width: 2px;
+  width: 16px;
   height: calc(100% - 3px);
   min-height: 2px;
   overflow: hidden;
   border-radius: 999px;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.track::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 7px;
+  width: 2px;
   background-color: hsl(var(--foreground) / 0.16);
-  transition: width 250ms ease;
+  content: '';
 }
 
 .fill {
+  position: absolute;
+  top: 0;
+  left: 7px;
   display: block;
-  width: 100%;
+  width: 2px;
   border-radius: inherit;
   background-color: hsl(var(--foreground));
 }
 
-.nav:hover .track,
-.nav:focus-within .track {
+.nav:hover .track::before,
+.nav:hover .fill,
+.nav:focus-within .track::before,
+.nav:focus-within .fill {
   width: 3px;
 }
 
@@ -86,8 +101,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .label,
-  .track {
+  .label {
     transition: none;
   }
 }

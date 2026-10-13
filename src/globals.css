@@ -340,3 +340,16 @@
     stroke-dashoffset: 0;
   }
 }
+
+/* On article and craft detail pages the reading rail is the visible scroll control. */
+@media (min-width: 1280px) {
+  html:has(#BenddDoc),
+  html:has(#BenddDoc) body {
+    scrollbar-width: none;
+  }
+
+  html:has(#BenddDoc)::-webkit-scrollbar,
+  html:has(#BenddDoc) body::-webkit-scrollbar {
+    display: none;
+  }
+}

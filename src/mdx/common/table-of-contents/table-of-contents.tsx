@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { type PointerEvent, useEffect, useState } from 'react';
 
 import styles from '@/mdx/common/table-of-contents/table-of-contents.module.css';
 
@@ -9,6 +9,7 @@ const HEADING_SELECTOR = 'h2[id]';
 const READING_OFFSET_PX = 112;
 const READING_VIEWPORT_RATIO = 0.2;
 const PERCENT = 100;
+const BOTTOM_TOLERANCE_PX = 1;
 
 type Section = {
   id: string;
@@ -18,6 +19,50 @@ type Section = {
   progress: number;
 };
 
+function getMaxScrollY() {
+  const scrollHeight =
+    document.scrollingElement?.scrollHeight ??
+    document.documentElement.scrollHeight;
+  return Math.max(0, scrollHeight - window.innerHeight);
+}
+
+function scrollFromRail(event: PointerEvent<HTMLSpanElement>) {
+  const nav = event.currentTarget.closest('nav');
+  if (!nav) {
+    return;
+  }
+
+  const { top, height } = nav.getBoundingClientRect();
+  if (height <= 0) {
+    return;
+  }
+
+  const fraction = Math.min(1, Math.max(0, (event.clientY - top) / height));
+  window.scrollTo(0, fraction * getMaxScrollY());
+}
+
+function handleRailPointerDown(event: PointerEvent<HTMLSpanElement>) {
+  if (event.button !== 0) {
+    return;
+  }
+
+  event.preventDefault();
+  event.currentTarget.setPointerCapture(event.pointerId);
+  scrollFromRail(event);
+}
+
+function handleRailPointerMove(event: PointerEvent<HTMLSpanElement>) {
+  if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+    scrollFromRail(event);
+  }
+}
+
+function handleRailPointerEnd(event: PointerEvent<HTMLSpanElement>) {
+  if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+    event.currentTarget.releasePointerCapture(event.pointerId);
+  }
+}
+
 function measureSections(title: string): Section[] {
   const doc = document.getElementById(DOCUMENT_ID);
   const article = doc?.querySelector('article');
@@ -26,6 +71,7 @@ function measureSections(title: string): Section[] {
   }
 
   const scrollY = window.scrollY;
+  const atBottom = scrollY >= getMaxScrollY() - BOTTOM_TOLERANCE_PX;
   const start = doc.getBoundingClientRect().top + scrollY;
   const end = Math.max(
     article.getBoundingClientRect().bottom + scrollY,
@@ -60,10 +106,12 @@ function measureSections(title: string): Section[] {
       title: section.title,
       top: ((section.position - start) / total) * PERCENT,
       height: ((next - section.position) / total) * PERCENT,
-      progress: Math.min(
-        1,
-        Math.max(0, (readingPosition - section.position) / length)
-      ),
+      progress: atBottom
+        ? 1
+        : Math.min(
+            1,
+            Math.max(0, (readingPosition - section.position) / length)
+          ),
     };
   });
 }
@@ -123,9 +171,18 @@ export function TableOfContents({ title }: { title: string }) {
           style={{ top: `${section.top}%`, height: `${section.height}%` }}
           aria-label={section.title}
           aria-current={index === activeIndex ? 'location' : undefined}
+          data-passed={section.progress === 1}
         >
           <span className={styles.label}>{section.title}</span>
-          <span className={styles.track} aria-hidden="true">
+          <span
+            className={styles.track}
+            aria-hidden="true"
+            onPointerDown={handleRailPointerDown}
+            onPointerMove={handleRailPointerMove}
+            onPointerUp={handleRailPointerEnd}
+            onPointerCancel={handleRailPointerEnd}
+            onClick={event => event.preventDefault()}
+          >
             <span
               className={styles.fill}
               style={{ height: `${section.progress * PERCENT}%` }}
