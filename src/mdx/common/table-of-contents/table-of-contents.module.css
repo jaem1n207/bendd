@@ -1,0 +1,260 @@
+.nav {
+  position: fixed;
+  z-index: 40;
+  top: 50%;
+  right: 0;
+  display: none;
+  width: 280px;
+  height: 72vh;
+  --toc-label-max-width: 228px;
+  transform: translateY(-50%);
+  font-family: system-ui, var(--font-sans, sans-serif);
+}
+
+.section {
+  position: absolute;
+  right: 0;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-height: 4px;
+  color: hsl(var(--muted-foreground));
+  text-decoration: none;
+}
+
+.label {
+  overflow: hidden;
+  max-width: var(--toc-label-max-width);
+  opacity: 0;
+  transform: translateX(4px);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition:
+    opacity 120ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 140ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.section[data-depth='1'] .label {
+  margin-right: 10px;
+}
+
+.nav:has(:focus-visible) .section[data-depth='0'] .label,
+.section[data-depth='1']:focus-visible .label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.nav:has(:focus-visible) .label,
+.section:focus-visible .label {
+  transition: none;
+}
+
+.section:focus-visible {
+  z-index: 1;
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.section[data-passed='true'] .label {
+  color: hsl(var(--foreground));
+}
+
+.railHitArea {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 24px;
+  height: 100%;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.touchRailHitArea {
+  display: none;
+}
+
+.track {
+  position: absolute;
+  top: 0;
+  right: 4px;
+  width: 16px;
+  height: calc(100% - 3px);
+  min-height: 2px;
+  overflow: hidden;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.track::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 8px;
+  width: 2px;
+  background-color: hsl(var(--foreground) / 0.16);
+  content: '';
+}
+
+.section[data-depth='1'] .track::before {
+  right: 8.5px;
+  width: 1px;
+}
+
+.fill {
+  position: absolute;
+  top: 0;
+  right: 8px;
+  display: block;
+  width: 2px;
+  border-radius: inherit;
+  background-color: hsl(var(--foreground));
+}
+
+.nav:has(:focus-visible) .track::before,
+.nav:has(:focus-visible) .fill {
+  width: 3px;
+}
+
+.nav:has(:focus-visible) .section[data-depth='1'] .track::before {
+  width: 1px;
+}
+
+@media (min-width: 1280px) {
+  .nav {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .label {
+    transition: none;
+  }
+}
+
+.section:focus-visible .label {
+  position: absolute;
+  right: 32px;
+  width: max-content;
+  max-width: min(var(--toc-label-max-width), calc(100vw - 64px));
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+  background-color: hsl(var(--background));
+}
+
+.fullListToggle {
+  position: absolute;
+  z-index: 3;
+  top: -38px;
+  right: 20px;
+  padding: 6px 9px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.fullListToggle:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.fullList {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  right: 20px;
+  width: 280px;
+  max-height: 100%;
+  overflow-y: auto;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  background-color: hsl(var(--background));
+  box-shadow: 0 8px 24px hsl(var(--foreground) / 0.12);
+}
+
+.fullList a {
+  display: block;
+  padding: 7px 12px;
+  color: hsl(var(--muted-foreground));
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.fullList a[data-depth='1'] {
+  padding-left: 24px;
+}
+
+.fullList a:hover,
+.fullList a:focus-visible,
+.fullList a[aria-current='location'] {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav:hover .section[data-depth='0'] .label,
+  .section[data-depth='1']:hover .label {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .section:hover {
+    z-index: 1;
+  }
+
+  .section:hover .label {
+    position: absolute;
+    right: 32px;
+    width: max-content;
+    max-width: min(var(--toc-label-max-width), calc(100vw - 64px));
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    white-space: normal;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  .nav:hover .track::before,
+  .nav:hover .fill {
+    width: 3px;
+  }
+
+  .nav:hover .section[data-depth='1'] .track::before {
+    width: 1px;
+  }
+}
+
+@media (pointer: coarse) {
+  .touchRailHitArea {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    display: block;
+    width: 44px;
+    height: 100%;
+    touch-action: none;
+  }
+}
+
+@media (hover: none) {
+  .section[aria-current='location'] .label {
+    opacity: 1;
+    transform: translateX(0);
+    transition: none;
+  }
+}

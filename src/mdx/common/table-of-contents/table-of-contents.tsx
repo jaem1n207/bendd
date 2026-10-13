@@ -1,92 +1,535 @@
 'use client';
 
-import { ListTree } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { type MouseEvent, type PointerEvent, useEffect, useState } from 'react';
 
-import { FluidHover } from '@/components/ui/fluid-hover';
-import { Typography } from '@/components/ui/typography';
-import { useScrollFade } from '@/hooks/use-scroll-fade';
-import { cn } from '@/lib/utils';
-import { TocRail } from '@/mdx/common/table-of-contents/toc-rail';
-import type { MenuItem } from '@/mdx/common/table-of-contents/toc';
-import {
-  flattenMenuItems,
-  getTocRailPadding,
-} from '@/mdx/common/table-of-contents/toc-tree';
-import {
-  getHeaders,
-  useActiveAnchor,
-} from '@/mdx/common/table-of-contents/use-toc';
+import styles from '@/mdx/common/table-of-contents/table-of-contents.module.css';
 
-export function TableOfContents() {
-  const [toc, setToc] = useState<MenuItem[]>([]);
-  const containerRef = useRef<HTMLUListElement>(null);
-  const flatToc = flattenMenuItems(toc);
+const DOCUMENT_ID = 'BenddDoc';
+const HEADING_SELECTOR = 'h2[id], h3[id]';
+const READING_OFFSET_PX = 112;
+const READING_VIEWPORT_RATIO = 0.2;
+const RAIL_VIEWPORT_RATIO = 0.72;
+const MIN_LINK_HEIGHT_PX = 4;
+const MIN_GROUP_HEIGHT_PX = 20;
+const MIN_SCROLL_DURATION_MS = 220;
+const MAX_SCROLL_DURATION_MS = 500;
+const SCROLL_PIXELS_PER_MS = 8;
+const PERCENT = 100;
+const BOTTOM_TOLERANCE_PX = 1;
 
-  useActiveAnchor(containerRef, flatToc.length);
-  useScrollFade(containerRef, 'y', flatToc.length);
+let sectionScrollFrame = 0;
+let removeScrollInterruption: (() => void) | null = null;
 
-  useEffect(() => {
-    setToc(getHeaders([2, 4]));
-  }, []);
+type Section = {
+  id: string;
+  title: string;
+  depth: number;
+  top: number;
+  height: number;
+  progress: number;
+  count: number;
+};
 
-  return (
-    <nav
-      aria-labelledby="table-of-contents-heading"
-      className="toc-navbar flex max-h-full min-h-0 min-w-0 flex-col self-start overflow-hidden"
-    >
-      <div className="mt-6 flex items-center gap-1.5 text-muted-foreground">
-        <ListTree aria-hidden="true" className="size-3.5 shrink-0" />
-        <Typography
-          id="table-of-contents-heading"
-          variant="p"
-          affects="small"
-          asChild
-          className="!mt-0 !leading-5"
-        >
-          <p>On this page</p>
-        </Typography>
-      </div>
-      <FluidHover highlightClassName="rounded-sm bg-muted/50">
-        <ul
-          ref={containerRef}
-          className={cn(
-            'scroll-fade-y relative mt-2 min-h-0 flex-1 overflow-y-auto rounded-sm py-1 font-sans [--scroll-fade-size:16px]'
-          )}
-        >
-          <TocRail linkCount={flatToc.length} />
-          {flatToc.map(({ item, depth }) => (
-            <TableOfContentsItem key={item.link} item={item} depth={depth} />
-          ))}
-        </ul>
-      </FluidHover>
-    </nav>
+type ArticleBounds = {
+  article: HTMLElement;
+  start: number;
+  end: number;
+};
+
+type HeadingSnapshot = {
+  element: HTMLHeadingElement;
+  id: string;
+  title: string;
+  depth: number;
+  hidden: boolean;
+  className: string;
+  style: string | null;
+};
+
+type SectionGeometry = Omit<Section, 'progress' | 'count'> & {
+  position: number;
+  length: number;
+};
+
+function getMaxScrollY() {
+  const scrollHeight =
+    document.scrollingElement?.scrollHeight ??
+    document.documentElement.scrollHeight;
+  return Math.max(0, scrollHeight - window.innerHeight);
+}
+
+function getReadingOffset() {
+  return Math.min(
+    READING_OFFSET_PX,
+    window.innerHeight * READING_VIEWPORT_RATIO
   );
 }
 
-interface TableOfContentsItemProps {
-  item: MenuItem;
-  depth: number;
+function getArticleBounds(): ArticleBounds | null {
+  const doc = document.getElementById(DOCUMENT_ID);
+  const article = doc?.querySelector<HTMLElement>('article');
+  if (!doc || !article) {
+    return null;
+  }
+
+  const scrollY = window.scrollY;
+  const start = doc.getBoundingClientRect().top + scrollY;
+  const end = Math.max(
+    article.getBoundingClientRect().bottom + scrollY,
+    start + 1
+  );
+  return { article, start, end };
 }
 
-function TableOfContentsItem({ item, depth }: TableOfContentsItemProps) {
+function scrollFromRail(event: PointerEvent<HTMLSpanElement>) {
+  const nav = event.currentTarget.closest('nav');
+  const bounds = getArticleBounds();
+  if (!nav || !bounds) {
+    return;
+  }
+
+  const { top, height } = nav.getBoundingClientRect();
+  if (height <= 0) {
+    return;
+  }
+
+  const fraction = Math.min(1, Math.max(0, (event.clientY - top) / height));
+  const readingPosition = bounds.start + fraction * (bounds.end - bounds.start);
+  const scrollY = Math.min(
+    getMaxScrollY(),
+    Math.max(0, readingPosition - getReadingOffset())
+  );
+  window.scrollTo(0, scrollY);
+}
+
+function handleRailPointerDown(event: PointerEvent<HTMLSpanElement>) {
+  if (event.button !== 0) {
+    return;
+  }
+
+  event.preventDefault();
+  event.currentTarget.setPointerCapture(event.pointerId);
+  scrollFromRail(event);
+}
+
+function handleRailPointerMove(event: PointerEvent<HTMLSpanElement>) {
+  if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+    scrollFromRail(event);
+  }
+}
+
+function handleRailPointerEnd(event: PointerEvent<HTMLSpanElement>) {
+  if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+    event.currentTarget.releasePointerCapture(event.pointerId);
+  }
+}
+
+function cancelSectionScroll() {
+  if (sectionScrollFrame) {
+    cancelAnimationFrame(sectionScrollFrame);
+    sectionScrollFrame = 0;
+  }
+  removeScrollInterruption?.();
+  removeScrollInterruption = null;
+}
+
+function animateSectionScroll(target: HTMLElement) {
+  cancelSectionScroll();
+
+  const start = window.scrollY;
+  const scrollMargin =
+    parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+  const destination = Math.min(
+    getMaxScrollY(),
+    Math.max(0, target.getBoundingClientRect().top + start - scrollMargin)
+  );
+  const distance = destination - start;
+  if (Math.abs(distance) < 1) {
+    window.scrollTo(0, destination);
+    return;
+  }
+
+  const duration = Math.min(
+    MAX_SCROLL_DURATION_MS,
+    Math.max(
+      MIN_SCROLL_DURATION_MS,
+      MIN_SCROLL_DURATION_MS + Math.abs(distance) / SCROLL_PIXELS_PER_MS
+    )
+  );
+  const interrupt = () => cancelSectionScroll();
+  window.addEventListener('wheel', interrupt, { passive: true });
+  window.addEventListener('touchstart', interrupt, { passive: true });
+  window.addEventListener('pointerdown', interrupt, { passive: true });
+  window.addEventListener('keydown', interrupt);
+  removeScrollInterruption = () => {
+    window.removeEventListener('wheel', interrupt);
+    window.removeEventListener('touchstart', interrupt);
+    window.removeEventListener('pointerdown', interrupt);
+    window.removeEventListener('keydown', interrupt);
+  };
+
+  let startedAt: number | null = null;
+  const step = (time: number) => {
+    if (startedAt === null) {
+      startedAt = time;
+    }
+    const progress = Math.min(1, (time - startedAt) / duration);
+    const eased = 1 - (1 - progress) ** 3;
+    window.scrollTo(0, start + distance * eased);
+    if (progress < 1) {
+      sectionScrollFrame = requestAnimationFrame(step);
+    } else {
+      cancelSectionScroll();
+    }
+  };
+  sectionScrollFrame = requestAnimationFrame(step);
+}
+
+function handleSectionClick(event: MouseEvent<HTMLAnchorElement>, id: string) {
+  if (
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  ) {
+    return;
+  }
+
+  const target = document.getElementById(id);
+  if (!target) {
+    return;
+  }
+
+  event.preventDefault();
+  const hash = `#${encodeURIComponent(id)}`;
+  if (window.location.hash !== hash) {
+    window.history.pushState(null, '', hash);
+  }
+  if (
+    event.detail === 0 ||
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  ) {
+    cancelSectionScroll();
+    target.scrollIntoView({ behavior: 'instant', block: 'start' });
+    return;
+  }
+  animateSectionScroll(target);
+}
+
+function readHeadings(article: HTMLElement): HeadingSnapshot[] {
+  return Array.from(
+    article.querySelectorAll<HTMLHeadingElement>(HEADING_SELECTOR)
+  ).map(element => ({
+    element,
+    id: element.id,
+    title: element.textContent?.trim() || element.id,
+    depth: element.tagName === 'H3' ? 1 : 0,
+    hidden: element.hidden,
+    className: element.className,
+    style: element.getAttribute('style'),
+  }));
+}
+
+function headingsChanged(
+  previous: HeadingSnapshot[],
+  current: HeadingSnapshot[]
+) {
   return (
-    <li aria-level={depth + 1}>
-      <Link
-        href={{ hash: item.link.slice(1) }}
-        data-fluid-hover-item=""
-        data-active="false"
-        data-toc-depth={depth}
-        style={{ paddingInlineStart: getTocRailPadding(depth) }}
-        className={cn(
-          'group relative block max-w-full break-keep py-1.5 text-sm font-medium leading-5',
-          'text-muted-foreground/70 transition-colors data-[fluid-hover-active]:text-foreground',
-          'data-[active=true]:!text-foreground'
-        )}
-      >
-        <span className="relative z-10">{item.title}</span>
-      </Link>
-    </li>
+    previous.length !== current.length ||
+    current.some((heading, index) => {
+      const old = previous[index];
+      return (
+        heading.element !== old.element ||
+        heading.id !== old.id ||
+        heading.title !== old.title ||
+        heading.hidden !== old.hidden ||
+        heading.className !== old.className ||
+        heading.style !== old.style
+      );
+    })
+  );
+}
+
+function measureGeometry(
+  title: string,
+  snapshots: HeadingSnapshot[]
+): SectionGeometry[] {
+  const bounds = getArticleBounds();
+  if (!bounds) {
+    return [];
+  }
+
+  const { start, end } = bounds;
+  const scrollY = window.scrollY;
+  const headings = snapshots
+    .filter(heading => heading.element.getClientRects().length > 0)
+    .map(heading => ({
+      id: heading.id,
+      title: heading.title,
+      depth: heading.depth,
+      position: heading.element.getBoundingClientRect().top + scrollY,
+    }))
+    .filter(heading => heading.position > start && heading.position < end)
+    .sort((a, b) => a.position - b.position);
+
+  if (headings.length === 0) {
+    return [];
+  }
+
+  const boundaries = [
+    { id: DOCUMENT_ID, title, depth: 0, position: start },
+    ...headings,
+    { id: '', title: '', depth: 0, position: end },
+  ];
+  const total = end - start;
+
+  return boundaries.slice(0, -1).map((section, index) => {
+    const next = boundaries[index + 1].position;
+    return {
+      id: section.id,
+      title: section.title,
+      depth: section.depth,
+      position: section.position,
+      length: Math.max(next - section.position, 1),
+      top: ((section.position - start) / total) * PERCENT,
+      height: ((next - section.position) / total) * PERCENT,
+    };
+  });
+}
+
+function updateProgress(geometry: SectionGeometry[]): Section[] {
+  const scrollY = window.scrollY;
+  const atBottom = scrollY >= getMaxScrollY() - BOTTOM_TOLERANCE_PX;
+  const readingPosition = scrollY + getReadingOffset();
+
+  return geometry.map(section => ({
+    id: section.id,
+    title: section.title,
+    depth: section.depth,
+    top: section.top,
+    height: section.height,
+    progress: atBottom
+      ? 1
+      : Math.min(
+          1,
+          Math.max(0, (readingPosition - section.position) / section.length)
+        ),
+    count: 1,
+  }));
+}
+
+function mergeSections(sections: Section[]): Section {
+  const first = sections[0];
+  const height = sections.reduce((sum, section) => sum + section.height, 0);
+  const consumed = sections.reduce(
+    (sum, section) => sum + section.height * section.progress,
+    0
+  );
+  return {
+    ...first,
+    title:
+      sections.length === 1
+        ? first.title
+        : `${first.title} 외 ${sections.length - 1}개 구간`,
+    height,
+    progress: height > 0 ? consumed / height : 0,
+    count: sections.length,
+  };
+}
+
+function groupSections(sections: Section[]): Section[] {
+  const railHeight = Math.max(window.innerHeight * RAIL_VIEWPORT_RATIO, 1);
+  const linkHeight = (MIN_LINK_HEIGHT_PX / railHeight) * PERCENT;
+  if (sections.every(section => section.height >= linkHeight)) {
+    return sections;
+  }
+
+  const groupHeight = (MIN_GROUP_HEIGHT_PX / railHeight) * PERCENT;
+  const grouped: Section[] = [];
+  let groupStart = 0;
+
+  for (let index = 1; index < sections.length; index++) {
+    const distance = sections[index].top - sections[groupStart].top;
+    const remaining = PERCENT - sections[index].top;
+    if (distance < groupHeight || remaining < groupHeight) {
+      continue;
+    }
+
+    grouped.push(mergeSections(sections.slice(groupStart, index)));
+    groupStart = index;
+  }
+
+  grouped.push(mergeSections(sections.slice(groupStart)));
+  return grouped;
+}
+
+function getActiveIndex(sections: Section[]) {
+  let activeIndex = 0;
+  sections.forEach((section, index) => {
+    if (section.progress > 0) {
+      activeIndex = index;
+    }
+  });
+  return activeIndex;
+}
+
+export function TableOfContents({ title }: { title: string }) {
+  const [sections, setSections] = useState<Section[]>([]);
+  const [isFullListOpen, setIsFullListOpen] = useState(false);
+
+  useEffect(() => {
+    let frame = 0;
+    let geometry: SectionGeometry[] = [];
+    let measuredHeadings: HeadingSnapshot[] = [];
+    let needsMeasure = true;
+    let observedArticle: HTMLElement | null = null;
+    let observer: ResizeObserver | null = null;
+
+    const update = () => {
+      frame = 0;
+      const article =
+        document
+          .getElementById(DOCUMENT_ID)
+          ?.querySelector<HTMLElement>('article') ?? null;
+      if (article !== observedArticle) {
+        observer?.disconnect();
+        observer = article ? new ResizeObserver(invalidate) : null;
+        if (article && observer) {
+          observer.observe(article);
+        }
+        observedArticle = article;
+        needsMeasure = true;
+      }
+
+      const headings = article ? readHeadings(article) : [];
+      if (needsMeasure || headingsChanged(measuredHeadings, headings)) {
+        geometry = measureGeometry(title, headings);
+        measuredHeadings = headings;
+        needsMeasure = false;
+      }
+      setSections(updateProgress(geometry));
+    };
+    const schedule = () => {
+      if (!frame) {
+        frame = requestAnimationFrame(update);
+      }
+    };
+    const invalidate = () => {
+      needsMeasure = true;
+      schedule();
+    };
+
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', invalidate);
+    schedule();
+
+    return () => {
+      if (frame) {
+        cancelAnimationFrame(frame);
+      }
+      observer?.disconnect();
+      cancelSectionScroll();
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', invalidate);
+    };
+  }, [title]);
+
+  if (sections.length === 0) {
+    return null;
+  }
+
+  const railSections = groupSections(sections);
+  const isDense = railSections.length < sections.length;
+  const activeRailIndex = getActiveIndex(railSections);
+  const activeSectionIndex = getActiveIndex(sections);
+
+  return (
+    <nav className={styles.nav} aria-label="글 목차">
+      {isDense && (
+        <button
+          type="button"
+          className={styles.fullListToggle}
+          aria-expanded={isFullListOpen}
+          aria-controls={isFullListOpen ? 'toc-full-list' : undefined}
+          onClick={() => setIsFullListOpen(open => !open)}
+        >
+          {isFullListOpen ? '목차 닫기' : `전체 목차 (${sections.length})`}
+        </button>
+      )}
+      {isDense && isFullListOpen && (
+        <div
+          id="toc-full-list"
+          className={styles.fullList}
+          role="region"
+          aria-label="전체 목차"
+          data-toc-full-list=""
+        >
+          {sections.map((section, index) => (
+            <a
+              key={section.id}
+              href={`#${section.id}`}
+              data-depth={section.depth}
+              aria-current={
+                index === activeSectionIndex ? 'location' : undefined
+              }
+              onClick={event => {
+                handleSectionClick(event, section.id);
+                setIsFullListOpen(false);
+              }}
+            >
+              {section.title}
+            </a>
+          ))}
+        </div>
+      )}
+      {railSections.map((section, index) => (
+        <a
+          key={section.id}
+          href={`#${section.id}`}
+          className={styles.section}
+          style={{ top: `${section.top}%`, height: `${section.height}%` }}
+          aria-label={section.title}
+          aria-current={index === activeRailIndex ? 'location' : undefined}
+          data-passed={section.progress === 1}
+          data-depth={section.depth}
+          data-group-size={section.count}
+          data-toc-rail-link=""
+          onClick={event => handleSectionClick(event, section.id)}
+        >
+          <span className={styles.label}>{section.title}</span>
+          <span
+            className={styles.railHitArea}
+            aria-hidden="true"
+            data-toc-rail-hit-area=""
+            onPointerDown={handleRailPointerDown}
+            onPointerMove={handleRailPointerMove}
+            onPointerUp={handleRailPointerEnd}
+            onPointerCancel={handleRailPointerEnd}
+            onClick={event => {
+              event.preventDefault();
+              event.stopPropagation();
+            }}
+          >
+            <span className={styles.track}>
+              <span
+                className={styles.fill}
+                data-toc-rail-fill=""
+                style={{ height: `${section.progress * PERCENT}%` }}
+              />
+            </span>
+          </span>
+        </a>
+      ))}
+      <span
+        className={styles.touchRailHitArea}
+        aria-hidden="true"
+        data-toc-touch-hit-area=""
+        onPointerDown={handleRailPointerDown}
+        onPointerMove={handleRailPointerMove}
+        onPointerUp={handleRailPointerEnd}
+        onPointerCancel={handleRailPointerEnd}
+      />
+    </nav>
   );
 }

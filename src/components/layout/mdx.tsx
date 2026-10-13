@@ -69,8 +69,8 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
               </Link>
             </div>
           </FluidHover>
-          <ClientTableOfContents />
         </div>
+        <ClientTableOfContents title={title} />
         <Typography
           variant="h2"
           className={cn(styles.contentText, styles.contentTitle)}

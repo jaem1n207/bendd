@@ -1,40 +1,490 @@
-import { render, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, test } from 'vitest';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TableOfContents } from '@/mdx/common/table-of-contents/table-of-contents';
 
 describe('TableOfContents', () => {
-  afterEach(() => {
-    document.getElementById('BenddDoc')?.remove();
-  });
+  let doc: HTMLElement;
+  let article: HTMLElement;
+  let pendingFrame: FrameRequestCallback | undefined;
 
-  test('should wire every depth into one shared base and active rail', async () => {
-    const documentEl = document.createElement('div');
-    documentEl.id = 'BenddDoc';
-    documentEl.innerHTML = `
-      <h2 id="parent"><a class="header-anchor">Parent</a></h2>
-      <h3 id="child"><a class="header-anchor">Child</a></h3>
-    `;
-    document.body.appendChild(documentEl);
+  const flushFrameAt = (time: number) => {
+    const callback = pendingFrame;
+    pendingFrame = undefined;
+    act(() => callback?.(time));
+  };
+  const flushFrame = () => flushFrameAt(0);
 
-    const { container } = render(<TableOfContents />);
-    const nav = container.querySelector('nav');
+  const place = (element: Element, top: number, bottom = top) => {
+    vi.spyOn(element, 'getBoundingClientRect').mockImplementation(
+      () =>
+        ({
+          top: top - window.scrollY,
+          bottom: bottom - window.scrollY,
+        }) as DOMRect
+    );
+  };
 
-    await waitFor(() => {
-      expect(nav?.querySelectorAll('ul a')).toHaveLength(2);
+  beforeEach(() => {
+    window.history.replaceState(null, '', window.location.pathname);
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 });
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      value: 1000,
+    });
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      value: 5000,
+    });
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        observe() {}
+        disconnect() {}
+      }
+    );
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(callback => {
+      pendingFrame = callback;
+      return 1;
+    });
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {
+      pendingFrame = undefined;
     });
 
+    doc = document.createElement('section');
+    doc.id = 'BenddDoc';
+    doc.innerHTML =
+      '<article><h2 id="first">첫 구간</h2><h2 id="second">두 번째 구간</h2></article>';
+    document.body.appendChild(doc);
+    article = doc.querySelector('article')!;
+    place(doc, 1000);
+    place(article, 1200, 3000);
+    const headings = article.querySelectorAll('h2');
+    place(headings[0], 1500);
+    place(headings[1], 2200);
+    headings.forEach(heading =>
+      vi
+        .spyOn(heading, 'getClientRects')
+        .mockReturnValue({ length: 1 } as DOMRectList)
+    );
+  });
+
+  afterEach(() => {
+    doc.remove();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    pendingFrame = undefined;
+  });
+
+  it('maps document sections to proportional rail segments and live reading progress', () => {
+    const addListener = vi.spyOn(window, 'addEventListener');
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    const first = screen.getByRole('link', { name: '첫 구간' });
+    const second = screen.getByRole('link', { name: '두 번째 구간' });
+    expect(first.getAttribute('href')).toBe('#first');
+    expect(first.style.top).toBe('25%');
+    expect(first.style.height).toBe('35%');
+    expect(second.style.top).toBe('60%');
+    expect(second.style.height).toBe('40%');
     expect(
-      Array.from(nav?.querySelectorAll<HTMLAnchorElement>('ul a') ?? []).map(
-        link => link.dataset.tocDepth
-      )
-    ).toEqual(['0', '1']);
-    expect(nav?.querySelectorAll('[data-toc-rail="base"]')).toHaveLength(1);
-    expect(nav?.querySelectorAll('[data-toc-rail="active"]')).toHaveLength(1);
+      addListener.mock.calls.find(([name]) => name === 'scroll')?.[2]
+    ).toEqual({ passive: true });
+
+    Object.defineProperty(window, 'scrollY', {
+      configurable: true,
+      value: 1688,
+    });
+    act(() => window.dispatchEvent(new Event('scroll')));
+    flushFrame();
+    expect(first.getAttribute('aria-current')).toBe('location');
     expect(
-      Array.from(nav?.querySelector('ul')?.children ?? []).every(
-        child => child instanceof HTMLLIElement
+      (first.querySelector('[data-toc-rail-fill]') as HTMLElement).style.height
+    ).toBe(`${(300 / 700) * 100}%`);
+  });
+
+  it('updates reading progress without remeasuring stable headings on scroll', () => {
+    const headings = Array.from(article.querySelectorAll('h2'));
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    const firstRect = vi.mocked(headings[0].getBoundingClientRect);
+    const secondRect = vi.mocked(headings[1].getBoundingClientRect);
+    const firstClientRects = vi.mocked(headings[0].getClientRects);
+    const secondClientRects = vi.mocked(headings[1].getClientRects);
+    firstRect.mockClear();
+    secondRect.mockClear();
+    firstClientRects.mockClear();
+    secondClientRects.mockClear();
+
+    Object.defineProperty(window, 'scrollY', {
+      configurable: true,
+      value: 1688,
+    });
+    act(() => window.dispatchEvent(new Event('scroll')));
+    flushFrame();
+
+    expect(firstRect).not.toHaveBeenCalled();
+    expect(secondRect).not.toHaveBeenCalled();
+    expect(firstClientRects).not.toHaveBeenCalled();
+    expect(secondClientRects).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('link', { name: '첫 구간' }).getAttribute('aria-current')
+    ).toBe('location');
+  });
+
+  it('remeasures section positions after layout changes', () => {
+    const heading = article.querySelector<HTMLHeadingElement>('#first')!;
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    vi.mocked(heading.getBoundingClientRect).mockImplementation(
+      () =>
+        ({
+          top: 1600 - window.scrollY,
+        }) as DOMRect
+    );
+    fireEvent.resize(window);
+    flushFrame();
+
+    expect(screen.getByRole('link', { name: '첫 구간' }).style.top).toBe('30%');
+  });
+
+  it('finishes a mouse click with a short smooth scroll and updates its hash', () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    const pushState = vi.spyOn(window.history, 'pushState');
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false }))
+    );
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    fireEvent.click(screen.getByRole('link', { name: '두 번째 구간' }), {
+      detail: 1,
+    });
+    expect(pushState).toHaveBeenCalledWith(null, '', '#second');
+    flushFrame();
+    flushFrameAt(240);
+    expect(scrollTo).toHaveBeenCalled();
+    const middle = scrollTo.mock.lastCall?.[1] as number;
+    expect(middle).toBeGreaterThan(0);
+    expect(middle).toBeLessThan(2200);
+    flushFrameAt(520);
+    expect(scrollTo).toHaveBeenLastCalledWith(0, 2200);
+  });
+
+  it('keeps the heading clear of the sticky header during the scroll', () => {
+    const target = article.querySelector<HTMLElement>('#second')!;
+    target.style.scrollMarginTop = '112px';
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false }))
+    );
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+    fireEvent.click(screen.getByRole('link', { name: '두 번째 구간' }), {
+      detail: 1,
+    });
+    flushFrame();
+    flushFrameAt(520);
+    expect(scrollTo).toHaveBeenLastCalledWith(0, 2088);
+  });
+
+  it('allows a wheel gesture to interrupt an animated click', () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false }))
+    );
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+    fireEvent.click(screen.getByRole('link', { name: '두 번째 구간' }), {
+      detail: 1,
+    });
+    flushFrame();
+    flushFrameAt(100);
+    const callsBeforeWheel = scrollTo.mock.calls.length;
+    fireEvent.wheel(window);
+    flushFrameAt(520);
+    expect(scrollTo).toHaveBeenCalledTimes(callsBeforeWheel);
+  });
+
+  it('moves immediately for keyboard activation or reduced motion', () => {
+    const target = article.querySelector<HTMLElement>('#first')!;
+    target.scrollIntoView = vi.fn();
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false }))
+    );
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+    fireEvent.click(screen.getByRole('link', { name: '첫 구간' }), {
+      detail: 0,
+    });
+    expect(target.scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'instant',
+      block: 'start',
+    });
+
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true }))
+    );
+    fireEvent.click(screen.getByRole('link', { name: '첫 구간' }), {
+      detail: 1,
+    });
+    expect(target.scrollIntoView).toHaveBeenLastCalledWith({
+      behavior: 'instant',
+      block: 'start',
+    });
+  });
+
+  it('adds h3 headings as subordinate rail segments in reading order', () => {
+    const subheading = document.createElement('h3');
+    subheading.id = 'subsection';
+    subheading.textContent = '첫 하위 구간';
+    article.querySelector('#second')!.before(subheading);
+    place(subheading, 1800);
+    vi.spyOn(subheading, 'getClientRects').mockReturnValue({
+      length: 1,
+    } as DOMRectList);
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    const links = screen.getAllByRole('link');
+    expect(links.map(link => link.getAttribute('aria-label'))).toEqual([
+      '글 제목',
+      '첫 구간',
+      '첫 하위 구간',
+      '두 번째 구간',
+    ]);
+    expect(links[1].style.height).toBe('15%');
+    expect(links[2].style.top).toBe('40%');
+    expect(links[2].style.height).toBe('20%');
+    expect(links[1].getAttribute('data-depth')).toBe('0');
+    expect(links[2].getAttribute('data-depth')).toBe('1');
+    expect(links[2].getAttribute('href')).toBe('#subsection');
+  });
+
+  it('fills every segment at the bottom of the page', () => {
+    place(article, 1200, 3800);
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      value: 4000,
+    });
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      value: 1000,
+    });
+    Object.defineProperty(window, 'scrollY', {
+      configurable: true,
+      value: 3000,
+    });
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    for (const link of screen.getAllByRole('link')) {
+      expect(
+        (link.querySelector('[data-toc-rail-fill]') as HTMLElement).style.height
+      ).toBe('100%');
+    }
+  });
+
+  it('maps clicks and drags across the whole rail without following section links', () => {
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      value: 4000,
+    });
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      value: 1000,
+    });
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    const pushState = vi.spyOn(window.history, 'pushState');
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    const rail = screen.getByRole('navigation', { name: '글 목차' });
+    vi.spyOn(rail, 'getBoundingClientRect').mockReturnValue({
+      top: 100,
+      bottom: 820,
+      height: 720,
+    } as DOMRect);
+    const hitArea = rail.querySelector<HTMLElement>('[data-toc-rail-hit-area]');
+    expect(hitArea).not.toBeNull();
+    hitArea!.setPointerCapture = vi.fn();
+    hitArea!.hasPointerCapture = vi.fn(() => true);
+    hitArea!.releasePointerCapture = vi.fn();
+
+    const pointerEvent = (type: string, clientY: number) => {
+      const event = new MouseEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientY,
+      });
+      Object.defineProperty(event, 'pointerId', { value: 1 });
+      fireEvent(hitArea!, event);
+    };
+    pointerEvent('pointerdown', 460);
+    pointerEvent('pointermove', 640);
+    pointerEvent('pointerup', 640);
+    fireEvent.click(hitArea!, { detail: 1 });
+
+    expect(scrollTo.mock.calls).toEqual([
+      [0, 1888],
+      [0, 2388],
+    ]);
+    expect(pushState).not.toHaveBeenCalled();
+    expect(window.location.hash).toBe('');
+  });
+
+  it('marks only passed sections for highlighted labels', () => {
+    Object.defineProperty(window, 'scrollY', {
+      configurable: true,
+      value: 1688,
+    });
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    expect(
+      screen.getByRole('link', { name: '글 제목' }).getAttribute('data-passed')
+    ).toBe('true');
+    expect(
+      screen.getByRole('link', { name: '첫 구간' }).getAttribute('data-passed')
+    ).toBe('false');
+    expect(
+      screen
+        .getByRole('link', { name: '두 번째 구간' })
+        .getAttribute('data-passed')
+    ).toBe('false');
+
+    Object.defineProperty(window, 'scrollY', {
+      configurable: true,
+      value: 2300,
+    });
+    act(() => window.dispatchEvent(new Event('scroll')));
+    flushFrame();
+    expect(
+      screen.getByRole('link', { name: '첫 구간' }).getAttribute('data-passed')
+    ).toBe('true');
+  });
+
+  it('reads replaced headings on the next scroll and updates the active section', () => {
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    const replacement = document.createElement('h2');
+    replacement.id = 'replacement';
+    replacement.textContent = '바뀐 구간';
+    article.querySelector('#second')!.replaceWith(replacement);
+    place(replacement, 2100);
+    vi.spyOn(replacement, 'getClientRects').mockReturnValue({
+      length: 1,
+    } as DOMRectList);
+    Object.defineProperty(window, 'scrollY', {
+      configurable: true,
+      value: 2300,
+    });
+    act(() => window.dispatchEvent(new Event('scroll')));
+    flushFrame();
+
+    expect(screen.queryByRole('link', { name: '두 번째 구간' })).toBeNull();
+    expect(
+      screen
+        .getByRole('link', { name: '바뀐 구간' })
+        .getAttribute('aria-current')
+    ).toBe('location');
+  });
+
+  it('discovers an article that appears after the rail mounts', () => {
+    doc.remove();
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+    expect(screen.queryByRole('navigation', { name: '글 목차' })).toBeNull();
+
+    document.body.appendChild(doc);
+    act(() => window.dispatchEvent(new Event('scroll')));
+    flushFrame();
+
+    expect(screen.getByRole('link', { name: '첫 구간' })).toBeTruthy();
+  });
+
+  it('hides the rail when the article has no headings', () => {
+    article.replaceChildren();
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    expect(screen.queryByRole('navigation', { name: '글 목차' })).toBeNull();
+  });
+
+  it('keeps complete long labels in the existing rail without a tooltip', () => {
+    const title =
+      '모바일과 데스크톱에서 읽기 진행과 목차 링크를 함께 동기화하는 방법?';
+    const heading =
+      'https://example.com/workspaces/acme/projects/q3-launch/docs/9f8e7d6c5b4a';
+    article.querySelector('#first')!.textContent = heading;
+
+    render(<TableOfContents title={title} />);
+    flushFrame();
+
+    const titleLink = screen.getByRole('link', { name: title });
+    const headingLink = screen.getByRole('link', { name: heading });
+    expect(titleLink.querySelector('[data-toc-tooltip]')).toBeNull();
+    expect(headingLink.querySelector('[data-toc-tooltip]')).toBeNull();
+    expect(titleLink.querySelector('span')?.textContent).toBe(title);
+    expect(headingLink.querySelector('span')?.textContent).toBe(heading);
+  });
+
+  it('groups a dense rail and keeps every heading in an expandable list', () => {
+    place(article, 1200, 3200);
+    const fragment = document.createDocumentFragment();
+    for (let index = 0; index < 1000; index++) {
+      const heading = document.createElement('h3');
+      heading.id = `section-${index}`;
+      heading.textContent = `참고 항목 ${index}`;
+      place(heading, 1201 + index * 2);
+      vi.spyOn(heading, 'getClientRects').mockReturnValue({
+        length: 1,
+      } as DOMRectList);
+      fragment.appendChild(heading);
+    }
+    article.replaceChildren(fragment);
+
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    const rail = screen.getByRole('navigation', { name: '글 목차' });
+    const railLinks = rail.querySelectorAll('a[data-toc-rail-link]');
+    expect(railLinks.length).toBeLessThan(100);
+    expect(railLinks.length).toBeGreaterThan(1);
+    expect(
+      [...railLinks].every(
+        link => parseFloat((link as HTMLElement).style.height) > 2.5
       )
     ).toBe(true);
+
+    fireEvent.click(screen.getByRole('button', { name: /전체 목차/ }));
+    expect(rail.querySelectorAll('[data-toc-full-list] a')).toHaveLength(1001);
+
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    fireEvent.click(
+      rail.querySelector('[data-toc-full-list] a[href="#section-999"]')!,
+      { detail: 1 }
+    );
+    flushFrame();
+    flushFrameAt(520);
+    expect(scrollTo).toHaveBeenCalled();
+    expect(rail.querySelector('[data-toc-full-list]')).toBeNull();
   });
 });
