@@ -2,8 +2,6 @@
 
 import dynamic from 'next/dynamic';
 
-import { SkeletonTableOfContents } from '@/mdx/common/table-of-contents/skeleton-table-of-contents';
-
 export const ClientTableOfContents = dynamic(
   () =>
     import('@/mdx/common/table-of-contents/table-of-contents').then(
@@ -11,6 +9,5 @@ export const ClientTableOfContents = dynamic(
     ),
   {
     ssr: false,
-    loading: SkeletonTableOfContents,
   }
 );

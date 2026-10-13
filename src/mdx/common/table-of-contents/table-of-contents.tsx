@@ -1,92 +1,138 @@
 'use client';
 
-import { ListTree } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { FluidHover } from '@/components/ui/fluid-hover';
-import { Typography } from '@/components/ui/typography';
-import { useScrollFade } from '@/hooks/use-scroll-fade';
-import { cn } from '@/lib/utils';
-import { TocRail } from '@/mdx/common/table-of-contents/toc-rail';
-import type { MenuItem } from '@/mdx/common/table-of-contents/toc';
-import {
-  flattenMenuItems,
-  getTocRailPadding,
-} from '@/mdx/common/table-of-contents/toc-tree';
-import {
-  getHeaders,
-  useActiveAnchor,
-} from '@/mdx/common/table-of-contents/use-toc';
+import styles from '@/mdx/common/table-of-contents/table-of-contents.module.css';
 
-export function TableOfContents() {
-  const [toc, setToc] = useState<MenuItem[]>([]);
-  const containerRef = useRef<HTMLUListElement>(null);
-  const flatToc = flattenMenuItems(toc);
+const DOCUMENT_ID = 'BenddDoc';
+const HEADING_SELECTOR = 'h2[id]';
+const READING_OFFSET_PX = 112;
+const READING_VIEWPORT_RATIO = 0.2;
+const PERCENT = 100;
 
-  useActiveAnchor(containerRef, flatToc.length);
-  useScrollFade(containerRef, 'y', flatToc.length);
+type Section = {
+  id: string;
+  title: string;
+  top: number;
+  height: number;
+  progress: number;
+};
+
+function measureSections(title: string): Section[] {
+  const doc = document.getElementById(DOCUMENT_ID);
+  const article = doc?.querySelector('article');
+  if (!doc || !article) {
+    return [];
+  }
+
+  const scrollY = window.scrollY;
+  const start = doc.getBoundingClientRect().top + scrollY;
+  const end = Math.max(
+    article.getBoundingClientRect().bottom + scrollY,
+    start + 1
+  );
+  const headings = Array.from(
+    article.querySelectorAll<HTMLHeadingElement>(HEADING_SELECTOR)
+  )
+    .filter(heading => heading.getClientRects().length > 0)
+    .map(heading => ({
+      id: heading.id,
+      title: heading.textContent?.trim() || heading.id,
+      position: heading.getBoundingClientRect().top + scrollY,
+    }))
+    .filter(heading => heading.position > start && heading.position < end)
+    .sort((a, b) => a.position - b.position);
+  const boundaries = [
+    { id: DOCUMENT_ID, title, position: start },
+    ...headings,
+    { id: '', title: '', position: end },
+  ];
+  const readingPosition =
+    scrollY +
+    Math.min(READING_OFFSET_PX, window.innerHeight * READING_VIEWPORT_RATIO);
+  const total = end - start;
+
+  return boundaries.slice(0, -1).map((section, index) => {
+    const next = boundaries[index + 1].position;
+    const length = Math.max(next - section.position, 1);
+    return {
+      id: section.id,
+      title: section.title,
+      top: ((section.position - start) / total) * PERCENT,
+      height: ((next - section.position) / total) * PERCENT,
+      progress: Math.min(
+        1,
+        Math.max(0, (readingPosition - section.position) / length)
+      ),
+    };
+  });
+}
+
+export function TableOfContents({ title }: { title: string }) {
+  const [sections, setSections] = useState<Section[]>([]);
 
   useEffect(() => {
-    setToc(getHeaders([2, 4]));
-  }, []);
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      setSections(measureSections(title));
+    };
+    const schedule = () => {
+      if (!frame) {
+        frame = requestAnimationFrame(update);
+      }
+    };
+
+    const article = document.querySelector('#BenddDoc article');
+    const observer = article ? new ResizeObserver(schedule) : null;
+    if (article && observer) {
+      observer.observe(article);
+    }
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    schedule();
+
+    return () => {
+      if (frame) {
+        cancelAnimationFrame(frame);
+      }
+      observer?.disconnect();
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+    };
+  }, [title]);
+
+  if (sections.length === 0) {
+    return null;
+  }
+
+  let activeIndex = 0;
+  sections.forEach((section, index) => {
+    if (section.progress > 0) {
+      activeIndex = index;
+    }
+  });
 
   return (
-    <nav
-      aria-labelledby="table-of-contents-heading"
-      className="toc-navbar flex max-h-full min-h-0 min-w-0 flex-col self-start overflow-hidden"
-    >
-      <div className="mt-6 flex items-center gap-1.5 text-muted-foreground">
-        <ListTree aria-hidden="true" className="size-3.5 shrink-0" />
-        <Typography
-          id="table-of-contents-heading"
-          variant="p"
-          affects="small"
-          asChild
-          className="!mt-0 !leading-5"
+    <nav className={styles.nav} aria-label="글 목차">
+      {sections.map((section, index) => (
+        <a
+          key={section.id}
+          href={`#${section.id}`}
+          className={styles.section}
+          style={{ top: `${section.top}%`, height: `${section.height}%` }}
+          aria-label={section.title}
+          aria-current={index === activeIndex ? 'location' : undefined}
         >
-          <p>On this page</p>
-        </Typography>
-      </div>
-      <FluidHover highlightClassName="rounded-sm bg-muted/50">
-        <ul
-          ref={containerRef}
-          className={cn(
-            'scroll-fade-y relative mt-2 min-h-0 flex-1 overflow-y-auto rounded-sm py-1 font-sans [--scroll-fade-size:16px]'
-          )}
-        >
-          <TocRail linkCount={flatToc.length} />
-          {flatToc.map(({ item, depth }) => (
-            <TableOfContentsItem key={item.link} item={item} depth={depth} />
-          ))}
-        </ul>
-      </FluidHover>
+          <span className={styles.label}>{section.title}</span>
+          <span className={styles.track} aria-hidden="true">
+            <span
+              className={styles.fill}
+              style={{ height: `${section.progress * PERCENT}%` }}
+            />
+          </span>
+        </a>
+      ))}
     </nav>
-  );
-}
-
-interface TableOfContentsItemProps {
-  item: MenuItem;
-  depth: number;
-}
-
-function TableOfContentsItem({ item, depth }: TableOfContentsItemProps) {
-  return (
-    <li aria-level={depth + 1}>
-      <Link
-        href={{ hash: item.link.slice(1) }}
-        data-fluid-hover-item=""
-        data-active="false"
-        data-toc-depth={depth}
-        style={{ paddingInlineStart: getTocRailPadding(depth) }}
-        className={cn(
-          'group relative block max-w-full break-keep py-1.5 text-sm font-medium leading-5',
-          'text-muted-foreground/70 transition-colors data-[fluid-hover-active]:text-foreground',
-          'data-[active=true]:!text-foreground'
-        )}
-      >
-        <span className="relative z-10">{item.title}</span>
-      </Link>
-    </li>
   );
 }

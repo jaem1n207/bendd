@@ -1,0 +1,93 @@
+.nav {
+  position: fixed;
+  z-index: 40;
+  top: 50%;
+  right: 0;
+  display: none;
+  width: 280px;
+  height: 72vh;
+  transform: translateY(-50%);
+  font-family: var(--font-sans, system-ui), sans-serif;
+}
+
+.section {
+  position: absolute;
+  right: 12px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  min-height: 4px;
+  color: hsl(var(--muted-foreground));
+  text-decoration: none;
+}
+
+.label {
+  overflow: hidden;
+  max-width: 220px;
+  opacity: 0;
+  transform: translateX(4px);
+  font-size: 12px;
+  line-height: 1.25;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition:
+    opacity 220ms ease,
+    transform 260ms ease;
+}
+
+.nav:hover .label,
+.nav:focus-within .label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.section:hover .label,
+.section[aria-current='location'] .label {
+  color: hsl(var(--foreground));
+}
+
+.section:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.track {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 2px;
+  height: calc(100% - 3px);
+  min-height: 2px;
+  overflow: hidden;
+  border-radius: 999px;
+  background-color: hsl(var(--foreground) / 0.16);
+  transition: width 250ms ease;
+}
+
+.fill {
+  display: block;
+  width: 100%;
+  border-radius: inherit;
+  background-color: hsl(var(--foreground));
+}
+
+.nav:hover .track,
+.nav:focus-within .track {
+  width: 3px;
+}
+
+@media (min-width: 1280px) {
+  .nav {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .label,
+  .track {
+    transition: none;
+  }
+}
