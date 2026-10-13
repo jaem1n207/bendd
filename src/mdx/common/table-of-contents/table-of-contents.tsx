@@ -36,6 +36,21 @@ type ArticleBounds = {
   end: number;
 };
 
+type HeadingSnapshot = {
+  element: HTMLHeadingElement;
+  id: string;
+  title: string;
+  depth: number;
+  hidden: boolean;
+  className: string;
+  style: string | null;
+};
+
+type SectionGeometry = Omit<Section, 'progress' | 'count'> & {
+  position: number;
+  length: number;
+};
+
 function getMaxScrollY() {
   const scrollHeight =
     document.scrollingElement?.scrollHeight ??
@@ -202,24 +217,58 @@ function handleSectionClick(event: MouseEvent<HTMLAnchorElement>, id: string) {
   animateSectionScroll(target);
 }
 
-function measureSections(title: string): Section[] {
+function readHeadings(article: HTMLElement): HeadingSnapshot[] {
+  return Array.from(
+    article.querySelectorAll<HTMLHeadingElement>(HEADING_SELECTOR)
+  ).map(element => ({
+    element,
+    id: element.id,
+    title: element.textContent?.trim() || element.id,
+    depth: element.tagName === 'H3' ? 1 : 0,
+    hidden: element.hidden,
+    className: element.className,
+    style: element.getAttribute('style'),
+  }));
+}
+
+function headingsChanged(
+  previous: HeadingSnapshot[],
+  current: HeadingSnapshot[]
+) {
+  return (
+    previous.length !== current.length ||
+    current.some((heading, index) => {
+      const old = previous[index];
+      return (
+        heading.element !== old.element ||
+        heading.id !== old.id ||
+        heading.title !== old.title ||
+        heading.hidden !== old.hidden ||
+        heading.className !== old.className ||
+        heading.style !== old.style
+      );
+    })
+  );
+}
+
+function measureGeometry(
+  title: string,
+  snapshots: HeadingSnapshot[]
+): SectionGeometry[] {
   const bounds = getArticleBounds();
   if (!bounds) {
     return [];
   }
 
-  const { article, start, end } = bounds;
+  const { start, end } = bounds;
   const scrollY = window.scrollY;
-  const atBottom = scrollY >= getMaxScrollY() - BOTTOM_TOLERANCE_PX;
-  const headings = Array.from(
-    article.querySelectorAll<HTMLHeadingElement>(HEADING_SELECTOR)
-  )
-    .filter(heading => heading.getClientRects().length > 0)
+  const headings = snapshots
+    .filter(heading => heading.element.getClientRects().length > 0)
     .map(heading => ({
       id: heading.id,
-      title: heading.textContent?.trim() || heading.id,
-      depth: heading.tagName === 'H3' ? 1 : 0,
-      position: heading.getBoundingClientRect().top + scrollY,
+      title: heading.title,
+      depth: heading.depth,
+      position: heading.element.getBoundingClientRect().top + scrollY,
     }))
     .filter(heading => heading.position > start && heading.position < end)
     .sort((a, b) => a.position - b.position);
@@ -233,27 +282,41 @@ function measureSections(title: string): Section[] {
     ...headings,
     { id: '', title: '', depth: 0, position: end },
   ];
-  const readingPosition = scrollY + getReadingOffset();
   const total = end - start;
 
   return boundaries.slice(0, -1).map((section, index) => {
     const next = boundaries[index + 1].position;
-    const length = Math.max(next - section.position, 1);
     return {
       id: section.id,
       title: section.title,
       depth: section.depth,
+      position: section.position,
+      length: Math.max(next - section.position, 1),
       top: ((section.position - start) / total) * PERCENT,
       height: ((next - section.position) / total) * PERCENT,
-      progress: atBottom
-        ? 1
-        : Math.min(
-            1,
-            Math.max(0, (readingPosition - section.position) / length)
-          ),
-      count: 1,
     };
   });
+}
+
+function updateProgress(geometry: SectionGeometry[]): Section[] {
+  const scrollY = window.scrollY;
+  const atBottom = scrollY >= getMaxScrollY() - BOTTOM_TOLERANCE_PX;
+  const readingPosition = scrollY + getReadingOffset();
+
+  return geometry.map(section => ({
+    id: section.id,
+    title: section.title,
+    depth: section.depth,
+    top: section.top,
+    height: section.height,
+    progress: atBottom
+      ? 1
+      : Math.min(
+          1,
+          Math.max(0, (readingPosition - section.position) / section.length)
+        ),
+    count: 1,
+  }));
 }
 
 function mergeSections(sections: Section[]): Section {
@@ -317,25 +380,48 @@ export function TableOfContents({ title }: { title: string }) {
 
   useEffect(() => {
     let frame = 0;
+    let geometry: SectionGeometry[] = [];
+    let measuredHeadings: HeadingSnapshot[] = [];
+    let needsMeasure = true;
+    let observedArticle: HTMLElement | null = null;
+    let observer: ResizeObserver | null = null;
+
     const update = () => {
       frame = 0;
-      setSections(measureSections(title));
+      const article =
+        document
+          .getElementById(DOCUMENT_ID)
+          ?.querySelector<HTMLElement>('article') ?? null;
+      if (article !== observedArticle) {
+        observer?.disconnect();
+        observer = article ? new ResizeObserver(invalidate) : null;
+        if (article && observer) {
+          observer.observe(article);
+        }
+        observedArticle = article;
+        needsMeasure = true;
+      }
+
+      const headings = article ? readHeadings(article) : [];
+      if (needsMeasure || headingsChanged(measuredHeadings, headings)) {
+        geometry = measureGeometry(title, headings);
+        measuredHeadings = headings;
+        needsMeasure = false;
+      }
+      setSections(updateProgress(geometry));
     };
     const schedule = () => {
       if (!frame) {
         frame = requestAnimationFrame(update);
       }
     };
+    const invalidate = () => {
+      needsMeasure = true;
+      schedule();
+    };
 
-    const article = document
-      .getElementById(DOCUMENT_ID)
-      ?.querySelector('article');
-    const observer = article ? new ResizeObserver(schedule) : null;
-    if (article && observer) {
-      observer.observe(article);
-    }
     window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
+    window.addEventListener('resize', invalidate);
     schedule();
 
     return () => {
@@ -345,7 +431,7 @@ export function TableOfContents({ title }: { title: string }) {
       observer?.disconnect();
       cancelSectionScroll();
       window.removeEventListener('scroll', schedule);
-      window.removeEventListener('resize', schedule);
+      window.removeEventListener('resize', invalidate);
     };
   }, [title]);
 
@@ -435,6 +521,15 @@ export function TableOfContents({ title }: { title: string }) {
           </span>
         </a>
       ))}
+      <span
+        className={styles.touchRailHitArea}
+        aria-hidden="true"
+        data-toc-touch-hit-area=""
+        onPointerDown={handleRailPointerDown}
+        onPointerMove={handleRailPointerMove}
+        onPointerUp={handleRailPointerEnd}
+        onPointerCancel={handleRailPointerEnd}
+      />
     </nav>
   );
 }

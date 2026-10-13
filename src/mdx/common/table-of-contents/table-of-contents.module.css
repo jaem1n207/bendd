@@ -45,27 +45,25 @@
   margin-right: 10px;
 }
 
-.nav:hover .section[data-depth='0'] .label,
 .nav:has(:focus-visible) .section[data-depth='0'] .label,
-.section[data-depth='1']:hover .label,
 .section[data-depth='1']:focus-visible .label {
   opacity: 1;
   transform: translateX(0);
 }
 
-.section:hover,
+.nav:has(:focus-visible) .label,
+.section:focus-visible .label {
+  transition: none;
+}
+
 .section:focus-visible {
   z-index: 1;
-}
-
-.section:hover .label,
-.section[data-passed='true'] .label {
-  color: hsl(var(--foreground));
-}
-
-.section:focus-visible {
   outline: 2px solid hsl(var(--ring));
   outline-offset: 2px;
+}
+
+.section[data-passed='true'] .label {
+  color: hsl(var(--foreground));
 }
 
 .railHitArea {
@@ -76,6 +74,10 @@
   height: 100%;
   cursor: ns-resize;
   touch-action: none;
+}
+
+.touchRailHitArea {
+  display: none;
 }
 
 .track {
@@ -115,14 +117,11 @@
   background-color: hsl(var(--foreground));
 }
 
-.nav:hover .track::before,
-.nav:hover .fill,
 .nav:has(:focus-visible) .track::before,
 .nav:has(:focus-visible) .fill {
   width: 3px;
 }
 
-.nav:hover .section[data-depth='1'] .track::before,
 .nav:has(:focus-visible) .section[data-depth='1'] .track::before {
   width: 1px;
 }
@@ -139,7 +138,6 @@
   }
 }
 
-.section:hover .label,
 .section:focus-visible .label {
   position: absolute;
   right: 32px;
@@ -206,9 +204,57 @@
   color: hsl(var(--foreground));
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .nav:hover .section[data-depth='0'] .label,
+  .section[data-depth='1']:hover .label {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .section:hover {
+    z-index: 1;
+  }
+
+  .section:hover .label {
+    position: absolute;
+    right: 32px;
+    width: max-content;
+    max-width: min(var(--toc-label-max-width), calc(100vw - 64px));
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    white-space: normal;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  .nav:hover .track::before,
+  .nav:hover .fill {
+    width: 3px;
+  }
+
+  .nav:hover .section[data-depth='1'] .track::before {
+    width: 1px;
+  }
+}
+
+@media (pointer: coarse) {
+  .touchRailHitArea {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    display: block;
+    width: 44px;
+    height: 100%;
+    touch-action: none;
+  }
+}
+
 @media (hover: none) {
   .section[aria-current='location'] .label {
     opacity: 1;
     transform: translateX(0);
+    transition: none;
   }
 }

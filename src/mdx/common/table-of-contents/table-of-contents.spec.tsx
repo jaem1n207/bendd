@@ -104,6 +104,53 @@ describe('TableOfContents', () => {
     ).toBe(`${(300 / 700) * 100}%`);
   });
 
+  it('updates reading progress without remeasuring stable headings on scroll', () => {
+    const headings = Array.from(article.querySelectorAll('h2'));
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    const firstRect = vi.mocked(headings[0].getBoundingClientRect);
+    const secondRect = vi.mocked(headings[1].getBoundingClientRect);
+    const firstClientRects = vi.mocked(headings[0].getClientRects);
+    const secondClientRects = vi.mocked(headings[1].getClientRects);
+    firstRect.mockClear();
+    secondRect.mockClear();
+    firstClientRects.mockClear();
+    secondClientRects.mockClear();
+
+    Object.defineProperty(window, 'scrollY', {
+      configurable: true,
+      value: 1688,
+    });
+    act(() => window.dispatchEvent(new Event('scroll')));
+    flushFrame();
+
+    expect(firstRect).not.toHaveBeenCalled();
+    expect(secondRect).not.toHaveBeenCalled();
+    expect(firstClientRects).not.toHaveBeenCalled();
+    expect(secondClientRects).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('link', { name: '첫 구간' }).getAttribute('aria-current')
+    ).toBe('location');
+  });
+
+  it('remeasures section positions after layout changes', () => {
+    const heading = article.querySelector<HTMLHeadingElement>('#first')!;
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+
+    vi.mocked(heading.getBoundingClientRect).mockImplementation(
+      () =>
+        ({
+          top: 1600 - window.scrollY,
+        }) as DOMRect
+    );
+    fireEvent.resize(window);
+    flushFrame();
+
+    expect(screen.getByRole('link', { name: '첫 구간' }).style.top).toBe('30%');
+  });
+
   it('finishes a mouse click with a short smooth scroll and updates its hash', () => {
     const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
     const pushState = vi.spyOn(window.history, 'pushState');
@@ -357,6 +404,19 @@ describe('TableOfContents', () => {
         .getByRole('link', { name: '바뀐 구간' })
         .getAttribute('aria-current')
     ).toBe('location');
+  });
+
+  it('discovers an article that appears after the rail mounts', () => {
+    doc.remove();
+    render(<TableOfContents title="글 제목" />);
+    flushFrame();
+    expect(screen.queryByRole('navigation', { name: '글 목차' })).toBeNull();
+
+    document.body.appendChild(doc);
+    act(() => window.dispatchEvent(new Event('scroll')));
+    flushFrame();
+
+    expect(screen.getByRole('link', { name: '첫 구간' })).toBeTruthy();
   });
 
   it('hides the rail when the article has no headings', () => {
