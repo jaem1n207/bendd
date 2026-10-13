@@ -106,11 +106,6 @@
   background-color: hsl(var(--foreground));
 }
 
-.section[data-depth='1'] .fill {
-  right: 8.5px;
-  width: 1px;
-}
-
 .nav:hover .track::before,
 .nav:hover .fill,
 .nav:has(:focus-visible) .track::before,
@@ -119,9 +114,7 @@
 }
 
 .nav:hover .section[data-depth='1'] .track::before,
-.nav:hover .section[data-depth='1'] .fill,
-.nav:has(:focus-visible) .section[data-depth='1'] .track::before,
-.nav:has(:focus-visible) .section[data-depth='1'] .fill {
+.nav:has(:focus-visible) .section[data-depth='1'] .track::before {
   width: 1px;
 }
 
