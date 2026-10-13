@@ -309,13 +309,6 @@ export function TableOfContents({ title }: { title: string }) {
         >
           <span className={styles.label}>{section.title}</span>
           <span
-            className={styles.tooltip}
-            data-toc-tooltip=""
-            aria-hidden="true"
-          >
-            {section.title}
-          </span>
-          <span
             className={styles.track}
             aria-hidden="true"
             onPointerDown={handleRailPointerDown}

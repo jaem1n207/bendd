@@ -258,7 +258,7 @@ describe('TableOfContents', () => {
     expect(screen.queryByRole('navigation', { name: '글 목차' })).toBeNull();
   });
 
-  it('exposes complete long labels to pointer and keyboard users', () => {
+  it('keeps complete long labels in the existing rail without a tooltip', () => {
     const title =
       '모바일과 데스크톱에서 읽기 진행과 목차 링크를 함께 동기화하는 방법?';
     const heading =
@@ -270,12 +270,10 @@ describe('TableOfContents', () => {
 
     const titleLink = screen.getByRole('link', { name: title });
     const headingLink = screen.getByRole('link', { name: heading });
-    expect(titleLink.querySelector('[data-toc-tooltip]')?.textContent).toBe(
-      title
-    );
-    expect(headingLink.querySelector('[data-toc-tooltip]')?.textContent).toBe(
-      heading
-    );
+    expect(titleLink.querySelector('[data-toc-tooltip]')).toBeNull();
+    expect(headingLink.querySelector('[data-toc-tooltip]')).toBeNull();
+    expect(titleLink.querySelector('span')?.textContent).toBe(title);
+    expect(headingLink.querySelector('span')?.textContent).toBe(heading);
   });
 
   it('groups a dense rail and keeps every heading in an expandable list', () => {

@@ -6,6 +6,7 @@
   display: none;
   width: 280px;
   height: 72vh;
+  --toc-label-max-width: 220px;
   transform: translateY(-50%);
   font-family: var(--font-sans, system-ui), sans-serif;
 }
@@ -25,7 +26,7 @@
 
 .label {
   overflow: hidden;
-  max-width: 220px;
+  max-width: var(--toc-label-max-width);
   opacity: 0;
   transform: translateX(4px);
   font-size: 12px;
@@ -135,31 +136,17 @@
   }
 }
 
-.tooltip {
+.section:hover .label,
+.section:focus-visible .label {
   position: absolute;
-  z-index: 2;
-  top: 50%;
-  right: 28px;
-  max-width: 280px;
-  padding: 6px 8px;
-  border: 1px solid hsl(var(--border));
-  border-radius: 6px;
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-size: 12px;
-  line-height: 1.4;
+  right: 32px;
+  width: max-content;
+  max-width: min(var(--toc-label-max-width), calc(100vw - 64px));
+  overflow: visible;
   overflow-wrap: anywhere;
+  text-overflow: clip;
   white-space: normal;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(-50%);
-}
-
-.section:hover .tooltip,
-.section:focus-visible .tooltip {
-  opacity: 1;
-  visibility: visible;
+  background-color: hsl(var(--background));
 }
 
 .fullListToggle {
