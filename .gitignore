@@ -101,3 +101,6 @@ skills-lock.json
 /scripts/incident-response/worktrees/
 /scripts/incident-response/releases/
 /scripts/incident-response/legacy-backup/
+
+# Production Sentry verification evidence
+.sentry-resolution/

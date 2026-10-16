@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "issues": [
+    {
+      "id": "7789135895",
+      "shortId": "BENDD-3",
+      "fixCommit": "2b2005ab8b8f6e608fec84aff90b4660cf1d2fa3",
+      "observedThrough": "2026-10-16T07:18:28.001Z"
+    },
+    {
+      "id": "7789135912",
+      "shortId": "BENDD-4",
+      "fixCommit": "2b2005ab8b8f6e608fec84aff90b4660cf1d2fa3",
+      "observedThrough": "2026-10-16T07:18:28.001Z"
+    }
+  ]
+}

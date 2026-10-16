@@ -409,3 +409,72 @@ Production 배포 `dpl_F3tnhG2GekD9UAixqbNNLxdZVsRd`는 Git 커밋 `5d945f7`을
 실제 오류의 원본 파일·행 번호 복원은 Sentry 화면에서 별도 확인해야 한다.
 
 [Production 배포](https://vercel.com/jaemins-crafts/bendd/F3tnhG2GekD9UAixqbNNLxdZVsRd)
+
+## 배포 검증 후 Sentry 이슈 자동 해결
+
+`.github/workflows/sentry-resolution.yml`은 `main`의 **push CI가 성공한 뒤**
+실행한다. 수동 재실행도 `main`에서만 허용한다. PR·포크·Preview 이벤트에서는
+Sentry 토큰을 사용하지 않는다. 다음 조건이 모두 맞아야 상태를 변경한다.
+
+1. 체크아웃·현재 `main`·성공한 `CI` 실행의 SHA가 일치한다.
+2. 같은 SHA에 대해 `vercel[bot]`이 만든 최신 `Production` 배포와 최신 배포
+   상태가 `success`다. 아직 준비 중이면 최대 약 10분 기다리고, 실패·권한
+   오류·커밋 변경은 중단한다. Vercel API 토큰은 사용하지 않는다.
+3. `scripts/sentry-resolution/issues.json`에 명시한 수정 커밋이 배포 커밋의
+   조상이다. 이 목록에 없는 이슈는 조회하거나 변경하지 않는다.
+4. 보호된 Vercel 배포 URL 대신 공개 `https://bendd.me`에서 Chromium으로
+   검증한다. 모든 시나리오에서 최초 로드와 새로고침 후
+   `window.SENTRY_RELEASE.id`가 배포 SHA와 일치해야 한다. SSO 보호를 해제하거나
+   우회 secret을 추가하지 않는다.
+5. 글 화면의 `localStorage` getter·`getItem`·`setItem`·`removeItem` 차단,
+   홈의 getter 차단, 저장소를 허용한 정상 글 화면을 각각 새 브라우저 컨텍스트로
+   검증한다. 실제 **사이트 탐색 Dock**의 키보드 크기 조절·새로고침,
+   차단 환경의 Giscus 안내·외부 스크립트 미로드·JS/console 오류 없음,
+   정상 환경의 설정 유지·댓글 위젯 표시를 확인한다. 정상 Giscus의 댓글 토론
+   미생성 `Discussion not found` 404는 별도 동작이므로 정상 케이스는 위젯과
+   uncaught JS 오류로 판정한다. 댓글·로그인·분석 동의는 제출하지 않는다.
+6. 검증 결과를 같은 job의 로컬 JSON에 기록한다. 해결 단계는 같은 계획의
+   hash·SHA·배포 ID/URL·전체 테스트 결과와 30분 이내의 검증 시각을 재검사하고,
+   최신 `main`·CI·배포를 다시 조회한다. 외부 run의 artifact를 내려받아 신뢰하지
+   않는다. 이슈 목록 전체의 프로젝트·ID·Short-ID·상태를 확인한 뒤에만 변경한다.
+7. `observedThrough`보다 새로운 `lastSeen`이 있거나 보관된 이슈면 중단한다.
+   `observedThrough`는 해당 수정으로 해결된다고 확인한 관측 시각의 상한이다.
+   이미 해결된 이슈는 건너뛰며, 이후 재발을 반복해서 자동으로 닫지 않는다.
+   각 변경 직전에도 이슈를 다시 조회하고 변경 후 `resolved`를 읽어 확인한다.
+
+### 최초 활성화와 인증
+
+코드가 `main`에 병합되고 GitHub 저장소 **Actions secret**
+`SENTRY_ISSUE_TOKEN`이 있어야 자동 해결까지 실행된다. Sentry의 조직 `jaemin`,
+프로젝트 `bendd` 이슈에 접근 가능한 전용 사용자 토큰에 `event:read`와
+`event:write` 권한을 부여해 저장한다. 현재 소스맵 업로드용 Vercel
+`SENTRY_AUTH_TOKEN` (`org:ci`)을 재사용하거나 브라우저에 노출하지 않는다.
+토큰은 생성된 값을 채팅·소스·명령 인수로 전달하지 않고 GitHub secret 입력란이나
+표준 입력으로 등록한다. 토큰의 접근 범위는 계정의 Sentry 프로젝트 권한에도
+영향을 받으므로 가능한 좁은 전용 계정을 사용한다.
+
+Sentry 토큰은 브라우저 검증이 끝난 **해결 단계에만** 주입한다. 토큰 누락·403·API
+오류는 성공으로 숨기지 않는다. 이슈를 일괄 변경하는 Sentry API 트랜잭션은 없으므로
+중간 실패 시 일부만 해결될 수 있다. 로그와 `resolution.json`을 확인한 뒤 Actions의
+실패 job을 재실행한다. 이미 해결된 이슈는 다시 변경하지 않는다. 재발한 이슈는
+관측 상한을 무조건 늘리지 말고 원인을 다시 조사한다.
+
+- 로컬 게이트 회귀 검사: `pnpm test:sentry`
+- 프로덕션 읽기/브라우저 검증: `GH_TOKEN`과 `DEPLOY_SHA`를 환경으로 설정한 뒤
+  `node scripts/sentry-resolution/run.mjs verify`. 체크아웃은 해당 SHA여야 한다.
+- 실제 해결: 같은 job/작업 디렉터리에서 전용 토큰을 환경에 설정하고
+  `node scripts/sentry-resolution/run.mjs resolve`. 임의 JSON 결과나 다른 SHA를
+  넣어 해결 단계를 생략하지 않는다.
+- 결과: Actions의 `sentry-resolution-<SHA>` artifact에 검증 결과와 개별 해결
+  상태를 14일 보관한다. 실패해도 가능한 결과를 업로드한다. 로컬 결과는 Git에서
+  제외한 `.sentry-resolution/`에 기록한다.
+- 새로운 원인의 이슈: 목록에 ID·Short-ID·실제 수정 커밋·관측 상한을 추가하고,
+  해당 원인을 검증하는 브라우저 검사와 `CHECK_NAMES`/게이트 테스트를 함께
+  갱신한다. 단순히 이슈 이름을 추가해 다른 버그의 테스트로 닫지 않는다.
+- 중지/복구: Actions에서 이 워크플로를 비활성화하거나 secret을 제거하면 후속
+  자동 변경을 멈출 수 있다. 잘못 해결된 이슈는 Sentry의 **Unresolve**로 복구한다.
+
+이번 목록은 PR #172의 BENDD-3·BENDD-4로 한정한다. 관측 상한은 검증한 최초
+프로덕션 배포 준비 시각 `2026-10-16T07:18:28.001Z`이고, 수정 커밋은
+`2b2005ab8b8f6e608fec84aff90b4660cf1d2fa3`이다. 두 이슈는 해당 배포와
+저장소 차단 회귀 검증 후 Sentry UI에서 `Resolved`로 변경해 확인했다.

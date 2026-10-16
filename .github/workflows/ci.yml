@@ -64,6 +64,15 @@ jobs:
       - name: Incident response format
         run: pnpm exec prettier --check "scripts/incident-response/*.{mjs,json,md}" docs/incident-response.md
 
+      - name: Sentry resolution gate tests
+        run: pnpm test:sentry
+
+      - name: Sentry resolution script lint
+        run: pnpm exec eslint "scripts/sentry-resolution/*.mjs"
+
+      - name: Sentry resolution formatting
+        run: pnpm exec prettier --check "scripts/sentry-resolution/*.{mjs,json}" .github/workflows/sentry-resolution.yml
+
       - name: Unit tests
         run: pnpm test:unit --run
 
