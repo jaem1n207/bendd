@@ -124,7 +124,7 @@ export function createSentry(token, fetcher = fetch) {
   const api = apiClient('https://us.sentry.io/', token, 'Sentry', fetcher);
   const authApi = apiClient('https://sentry.io/', token, 'Sentry', fetcher);
   async function checkAccess() {
-    // Sentry's control-silo API index exposes token scopes. Never retain its user data.
+    // Retain only the scope and stable user ID needed for assignment, never the profile.
     const response = await authApi('/api/0/');
     const scopes = response?.auth?.scopes;
     const issueWriteScope =
@@ -134,7 +134,11 @@ export function createSentry(token, fetcher = fetch) {
     if (!issueWriteScope) {
       throw new Error('Sentry token needs event:write (or event:admin)');
     }
-    return { issueWriteScope };
+    const id = response?.user?.id;
+    if (typeof id !== 'string' || !/^[1-9]\d*$/.test(id)) {
+      throw new Error('Sentry token must identify its resolving user');
+    }
+    return { issueWriteScope, resolver: { type: 'user', id } };
   }
   async function issue(id, method = 'GET', body) {
     if (!/^\d+$/.test(id)) {
@@ -142,9 +146,20 @@ export function createSentry(token, fetcher = fetch) {
     }
     return api(`/api/0/organizations/jaemin/issues/${id}/`, method, body);
   }
+  function actor(resolver) {
+    if (resolver?.type !== 'user' || !/^[1-9]\d*$/.test(resolver.id)) {
+      throw new Error('Invalid Sentry resolving user');
+    }
+    return `user:${resolver.id}`;
+  }
   return {
     checkAccess,
     get: id => issue(id),
-    resolve: id => issue(id, 'PUT', { status: 'resolved' }),
+    resolve: (id, resolver) =>
+      issue(id, 'PUT', {
+        status: 'resolved',
+        assignedTo: actor(resolver),
+      }),
+    assign: (id, resolver) => issue(id, 'PUT', { assignedTo: actor(resolver) }),
   };
 }

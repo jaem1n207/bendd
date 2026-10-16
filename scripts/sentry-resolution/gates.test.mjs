@@ -6,6 +6,7 @@ import { CHECK_NAMES, resolveIssues, verifyProduction } from './gates.mjs';
 const SHA = 'b'.repeat(40);
 const FIX = 'a'.repeat(40);
 const NOW = Date.parse('2026-10-16T08:00:00Z');
+const RESOLVER = { type: 'user', id: '42' };
 const DEPLOYMENT = {
   id: 42,
   sha: SHA,
@@ -32,6 +33,7 @@ const PLAN = {
 
 function harness() {
   const writes = [];
+  const assignments = [];
   const states = new Map(
     PLAN.issues.map(issue => [
       issue.id,
@@ -49,16 +51,25 @@ function harness() {
     plan: structuredClone(PLAN),
     now: () => NOW,
     writes,
+    assignments,
     states,
     github: { production: async () => structuredClone(DEPLOYMENT) },
     containsFix: async commit => commit === FIX,
     check: async () => CHECK_NAMES.map(name => ({ name, passed: true })),
     sentry: {
-      checkAccess: async () => ({ issueWriteScope: 'event:write' }),
+      checkAccess: async () => ({
+        issueWriteScope: 'event:write',
+        resolver: RESOLVER,
+      }),
       get: async id => structuredClone(states.get(id)),
-      resolve: async id => {
+      resolve: async (id, resolver) => {
         writes.push(id);
         states.get(id).status = 'resolved';
+        states.get(id).assignedTo = structuredClone(resolver);
+      },
+      assign: async (id, resolver) => {
+        assignments.push(id);
+        states.get(id).assignedTo = structuredClone(resolver);
       },
     },
     save: async () => {},
@@ -193,11 +204,11 @@ test('partial API failure is retryable without resolving an already resolved iss
   const context = harness();
   const report = await verified(context);
   const resolve = context.sentry.resolve;
-  context.sentry.resolve = async id => {
+  context.sentry.resolve = async (id, resolver) => {
     if (id === PLAN.issues[1].id) {
       throw new Error('API');
     }
-    await resolve(id);
+    await resolve(id, resolver);
   };
   await assert.rejects(resolveIssues({ ...context, report }), /API/);
   context.sentry.resolve = resolve;
@@ -321,14 +332,17 @@ test('Sentry driver uses only the fixed organization endpoint and minimal resolu
     calls.push({ url: String(url), ...options });
     return Response.json({ id: '7789135895', status: 'resolved' });
   });
-  await sentry.resolve('7789135895');
+  await sentry.resolve('7789135895', RESOLVER);
   assert.equal(
     calls[0].url,
     'https://us.sentry.io/api/0/organizations/jaemin/issues/7789135895/'
   );
   assert.equal(calls[0].method, 'PUT');
   assert.equal(calls[0].headers.Authorization, 'Bearer issue-token');
-  assert.deepEqual(JSON.parse(calls[0].body), { status: 'resolved' });
+  assert.deepEqual(JSON.parse(calls[0].body), {
+    status: 'resolved',
+    assignedTo: 'user:42',
+  });
   assert.equal(calls[0].redirect, 'error');
   await assert.rejects(sentry.get('../other'));
 });
@@ -341,7 +355,7 @@ test('missing credentials and API failures are not treated as success and never 
     async () => new Response('secret-response', { status: 403 })
   );
   await assert.rejects(
-    sentry.resolve('7789135895'),
+    sentry.resolve('7789135895', RESOLVER),
     error => /403/.test(error.message) && !/secret/.test(error.message)
   );
 });
@@ -428,7 +442,7 @@ test('already-resolved issues still reject a read-only Sentry token', async () =
 });
 
 for (const scope of ['event:write', 'event:admin']) {
-  test(`Sentry verifies ${scope} without returning identity data or changing an issue`, async () => {
+  test(`Sentry verifies ${scope} without exposing email or changing an issue`, async () => {
     const calls = [];
     const sentry = createSentry('issue-token', async (url, options) => {
       calls.push({ url: String(url), method: options.method });
@@ -436,10 +450,13 @@ for (const scope of ['event:write', 'event:admin']) {
       assert.equal(options.redirect, 'error');
       return Response.json({
         auth: { scopes: ['event:read', scope] },
-        user: { email: 'do-not-save@example.test', id: 'private-user' },
+        user: { email: 'do-not-save@example.test', id: '42' },
       });
     });
-    assert.deepEqual(await sentry.checkAccess(), { issueWriteScope: scope });
+    assert.deepEqual(await sentry.checkAccess(), {
+      issueWriteScope: scope,
+      resolver: RESOLVER,
+    });
     assert.deepEqual(calls, [
       { url: 'https://sentry.io/api/0/', method: 'GET' },
     ]);
@@ -472,3 +489,141 @@ test('Sentry scope lookup errors fail closed even when all issues are already re
   await assert.rejects(resolveIssues({ ...context, report }), /503/);
   assert.deepEqual(context.writes, []);
 });
+
+test('the token owner is assigned while an unresolved issue is resolved', async () => {
+  const context = harness();
+  const report = await verified(context);
+  context.sentry.checkAccess = async () => ({
+    issueWriteScope: 'event:write',
+    resolver: { type: 'user', id: '42' },
+  });
+  const result = await resolveIssues({ ...context, report });
+  assert.deepEqual(result.issues[0].assignedTo, { type: 'user', id: '42' });
+  assert.equal(result.issues[0].previousStatus, 'unresolved');
+  assert.equal(result.issues[0].action, 'resolve');
+});
+
+test('already-resolved issues receive only assignment and a second run does not write', async () => {
+  const context = harness();
+  const report = await verified(context);
+  for (const issue of context.states.values()) {
+    issue.status = 'resolved';
+  }
+  const first = await resolveIssues({ ...context, report });
+  assert.deepEqual(context.writes, []);
+  assert.deepEqual(context.assignments, ['7789135895', '7789135912']);
+  assert.equal(first.issues[0].previousStatus, 'resolved');
+  assert.equal(first.issues[0].action, 'assign');
+  assert.deepEqual(first.issues[0].assignedTo, { type: 'user', id: '42' });
+  const second = await resolveIssues({ ...context, report });
+  assert.deepEqual(context.writes, []);
+  assert.deepEqual(context.assignments, ['7789135895', '7789135912']);
+  assert.ok(second.issues.every(issue => issue.action === 'none'));
+});
+
+test('a resolved issue is not reported as successful until assignment is read back', async () => {
+  const context = harness();
+  const report = await verified(context);
+  context.sentry.resolve = async id => {
+    context.states.get(id).status = 'resolved';
+  };
+  await assert.rejects(
+    resolveIssues({ ...context, report }),
+    /assignee read.back/
+  );
+});
+
+test('missing resolver identity prevents every issue mutation', async () => {
+  const context = harness();
+  const report = await verified(context);
+  context.sentry.checkAccess = async () => ({ issueWriteScope: 'event:write' });
+  await assert.rejects(resolveIssues({ ...context, report }), /resolving user/);
+  assert.deepEqual(context.writes, []);
+  assert.deepEqual(context.assignments, []);
+});
+
+test('the Sentry assignment-only request preserves the resolved issue status', async () => {
+  const calls = [];
+  const sentry = createSentry('token', async (url, options) => {
+    calls.push({ method: options.method, body: JSON.parse(options.body) });
+    return Response.json({});
+  });
+  await sentry.assign('7789135895', RESOLVER);
+  assert.deepEqual(calls, [{ method: 'PUT', body: { assignedTo: 'user:42' } }]);
+  assert.throws(
+    () => sentry.assign('7789135895', { type: 'team', id: '42' }),
+    /resolving user/
+  );
+});
+
+for (const user of [null, {}, { id: 'not-an-id' }]) {
+  test('a token without an identifiable human resolver fails closed', async () => {
+    const sentry = createSentry('token', async () =>
+      Response.json({
+        auth: { scopes: ['event:write'] },
+        user,
+      })
+    );
+    await assert.rejects(sentry.checkAccess(), /resolving user/);
+  });
+}
+
+test('a partial status update is retried by assigning the already-resolved issue', async () => {
+  const context = harness();
+  const report = await verified(context);
+  const resolve = context.sentry.resolve;
+  context.sentry.resolve = async id => {
+    context.states.get(id).status = 'resolved';
+    throw new Error('assignment failed');
+  };
+  await assert.rejects(
+    resolveIssues({ ...context, report }),
+    /assignment failed/
+  );
+  context.sentry.resolve = resolve;
+  const result = await resolveIssues({ ...context, report });
+  assert.deepEqual(context.assignments, ['7789135895']);
+  assert.equal(result.issues[0].action, 'assign');
+  assert.ok(
+    result.issues.every(
+      issue => issue.status === 'resolved' && issue.assignedTo.id === '42'
+    )
+  );
+});
+
+test('an already-resolved issue keeps its existing human assignment', async () => {
+  const context = harness();
+  const report = await verified(context);
+  for (const issue of context.states.values()) {
+    issue.status = 'resolved';
+    issue.assignedTo = {
+      type: 'user',
+      id: '99',
+      email: 'not-for-artifacts@example.test',
+    };
+  }
+  const result = await resolveIssues({ ...context, report });
+  assert.deepEqual(context.writes, []);
+  assert.deepEqual(context.assignments, []);
+  assert.ok(result.issues.every(issue => issue.action === 'none'));
+  assert.deepEqual(result.issues[0].assignedTo, { type: 'user', id: '99' });
+  assert.equal(JSON.stringify(result).includes('@'), false);
+});
+
+for (const assignedTo of [
+  { type: 'user', id: '99' },
+  { type: 'team', id: '42' },
+]) {
+  test('a new resolution rejects a different assignee even if its status is resolved', async () => {
+    const context = harness();
+    const report = await verified(context);
+    context.sentry.resolve = async id => {
+      context.states.get(id).status = 'resolved';
+      context.states.get(id).assignedTo = assignedTo;
+    };
+    await assert.rejects(
+      resolveIssues({ ...context, report }),
+      /assignee read.back/
+    );
+  });
+}
