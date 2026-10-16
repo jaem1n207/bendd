@@ -1,6 +1,8 @@
-import { beforeEach, describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { useDockPreferences } from '@/components/navigation/model/dock-preferences';
+
+afterEach(() => vi.restoreAllMocks());
 
 describe('saved dock preferences', () => {
   beforeEach(() => {
@@ -52,4 +54,27 @@ test('persists and rehydrates ratio settings without changing the base size', as
   expect(
     JSON.parse(localStorage.getItem('dock-preferences') ?? '{}')
   ).toMatchObject({ version: 2, state: { size: 52, magnification: 1.8 } });
+});
+
+test('keeps Dock settings usable when storage writes are denied', () => {
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    throw new DOMException('Storage access denied', 'SecurityError');
+  });
+
+  expect(() => useDockPreferences.getState().setSize(52)).not.toThrow();
+  expect(() =>
+    useDockPreferences.getState().setMagnification(1.8)
+  ).not.toThrow();
+  expect(useDockPreferences.getState()).toMatchObject({
+    size: 52,
+    magnification: 1.8,
+  });
+});
+
+test('can clear Dock preferences when storage removal is denied', () => {
+  vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {
+    throw new DOMException('Storage access denied', 'SecurityError');
+  });
+
+  expect(() => useDockPreferences.persist.clearStorage()).not.toThrow();
 });

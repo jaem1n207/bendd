@@ -1,7 +1,8 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { DOCK_STORAGE_KEY } from '@/components/navigation/consts/dock';
+import { dockStorage } from '@/components/navigation/lib/dock-storage';
 
 import {
   clampDockSize,
@@ -27,6 +28,7 @@ export const useDockPreferences = create<DockState>()(
     }),
     {
       name: DOCK_STORAGE_KEY,
+      storage: createJSONStorage(() => dockStorage),
       version: 2,
       migrate: persisted => ({
         ...readDockPreferences(null),
