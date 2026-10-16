@@ -12,6 +12,14 @@
       "shortId": "BENDD-4",
       "fixCommit": "2b2005ab8b8f6e608fec84aff90b4660cf1d2fa3",
       "observedThrough": "2026-10-16T07:18:28.001Z"
+    },
+    {
+      "id": "7796215406",
+      "shortId": "BENDD-5",
+      "fixCommit": "d1003dc9a17622a473ca6bbd56e7bdcadbd054f8",
+      "observedThrough": "2026-10-16T14:19:48.694142+00:00",
+      "purpose": "integration-test",
+      "testEventId": "f443639e839e4333bdd5e8da131e5c5a"
     }
   ]
 }

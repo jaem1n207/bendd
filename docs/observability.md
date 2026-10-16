@@ -458,7 +458,8 @@ Sentry 토큰은 브라우저 검증이 끝난 **해결 단계에만** 주입한
 이미 해결된 이슈만 있어도 전역 control-silo `GET https://sentry.io/api/0/`의
 `auth.scopes`에서 `event:write` 또는 `event:admin`을 확인한다. 지역 API 루트는
 이 경로를 제공하지 않으므로 이슈 API와 호스트를 구분한다. 결과에는 허용된
-쓰기 scope만 남기고 응답의 사용자 정보·전체 auth payload는 기록하지 않는다.
+쓰기 scope와 담당자 지정에 필요한 사용자 ID만 남기고 이메일·전체 사용자 프로필·
+전체 auth payload는 기록하지 않는다.
 이 경로는 [공식 Sentry 소스](https://github.com/getsentry/sentry/blob/master/src/sentry/api/endpoints/index.py)와
 [토큰 인증 테스트](https://github.com/getsentry/sentry/blob/master/tests/sentry/api/endpoints/test_index.py)로
 확인한 PRIVATE API다. 공개 호환성 계약이 없으므로 응답 변경·조회 실패·scope
@@ -488,3 +489,33 @@ Sentry 토큰은 브라우저 검증이 끝난 **해결 단계에만** 주입한
 프로덕션 배포 준비 시각 `2026-10-16T07:18:28.001Z`이고, 수정 커밋은
 `2b2005ab8b8f6e608fec84aff90b4660cf1d2fa3`이다. 두 이슈는 해당 배포와
 저장소 차단 회귀 검증 후 Sentry UI에서 `Resolved`로 변경해 확인했다.
+
+### 해결 담당자 지정
+
+해결 담당자는 Sentry 사용자 토큰의 소유자다. 토큰 조회에서 쓰기 scope와 숫자형
+사용자 ID를 함께 확인하며, 소유자를 확인할 수 없으면 이슈를 변경하지 않는다.
+미해결 이슈는 한 PUT에 `status: resolved`와 `assignedTo: user:<id>`를 전달한다.
+해결·할당 후 둘 다 다시 조회해 일치해야 성공으로 기록한다.
+
+이미 해결된 이슈의 담당자가 비어 있으면 상태를 바꾸지 않고 담당자만 지정한다.
+이미 해결되어 담당자도 있는 이슈는 기존 할당을 유지한다. 소유자 정보와 이슈에
+담당자 지정이 가능한 실제 프로젝트 권한은 API 응답으로 검증한다. 토큰 소유자가
+변경되면 이후 자동 해결 담당자도 바뀐다.
+
+결과의 개별 이슈에 `previousStatus`, `previousAssignee`, `action`, `assignedTo`를
+기록한다. `action`은 `resolve`, `assign`, `none`이며 재시도에서 이미 해결·할당된
+이슈를 반복 변경하지 않는다. 이메일이나 전체 사용자 프로필은 artifact에 저장하지
+않는다. 부분적으로 상태만 바뀐 실패도 다음 실행에서 담당자 할당을 보완할 수 있다.
+
+실제 통합 검증에는 `automation-test` 환경, 고유 fingerprint와 `automation_test`
+tag를 가진 합성 오류 1개를 사용한다. 테스트 이슈를 수정 커밋과 함께 명시적으로
+등록하고, 미해결·미할당 상태에서 프로덕션 배포·브라우저 회귀가 통과한 뒤 실제
+Sentry PUT으로 해결·할당되는지 확인한다. 테스트 오류는 앱에서 발생한 장애가
+아니며 자동 재발 이벤트를 반복 전송하지 않는다.
+
+실제 쓰기 검증 대상은 [BENDD-5](https://jaemin.sentry.io/issues/7796215406/)다.
+이벤트 `f443639e839e4333bdd5e8da131e5c5a`를 한 번 전송했고, 처리 전
+미해결·담당자 미지정 상태를 확인했다. 계획의 `purpose: integration-test`와
+`testEventId`는 합성 검증 대상을 식별하는 메타데이터이며 배포·회귀·이슈 식별
+검사를 생략하지 않는다. 실제 처리 결과는 GitHub Actions artifact의 변경 전후
+상태와 담당자, `action: resolve`로 확인한다.

@@ -117,6 +117,24 @@ function validateIssue(issue, expected) {
   }
 }
 
+function readAssignee(issue) {
+  const assignee = issue.assignedTo;
+  if (assignee == null) {
+    return null;
+  }
+  if (
+    !['user', 'team'].includes(assignee.type) ||
+    !/^[1-9]\d*$/.test(assignee.id)
+  ) {
+    throw new Error('Invalid Sentry assignee response');
+  }
+  return { type: assignee.type, id: assignee.id };
+}
+
+function sameAssignee(assignee, resolver) {
+  return assignee?.type === resolver.type && assignee.id === resolver.id;
+}
+
 export async function resolveIssues({
   sha,
   plan,
@@ -142,10 +160,20 @@ export async function resolveIssues({
   validateChecks(report.checks);
   sameDeployment(report.deployment, await github.production(sha));
   const sentryAccess = await sentry.checkAccess();
+  const resolver = sentryAccess?.resolver;
+  if (
+    resolver?.type !== 'user' ||
+    typeof resolver.id !== 'string' ||
+    !/^[1-9]\d*$/.test(resolver.id)
+  ) {
+    throw new Error('Sentry token must identify its resolving user');
+  }
   const issues = [];
   // Preflight the entire explicit list before changing any issue.
   for (const expected of plan.issues) {
-    validateIssue(await sentry.get(expected.id), expected);
+    const current = await sentry.get(expected.id);
+    validateIssue(current, expected);
+    readAssignee(current);
     issues.push({
       id: expected.id,
       shortId: expected.shortId,
@@ -158,17 +186,38 @@ export async function resolveIssues({
   for (const [index, expected] of plan.issues.entries()) {
     const current = await sentry.get(expected.id);
     validateIssue(current, expected);
+    const previousStatus = current.status;
+    const previousAssignee = readAssignee(current);
+    const expectedAssignee =
+      current.status === 'resolved' && previousAssignee
+        ? previousAssignee
+        : resolver;
+    let action = 'none';
     if (current.status !== 'resolved') {
-      await sentry.resolve(expected.id);
-      const updated = await sentry.get(expected.id);
-      validateIssue(updated, expected);
-      if (updated.status !== 'resolved') {
-        throw new Error(
-          `Sentry resolution read-back failed: ${expected.shortId}`
-        );
-      }
+      await sentry.resolve(expected.id, resolver);
+      action = 'resolve';
+    } else if (previousAssignee === null) {
+      await sentry.assign(expected.id, resolver);
+      action = 'assign';
     }
-    issues[index].status = 'resolved';
+    const updated = action === 'none' ? current : await sentry.get(expected.id);
+    validateIssue(updated, expected);
+    const assignedTo = readAssignee(updated);
+    if (
+      updated.status !== 'resolved' ||
+      !sameAssignee(assignedTo, expectedAssignee)
+    ) {
+      throw new Error(
+        `Sentry resolution/assignee read-back failed: ${expected.shortId}`
+      );
+    }
+    Object.assign(issues[index], {
+      previousStatus,
+      previousAssignee,
+      action,
+      status: 'resolved',
+      assignedTo,
+    });
     await save(result);
   }
   result.phase = 'resolved';
