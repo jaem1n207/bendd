@@ -54,6 +54,7 @@ function harness() {
     containsFix: async commit => commit === FIX,
     check: async () => CHECK_NAMES.map(name => ({ name, passed: true })),
     sentry: {
+      checkAccess: async () => ({ issueWriteScope: 'event:write' }),
       get: async id => structuredClone(states.get(id)),
       resolve: async id => {
         writes.push(id);
@@ -401,5 +402,73 @@ test('a changed resolution plan invalidates previously passed browser evidence',
     resolveIssues({ ...context, report }),
     /verification report/
   );
+  assert.deepEqual(context.writes, []);
+});
+
+test('already-resolved issues still reject a read-only Sentry token', async () => {
+  const context = harness();
+  const report = await verified(context);
+  for (const issue of context.states.values()) {
+    issue.status = 'resolved';
+  }
+  const paths = [];
+  context.sentry = createSentry('read-only-token', async (url, options) => {
+    paths.push(url.pathname);
+    if (url.pathname === '/api/0/') {
+      return Response.json({ auth: { scopes: ['event:read'] } });
+    }
+    if (options.method === 'PUT') {
+      return new Response('denied', { status: 403 });
+    }
+    const id = url.pathname.split('/').filter(Boolean).at(-1);
+    return Response.json(context.states.get(id));
+  });
+  await assert.rejects(resolveIssues({ ...context, report }), /event:write/);
+  assert.deepEqual(paths, ['/api/0/']);
+});
+
+for (const scope of ['event:write', 'event:admin']) {
+  test(`Sentry verifies ${scope} without returning identity data or changing an issue`, async () => {
+    const calls = [];
+    const sentry = createSentry('issue-token', async (url, options) => {
+      calls.push({ url: String(url), method: options.method });
+      assert.equal(options.headers.Authorization, 'Bearer issue-token');
+      assert.equal(options.redirect, 'error');
+      return Response.json({
+        auth: { scopes: ['event:read', scope] },
+        user: { email: 'do-not-save@example.test', id: 'private-user' },
+      });
+    });
+    assert.deepEqual(await sentry.checkAccess(), { issueWriteScope: scope });
+    assert.deepEqual(calls, [
+      { url: 'https://sentry.io/api/0/', method: 'GET' },
+    ]);
+  });
+}
+
+for (const auth of [
+  null,
+  {},
+  { scopes: [] },
+  { scopes: 'event:write' },
+  { scopes: ['event:read'] },
+  { scopes: ['event:write', null] },
+]) {
+  test('missing, read-only, or unrecognized Sentry token scopes fail closed', async () => {
+    const sentry = createSentry('token', async () => Response.json({ auth }));
+    await assert.rejects(sentry.checkAccess(), /event:write/);
+  });
+}
+
+test('Sentry scope lookup errors fail closed even when all issues are already resolved', async () => {
+  const context = harness();
+  const report = await verified(context);
+  for (const issue of context.states.values()) {
+    issue.status = 'resolved';
+  }
+  context.sentry.checkAccess = async () => {
+    throw new Error('HTTP 503');
+  };
+  await assert.rejects(resolveIssues({ ...context, report }), /503/);
   assert.deepEqual(context.writes, []);
 });

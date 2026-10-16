@@ -2,6 +2,7 @@ const REPOSITORY = 'jaem1n207/bendd';
 const SHA_PATTERN = /^[a-f0-9]{40}$/;
 const DEPLOY_HOST = /^bendd-[a-z0-9-]+-jaemins-crafts\.vercel\.app$/;
 const API_TIMEOUT_MS = 15_000;
+const ISSUE_WRITE_SCOPES = ['event:write', 'event:admin'];
 
 export class DeploymentPending extends Error {}
 
@@ -121,6 +122,20 @@ export function createSentry(token, fetcher = fetch) {
     throw new Error('SENTRY_ISSUE_TOKEN is required');
   }
   const api = apiClient('https://us.sentry.io/', token, 'Sentry', fetcher);
+  const authApi = apiClient('https://sentry.io/', token, 'Sentry', fetcher);
+  async function checkAccess() {
+    // Sentry's control-silo API index exposes token scopes. Never retain its user data.
+    const response = await authApi('/api/0/');
+    const scopes = response?.auth?.scopes;
+    const issueWriteScope =
+      Array.isArray(scopes) &&
+      scopes.every(scope => typeof scope === 'string') &&
+      ISSUE_WRITE_SCOPES.find(scope => scopes.includes(scope));
+    if (!issueWriteScope) {
+      throw new Error('Sentry token needs event:write (or event:admin)');
+    }
+    return { issueWriteScope };
+  }
   async function issue(id, method = 'GET', body) {
     if (!/^\d+$/.test(id)) {
       throw new Error('Invalid Sentry issue ID');
@@ -128,6 +143,7 @@ export function createSentry(token, fetcher = fetch) {
     return api(`/api/0/organizations/jaemin/issues/${id}/`, method, body);
   }
   return {
+    checkAccess,
     get: id => issue(id),
     resolve: id => issue(id, 'PUT', { status: 'resolved' }),
   };

@@ -141,6 +141,7 @@ export async function resolveIssues({
   }
   validateChecks(report.checks);
   sameDeployment(report.deployment, await github.production(sha));
+  const sentryAccess = await sentry.checkAccess();
   const issues = [];
   // Preflight the entire explicit list before changing any issue.
   for (const expected of plan.issues) {
@@ -151,7 +152,7 @@ export async function resolveIssues({
       status: 'pending',
     });
   }
-  const result = { ...report, phase: 'verified', issues };
+  const result = { ...report, sentryAccess, phase: 'verified', issues };
   await save(result);
   sameDeployment(report.deployment, await github.production(sha));
   for (const [index, expected] of plan.issues.entries()) {

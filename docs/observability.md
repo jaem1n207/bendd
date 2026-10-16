@@ -436,7 +436,8 @@ Sentry 토큰을 사용하지 않는다. 다음 조건이 모두 맞아야 상�
 6. 검증 결과를 같은 job의 로컬 JSON에 기록한다. 해결 단계는 같은 계획의
    hash·SHA·배포 ID/URL·전체 테스트 결과와 30분 이내의 검증 시각을 재검사하고,
    최신 `main`·CI·배포를 다시 조회한다. 외부 run의 artifact를 내려받아 신뢰하지
-   않는다. 이슈 목록 전체의 프로젝트·ID·Short-ID·상태를 확인한 뒤에만 변경한다.
+   않는다. 해결 여부와 관계없이 토큰의 이슈 쓰기 권한도 확인한다. 이슈 목록
+   전체의 프로젝트·ID·Short-ID·상태를 확인한 뒤에만 변경한다.
 7. `observedThrough`보다 새로운 `lastSeen`이 있거나 보관된 이슈면 중단한다.
    `observedThrough`는 해당 수정으로 해결된다고 확인한 관측 시각의 상한이다.
    이미 해결된 이슈는 건너뛰며, 이후 재발을 반복해서 자동으로 닫지 않는다.
@@ -453,8 +454,17 @@ Sentry 토큰을 사용하지 않는다. 다음 조건이 모두 맞아야 상�
 표준 입력으로 등록한다. 토큰의 접근 범위는 계정의 Sentry 프로젝트 권한에도
 영향을 받으므로 가능한 좁은 전용 계정을 사용한다.
 
-Sentry 토큰은 브라우저 검증이 끝난 **해결 단계에만** 주입한다. 토큰 누락·403·API
-오류는 성공으로 숨기지 않는다. 이슈를 일괄 변경하는 Sentry API 트랜잭션은 없으므로
+Sentry 토큰은 브라우저 검증이 끝난 **해결 단계에만** 주입한다.
+이미 해결된 이슈만 있어도 전역 control-silo `GET https://sentry.io/api/0/`의
+`auth.scopes`에서 `event:write` 또는 `event:admin`을 확인한다. 지역 API 루트는
+이 경로를 제공하지 않으므로 이슈 API와 호스트를 구분한다. 결과에는 허용된
+쓰기 scope만 남기고 응답의 사용자 정보·전체 auth payload는 기록하지 않는다.
+이 경로는 [공식 Sentry 소스](https://github.com/getsentry/sentry/blob/master/src/sentry/api/endpoints/index.py)와
+[토큰 인증 테스트](https://github.com/getsentry/sentry/blob/master/tests/sentry/api/endpoints/test_index.py)로
+확인한 PRIVATE API다. 공개 호환성 계약이 없으므로 응답 변경·조회 실패·scope
+누락은 해결을 중단한다. 이슈를 재오픈하거나 권한 검사를 생략해서 성공으로
+만들지 않는다.
+토큰 누락·403·API 오류는 성공으로 숨기지 않는다. 이슈를 일괄 변경하는 Sentry API 트랜잭션은 없으므로
 중간 실패 시 일부만 해결될 수 있다. 로그와 `resolution.json`을 확인한 뒤 Actions의
 실패 job을 재실행한다. 이미 해결된 이슈는 다시 변경하지 않는다. 재발한 이슈는
 관측 상한을 무조건 늘리지 말고 원인을 다시 조사한다.
