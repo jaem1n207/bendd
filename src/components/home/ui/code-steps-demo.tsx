@@ -255,7 +255,7 @@ export function CodeStepsDemo({ steps }: { steps: CodeStep[] }) {
         className={styles.viewport}
         style={viewportStyle}
         role="region"
-        aria-label="스크롤로 읽는 코드 설명"
+        aria-label="단계별 코드 설명"
         data-craft-cursor="스크롤해 설명 읽기"
         aria-describedby={instructionId}
         tabIndex={0}
@@ -421,7 +421,12 @@ export function CodeStepsDemo({ steps }: { steps: CodeStep[] }) {
             <div className={styles.footer}>
               <p id={instructionId}>
                 <Mouse aria-hidden="true" />
-                스크롤로 한 부분씩 읽기
+                <span className={styles.scrollHint}>
+                  스크롤로 한 부분씩 읽기
+                </span>
+                <span className={styles.buttonHint}>
+                  버튼으로 한 부분씩 읽기
+                </span>
                 <span className={styles.srOnly}>
                   방향키로 설명을 이동하고, Tab 키로 이 영역을 나갈 수 있습니다.
                 </span>

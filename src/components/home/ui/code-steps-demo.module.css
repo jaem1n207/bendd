@@ -3,14 +3,15 @@
 }
 
 .viewport {
-  --code-height: calc(var(--code-line-count) * 24px + 62px);
+  --code-line-height: 24px;
+  --code-height: calc(var(--code-line-count) * var(--code-line-height) + 62px);
   --viewer-height: calc(
     max(var(--explanation-height, 218px), var(--code-height)) + 156px
   );
   position: relative;
   height: calc(var(--viewer-height) + 2px);
   overflow: hidden auto;
-  overscroll-behavior: none;
+  overscroll-behavior: auto;
   overflow-anchor: none;
   scroll-behavior: auto;
   scrollbar-gutter: stable;
@@ -224,7 +225,7 @@
   font-family: var(--font-mono), monospace;
   font-size: 13px;
   font-variant-ligatures: none;
-  line-height: 24px;
+  line-height: var(--code-line-height);
   letter-spacing: 0;
   tab-size: 2;
 }
@@ -289,7 +290,7 @@
 .focusLine {
   position: relative;
   display: block;
-  height: 24px;
+  height: var(--code-line-height);
 }
 
 .focusLine[data-focused='true']::before {
@@ -372,6 +373,10 @@
   height: 13px;
 }
 
+.buttonHint {
+  display: none;
+}
+
 .footer > span {
   flex-shrink: 0;
 }
@@ -441,14 +446,23 @@
 
 @container (max-width: 639px) {
   .viewport {
-    --viewer-height: calc(
-      var(--explanation-height, 192px) + var(--code-height) + 162px
-    );
+    --code-line-height: 20px;
+    /* Touch gestures belong to the page; the controls still select every stop.
+       clip also prevents button navigation from scrolling this frame. */
+    height: auto;
+    overflow: clip;
+    scrollbar-gutter: auto;
+  }
+
+  .scrollTrack {
+    height: auto;
   }
 
   .scene {
-    grid-template-rows: 18px minmax(0, 1fr) 44px 16px;
+    position: relative;
+    grid-template-rows: 18px auto 44px 16px;
     gap: 12px;
+    height: auto;
     padding: 16px;
   }
 
@@ -505,6 +519,15 @@
 
   .footer {
     font-size: 9px;
+  }
+
+  .scrollHint,
+  .footer p > svg {
+    display: none;
+  }
+
+  .buttonHint {
+    display: inline;
   }
 }
 

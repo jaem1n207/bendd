@@ -103,7 +103,7 @@ describe('home code walkthrough', () => {
     ];
     render(<CodeStepsDemo steps={sizedSteps} />);
     const viewport = screen.getByRole('region', {
-      name: '스크롤로 읽는 코드 설명',
+      name: '단계별 코드 설명',
     });
 
     next();
@@ -167,7 +167,7 @@ describe('home code walkthrough', () => {
   it('uses native scroll position to select the latest explanation in either direction', () => {
     render(<CodeStepsDemo steps={steps} />);
     const viewport = screen.getByRole('region', {
-      name: '스크롤로 읽는 코드 설명',
+      name: '단계별 코드 설명',
     });
     viewport.scrollTop = 720;
     fireEvent.scroll(viewport);
@@ -183,7 +183,7 @@ describe('home code walkthrough', () => {
   it('consumes navigation keys at both ends without trapping Tab', () => {
     render(<CodeStepsDemo steps={steps} />);
     const viewport = screen.getByRole('region', {
-      name: '스크롤로 읽는 코드 설명',
+      name: '단계별 코드 설명',
     });
     expect(fireEvent.keyDown(viewport, { key: 'ArrowUp' })).toBe(false);
     expect(viewport.scrollTop).toBe(0);
@@ -269,7 +269,7 @@ describe('home code walkthrough', () => {
   it('settles interrupted moves and ignores completion from an older move', () => {
     render(<CodeStepsDemo steps={steps} />);
     const viewport = screen.getByRole('region', {
-      name: '스크롤로 읽는 코드 설명',
+      name: '단계별 코드 설명',
     });
     next();
     act(() => vi.advanceTimersByTime(320));
