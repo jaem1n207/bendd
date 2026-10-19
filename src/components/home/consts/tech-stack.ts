@@ -120,6 +120,7 @@ export const techStackGroups: readonly TechStackGroup[] = [
       { id: 'cursor', name: 'Cursor', monochrome: true },
       { id: 'gemini', name: 'Gemini' },
       { id: 'grok', name: 'Grok', monochrome: true },
+      { id: 'jev', name: 'Jev (TypeSafe AI)', image: 'jev.png' },
     ],
   },
   {

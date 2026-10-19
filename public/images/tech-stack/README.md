@@ -16,10 +16,12 @@ The Grok mark comes from
 MIT; see `LICENSE-LobeIcons.txt`. The Obsidian mark uses `logos:obsidian-icon`
 from the SVG Logos collection above.
 
-Two assets come directly from the projects' public websites:
+These assets come directly from the projects' public websites:
 
 - [ArkType favicon](https://arktype.io/image/favicon.svg).
 - [Emotion logo](https://emotion.sh/logo-96x96.png).
+- [TypeSafe AI favicon](https://framerusercontent.com/images/aNFzSFxM4fjICmnibw7npfZjcQ.png)
+  for Jev, linked from [the official website](https://typesafe.ai/).
 
 Collection SVG color literals are expressed in equivalent HSL notation. Logo
 geometry is unchanged. Monochrome appearance and the color reveal are CSS layers,
