@@ -213,7 +213,7 @@ export function HomeStudio({
                 </div>
                 <div className={styles.craftEntry}>
                   <MarginNote side="right">
-                    <span>안에서 스크롤해</span> <span>보세요</span>
+                    <span>설명과 코드를</span> <span>읽어 보세요</span>
                   </MarginNote>
                   <article
                     className={`${styles.craft} ${styles.codeCraft}`}
