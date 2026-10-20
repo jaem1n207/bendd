@@ -50,7 +50,7 @@ export default function CraftPage() {
   return (
     <main>
       <JsonLdScript data={collectionJsonLd} />
-      <div className="relative mx-auto my-0 mt-8 max-w-4xl space-y-1 overflow-y-auto overflow-x-hidden px-2 pb-28 pt-10 sm:px-6 sm:py-32">
+      <div className="relative mx-auto my-0 mt-8 max-w-[calc(var(--reading-width)+3rem)] space-y-1 overflow-y-auto overflow-x-hidden px-2 pb-28 pt-10 sm:px-6 sm:py-32">
         <SeriesBanner items={seriesSummaries} />
         <FluidHover
           highlightClassName="bg-gray-300"

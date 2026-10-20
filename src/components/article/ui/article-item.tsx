@@ -178,12 +178,12 @@ export function ArticleItem({
         href={href}
         className={cn(
           styles.item,
-          'relative block w-full overflow-hidden rounded-xl px-3 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex sm:min-w-0 sm:items-center sm:gap-3'
+          'relative block w-full overflow-hidden rounded-xl px-3 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex sm:min-w-0 sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1'
         )}
       >
         <h2
           ref={nameRef}
-          className="min-h-5 min-w-0 shrink truncate text-sm font-medium md:min-h-6 md:text-base"
+          className="min-h-5 min-w-0 shrink break-keep text-sm font-medium sm:basis-full md:min-h-6 md:text-base"
         >
           {name}
         </h2>

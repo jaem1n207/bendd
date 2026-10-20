@@ -13,7 +13,7 @@
 }
 
 .studio {
-  max-width: 47.5rem;
+  max-width: calc(var(--reading-width) + 2 * var(--home-space));
   margin-inline: auto;
 }
 .studio h1,
