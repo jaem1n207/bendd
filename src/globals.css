@@ -144,8 +144,8 @@
 
 @layer base {
   :root {
-    /* 기본 16px 환경에서 18~20px. rem 기반 글꼴과 읽기 폭을 함께 확대합니다. */
-    font-size: clamp(112.5%, calc(106.25% + 0.125vw), 125%);
+    /* 기본 16px 환경에서 17~19px. rem 기반 글꼴과 읽기 폭을 함께 확대합니다. */
+    font-size: clamp(106.25%, calc(100% + 0.125vw), 118.75%);
     --font-sans: var(--font-interface-sans), var(--font-content-sans);
     scrollbar-gutter: stable;
     --background: 0 0% 100%;

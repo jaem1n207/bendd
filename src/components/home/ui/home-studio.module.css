@@ -6,7 +6,7 @@
   font-family: var(--font-home-sans), var(--font-sans), system-ui,
     'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   font-size: 0.9375rem;
-  font-weight: 450;
+  font-weight: 400;
   font-synthesis: none;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
@@ -162,7 +162,7 @@
 }
 .projectHeading h3 {
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 550;
   line-height: 1.5;
   letter-spacing: -0.035em;
 }
@@ -316,7 +316,7 @@
 .documentViewport p {
   color: hsl(var(--muted-foreground));
   font-size: 0.6875rem;
-  line-height: 1.85;
+  line-height: 1.7;
   margin-bottom: 12px;
 }
 .documentViewport mark {
@@ -653,7 +653,7 @@
 .contributionDetail p {
   flex-basis: 100%;
   max-width: 60ch;
-  line-height: 1.85;
+  line-height: 1.7;
   word-break: keep-all;
 }
 .contributionStatus {
@@ -792,11 +792,11 @@
     opacity: 1;
   }
 }
-@media (min-width: 1120px) {
+@media (min-width: 1280px) {
   .marginNote {
     position: absolute;
     top: 148px;
-    width: 132px;
+    width: 6em;
     margin: 0;
     font-size: 1.5rem;
   }

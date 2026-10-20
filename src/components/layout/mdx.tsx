@@ -40,7 +40,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
   return (
     <main
       className={cn(
-        'relative mx-auto my-0 min-h-screen overflow-hidden px-6 py-32',
+        'relative mx-auto my-0 min-h-screen overflow-hidden px-6 py-24 md:py-28',
         styles.readingLayout
       )}
     >
@@ -84,7 +84,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         </Typography>
         <Typography
           variant="p"
-          className="!mt-2 text-base text-muted-foreground/80"
+          className="!mt-2 text-sm text-muted-foreground/80"
           asChild
         >
           <p>
@@ -114,9 +114,8 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
           data-content-font="pretendard"
           data-engagement-content=""
           className={cn(
-            'prose prose-slate mb-24 dark:prose-invert md:mb-40',
-            styles.contentArticle,
-            type === 'article' ? 'mt-16 md:mt-24' : 'mt-40 md:mt-52'
+            'prose prose-slate mb-20 mt-10 dark:prose-invert md:mb-28 md:mt-12',
+            styles.contentArticle
           )}
         >
           <CustomMDX source={post.content} />

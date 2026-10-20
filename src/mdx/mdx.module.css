@@ -14,19 +14,22 @@
 }
 
 .container > :global(h2:not(:first-child)) {
-  @apply mt-24 border-t border-border/60 pt-12;
+  @apply border-t border-border/60;
+  margin-top: 2.5em;
+  padding-top: 1em;
 }
 
 .container > :global(h2 + p) {
-  @apply mt-6;
+  margin-top: 1em;
 }
 
 .container > :global(h3) {
-  @apply mt-16 text-pretty;
+  @apply text-pretty;
+  margin-top: 1.75em;
 }
 
 .container > :global(figure) {
-  @apply my-12;
+  margin-block: 2em;
 }
 
 .container :global(.header-anchor::after) {

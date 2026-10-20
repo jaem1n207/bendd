@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { Typography } from '../typography';
+import { Typography } from '@/components/ui/typography';
 
 describe('typography component', () => {
   it('should render a h1 element by default', () => {
@@ -44,7 +44,7 @@ describe('typography component', () => {
     );
     const heading = screen.getByRole('heading');
     expect(heading.className).toContain(
-      'scroll-m-20 text-4xl font-extrabold tracking-tight md:text-5xl text-center text-secondary'
+      'scroll-m-20 text-4xl font-semibold tracking-tight md:text-5xl text-center text-secondary'
     );
   });
   it('should forward a ref to the DOM element', () => {

@@ -28,19 +28,21 @@
   overflow-wrap: break-word;
 }
 
-.contentTitle {
-  line-height: 1.35;
-  font-weight: 700;
+.readingLayout .contentTitle {
+  font-size: 2em;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 .contentSummary {
-  line-height: 1.8;
+  line-height: 1.65;
   font-weight: 400;
 }
 
 .contentArticle {
   font-family: var(--content-font-sans);
-  line-height: 1.9;
+  line-height: 1.75;
   word-break: keep-all;
   overflow-wrap: break-word;
   font-synthesis-weight: none;
@@ -50,7 +52,11 @@
 .contentArticle :global(p),
 .contentArticle :global(li),
 .contentArticle :global(blockquote) {
-  line-height: 1.9;
+  line-height: 1.75;
+}
+
+.contentSummary :global(strong) {
+  font-weight: 600;
 }
 
 .contentArticle :global(pre),

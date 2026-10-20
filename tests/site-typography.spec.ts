@@ -46,7 +46,7 @@ test('Dock 툴팁·설정도 공통 글자 크기 비율을 따른다', async ({
   const tooltipDesktop = await fontSize(tooltip);
   await page.setViewportSize(largeDisplay);
   await link.focus();
-  const rootRatio = 20 / 18.8;
+  const rootRatio = 19 / 17.8;
   expect((await fontSize(tooltip)) / tooltipDesktop).toBeCloseTo(rootRatio, 2);
 
   await page.setViewportSize(desktop);
@@ -71,7 +71,7 @@ test('본문 밖 목차도 공통 글자 크기 비율을 따른다', async ({ p
   await expect(label).toBeAttached();
   const desktopSize = await fontSize(label);
   await page.setViewportSize(largeDisplay);
-  expect((await fontSize(label)) / desktopSize).toBeCloseTo(20 / 18.8, 2);
+  expect((await fontSize(label)) / desktopSize).toBeCloseTo(19 / 17.8, 2);
 });
 
 for (const { route, selectors } of pages) {
@@ -93,7 +93,7 @@ for (const { route, selectors } of pages) {
 
     await page.setViewportSize(largeDisplay);
     const largeRoot = await fontSize(root);
-    expect(largeRoot).toBeCloseTo(20, 1);
+    expect(largeRoot).toBeCloseTo(19, 1);
     expect(largeRoot).toBeGreaterThan(desktopRoot);
     for (const [index, selector] of selectors.entries()) {
       const largeSize = await fontSize(page.locator(selector).first());
@@ -103,7 +103,7 @@ for (const { route, selectors } of pages) {
       );
     }
 
-    for (const width of [320, 390, largeDisplay.width]) {
+    for (const width of [320, 390, 1120, 1280, largeDisplay.width]) {
       await page.setViewportSize({ width, height: largeDisplay.height });
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - innerWidth

@@ -24,6 +24,11 @@ async function readMetrics(article: Locator) {
       lineHeight: Number.parseFloat(style.lineHeight),
       width: element.getBoundingClientRect().width,
       overflow: document.documentElement.scrollWidth - innerWidth,
+      paragraphGap: Number.parseFloat(style.marginBottom),
+      titleWeight: Number.parseFloat(
+        getComputedStyle(document.querySelector('#BenddDoc > h1')!).fontWeight
+      ),
+      introGap: Number.parseFloat(getComputedStyle(element).marginTop),
     };
   });
 }
@@ -84,15 +89,19 @@ for (const route of routes) {
       samples.push(await readMetrics(article));
     }
 
-    expect(samples[0].fontSize).toBeGreaterThanOrEqual(18);
-    expect(samples[4].fontSize).toBeGreaterThanOrEqual(18);
-    expect(samples[6].fontSize).toBeCloseTo(20, 1);
+    expect(samples[0].fontSize).toBeGreaterThanOrEqual(17);
+    expect(samples[4].fontSize).toBeGreaterThanOrEqual(17);
+    expect(samples[6].fontSize).toBeCloseTo(19, 1);
     expect(samples[7].fontSize).toBeCloseTo(samples[6].fontSize, 1);
     for (const sample of samples) {
       expect(sample.summaryFontSize).toBeCloseTo(sample.fontSize, 1);
       expect(sample.lineHeight / sample.fontSize).toBeGreaterThanOrEqual(1.7);
+      expect(sample.lineHeight / sample.fontSize).toBeLessThanOrEqual(1.8);
+      expect(sample.paragraphGap / sample.fontSize).toBeLessThanOrEqual(1.1);
+      expect(sample.titleWeight).toBeLessThanOrEqual(600);
+      expect(sample.introGap / sample.fontSize).toBeLessThanOrEqual(3.5);
       expect(sample.overflow).toBeLessThanOrEqual(1);
-      expect(sample.fontSize).toBeLessThanOrEqual(20);
+      expect(sample.fontSize).toBeLessThanOrEqual(19);
     }
     expect(samples[5].fontSize).toBeGreaterThan(samples[4].fontSize);
     expect(samples[2].fontSize - samples[1].fontSize).toBeLessThan(0.01);
