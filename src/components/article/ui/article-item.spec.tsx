@@ -102,7 +102,8 @@ describe('ArticleItem reduced motion', () => {
       state.reducedMotion = preference;
       render(<ArticleItem {...article} />);
       expect(screen.getByRole('heading').textContent).toBe(article.name);
-      expect(screen.getByText(article.summary).style.opacity).toBe('1');
+      expect(screen.queryByText(article.summary)).toBeNull();
+      expect(screen.getByText(article.publishedAt).style.opacity).toBe('1');
       expect(state.animate).not.toHaveBeenCalled();
       expect(frames.size).toBe(0);
     }
@@ -127,7 +128,7 @@ describe('ArticleItem reduced motion', () => {
     expect(frames.size).toBe(0);
     advanceFrame(160);
     expect(screen.getByRole('heading').textContent).toBe(updated.name);
-    expect(screen.getByText(updated.summary).style.opacity).toBe('1');
+    expect(screen.queryByText(updated.summary)).toBeNull();
     expect(screen.getByText(updated.publishedAt).style.opacity).toBe('1');
     state.reducedMotion = false;
     rerender(<ArticleItem {...updated} />);
@@ -221,13 +222,16 @@ describe('ArticleItem reduced motion', () => {
     expect(screen.getByRole('heading').textContent).toBe(article.name);
   });
 
-  it('shuffles the summary at the same pace as the title', () => {
+  it('omits summaries before and after shuffling the visible text', () => {
     const sameLength = { ...article, name: '제목글자', summary: '요약글자' };
     render(<ArticleItem {...sameLength} />);
+    expect(screen.queryByText(sameLength.summary)).toBeNull();
     advanceFrame(0);
-    advanceFrame(500);
+    advanceFrame(1000);
     expect(screen.getByRole('heading').textContent).toBe(sameLength.name);
-    expect(screen.getByText(sameLength.summary)).toBeTruthy();
+    expect(screen.queryByText(sameLength.summary)).toBeNull();
+    expect(screen.getByText(sameLength.publishedAt)).toBeTruthy();
+    expect(frames.size).toBe(0);
   });
 
   it('restores readable text immediately when the row receives focus', () => {
@@ -237,7 +241,8 @@ describe('ArticleItem reduced motion', () => {
     act(() => screen.getByRole('link').focus());
     expect(screen.getByRole('link').dataset.lineEntrance).toBe('visible');
     expect(screen.getByRole('heading').textContent).toBe(article.name);
-    expect(screen.getByText(article.summary)).toBeTruthy();
+    expect(screen.queryByText(article.summary)).toBeNull();
+    expect(screen.getByText(article.publishedAt)).toBeTruthy();
     expect(frames.size).toBe(0);
   });
 
