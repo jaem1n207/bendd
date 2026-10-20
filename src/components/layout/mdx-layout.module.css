@@ -1,3 +1,23 @@
+.readingLayout {
+  /* stephango.com: 글자와 읽기 폭을 함께 확대해 넓은 화면의 줄바꿈을 유지합니다. */
+  font-size: calc(1.0625rem + 0.25vw);
+  max-width: calc(37em + 3rem);
+}
+
+.readingLayout .contentArticle,
+.readingLayout .contentSummary {
+  font-size: 1em;
+}
+
+.readingLayout .contentArticle,
+.readingLayout .contentArticle :global(figcaption) {
+  max-width: none;
+}
+
+.readingLayout .contentArticle :global(p > code) {
+  font-size: 0.875em;
+}
+
 .contentText,
 .contentArticle {
   --content-font-sans: var(--font-sans), system-ui, sans-serif;
@@ -21,7 +41,6 @@
 
 .contentArticle {
   font-family: var(--content-font-sans);
-  font-size: 1.0625rem;
   line-height: 1.9;
   word-break: keep-all;
   overflow-wrap: break-word;

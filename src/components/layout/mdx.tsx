@@ -38,7 +38,12 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
       : createCraftDetailGraph({ post });
 
   return (
-    <main className="relative mx-auto my-0 min-h-screen max-w-2xl overflow-hidden px-6 py-32">
+    <main
+      className={cn(
+        'relative mx-auto my-0 min-h-screen overflow-hidden px-6 py-32',
+        styles.readingLayout
+      )}
+    >
       <section
         id="BenddDoc"
         data-webmcp-content
@@ -79,7 +84,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         </Typography>
         <Typography
           variant="p"
-          className="!mt-2 text-muted-foreground/80"
+          className="!mt-2 text-base text-muted-foreground/80"
           asChild
         >
           <p>
