@@ -11,6 +11,7 @@ import {
   AnalyticsConsent,
   CONSENT_EVENT,
   CONSENT_KEY,
+  getMeasurementId,
   readConsent,
   setConsent,
 } from '@/components/observability/lib/analytics';
@@ -54,6 +55,7 @@ export function usePrivacyPreference() {
   const [returnView, setReturnView] = useState(PrivacyView.Closed);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     updateConsent(readConsent());
@@ -64,6 +66,7 @@ export function usePrivacyPreference() {
         current === PrivacyView.Details ? current : PrivacyView.Closed
       );
       setError('');
+      setSaved(false);
     };
     const storage = (event: StorageEvent) => {
       if (event.key !== CONSENT_KEY && event.key !== null) {
@@ -85,11 +88,13 @@ export function usePrivacyPreference() {
   useEffect(() => {
     setView(PrivacyView.Closed);
     setError('');
+    setSaved(false);
   }, [pathname]);
 
   useEffect(() => {
     if (
       !ready ||
+      !getMeasurementId() ||
       consent !== AnalyticsConsent.Unknown ||
       view !== PrivacyView.Closed ||
       promptWasSeen()
@@ -144,6 +149,7 @@ export function usePrivacyPreference() {
   const open = () => {
     markPromptSeen();
     setError('');
+    setSaved(false);
     setReturnView(
       view === PrivacyView.Notice ? PrivacyView.Notice : PrivacyView.Closed
     );
@@ -151,10 +157,12 @@ export function usePrivacyPreference() {
   };
   const closeDetails = useCallback(() => {
     setError('');
+    setSaved(false);
     setView(returnView);
   }, [returnView]);
   const choose = (choice: AnalyticsConsent) => {
     if (!setConsent(choice)) {
+      setSaved(false);
       setError(
         '이 브라우저에 선택을 저장하지 못했어요. 브라우저 저장 설정을 확인한 뒤 다시 시도해 주세요.'
       );
@@ -162,8 +170,22 @@ export function usePrivacyPreference() {
     }
     markPromptSeen();
     setError('');
+    if (view === PrivacyView.Details) {
+      setSaved(true);
+      return;
+    }
     setView(PrivacyView.Confirmation);
   };
 
-  return { consent, view, ready, error, open, dismiss, closeDetails, choose };
+  return {
+    consent,
+    view,
+    ready,
+    error,
+    saved,
+    open,
+    dismiss,
+    closeDetails,
+    choose,
+  };
 }

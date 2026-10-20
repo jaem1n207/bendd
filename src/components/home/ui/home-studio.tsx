@@ -349,12 +349,6 @@ export function HomeStudio({
               </div>
             </div>
           </main>
-          <footer className={styles.footer}>
-            <div className={styles.colophon}>
-              <span>© {new Date().getFullYear()} BENDD</span>
-              <span>ALWAYS A WORK IN PROGRESS.</span>
-            </div>
-          </footer>
         </div>
       </HomeMotion>
     </div>

@@ -1,7 +1,7 @@
 .page {
   --home-ease: cubic-bezier(0.19, 1, 0.22, 1);
   --home-space: 2rem;
-  padding: 88px 20px 140px;
+  padding: 88px 20px 0;
   color: hsl(var(--foreground));
   font-family: var(--font-home-sans), var(--font-sans), system-ui,
     'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
@@ -41,8 +41,7 @@
 .eyebrow,
 .tag,
 .stageLabel,
-.documentBar,
-.colophon {
+.documentBar {
   font-family: var(--font-mono), var(--font-home-sans), var(--font-sans),
     monospace;
   font-size: 0.6875rem;
@@ -672,9 +671,6 @@
   width: 13px;
   height: 13px;
 }
-.footer {
-  border-block: 1px solid hsl(var(--border));
-}
 .copyControl {
   position: relative;
   display: flex;
@@ -698,13 +694,6 @@
   font-size: 0.75rem;
   background: hsl(var(--background));
   z-index: 1;
-}
-.colophon {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 15px var(--home-space);
-  font-size: 0.625rem;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -834,7 +823,7 @@
 @media (max-width: 640px) {
   .page {
     --home-space: 1.25rem;
-    padding: 88px 12px 140px;
+    padding: 88px 12px 0;
   }
   .masthead {
     padding-inline: 20px;
@@ -936,10 +925,6 @@
   }
   .writingLink {
     gap: 14px;
-  }
-  .colophon {
-    flex-wrap: wrap;
-    font-size: 0.5625rem;
   }
   .copyStatus {
     left: auto;

@@ -1,7 +1,4 @@
-import {
-  AnalyticsConsentControl,
-  EngagementTracker,
-} from '@/components/observability';
+import { EngagementTracker } from '@/components/observability';
 import { CornerUpLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -122,7 +119,6 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         </article>
         {seriesInfo && <SeriesNavigationBottom {...seriesInfo} />}
         <EngagementTracker />
-        <AnalyticsConsentControl />
         <Giscus />
       </section>
     </main>

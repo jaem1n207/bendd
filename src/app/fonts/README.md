@@ -4,9 +4,9 @@
 license is in `Pretendard-LICENSE.txt`. Article and Craft pages continue to
 load this file without preloading the roughly 2 MB payload.
 
-`PretendardInterface.woff2` is a 55,988-byte subset generated from printable
+`PretendardInterface.woff2` is a 56,848-byte subset generated from printable
 ASCII and string/JSX text in navigation, sound, theme, the root layout, site
-metadata, and the portalled install menu. The TypeScript parser excludes
+metadata, the portalled install menu, and the shared privacy footer. The TypeScript parser excludes
 comments. It preserves the original glyphs, metrics, variable weight axis,
 and license metadata.
 
@@ -22,7 +22,7 @@ glyph outlines, metrics, and embedded license metadata. It includes printable
 ASCII, home, profile, and shared Dock component text (including interaction states), site metadata, and
 article frontmatter so any featured title or summary is covered. Article bodies
 are excluded. The original home subset was 90,912 bytes; the current home and
-profile, Tech Stack, code walkthrough, and Dock copy produces 106,272 bytes.
+profile, Tech Stack, code walkthrough, and Dock copy produces 108,676 bytes.
 
 Run `pnpm fonts:home` after editing home or shared UI copy while the dev server is running.
 `pnpm dev` and `pnpm build` regenerate both subsets before starting Next.js.
