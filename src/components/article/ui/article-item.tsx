@@ -30,7 +30,6 @@ function restoreText(element: HTMLElement | null, text: string) {
 
 export function ArticleItem({
   name,
-  summary,
   href,
   publishedAt,
   series,
@@ -45,7 +44,6 @@ export function ArticleItem({
   const itemRef = useRef<HTMLAnchorElement>(null);
   const isInView = useInView(itemRef, { once: true });
   const nameRef = useRef<HTMLHeadingElement>(null);
-  const summaryRef = useRef<HTMLSpanElement>(null);
   const publishedAtRef = useRef<HTMLSpanElement>(null);
   const animateRow = useAnimation();
 
@@ -56,7 +54,6 @@ export function ArticleItem({
     }
     const restoreContent = () => {
       restoreText(nameRef.current, name);
-      restoreText(summaryRef.current, summary);
       restoreText(publishedAtRef.current, publishedAt);
     };
     const settle = () => {
@@ -133,12 +130,8 @@ export function ArticleItem({
         }
       });
 
-    // 셔플은 행 지연과 별개로 함께 시작한다. 요약은 이 목록에서 따로 조정한다.
-    const shuffleTargets = [
-      nameRef.current,
-      summaryRef.current,
-      publishedAtRef.current,
-    ];
+    // 셔플은 행 지연과 별개로 함께 시작한다.
+    const shuffleTargets = [nameRef.current, publishedAtRef.current];
     shuffleTargets.forEach(element => {
       if (!element || getComputedStyle(element).display === 'none') {
         return;
@@ -162,7 +155,6 @@ export function ArticleItem({
     prefersReducedMotion,
     index,
     name,
-    summary,
     publishedAt,
     animateRow,
   ]);
@@ -178,36 +170,31 @@ export function ArticleItem({
         href={href}
         className={cn(
           styles.item,
-          'relative block w-full overflow-hidden rounded-xl px-3 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex sm:min-w-0 sm:items-center sm:gap-3'
+          'relative flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-xl px-3 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:gap-3'
         )}
       >
         <h2
           ref={nameRef}
+          title={name}
           className="min-h-5 min-w-0 shrink truncate text-sm font-medium md:min-h-6 md:text-base"
         >
           {name}
         </h2>
         {series && (
-          <span className="shrink-0 whitespace-nowrap rounded-full bg-primary/10 px-2 py-0.5 text-xs tabular-nums text-primary">
-            {series.name} #{series.order}
+          <span
+            title={series.name}
+            className="hidden shrink-0 whitespace-nowrap rounded-full bg-primary/10 px-2 py-0.5 text-xs tabular-nums text-primary sm:inline-block"
+          >
+            <span className="sr-only">{series.name} </span>#{series.order}
           </span>
         )}
-        <span
-          ref={summaryRef}
-          className="hidden min-w-0 shrink truncate text-sm text-muted-foreground sm:inline-block"
-        >
-          {summary}
-        </span>
         <div
           aria-hidden="true"
-          className={cn(
-            styles.line,
-            'hidden min-w-8 sm:inline-block sm:flex-1'
-          )}
+          className={cn(styles.line, 'min-w-4 flex-1 sm:min-w-8')}
         />
         <span
           ref={publishedAtRef}
-          className="inline-block min-h-5 shrink-0 whitespace-nowrap align-top text-sm tabular-nums text-muted-foreground"
+          className="inline-block shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground sm:text-sm"
         >
           {publishedAt}
         </span>

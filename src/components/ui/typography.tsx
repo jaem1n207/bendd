@@ -6,11 +6,11 @@ import { forwardRef, type HTMLAttributes } from 'react';
 export const typographyVariants = cva(null, {
   variants: {
     variant: {
-      h1: 'scroll-m-20 text-4xl font-extrabold tracking-tight md:text-5xl',
+      h1: 'scroll-m-20 text-4xl font-semibold tracking-tight md:text-5xl',
       h2: 'scroll-m-20 text-3xl font-semibold tracking-tight md:text-4xl',
-      h3: 'scroll-m-20 text-2xl font-semibold tracking-tight md:text-3xl',
-      h4: 'scroll-m-20 text-xl font-semibold md:text-2xl',
-      h5: 'text-lg font-semibold md:text-xl',
+      h3: 'scroll-m-20 text-2xl font-medium tracking-tight md:text-3xl',
+      h4: 'scroll-m-20 text-xl font-medium md:text-2xl',
+      h5: 'text-lg font-medium md:text-xl',
       p: 'leading-7 [&:not(:first-child)]:mt-6',
       blockquote: '-ml-4 border-l-4 px-4 py-2 text-base text-muted-foreground',
     },

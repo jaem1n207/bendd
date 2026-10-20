@@ -127,7 +127,7 @@ export default async function TocBreakPage({
     <main style={{ maxWidth: 672, margin: '0 auto', padding: '128px 24px' }}>
       <section id="BenddDoc">
         <ClientTableOfContents title={title} />
-        <h1 style={{ fontSize: 32, fontWeight: 700 }}>{title}</h1>
+        <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>{title}</h1>
         <p>{PARAGRAPH}</p>
         <article style={{ marginTop: 80 }}>
           {headings.map(heading => (
@@ -136,7 +136,7 @@ export default async function TocBreakPage({
                 <h2
                   id={heading.id}
                   style={{
-                    fontSize: 28,
+                    fontSize: '1.75rem',
                     fontWeight: 700,
                     marginTop: 48,
                     overflowWrap: 'anywhere',
@@ -148,7 +148,7 @@ export default async function TocBreakPage({
                 <h3
                   id={heading.id}
                   style={{
-                    fontSize: 22,
+                    fontSize: '1.375rem',
                     fontWeight: 650,
                     marginTop: 36,
                     overflowWrap: 'anywhere',
@@ -167,7 +167,7 @@ export default async function TocBreakPage({
         </article>
         {scenario === 'worst' && (
           <section aria-label="댓글" style={{ marginTop: 120 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 700 }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>
               댓글 {COMMENT_COUNT}개
             </h2>
             {Array.from({ length: COMMENT_COUNT }, (_, index) => (
@@ -197,7 +197,7 @@ export default async function TocBreakPage({
           background: 'hsl(var(--muted))',
           color: 'hsl(var(--foreground))',
           fontFamily: 'system-ui',
-          fontSize: 12,
+          fontSize: '0.75rem',
           whiteSpace: 'nowrap',
         }}
       >

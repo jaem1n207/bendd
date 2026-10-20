@@ -41,11 +41,17 @@ const config = {
               content: 'normal',
             },
             'h1, h2, h3, h4, h5, h6': {
-              fontWeight: 700,
+              fontWeight: 600,
               '& a': {
                 textDecoration: 'none',
               },
             },
+            h2: { fontSize: '1.3em', lineHeight: '1.4' },
+            h3: { fontSize: '1.125em', lineHeight: '1.45' },
+            strong: { fontWeight: 600 },
+            p: { marginTop: '1em', marginBottom: '1em' },
+            'ul, ol': { marginTop: '1em', marginBottom: '1em' },
+            li: { marginTop: '0.25em', marginBottom: '0.25em' },
           },
         },
       },

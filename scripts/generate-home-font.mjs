@@ -95,6 +95,7 @@ const interfaceSources = await Promise.all(
     path.join(root, 'src/app/layout.tsx'),
     path.join(root, 'src/lib/site-metadata.ts'),
     path.join(root, 'src/components/home/ui/extension-install-menu.tsx'),
+    path.join(root, 'src/components/observability/ui/privacy-footer.tsx'),
   ].map(async file => {
     const source = ts.createSourceFile(
       file,

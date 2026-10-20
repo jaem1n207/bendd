@@ -14,7 +14,7 @@
   color: hsl(var(--background));
   box-shadow: 0 2px 8px hsl(var(--foreground) / 0.1);
   font-family: var(--font-home-sans), var(--font-sans), sans-serif;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 500;
   line-height: 1.5;
   word-break: keep-all;

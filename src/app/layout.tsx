@@ -4,7 +4,10 @@ import type { Metadata } from 'next';
 import { Fira_Mono as FontMono } from 'next/font/google';
 import localFont from 'next/font/local';
 
-import { WebVitalsTracker } from '@/components/observability';
+import {
+  AnalyticsConsentControl,
+  WebVitalsTracker,
+} from '@/components/observability';
 
 import { Navigation, PathnameHistoryTracker } from '@/components/navigation';
 import {
@@ -117,7 +120,10 @@ export default function RootLayout({
           <WebMCPProvider />
           <TooltipProvider>
             <Signature />
-            {children}
+            <div className="flex min-h-svh flex-col">
+              <div className="flex-1">{children}</div>
+              <AnalyticsConsentControl />
+            </div>
             <footer
               aria-labelledby="footer-navigation"
               className="fixed bottom-[calc(20px+env(safe-area-inset-bottom))] left-1/2 z-30 flex max-w-[calc(100%-32px)] -translate-x-1/2 items-end"

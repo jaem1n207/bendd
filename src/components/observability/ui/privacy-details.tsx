@@ -4,7 +4,7 @@ import { useId, useState, type ReactNode } from 'react';
 
 import {
   PRIVACY_EASE,
-  PRIVACY_EXIT_SECONDS,
+  PRIVACY_ENTER_SECONDS,
   PRIVACY_FADE_SECONDS,
 } from '@/components/observability/consts/privacy';
 import styles from '@/components/observability/ui/privacy-settings.module.css';
@@ -14,13 +14,30 @@ function SectionContent({
   id,
   labelId,
   children,
+  instant,
 }: {
+  instant: boolean;
   id: string;
   labelId: string;
   children: ReactNode;
 }) {
   const present = useIsPresent();
-  const reduced = usePrefersReducedMotion();
+  const reduced = usePrefersReducedMotion() !== false;
+  const still = reduced || instant;
+  const exitVariants = {
+    exit: ({ instant: keyboard }: { instant: boolean }) => ({
+      height: reduced || keyboard ? 'auto' : 0,
+      opacity: 0,
+      transition: {
+        duration: keyboard
+          ? 0
+          : reduced
+            ? PRIVACY_FADE_SECONDS
+            : PRIVACY_ENTER_SECONDS,
+        ease: PRIVACY_EASE,
+      },
+    }),
+  };
   return (
     <motion.div
       id={id}
@@ -29,11 +46,17 @@ function SectionContent({
       aria-hidden={present ? undefined : true}
       inert={!present}
       className={styles.sectionReveal}
-      initial={{ height: reduced ? 'auto' : 0, opacity: 0 }}
+      initial={instant ? false : { height: still ? 'auto' : 0, opacity: 0 }}
       animate={{ height: 'auto', opacity: 1 }}
-      exit={{ height: reduced ? 'auto' : 0, opacity: 0 }}
+      variants={exitVariants}
+      custom={{ instant }}
+      exit="exit"
       transition={{
-        duration: reduced ? PRIVACY_FADE_SECONDS : PRIVACY_EXIT_SECONDS,
+        duration: instant
+          ? 0
+          : reduced
+            ? PRIVACY_FADE_SECONDS
+            : PRIVACY_ENTER_SECONDS,
         ease: PRIVACY_EASE,
       }}
     >
@@ -54,10 +77,14 @@ function PrivacySection({
   children: ReactNode;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [instant, setInstant] = useState(false);
   const id = useId();
   const labelId = `${id}-label`;
   return (
-    <li className={styles.section}>
+    <li
+      className={styles.section}
+      data-input={instant ? 'keyboard' : 'pointer'}
+    >
       <h3>
         <button
           id={labelId}
@@ -65,7 +92,10 @@ function PrivacySection({
           className={styles.sectionTrigger}
           aria-expanded={expanded}
           aria-controls={id}
-          onClick={() => setExpanded(value => !value)}
+          onClick={event => {
+            setInstant(event.detail === 0);
+            setExpanded(value => !value);
+          }}
         >
           <span className={styles.sectionNumber} aria-hidden="true">
             {number}
@@ -81,9 +111,9 @@ function PrivacySection({
           />
         </button>
       </h3>
-      <AnimatePresence initial={false}>
+      <AnimatePresence initial={false} custom={{ instant }}>
         {expanded && (
-          <SectionContent id={id} labelId={labelId}>
+          <SectionContent id={id} labelId={labelId} instant={instant}>
             {children}
           </SectionContent>
         )}
@@ -92,7 +122,7 @@ function PrivacySection({
   );
 }
 
-export function PrivacyDetails() {
+function PrivacySections() {
   return (
     <ol className={styles.sections}>
       <PrivacySection
@@ -211,8 +241,8 @@ export function PrivacyDetails() {
           </li>
         </ul>
         <p>
-          선택을 바꾸려면 화면의 ‘쿠키 설정’을 열고 아래 버튼을 눌러 주세요.
-          허용하지 않아도 글과 Craft는 그대로 이용할 수 있어요.
+          선택을 바꾸려면 페이지 하단의 ‘쿠키 설정’을 열고 아래 버튼을 눌러
+          주세요. 허용하지 않아도 글과 Craft는 그대로 이용할 수 있어요.
         </p>
         <p className={styles.note}>
           이 설정은 Google Analytics에 적용돼요. 분석 쿠키를 쓰지 않는 Vercel
@@ -220,5 +250,46 @@ export function PrivacyDetails() {
         </p>
       </PrivacySection>
     </ol>
+  );
+}
+
+export function PrivacyDetails({
+  initiallyExpanded = false,
+}: {
+  initiallyExpanded?: boolean;
+}) {
+  const [expanded, setExpanded] = useState(initiallyExpanded);
+  const [instant, setInstant] = useState(false);
+  const id = useId();
+  const labelId = `${id}-label`;
+  return (
+    <div
+      className={styles.explanation}
+      data-input={instant ? 'keyboard' : 'pointer'}
+    >
+      <button
+        id={labelId}
+        type="button"
+        className={styles.sectionTrigger}
+        aria-expanded={expanded}
+        aria-controls={id}
+        onClick={event => {
+          setInstant(event.detail === 0);
+          setExpanded(value => !value);
+        }}
+      >
+        <span className={styles.explanationHeading}>
+          개인정보와 쿠키 자세히 보기
+        </span>
+        <ChevronDown className={styles.chevron} size={16} aria-hidden="true" />
+      </button>
+      <AnimatePresence initial={false} custom={{ instant }}>
+        {expanded && (
+          <SectionContent id={id} labelId={labelId} instant={instant}>
+            <PrivacySections />
+          </SectionContent>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

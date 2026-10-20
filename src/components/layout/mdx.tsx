@@ -1,7 +1,4 @@
-import {
-  AnalyticsConsentControl,
-  EngagementTracker,
-} from '@/components/observability';
+import { EngagementTracker } from '@/components/observability';
 import { CornerUpLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -38,7 +35,12 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
       : createCraftDetailGraph({ post });
 
   return (
-    <main className="relative mx-auto my-0 min-h-screen max-w-2xl overflow-hidden px-6 py-32">
+    <main
+      className={cn(
+        'relative mx-auto my-0 min-h-screen overflow-hidden px-6 py-24 md:py-28',
+        styles.readingLayout
+      )}
+    >
       <section
         id="BenddDoc"
         data-webmcp-content
@@ -79,7 +81,7 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
         </Typography>
         <Typography
           variant="p"
-          className="!mt-2 text-muted-foreground/80"
+          className="!mt-2 text-sm text-muted-foreground/80"
           asChild
         >
           <p>
@@ -109,16 +111,14 @@ export function MdxLayout({ post, type, seriesInfo }: MdxLayoutProps) {
           data-content-font="pretendard"
           data-engagement-content=""
           className={cn(
-            'prose prose-slate mb-24 dark:prose-invert md:mb-40',
-            styles.contentArticle,
-            type === 'article' ? 'mt-16 md:mt-24' : 'mt-40 md:mt-52'
+            'prose prose-slate mb-20 mt-10 dark:prose-invert md:mb-28 md:mt-12',
+            styles.contentArticle
           )}
         >
           <CustomMDX source={post.content} />
         </article>
         {seriesInfo && <SeriesNavigationBottom {...seriesInfo} />}
         <EngagementTracker />
-        <AnalyticsConsentControl />
         <Giscus />
       </section>
     </main>

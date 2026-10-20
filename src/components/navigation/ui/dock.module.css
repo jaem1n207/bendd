@@ -199,7 +199,7 @@
   padding: 5px 10px;
   box-shadow: 0 3px 10px hsl(var(--foreground) / 0.05);
   font:
-    500 12px/18px var(--font-sans),
+    500 0.75rem/1.125rem var(--font-sans),
     sans-serif;
 }
 .tooltipText {
@@ -233,7 +233,7 @@
   background: hsl(var(--background));
   color: hsl(var(--foreground));
   font:
-    500 11px/1 var(--font-sans),
+    500 0.6875rem/1 var(--font-sans),
     sans-serif;
   font-variant-numeric: tabular-nums;
   pointer-events: none;
@@ -257,7 +257,7 @@
     0 12px 40px hsl(var(--foreground) / 0.12),
     0 2px 5px hsl(var(--foreground) / 0.04);
   font:
-    400 12px/1.5 var(--font-sans),
+    400 0.75rem/1.5 var(--font-sans),
     sans-serif;
 }
 .settingsHeader,
@@ -270,7 +270,7 @@
   margin-bottom: 10px;
 }
 .settingsHeader strong {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 .settingsHeader button {
@@ -360,8 +360,8 @@
   background: hsl(var(--background));
   color: hsl(var(--foreground));
   box-shadow: 0 2px 6px hsl(var(--foreground) / 0.06);
-  font-size: 11px;
-  line-height: 14px;
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
   opacity: 0;
   pointer-events: none;
   transition:
@@ -404,7 +404,7 @@
   justify-content: space-between;
   margin-top: 3px;
   color: hsl(var(--muted-foreground));
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 .settingsFooter {
   display: flex;
@@ -415,7 +415,7 @@
   padding-top: 8px;
   border-top: 1px solid hsl(var(--border));
   color: hsl(var(--muted-foreground));
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 .settingsFooter button {
   min-height: 32px;

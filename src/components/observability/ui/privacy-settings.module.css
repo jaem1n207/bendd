@@ -10,13 +10,11 @@
   inset: 0;
   background: hsl(0 0% 0% / 0.5);
 }
-.card,
-.launcher {
+.card {
   position: fixed;
   right: var(--privacy-edge);
   bottom: var(--privacy-bottom);
-}
-.card {
+  pointer-events: auto;
   width: min(380px, calc(100vw - 40px));
   max-height: var(--privacy-max-height);
   overflow: hidden;
@@ -27,11 +25,25 @@
     0 12px 48px hsl(var(--foreground) / 0.12),
     0 2px 8px hsl(var(--foreground) / 0.05);
   transform-origin: bottom right;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.65;
 }
+.positioner {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  pointer-events: none;
+}
 .card[data-view='details'] {
-  width: min(560px, calc(100vw - 40px));
+  --privacy-max-height: min(720px, calc(100dvh - 40px));
+  position: relative;
+  right: auto;
+  bottom: auto;
+  width: min(560px, 100%);
+  transform-origin: center;
 }
 .inner {
   display: flex;
@@ -53,16 +65,18 @@
   gap: 6px;
   margin-bottom: 6px;
   color: hsl(var(--muted-foreground));
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .title {
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1.4;
   font-weight: 600;
   letter-spacing: -0.025em;
 }
 .close {
   flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
   margin-top: -4px;
   margin-right: -8px;
 }
@@ -77,7 +91,7 @@
 }
 .status {
   margin-top: 12px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .actions {
   display: grid;
@@ -97,14 +111,14 @@
   justify-content: space-between;
   gap: 8px;
   margin-top: 12px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: hsl(var(--muted-foreground));
 }
 .footer button {
   height: 36px;
   margin-left: -8px;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 /* 상세 설명의 유일한 스크롤 경계예요. */
 .details {
@@ -115,7 +129,7 @@
   padding-right: 8px;
   color: hsl(var(--foreground));
   word-break: keep-all;
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.75;
 }
 .sections {
@@ -139,7 +153,7 @@
   border-radius: 8px;
 }
 .sectionNumber {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: hsl(var(--muted-foreground));
   font-variant-numeric: tabular-nums;
 }
@@ -151,13 +165,13 @@
   font-weight: 600;
 }
 .sectionHint {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   color: hsl(var(--muted-foreground));
 }
 .chevron {
   flex-shrink: 0;
-  transition: transform 200ms ease-out;
+  transition: transform 200ms cubic-bezier(0.19, 1, 0.22, 1);
 }
 .sectionTrigger[aria-expanded='true'] .chevron {
   transform: rotate(180deg);
@@ -193,7 +207,7 @@
   margin-top: 12px;
   text-decoration: underline;
   text-underline-offset: 3px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .card[data-view='details'] .actions button {
   height: 58px;
@@ -208,7 +222,7 @@
   display: flex;
   gap: 4px;
   align-items: center;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 400;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -240,14 +254,6 @@
 .retention dd {
   color: hsl(var(--foreground));
 }
-.launcher {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border-radius: 999px;
-  box-shadow: 0 2px 12px hsl(var(--foreground) / 0.06);
-  font-size: 12px;
-}
 @media (max-width: 1439px) {
   .root {
     --privacy-bottom: calc(
@@ -260,11 +266,24 @@
   .root {
     --privacy-edge: max(12px, env(safe-area-inset-right));
   }
-  .card,
-  .card[data-view='details'] {
+  .card {
     width: calc(
       100vw - var(--privacy-edge) - max(12px, env(safe-area-inset-left))
     );
+  }
+  .positioner {
+    align-items: flex-end;
+    padding: 12px max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+  }
+  .card[data-view='details'] {
+    --privacy-max-height: calc(
+      100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+    );
+    width: 100%;
+    max-width: 560px;
+    transform-origin: bottom center;
   }
   .inner {
     padding: 20px;
@@ -273,5 +292,112 @@
 @media (max-height: 500px) {
   .inner {
     padding: 16px;
+  }
+}
+
+.siteFooter {
+  width: calc(100% - 3rem);
+  max-width: var(--reading-width);
+  margin: 48px auto 0;
+  padding: 16px 0 calc(128px + env(safe-area-inset-bottom));
+  border-top: 1px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+.siteFooterContent,
+.siteFooterLinks {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.siteFooterContent {
+  justify-content: space-between;
+  gap: 4px 16px;
+}
+.siteFooterLinks {
+  gap: 16px;
+}
+.siteFooterLinks button {
+  min-width: 44px;
+  min-height: 44px;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-underline-offset: 4px;
+}
+.siteFooterLinks button:hover {
+  color: hsl(var(--foreground));
+  text-decoration: underline;
+}
+.siteFooterLinks button:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+.currentChoice {
+  flex-shrink: 0;
+  margin-bottom: 16px;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.8125rem;
+}
+.currentChoice strong {
+  margin-left: 6px;
+  color: hsl(var(--foreground));
+  font-weight: 500;
+}
+.feedbackSlot {
+  flex-shrink: 0;
+  min-height: 1lh;
+  margin-top: 8px;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.8125rem;
+}
+.section[data-input='keyboard'] .chevron {
+  transition: none;
+}
+
+.descriptionBody {
+  flex-shrink: 0;
+}
+.explanation {
+  margin-top: 16px;
+  border-top: 1px solid hsl(var(--border));
+}
+.explanation > .sectionTrigger {
+  min-height: 44px;
+  padding: 14px 0;
+  font-size: 0.8125rem;
+}
+.explanationHeading {
+  flex: 1;
+}
+.explanation > .sectionReveal > .sectionContent {
+  padding: 0;
+}
+.explanation .sections > .section:first-child {
+  border-top: 0;
+}
+.explanation[data-input='keyboard'] > .sectionTrigger .chevron {
+  transition: none;
+}
+@media (max-height: 500px) {
+  .eyebrow {
+    display: none;
+  }
+  .header,
+  .currentChoice {
+    margin-bottom: 8px;
+  }
+  .actions {
+    margin-top: 12px;
+  }
+  .feedbackSlot {
+    margin-top: 8px;
+    min-height: 1lh;
+  }
+  .explanation {
+    margin-top: 12px;
   }
 }
