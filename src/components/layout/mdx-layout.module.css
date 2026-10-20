@@ -1,6 +1,5 @@
 .readingLayout {
-  /* stephango.com: 글자와 읽기 폭을 함께 확대해 넓은 화면의 줄바꿈을 유지합니다. */
-  font-size: calc(1.0625rem + 0.25vw);
+  /* 공통 글자 크기와 읽기 폭을 함께 확대합니다. */
   max-width: calc(37em + 3rem);
 }
 

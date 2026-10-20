@@ -54,13 +54,13 @@
 .eyebrow {
   color: hsl(var(--muted-foreground));
   font-family: var(--font-mono), monospace;
-  font-size: 9px;
+  font-size: 0.5625rem;
   letter-spacing: 0.19em;
 }
 
 .section .heading h2 {
   margin-top: 12px;
-  font-size: clamp(19px, 3.5vw, 24px);
+  font-size: 1.5rem;
   font-weight: 550;
   letter-spacing: -0.045em;
   text-wrap: balance;
@@ -191,7 +191,7 @@
   border-radius: 4px;
   background: hsl(var(--background) / 0.88);
   color: hsl(var(--foreground));
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 500;
   white-space: nowrap;
   transform: translateX(-50%);
@@ -206,7 +206,7 @@
   background: hsl(var(--background) / 0.94);
   color: hsl(var(--foreground));
   font-family: var(--font-mono), monospace;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
   white-space: nowrap;
@@ -220,7 +220,7 @@
 .message {
   min-height: 24px;
   color: hsl(var(--muted-foreground));
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.8;
   word-break: keep-all;
   text-wrap: balance;
@@ -234,7 +234,7 @@
 .timeDifference,
 .connectionNote {
   color: hsl(var(--muted-foreground));
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.8;
   font-variant-numeric: tabular-nums;
 }
@@ -258,7 +258,7 @@
 .note {
   display: block;
   color: hsl(var(--muted-foreground) / 0.8);
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 
 .fallbackGlobe {
@@ -298,11 +298,11 @@
   }
   .message {
     min-height: 24px;
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   .timeDifference,
   .connectionNote {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   .caption {
     padding-inline: 4px;
@@ -399,7 +399,7 @@
 }
 .sharedNames {
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 500;
 }
 .sharedNames > span {
@@ -415,7 +415,7 @@
 }
 .sharedLabel strong {
   display: block;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 550;
   letter-spacing: -0.025em;
 }
@@ -426,7 +426,7 @@
   border-radius: 5px;
   background: hsl(var(--background) / 0.88);
   color: hsl(var(--muted-foreground));
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -514,7 +514,7 @@
 .interactionHint {
   margin: -5px 0 10px;
   color: hsl(var(--muted-foreground) / 0.75);
-  font-size: 10px;
+  font-size: 0.625rem;
   opacity: 0;
   transition: opacity 150ms ease-out;
   pointer-events: none;

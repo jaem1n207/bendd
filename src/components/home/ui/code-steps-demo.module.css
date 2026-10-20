@@ -3,7 +3,7 @@
 }
 
 .viewport {
-  --code-line-height: 24px;
+  --code-line-height: 1.5rem;
   --code-height: calc(var(--code-line-count) * var(--code-line-height) + 62px);
   --viewer-height: calc(
     max(var(--explanation-height, 218px), var(--code-height)) + 156px
@@ -61,7 +61,7 @@
   justify-content: space-between;
   gap: 12px;
   color: hsl(var(--muted-foreground));
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 
 .header,
@@ -129,12 +129,12 @@
   margin-bottom: 13px;
   color: hsl(var(--muted-foreground));
   font-family: var(--font-mono), var(--font-home-sans), monospace;
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 
 .description strong {
   display: block;
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 580;
   line-height: 1.5;
   letter-spacing: -0.035em;
@@ -144,7 +144,7 @@
 .viewport .description p {
   margin-top: 10px;
   color: hsl(var(--muted-foreground));
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.8;
   word-break: keep-all;
 }
@@ -155,7 +155,7 @@
   gap: 6px;
   margin-top: 13px;
   color: hsl(var(--muted-foreground));
-  font-size: 10px;
+  font-size: 0.625rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -180,7 +180,7 @@
   margin-left: 4px;
   color: hsl(var(--muted-foreground));
   font-family: var(--font-mono), monospace;
-  font-size: 9px;
+  font-size: 0.5625rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -207,8 +207,8 @@
   border-bottom: 1px solid hsl(var(--border));
   color: hsl(var(--muted-foreground));
   font-family: var(--font-mono), monospace;
-  font-size: 9px;
-  line-height: 15px;
+  font-size: 0.5625rem;
+  line-height: 0.9375rem;
 }
 
 .codeViewport {
@@ -223,7 +223,7 @@
   min-height: 100%;
   padding: 14px 16px 14px 40px;
   font-family: var(--font-mono), monospace;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-variant-ligatures: none;
   line-height: var(--code-line-height);
   letter-spacing: 0;
@@ -263,7 +263,7 @@
   left: 10px;
   width: 16px;
   color: hsl(var(--muted-foreground));
-  font-size: 10px;
+  font-size: 0.625rem;
   text-align: right;
   user-select: none;
 }
@@ -330,7 +330,7 @@
   flex-shrink: 0;
   border-radius: 6px;
   color: hsl(var(--muted-foreground));
-  font-size: 12px;
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -446,7 +446,7 @@
 
 @container (max-width: 639px) {
   .viewport {
-    --code-line-height: 20px;
+    --code-line-height: 1.25rem;
     /* Touch gestures belong to the page; the controls still select every stop.
        clip also prevents button navigation from scrolling this frame. */
     height: auto;
@@ -481,12 +481,12 @@
   }
 
   .description strong {
-    font-size: 16px;
+    font-size: 1rem;
   }
 
   .viewport .description p {
     margin-top: 6px;
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1.65;
   }
 
@@ -497,7 +497,7 @@
   .codeCanvas {
     padding-right: 10px;
     padding-left: 28px;
-    font-size: 12px;
+    font-size: 0.75rem;
   }
 
   .codeCanvas .focusLayer {
@@ -518,7 +518,7 @@
   }
 
   .footer {
-    font-size: 9px;
+    font-size: 0.5625rem;
   }
 
   .scrollHint,

@@ -1,11 +1,11 @@
 .page {
   --home-ease: cubic-bezier(0.19, 1, 0.22, 1);
-  --home-space: 32px;
+  --home-space: 2rem;
   padding: 88px 20px 140px;
   color: hsl(var(--foreground));
   font-family: var(--font-home-sans), var(--font-sans), system-ui,
     'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 450;
   font-synthesis: none;
   line-height: 1.65;
@@ -13,7 +13,7 @@
 }
 
 .studio {
-  max-width: 760px;
+  max-width: 47.5rem;
   margin-inline: auto;
 }
 .studio h1,
@@ -45,7 +45,7 @@
 .colophon {
   font-family: var(--font-mono), var(--font-home-sans), var(--font-sans),
     monospace;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: 0.025em;
@@ -61,13 +61,13 @@
   border-bottom: 1px solid hsl(var(--border));
 }
 .wordmark {
-  font-size: 23px;
+  font-size: 1.4375rem;
   font-weight: 740;
   letter-spacing: -0.07em;
 }
 .profileKicker {
   font-family: var(--font-profile-dots), var(--font-mono), monospace;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   line-height: 1.5;
   letter-spacing: 0.09em;
@@ -81,7 +81,7 @@
   align-items: center;
   gap: 6px;
   min-height: 30px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .section {
   position: relative;
@@ -117,13 +117,13 @@
   height: 22px;
 }
 .headingTitle h2 {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 550;
   line-height: 1.4;
   letter-spacing: -0.02em;
 }
 .sectionNote {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: hsl(var(--muted-foreground));
 }
 .marginNote {
@@ -131,7 +131,7 @@
   color: hsl(var(--muted-foreground));
   font-family: var(--font-home-notes), var(--font-home-sans), var(--font-sans),
     sans-serif;
-  font-size: 23px;
+  font-size: 1.4375rem;
   font-weight: 400;
   line-height: 1.3;
   letter-spacing: -0.015em;
@@ -161,7 +161,7 @@
   margin-bottom: 21px;
 }
 .projectHeading h3 {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.5;
   letter-spacing: -0.035em;
@@ -169,7 +169,7 @@
 .projectHeading p {
   margin-top: 5px;
   color: hsl(var(--muted-foreground));
-  font-size: 14px;
+  font-size: 0.875rem;
   word-break: keep-all;
 }
 .tag {
@@ -177,7 +177,7 @@
   border: 1px solid hsl(var(--border));
   border-radius: 4px;
   padding: 4px 6px;
-  font-size: 10px;
+  font-size: 0.625rem;
   white-space: nowrap;
 }
 .demo {
@@ -201,7 +201,7 @@
   justify-content: center;
   gap: 6px;
   min-height: 30px;
-  font-size: 12px;
+  font-size: 0.75rem;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -257,7 +257,7 @@
   gap: 12px;
   background: hsl(var(--gray-100));
   color: hsl(var(--muted-foreground));
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .videoLoading svg {
   width: 24px;
@@ -298,7 +298,7 @@
   padding-inline: 12px;
   border-bottom: 1px solid hsl(var(--border));
   background: hsl(var(--gray-100));
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 .documentViewport {
   height: calc(100% - 31px);
@@ -307,7 +307,7 @@
 }
 .documentViewport strong {
   display: block;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 580;
   line-height: 1.5;
   letter-spacing: -0.02em;
@@ -315,7 +315,7 @@
 }
 .documentViewport p {
   color: hsl(var(--muted-foreground));
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 1.85;
   margin-bottom: 12px;
 }
@@ -343,7 +343,7 @@
   min-height: 48px;
   padding: 10px 16px;
   border-top: 1px solid hsl(var(--border));
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .demoControls label {
   white-space: nowrap;
@@ -360,12 +360,12 @@
   min-width: 36px;
   text-align: right;
   font-family: var(--font-mono), monospace;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-variant-numeric: tabular-nums;
 }
 .demoControls p {
   color: hsl(var(--muted-foreground));
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .videoLink {
   display: inline-flex;
@@ -373,7 +373,7 @@
   gap: 4px;
   margin-left: auto;
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .videoLink svg {
   width: 13px;
@@ -410,7 +410,7 @@
 .installNote {
   padding: 7px 10px;
   color: hsl(var(--muted-foreground));
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 1.6;
 }
 .installItem {
@@ -429,14 +429,14 @@
 }
 .installItem strong {
   display: block;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 550;
 }
 .installItem small {
   display: block;
   margin-top: 2px;
   color: hsl(var(--muted-foreground));
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .installItem svg {
   width: 14px;
@@ -508,7 +508,7 @@
   position: absolute;
   top: 11px;
   left: 13px;
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 .demoHint {
   position: absolute;
@@ -518,7 +518,7 @@
   bottom: 12px;
   right: 13px;
   color: hsl(var(--muted-foreground));
-  font-size: 11px;
+  font-size: 0.6875rem;
   pointer-events: none;
 }
 .demoHint svg {
@@ -529,7 +529,7 @@
   padding: 15px 8px;
   max-width: 100%;
   font-family: var(--font-mono), var(--font-home-sans), monospace;
-  font-size: clamp(14px, 1.8vw, 17px);
+  font-size: 1.0625rem;
   line-height: 1.4;
   letter-spacing: -0.05em;
 }
@@ -557,7 +557,7 @@
   min-height: 32px;
 }
 .craftTitle h3 {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 560;
   letter-spacing: -0.015em;
 }
@@ -567,7 +567,7 @@
 }
 .craft > p,
 .craftDetails > p {
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.7;
   color: hsl(var(--muted-foreground));
   word-break: keep-all;
@@ -575,7 +575,7 @@
 .craft > .craftCredit,
 .craftDetails > .craftCredit {
   margin-top: 8px;
-  font-size: 10px;
+  font-size: 0.625rem;
   line-height: 1.6;
 }
 .allLink {
@@ -598,7 +598,7 @@
   padding: 22px var(--home-space);
 }
 .writingLink h3 {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 570;
   line-height: 1.6;
   letter-spacing: -0.02em;
@@ -606,7 +606,7 @@
   overflow-wrap: anywhere;
 }
 .writingLink p {
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.6;
   color: hsl(var(--muted-foreground));
   margin-top: 4px;
@@ -618,7 +618,7 @@
   gap: 18px;
   color: hsl(var(--muted-foreground));
   font-family: var(--font-mono), monospace;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -638,7 +638,7 @@
   margin-top: 4px;
 }
 .contribution h2 {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 520;
 }
 .contributionDetail {
@@ -646,7 +646,7 @@
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: hsl(var(--muted-foreground));
   margin-top: 5px;
 }
@@ -658,7 +658,7 @@
 }
 .contributionStatus {
   font-family: var(--font-mono), monospace;
-  font-size: 10px;
+  font-size: 0.625rem;
   white-space: nowrap;
 }
 .contribution a {
@@ -695,7 +695,7 @@
   top: calc(100% + 4px);
   left: 0;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 0.75rem;
   background: hsl(var(--background));
   z-index: 1;
 }
@@ -704,7 +704,7 @@
   justify-content: space-between;
   gap: 14px;
   padding: 15px var(--home-space);
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -798,7 +798,7 @@
     top: 148px;
     width: 132px;
     margin: 0;
-    font-size: 24px;
+    font-size: 1.5rem;
   }
   .marginNote > div {
     display: block;
@@ -833,14 +833,14 @@
 }
 @media (max-width: 640px) {
   .page {
-    --home-space: 20px;
+    --home-space: 1.25rem;
     padding: 88px 12px 140px;
   }
   .masthead {
     padding-inline: 20px;
   }
   .profileKicker {
-    font-size: 9px;
+    font-size: 0.5625rem;
     letter-spacing: 0.02em;
   }
   .sectionHeading {
@@ -859,7 +859,7 @@
     display: none;
   }
   .headingTitle h2 {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
   .section {
     margin-top: 36px;
@@ -868,13 +868,13 @@
     margin-top: 56px;
   }
   .marginNote {
-    font-size: 22px;
+    font-size: 1.375rem;
   }
   .feature {
     padding-top: 21px;
   }
   .projectHeading h3 {
-    font-size: 19px;
+    font-size: 1.1875rem;
   }
   .syncStage {
     gap: 12px;
@@ -887,11 +887,11 @@
     padding: 12px;
   }
   .documentViewport strong {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   .documentBar {
     padding-inline: 8px;
-    font-size: 8px;
+    font-size: 0.5rem;
   }
   .documentBar > span:last-child {
     display: none;
@@ -900,17 +900,17 @@
     padding-inline: 10px;
   }
   .demoToolbar .eyebrow {
-    font-size: 10px;
+    font-size: 0.625rem;
   }
   .demoControls {
     gap: 10px;
     padding-inline: 12px;
   }
   .demoControls p {
-    font-size: 10px;
+    font-size: 0.625rem;
   }
   .videoLink {
-    font-size: 10px;
+    font-size: 0.625rem;
   }
   .craft {
     padding: 20px;
@@ -926,7 +926,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
   .shuffleButton {
-    font-size: 17px;
+    font-size: 1.0625rem;
   }
   .writingMeta {
     gap: 8px;
@@ -939,7 +939,7 @@
   }
   .colophon {
     flex-wrap: wrap;
-    font-size: 9px;
+    font-size: 0.5625rem;
   }
   .copyStatus {
     left: auto;
@@ -1038,7 +1038,7 @@
   justify-content: space-between;
   gap: 8px 20px;
   color: hsl(var(--muted-foreground));
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .dockDemoHint p {
   margin: 0;

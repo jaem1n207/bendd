@@ -7,7 +7,7 @@ const routes = [
   '/article/naming-tokens-in-design',
   '/craft/implement-rauno-style-text-animation',
 ];
-const widths = [390, 767, 768, 1024, 1440, 1920];
+const widths = [390, 767, 768, 1024, 1440, 1920, 2560, 3840];
 
 async function readMetrics(article: Locator) {
   return article.evaluate(element => {
@@ -49,6 +49,8 @@ async function readLineEnds(paragraph: Locator) {
     const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
     const range = document.createRange();
     const lines = new Map<number, string>();
+    const paragraphTop = element.getBoundingClientRect().top;
+    const lineHeight = Number.parseFloat(getComputedStyle(element).lineHeight);
     let node = walker.nextNode();
 
     while (node) {
@@ -56,8 +58,8 @@ async function readLineEnds(paragraph: Locator) {
         range.setStart(node, offset);
         range.setEnd(node, offset + 1);
         const rect = range.getBoundingClientRect();
-        const top = Math.round(rect.top);
-        lines.set(top, (lines.get(top) ?? '') + range.toString());
+        const line = Math.round((rect.top - paragraphTop) / lineHeight);
+        lines.set(line, (lines.get(line) ?? '') + range.toString());
       }
       node = walker.nextNode();
     }
@@ -82,17 +84,17 @@ for (const route of routes) {
       samples.push(await readMetrics(article));
     }
 
-    expect(samples[0].fontSize).toBeGreaterThanOrEqual(17.9);
-    expect(samples[4].fontSize).toBeGreaterThanOrEqual(20);
-    expect(samples[4].fontSize).toBeLessThanOrEqual(22);
+    expect(samples[0].fontSize).toBeGreaterThanOrEqual(18);
+    expect(samples[4].fontSize).toBeGreaterThanOrEqual(18);
+    expect(samples[6].fontSize).toBeCloseTo(20, 1);
+    expect(samples[7].fontSize).toBeCloseTo(samples[6].fontSize, 1);
     for (const sample of samples) {
       expect(sample.summaryFontSize).toBeCloseTo(sample.fontSize, 1);
       expect(sample.lineHeight / sample.fontSize).toBeGreaterThanOrEqual(1.7);
       expect(sample.overflow).toBeLessThanOrEqual(1);
+      expect(sample.fontSize).toBeLessThanOrEqual(20);
     }
-    for (const [index, sample] of samples.slice(1).entries()) {
-      expect(sample.fontSize).toBeGreaterThan(samples[index].fontSize);
-    }
+    expect(samples[5].fontSize).toBeGreaterThan(samples[4].fontSize);
     expect(samples[2].fontSize - samples[1].fontSize).toBeLessThan(0.01);
     expect(samples[5].width / samples[5].fontSize).toBeCloseTo(
       samples[4].width / samples[4].fontSize,
@@ -115,9 +117,10 @@ for (const route of routes) {
     await expect(article).toBeVisible();
     const original = await readMetrics(article);
 
-    await page.addStyleTag({ content: 'html { font-size: 200%; }' });
+    await page.addStyleTag({ content: ':root { font-size: 200%; }' });
     const enlarged = await readMetrics(article);
-    expect(enlarged.fontSize).toBeGreaterThan(original.fontSize * 1.9);
+    expect(enlarged.fontSize).toBeGreaterThan(original.fontSize);
+    expect(enlarged.fontSize).toBeGreaterThanOrEqual(32);
     expect(enlarged.overflow).toBeLessThanOrEqual(1);
     expect(enlarged.width).toBeLessThanOrEqual(320);
   });

@@ -27,7 +27,7 @@
     0 12px 48px hsl(var(--foreground) / 0.12),
     0 2px 8px hsl(var(--foreground) / 0.05);
   transform-origin: bottom right;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.65;
 }
 .card[data-view='details'] {
@@ -53,10 +53,10 @@
   gap: 6px;
   margin-bottom: 6px;
   color: hsl(var(--muted-foreground));
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .title {
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1.4;
   font-weight: 600;
   letter-spacing: -0.025em;
@@ -77,7 +77,7 @@
 }
 .status {
   margin-top: 12px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .actions {
   display: grid;
@@ -97,14 +97,14 @@
   justify-content: space-between;
   gap: 8px;
   margin-top: 12px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: hsl(var(--muted-foreground));
 }
 .footer button {
   height: 36px;
   margin-left: -8px;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 /* 상세 설명의 유일한 스크롤 경계예요. */
 .details {
@@ -115,7 +115,7 @@
   padding-right: 8px;
   color: hsl(var(--foreground));
   word-break: keep-all;
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.75;
 }
 .sections {
@@ -139,7 +139,7 @@
   border-radius: 8px;
 }
 .sectionNumber {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: hsl(var(--muted-foreground));
   font-variant-numeric: tabular-nums;
 }
@@ -151,7 +151,7 @@
   font-weight: 600;
 }
 .sectionHint {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   color: hsl(var(--muted-foreground));
 }
@@ -193,7 +193,7 @@
   margin-top: 12px;
   text-decoration: underline;
   text-underline-offset: 3px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .card[data-view='details'] .actions button {
   height: 58px;
@@ -208,7 +208,7 @@
   display: flex;
   gap: 4px;
   align-items: center;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 400;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -246,7 +246,7 @@
   gap: 6px;
   border-radius: 999px;
   box-shadow: 0 2px 12px hsl(var(--foreground) / 0.06);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 @media (max-width: 1439px) {
   .root {
