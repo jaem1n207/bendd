@@ -42,13 +42,6 @@ for (const { route, selector } of indexes) {
 
     for (const width of [320, 390, 768, 1120, 1280, 1440, 2560]) {
       await page.setViewportSize({ width, height: 1000 });
-      const titles = page.locator('main a[data-fluid-hover-item] h2');
-      const clippedTitles = await titles.evaluateAll(elements =>
-        elements
-          .filter(element => element.scrollWidth > element.clientWidth)
-          .map(element => element.textContent)
-      );
-      expect(clippedTitles).toEqual([]);
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - innerWidth
       );

@@ -178,36 +178,37 @@ export function ArticleItem({
         href={href}
         className={cn(
           styles.item,
-          'relative block w-full overflow-hidden rounded-xl px-3 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex sm:min-w-0 sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1'
+          'relative flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-xl px-3 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:gap-3'
         )}
       >
         <h2
           ref={nameRef}
-          className="min-h-5 min-w-0 shrink break-keep text-sm font-medium sm:basis-full md:min-h-6 md:text-base"
+          title={name}
+          className="min-h-5 min-w-0 shrink truncate text-sm font-medium md:min-h-6 md:text-base"
         >
           {name}
         </h2>
         {series && (
-          <span className="shrink-0 whitespace-nowrap rounded-full bg-primary/10 px-2 py-0.5 text-xs tabular-nums text-primary">
-            {series.name} #{series.order}
+          <span
+            title={series.name}
+            className="hidden shrink-0 whitespace-nowrap rounded-full bg-primary/10 px-2 py-0.5 text-xs tabular-nums text-primary sm:inline-block"
+          >
+            <span className="sr-only">{series.name} </span>#{series.order}
           </span>
         )}
         <span
           ref={summaryRef}
-          className="hidden min-w-0 shrink truncate text-sm text-muted-foreground sm:inline-block"
+          className="hidden min-w-0 flex-1 truncate text-sm text-muted-foreground sm:inline-block"
         >
           {summary}
         </span>
         <div
           aria-hidden="true"
-          className={cn(
-            styles.line,
-            'hidden min-w-8 sm:inline-block sm:flex-1'
-          )}
+          className={cn(styles.line, 'min-w-4 flex-1 sm:min-w-8')}
         />
         <span
           ref={publishedAtRef}
-          className="inline-block min-h-5 shrink-0 whitespace-nowrap align-top text-sm tabular-nums text-muted-foreground"
+          className="inline-block shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground sm:text-sm"
         >
           {publishedAt}
         </span>
