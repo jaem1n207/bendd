@@ -146,6 +146,23 @@ image: '/optional-image.png' # 선택
 
 초과하면 빌드 시 Zod 검증 에러가 발생한다.
 
+본문에 영상이 있는 글은 대표 영상 하나를 선택해 아래 세 필드를 함께 추가한다.
+`video`는 `public/` 아래 MP4 또는 WebM 파일의 루트 상대 경로이고,
+`videoWidth`와 `videoHeight`는 파일의 실제 픽셀 크기인 양의 정수다.
+파일명과 디렉토리명에는 영문, 숫자, `_`, `-`를 사용한다.
+
+```yaml
+video: '/videos/usage-motion-slot.mp4'
+videoWidth: 1278
+videoHeight: 944
+```
+
+Article과 Craft 상세 페이지는 이 정보로 `og:video`,
+`og:video:secure_url`, `og:video:type`, `og:video:width`, `og:video:height`를 생성한다.
+영상 URL은 `siteMetadata.siteUrl` 기준 HTTPS 절대 URL을 사용한다.
+영상이 없으면 태그를 생략하며, 기존 `og:image`와 Twitter 이미지 카드는 유지한다.
+본문의 첫 영상이 비교용 이전 버전일 수 있으므로 대표 영상을 자동 추출하지 않는다.
+
 ## 커밋 & 브랜치
 
 ### Conventional Commits + 한국어

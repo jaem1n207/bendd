@@ -19,9 +19,28 @@ const MetadataSchema = z
     description: z.string().max(150),
     summary: z.string().max(40),
     image: z.string().optional(),
+    video: z
+      .string()
+      .regex(
+        /^\/(?:[\w-]+\/)*[\w-]+\.(?:mp4|webm)$/,
+        'video는 public 안의 MP4 또는 WebM 파일 경로여야 합니다.'
+      )
+      .optional(),
+    videoWidth: z.coerce.number().int().positive().optional(),
+    videoHeight: z.coerce.number().int().positive().optional(),
     series: z.string().optional(),
     seriesOrder: z.coerce.number().int().positive().optional(),
   })
+  .refine(
+    data =>
+      data.video
+        ? data.videoWidth != null && data.videoHeight != null
+        : data.videoWidth == null && data.videoHeight == null,
+    {
+      message: 'video, videoWidth, videoHeight는 함께 설정해야 합니다.',
+      path: ['video'],
+    }
+  )
   .refine(data => !data.series || data.seriesOrder != null, {
     message: 'series가 설정된 글에는 seriesOrder가 필수입니다.',
     path: ['seriesOrder'],

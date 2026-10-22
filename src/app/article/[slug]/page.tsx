@@ -3,6 +3,7 @@ import { cache } from 'react';
 import { notFound } from 'next/navigation';
 
 import { MdxLayout } from '@/components/layout/mdx';
+import { getOpenGraphVideos } from '@/lib/open-graph-video';
 import { siteMetadata } from '@/lib/site-metadata';
 import { findBySlug, getSeriesInfo, readArticles } from '@/mdx/mdx';
 
@@ -50,6 +51,7 @@ export async function generateMetadata(props: {
       type: 'article',
       publishedTime,
       url: `${siteMetadata.siteUrl}/article/${post.slug}`,
+      videos: getOpenGraphVideos(post.metadata),
       images: [
         {
           url: ogImage,
