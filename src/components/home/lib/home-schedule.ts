@@ -14,7 +14,13 @@ export interface HomeRevealItem {
   selected?: boolean;
 }
 
-export const HOME_NOTE_DELAY = 60;
+const HOME_NOTE_DELAY = 60;
+const STACK_GAP = 36;
+const LIST_GAP = 60;
+const SECTION_GAP = 120;
+const LIST_STAGGER_COUNT = 4;
+const MAX_DELAY = 600;
+const BLUR_BUDGET = 12;
 
 export enum HomeViewport {
   Compact = 'compact',
@@ -27,7 +33,7 @@ interface HomeRevealPlanOptions {
 }
 
 /** Plan a newly visible cohort in DOM order, without changing earlier effects. */
-export function createHomeRevealPlan(
+function createHomeRevealPlan(
   items: HomeRevealItem[],
   viewport: HomeViewport,
   options: HomeRevealPlanOptions = {}
@@ -62,13 +68,17 @@ export function createHomeRevealPlan(
           delays.set(
             item.id,
             start +
-              (heading.length ? 36 : 0) +
-              (Math.min(seen + index, 3) - Math.min(seen, 3)) * 60
+              (heading.length ? STACK_GAP : 0) +
+              (Math.min(seen + index, LIST_STAGGER_COUNT - 1) -
+                Math.min(seen, LIST_STAGGER_COUNT - 1)) *
+                LIST_GAP
           )
         );
       }
     } else {
-      content.forEach((item, index) => delays.set(item.id, start + index * 36));
+      content.forEach((item, index) =>
+        delays.set(item.id, start + index * STACK_GAP)
+      );
     }
     const last = Math.max(
       start,
@@ -80,7 +90,7 @@ export function createHomeRevealPlan(
       delays.set(item.id, last + pause);
       fixedDelays.set(item.id, noteDelay);
     });
-    start = last + pause + 120;
+    start = last + pause + SECTION_GAP;
   }
 
   const lastStart = Math.max(0, ...delays.values());
@@ -88,8 +98,8 @@ export function createHomeRevealPlan(
   // The home has three annotated groups; their pauses fit inside the 600ms cap.
   const scalableDelay = lastStart - noteDelay;
   const scale =
-    lastStart > 600 && scalableDelay > 0
-      ? Math.max(0, 600 - noteDelay) / scalableDelay
+    lastStart > MAX_DELAY && scalableDelay > 0
+      ? Math.max(0, MAX_DELAY - noteDelay) / scalableDelay
       : 1;
   // Important text and each list's leading item retain blur when a tall viewport
   // exceeds the layer budget. The remainder keep the same opacity timing.
@@ -101,7 +111,10 @@ export function createHomeRevealPlan(
     items
       .filter(item => item.kind !== 'preview')
       .sort((a, b) => priority(a) - priority(b))
-      .slice(0, Math.max(0, Math.min(12, options.blurBudget ?? 12)))
+      .slice(
+        0,
+        Math.max(0, Math.min(BLUR_BUDGET, options.blurBudget ?? BLUR_BUDGET))
+      )
       .map(item => item.id)
   );
   return items.map(item => {
@@ -132,4 +145,85 @@ export function createHomeRevealPlan(
       distance,
     };
   });
+}
+
+interface GroupSchedule {
+  bodyStart?: number;
+  bodyKind?: HomeRevealKind;
+  entries: number;
+}
+
+/** One effect owns one schedule. Time and DOM-ordered descriptors are explicit inputs. */
+export function createHomeSchedule() {
+  const groups = new Map<string, GroupSchedule>();
+  const blurred = new Set<number>();
+  let latest: { group: string; at: number } | undefined;
+
+  function plan(
+    items: HomeRevealItem[],
+    { now, viewport }: { now: number; viewport: HomeViewport }
+  ) {
+    const firstGroup = items[0]?.group;
+    if (!firstGroup) {
+      return [];
+    }
+    const firstItems = items.filter(item => item.group === firstGroup);
+    const first =
+      firstItems.find(item => item.kind !== 'note') ?? firstItems[0];
+    let epoch = now;
+    if (latest?.group !== firstGroup) {
+      if (latest) {
+        epoch = Math.max(epoch, latest.at + SECTION_GAP);
+      }
+    } else {
+      const previous = groups.get(firstGroup);
+      if (previous?.bodyStart !== undefined) {
+        const gap =
+          first.kind === 'note'
+            ? HOME_NOTE_DELAY
+            : first.sequence === 'stack' || previous.bodyKind === 'heading'
+              ? STACK_GAP
+              : previous.entries >= LIST_STAGGER_COUNT
+                ? 0
+                : LIST_GAP;
+        epoch = Math.max(epoch, previous.bodyStart + gap);
+      }
+    }
+    const cohort = createHomeRevealPlan(items, viewport, {
+      blurBudget: BLUR_BUDGET - blurred.size,
+      listEntries: new Map(
+        Array.from(groups, ([group, state]) => [group, state.entries])
+      ),
+    });
+    const byId = new Map(items.map(item => [item.id, item]));
+    return cohort.map(step => {
+      const item = byId.get(step.id)!;
+      const startAt = epoch + step.delay;
+      const state = groups.get(item.group) ?? { entries: 0 };
+      if (item.kind !== 'note') {
+        if (state.bodyStart === undefined || startAt >= state.bodyStart) {
+          state.bodyStart = startAt;
+          state.bodyKind = item.kind;
+        }
+        if (item.kind !== 'heading') {
+          state.entries += 1;
+        }
+      }
+      groups.set(item.group, state);
+      if (!latest || startAt >= latest.at) {
+        latest = { group: item.group, at: startAt };
+      }
+      if (step.blur > 0) {
+        blurred.add(step.id);
+      }
+      return { id: step.id, startAt, blur: step.blur, distance: step.distance };
+    });
+  }
+
+  return {
+    plan,
+    release: (id: number) => {
+      blurred.delete(id);
+    },
+  };
 }
