@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { observeShuffleDemos } from '@/components/shuffle';
 
 import {
   hasModelContext,
@@ -36,20 +37,32 @@ export function WebMCPRegistration() {
     const requestIdle = globalThis.requestIdleCallback ?? requestIdleFallback;
     const cancelIdle = globalThis.cancelIdleCallback ?? window.clearTimeout;
 
-    const idleId = requestIdle(() => {
-      try {
-        const declarativeToolNames = getDeclarativeToolNames(document);
-        const tools = buildTools().filter(
-          tool => !declarativeToolNames.has(tool.name)
-        );
-        cleanup = registerWebMCPTools(tools);
-      } catch {
-        cleanup = () => {};
+    let idleId: number | undefined;
+    const refresh = () => {
+      if (idleId !== undefined) {
+        cancelIdle(idleId);
       }
-    });
+      cleanup();
+      idleId = requestIdle(() => {
+        try {
+          const declarativeToolNames = getDeclarativeToolNames(document);
+          const tools = buildTools().filter(
+            tool => !declarativeToolNames.has(tool.name)
+          );
+          cleanup = registerWebMCPTools(tools);
+        } catch {
+          cleanup = () => {};
+        }
+      });
+    };
+    const unobserve = observeShuffleDemos(refresh);
+    refresh();
 
     return () => {
-      cancelIdle(idleId);
+      unobserve();
+      if (idleId !== undefined) {
+        cancelIdle(idleId);
+      }
       cleanup();
     };
   }, [buildTools]);

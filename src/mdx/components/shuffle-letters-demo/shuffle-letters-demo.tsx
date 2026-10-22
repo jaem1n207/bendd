@@ -2,68 +2,29 @@
 
 import { useDemoCompletion } from '@/components/observability';
 
-import { shuffleLetters } from '@/lib/shuffle-letters';
+import { shuffleInputSchema, useShuffleDemo } from '@/components/shuffle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createMDXComponent } from '@/mdx/common/create-mdx-component';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 
 const ShuffleLettersDemoSchema = z.object({
   initialText: z.string().optional().default('한글 English 123 @#$%'),
-  initialIterations: z.number().min(1).max(50).optional().default(8),
-  initialFps: z.number().min(1).max(60).optional().default(30),
+  initialIterations: z
+    .number()
+    .min(shuffleInputSchema.properties.iterations.minimum)
+    .max(shuffleInputSchema.properties.iterations.maximum)
+    .optional()
+    .default(8),
+  initialFps: z
+    .number()
+    .min(shuffleInputSchema.properties.fps.minimum)
+    .max(shuffleInputSchema.properties.fps.maximum)
+    .optional()
+    .default(30),
 });
 
 type ShuffleLettersDemoProps = z.infer<typeof ShuffleLettersDemoSchema>;
-
-type ShuffleLettersPayload = {
-  text: string;
-  iterations: number;
-  fps: number;
-};
-
-type AgentSubmitEvent = SubmitEvent & {
-  agentInvoked?: boolean;
-  respondWith?: (promise: Promise<unknown>) => void;
-};
-
-const invalidPayloadResponse = {
-  ok: false,
-  error: 'text, iterations, fps 값이 올바르지 않습니다.',
-} as const;
-
-function parseShuffleLettersPayload(
-  detail: unknown
-): ShuffleLettersPayload | null {
-  if (typeof detail !== 'object' || detail === null) return null;
-
-  const { text, iterations, fps } = detail as Partial<
-    Record<keyof ShuffleLettersPayload, unknown>
-  >;
-
-  if (typeof text !== 'string' || text.trim() === '') return null;
-  if (
-    typeof iterations !== 'number' ||
-    !Number.isFinite(iterations) ||
-    !Number.isInteger(iterations) ||
-    iterations < 1 ||
-    iterations > 50
-  ) {
-    return null;
-  }
-  if (
-    typeof fps !== 'number' ||
-    !Number.isFinite(fps) ||
-    !Number.isInteger(fps) ||
-    fps < 1 ||
-    fps > 60
-  ) {
-    return null;
-  }
-
-  return { text, iterations, fps };
-}
 
 function ShuffleLettersDemo({
   initialText = '한글 English 123 @#$%',
@@ -71,117 +32,21 @@ function ShuffleLettersDemo({
   initialFps = 40,
 }: ShuffleLettersDemoProps) {
   const reportComplete = useDemoCompletion('shuffle-letters');
-  const [text, setText] = useState(initialText);
-  const [iterations, setIterations] = useState(initialIterations);
-  const [fps, setFps] = useState(initialFps);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const animatedTextRef = useRef<HTMLDivElement>(null);
-  const clearAnimationRef = useRef<(() => void) | null>(null);
-  const intendedDisplayTextRef = useRef(initialText);
-
-  const stopAnimation = useCallback(() => {
-    if (clearAnimationRef.current) {
-      clearAnimationRef.current();
-      clearAnimationRef.current = null;
-      setIsAnimating(false);
-
-      // 즉시 텍스트를 원래 상태로 되돌립니다.
-      if (animatedTextRef.current) {
-        animatedTextRef.current.textContent = intendedDisplayTextRef.current;
-      }
-    }
-  }, []);
-
-  const startAnimation = useCallback(
-    ({
-      text: nextText,
-      iterations: nextIterations,
-      fps: nextFps,
-    }: ShuffleLettersPayload) => {
-      if (clearAnimationRef.current || !animatedTextRef.current) return false;
-
-      intendedDisplayTextRef.current = nextText;
-      setText(nextText);
-      setIterations(nextIterations);
-      setFps(nextFps);
-      animatedTextRef.current.textContent = nextText;
-      setIsAnimating(true);
-      clearAnimationRef.current = shuffleLetters(animatedTextRef.current, {
-        iterations: nextIterations,
-        fps: nextFps,
-        onComplete: () => {
-          reportComplete();
-          setIsAnimating(false);
-          clearAnimationRef.current = null;
-        },
-      });
-
-      return true;
-    },
-    [reportComplete]
+  const {
+    text,
+    setText,
+    iterations,
+    setIterations,
+    fps,
+    setFps,
+    isAnimating,
+    animatedTextRef,
+    handleSubmit,
+    isValid,
+  } = useShuffleDemo(
+    { text: initialText, iterations: initialIterations, fps: initialFps },
+    reportComplete
   );
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const payload = parseShuffleLettersPayload({ text, iterations, fps });
-    const started = payload ? startAnimation(payload) : false;
-    const nativeEvent = e.nativeEvent as AgentSubmitEvent;
-
-    if (nativeEvent.agentInvoked && nativeEvent.respondWith) {
-      nativeEvent.respondWith(
-        Promise.resolve(
-          payload
-            ? {
-                ok: started,
-                text: payload.text,
-                iterations: payload.iterations,
-                fps: payload.fps,
-              }
-            : invalidPayloadResponse
-        )
-      );
-    }
-  };
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isAnimating) {
-        stopAnimation();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAnimating, stopAnimation]);
-
-  useEffect(() => {
-    const handleRun = (event: Event) => {
-      const { detail } = event as CustomEvent<unknown>;
-      const payload = parseShuffleLettersPayload(detail);
-      if (!payload) return;
-      startAnimation(payload);
-    };
-
-    const handleStop = () => {
-      stopAnimation();
-    };
-
-    window.addEventListener('webmcp:run-shuffle-letters', handleRun);
-    window.addEventListener('webmcp:stop-shuffle-letters', handleStop);
-
-    return () => {
-      window.removeEventListener('webmcp:run-shuffle-letters', handleRun);
-      window.removeEventListener('webmcp:stop-shuffle-letters', handleStop);
-    };
-  }, [startAnimation, stopAnimation]);
-
-  const isValid =
-    text &&
-    text.trim() !== '' &&
-    iterations >= 1 &&
-    iterations <= 50 &&
-    fps >= 1 &&
-    fps <= 60;
 
   return (
     <div className="mt-6 flex flex-col items-center gap-4 rounded-lg border border-gray-200 bg-secondary p-6">
@@ -229,8 +94,8 @@ function ShuffleLettersDemo({
               type="number"
               value={iterations}
               onChange={e => setIterations(Number(e.target.value))}
-              min="1"
-              max="50"
+              min={shuffleInputSchema.properties.iterations.minimum}
+              max={shuffleInputSchema.properties.iterations.maximum}
               toolparamdescription="Number of random character replacements per letter. Use 1 through 50."
               required
             />
@@ -245,8 +110,8 @@ function ShuffleLettersDemo({
               type="number"
               value={fps}
               onChange={e => setFps(Number(e.target.value))}
-              min="1"
-              max="60"
+              min={shuffleInputSchema.properties.fps.minimum}
+              max={shuffleInputSchema.properties.fps.maximum}
               toolparamdescription="Animation frames per second. Use 1 through 60."
               required
             />

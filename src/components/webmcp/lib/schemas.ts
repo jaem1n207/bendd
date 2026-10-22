@@ -1,3 +1,5 @@
+import { shuffleInputSchema } from '@/components/shuffle';
+import { parseActionInput } from '@/lib/action-input';
 import type {
   WebMCPJSONSchema,
   WebMCPModelContextClient,
@@ -29,11 +31,12 @@ export const emptyObjectSchema = {
 
 const stringSchema = {
   type: 'string',
+  minLength: 1,
 } satisfies WebMCPJSONSchema;
 
 const numberSchema = (minimum: number, maximum: number) =>
   ({
-    type: 'number',
+    type: 'integer',
     minimum,
     maximum,
   }) satisfies WebMCPJSONSchema;
@@ -70,8 +73,8 @@ export const webMCPSchemas = {
     type: 'object',
     properties: {
       query: stringSchema,
-      type: enumSchema(['all', 'article', 'craft']),
-      limit: numberSchema(1, 10),
+      type: { ...enumSchema(['all', 'article', 'craft']), default: 'all' },
+      limit: { ...numberSchema(1, 10), default: 5 },
     },
     required: ['query'],
     additionalProperties: false,
@@ -109,16 +112,7 @@ export const webMCPSchemas = {
     required: ['index'],
     additionalProperties: false,
   },
-  runShuffleLetters: {
-    type: 'object',
-    properties: {
-      text: stringSchema,
-      iterations: numberSchema(1, 50),
-      fps: numberSchema(1, 60),
-    },
-    required: ['text', 'iterations', 'fps'],
-    additionalProperties: false,
-  },
+  runShuffleLetters: shuffleInputSchema,
 } satisfies Record<string, WebMCPJSONSchema>;
 
 export function createToolDescriptor<Input, Output>({
@@ -138,13 +132,19 @@ export function createToolDescriptor<Input, Output>({
     input: Input,
     client: WebMCPModelContextClient
   ) => Output | Promise<Output>;
-}): WebMCPToolDescriptor<Input, Output> {
+}): WebMCPToolDescriptor<unknown, Output | { ok: false; error: string }> {
   return {
     name,
     title,
     description,
     inputSchema,
     annotations,
-    execute,
+    execute: (input, client) => {
+      const parsed = parseActionInput(inputSchema, input);
+      if (!parsed.ok) {
+        return parsed;
+      }
+      return execute(parsed.value as Input, client);
+    },
   };
 }

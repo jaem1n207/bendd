@@ -1,10 +1,9 @@
-/* eslint-disable playwright/no-standalone-expect */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   getCodeBlockText,
   getCurrentContentContext,
-  getPageActions,
+  getContentCapabilities,
   getSeriesTargetHref,
   jumpToHeading,
 } from '@/components/webmcp/lib/content-snapshot';
@@ -169,38 +168,17 @@ describe('content-snapshot', () => {
     });
   });
 
-  it('lists route-relevant page actions', () => {
-    expect(getPageActions('/article/agentic-interfaces', document)).toEqual([
-      'navigate_site',
-      'get_site_context',
-      'toggle_theme',
-      'set_sound',
-      'copy_current_url',
-      'find_content',
-      'open_content',
-      'list_page_actions',
-      'get_current_content_context',
-      'jump_to_heading',
-      'copy_code_block',
-      'open_series',
-    ]);
-  });
-
-  it('lists shuffle actions only on the exact shuffle playground route', () => {
-    expect(getPageActions('/playground/shuffle-letters', document)).toContain(
-      'run_shuffle_letters'
-    );
-    expect(getPageActions('/playground/shuffle-letters', document)).toContain(
-      'stop_shuffle_letters'
-    );
-    expect(getPageActions('/playground/shuffle-letters/', document)).toContain(
-      'run_shuffle_letters'
-    );
-    expect(
-      getPageActions('/playground/shuffle-letters-preview', document)
-    ).not.toContain('run_shuffle_letters');
-    expect(
-      getPageActions('/playground/shuffle-letters-preview', document)
-    ).not.toContain('stop_shuffle_letters');
+  it('reports live content capabilities without action policy', () => {
+    expect(getContentCapabilities(document)).toEqual({
+      content: true,
+      code: true,
+      series: true,
+    });
+    document.body.innerHTML = '';
+    expect(getContentCapabilities(document)).toEqual({
+      content: false,
+      code: false,
+      series: false,
+    });
   });
 });

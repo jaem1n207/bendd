@@ -1,8 +1,18 @@
+import {
+  hasShuffleDemo,
+  runShuffleDemo,
+  stopShuffleDemo,
+} from '@/components/shuffle';
+import {
+  createToolDescriptor,
+  emptyObjectSchema,
+  webMCPSchemas,
+} from '@/components/webmcp/lib/schemas';
 import type { WebMCPContentIndexItem } from '@/components/webmcp/lib/content-index';
 import {
   getCodeBlockText,
   getCurrentContentContext,
-  getPageActions,
+  getContentCapabilities,
   getSeriesTargetHref,
   jumpToHeading,
 } from '@/components/webmcp/lib/content-snapshot';
@@ -22,7 +32,7 @@ type ToolFailure = {
   error: string;
 };
 
-type WebMCPHandlerDeps = {
+type WebMCPActionDeps = {
   pathname: string;
   router: RouterLike;
   getTheme: () => ThemeValue;
@@ -33,7 +43,6 @@ type WebMCPHandlerDeps = {
   document: Document;
   clipboard?: ClipboardLike;
   fetchContentIndex: () => Promise<WebMCPContentIndexItem[]>;
-  dispatchWindowEvent: (name: string, detail?: unknown) => void;
 };
 
 const destinations = {
@@ -42,42 +51,18 @@ const destinations = {
   craft: '/craft',
   'shuffle-playground': '/playground/shuffle-letters',
 } as const;
-const shuffleLettersPathname = '/playground/shuffle-letters';
-
-function isRecord(input: unknown): input is Record<string, unknown> {
-  return typeof input === 'object' && input !== null;
-}
 
 function fail(error: string): ToolFailure {
   return { ok: false, error };
 }
-
 function readString(input: unknown, key: string) {
-  if (!isRecord(input) || typeof input[key] !== 'string') {
-    return undefined;
-  }
-
-  return input[key];
+  return (input as Record<string, string>)[key];
 }
-
 function readNumber(input: unknown, key: string) {
-  if (!isRecord(input) || typeof input[key] !== 'number') {
-    return undefined;
-  }
-
-  return input[key];
+  return (input as Record<string, number>)[key];
 }
-
 function readBoolean(input: unknown, key: string) {
-  if (!isRecord(input) || typeof input[key] !== 'boolean') {
-    return undefined;
-  }
-
-  return input[key];
-}
-
-function isContentType(type: string): type is WebMCPContentIndexItem['type'] {
-  return type === 'article' || type === 'craft';
+  return (input as Record<string, boolean>)[key];
 }
 
 function includesText(item: WebMCPContentIndexItem, query: string) {
@@ -93,13 +78,6 @@ function includesText(item: WebMCPContentIndexItem, query: string) {
     .toLowerCase();
 
   return haystack.includes(query.toLowerCase());
-}
-
-function isShuffleLettersPathname(pathname: string) {
-  return (
-    pathname === shuffleLettersPathname ||
-    pathname === `${shuffleLettersPathname}/`
-  );
 }
 
 function copyTextWithSelection(text: string, doc: Document) {
@@ -169,17 +147,11 @@ export function createLazyContentIndexFetcher(fetcher: typeof fetch = fetch) {
   };
 }
 
-export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
-  return {
+export function createWebMCPActions(deps: WebMCPActionDeps) {
+  const handlers = {
     navigateSite(input: unknown) {
       const destination = readString(input, 'destination');
-      const href = destination
-        ? destinations[destination as keyof typeof destinations]
-        : undefined;
-
-      if (!href) {
-        return fail('지원하지 않는 destination입니다.');
-      }
+      const href = destinations[destination as keyof typeof destinations];
 
       deps.router.push(href);
       return { ok: true, href };
@@ -193,7 +165,7 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
         canonicalUrl:
           deps.document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
             ?.href ?? deps.getCurrentHref(),
-        actions: getPageActions(deps.pathname, deps.document),
+        actions: listActions(),
       };
     },
 
@@ -205,10 +177,6 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
 
     setSound(input: unknown) {
       const enabled = readBoolean(input, 'enabled');
-
-      if (enabled == null) {
-        return fail('enabled boolean 값이 필요합니다.');
-      }
 
       deps.setSoundEnabled(enabled);
       return { ok: true, enabled };
@@ -230,21 +198,9 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
     },
 
     async findContent(input: unknown) {
-      const query = readString(input, 'query')?.trim();
-      const type = readString(input, 'type') ?? 'all';
-      const limit = readNumber(input, 'limit') ?? 5;
-
-      if (!query) {
-        return fail('query 문자열이 필요합니다.');
-      }
-
-      if (type !== 'all' && !isContentType(type)) {
-        return fail('type은 all, article, craft 중 하나여야 합니다.');
-      }
-
-      if (!Number.isInteger(limit) || limit < 1 || limit > 10) {
-        return fail('limit은 1에서 10 사이여야 합니다.');
-      }
+      const query = readString(input, 'query');
+      const type = readString(input, 'type');
+      const limit = readNumber(input, 'limit');
 
       const items = await deps.fetchContentIndex();
       return {
@@ -259,14 +215,6 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
     async openContent(input: unknown) {
       const type = readString(input, 'type');
       const slug = readString(input, 'slug');
-
-      if (!type || !isContentType(type)) {
-        return fail('type은 article 또는 craft여야 합니다.');
-      }
-
-      if (!slug) {
-        return fail('slug 문자열이 필요합니다.');
-      }
 
       const items = await deps.fetchContentIndex();
       const target = items.find(
@@ -288,11 +236,10 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
     openSeries(input: unknown) {
       const target = readString(input, 'target');
 
-      if (target !== 'series' && target !== 'previous' && target !== 'next') {
-        return fail('target은 series, previous, next 중 하나여야 합니다.');
-      }
-
-      const result = getSeriesTargetHref(target, deps.document);
+      const result = getSeriesTargetHref(
+        target as 'series' | 'previous' | 'next',
+        deps.document
+      );
 
       if (!result.ok) {
         return result;
@@ -305,19 +252,11 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
     jumpToHeading(input: unknown) {
       const headingId = readString(input, 'headingId');
 
-      if (!headingId) {
-        return fail('headingId 문자열이 필요합니다.');
-      }
-
       return jumpToHeading(headingId, deps.document);
     },
 
     async copyCodeBlock(input: unknown) {
       const index = readNumber(input, 'index');
-
-      if (index == null || !Number.isInteger(index) || index < 0) {
-        return fail('index는 0 이상의 숫자여야 합니다.');
-      }
 
       const result = getCodeBlockText(index, deps.document);
 
@@ -344,52 +283,140 @@ export function createWebMCPHandlers(deps: WebMCPHandlerDeps) {
     listPageActions() {
       return {
         ok: true,
-        actions: getPageActions(deps.pathname, deps.document),
+        actions: listActions(),
       };
     },
 
     runShuffleLetters(input: unknown) {
-      if (!isShuffleLettersPathname(deps.pathname)) {
-        return fail('shuffle letters 페이지에서만 실행할 수 있습니다.');
-      }
-
-      const text = readString(input, 'text')?.trim();
-      const iterations = readNumber(input, 'iterations');
-      const fps = readNumber(input, 'fps');
-
-      if (!text) {
-        return fail('text 문자열이 필요합니다.');
-      }
-
-      if (
-        iterations == null ||
-        !Number.isInteger(iterations) ||
-        iterations < 1 ||
-        iterations > 50
-      ) {
-        return fail('iterations는 1에서 50 사이여야 합니다.');
-      }
-
-      if (fps == null || !Number.isInteger(fps) || fps < 1 || fps > 60) {
-        return fail('fps는 1에서 60 사이여야 합니다.');
-      }
-
-      deps.dispatchWindowEvent('webmcp:run-shuffle-letters', {
-        text,
-        iterations,
-        fps,
-      });
-
-      return { ok: true, text, iterations, fps };
+      return runShuffleDemo(input, deps.document);
     },
-
     stopShuffleLetters() {
-      if (!isShuffleLettersPathname(deps.pathname)) {
-        return fail('shuffle letters 페이지에서만 실행할 수 있습니다.');
-      }
-
-      deps.dispatchWindowEvent('webmcp:stop-shuffle-letters');
-      return { ok: true };
+      return stopShuffleDemo(deps.document);
     },
+  };
+  function defineAction<Input, Output>(
+    definition: Parameters<typeof createToolDescriptor<Input, Output>>[0] & {
+      available?: () => boolean;
+    }
+  ) {
+    return {
+      tool: createToolDescriptor(definition),
+      available: definition.available ?? (() => true),
+    };
+  }
+  const definitions = [
+    defineAction({
+      name: 'navigate_site',
+      description: 'Navigate to a safe internal page on bendd.me.',
+      inputSchema: webMCPSchemas.navigateSite,
+      execute: handlers.navigateSite,
+    }),
+    defineAction({
+      name: 'get_site_context',
+      description:
+        'Read the current bendd.me route, title, canonical URL, and available actions.',
+      inputSchema: emptyObjectSchema,
+      annotations: { readOnlyHint: true },
+      execute: handlers.getSiteContext,
+    }),
+    defineAction({
+      name: 'toggle_theme',
+      description: 'Toggle the visible site theme between light and dark.',
+      inputSchema: emptyObjectSchema,
+      execute: handlers.toggleTheme,
+    }),
+    defineAction({
+      name: 'set_sound',
+      description: 'Enable or disable site interaction sounds.',
+      inputSchema: webMCPSchemas.setSound,
+      execute: handlers.setSound,
+    }),
+    defineAction({
+      name: 'copy_current_url',
+      description: 'Copy the current page URL to the clipboard.',
+      inputSchema: emptyObjectSchema,
+      execute: handlers.copyCurrentUrl,
+    }),
+    defineAction({
+      name: 'find_content',
+      description:
+        'Search bendd.me article and craft metadata by title, summary, description, category, slug, or series.',
+      inputSchema: webMCPSchemas.findContent,
+      annotations: { readOnlyHint: true },
+      execute: handlers.findContent,
+    }),
+    defineAction({
+      name: 'open_content',
+      description: 'Open an internal article or craft page by type and slug.',
+      inputSchema: webMCPSchemas.openContent,
+      execute: handlers.openContent,
+    }),
+    defineAction({
+      name: 'get_current_content_context',
+      available: () => getContentCapabilities(deps.document).content,
+      description:
+        'Read the current article or craft title, metadata, TL;DR, headings, and a short excerpt.',
+      inputSchema: emptyObjectSchema,
+      annotations: { readOnlyHint: true },
+      execute: handlers.getCurrentContentContext,
+    }),
+    defineAction({
+      name: 'open_series',
+      available: () => getContentCapabilities(deps.document).series,
+      description:
+        'Open the current series page, previous article, or next article when available.',
+      inputSchema: webMCPSchemas.openSeries,
+      execute: handlers.openSeries,
+    }),
+    defineAction({
+      name: 'jump_to_heading',
+      available: () => getContentCapabilities(deps.document).content,
+      description:
+        'Scroll the current article or craft page to a heading by id.',
+      inputSchema: webMCPSchemas.jumpToHeading,
+      execute: handlers.jumpToHeading,
+    }),
+    defineAction({
+      name: 'copy_code_block',
+      available: () => getContentCapabilities(deps.document).code,
+      description: 'Copy a visible MDX code block by zero-based index.',
+      inputSchema: webMCPSchemas.copyCodeBlock,
+      execute: handlers.copyCodeBlock,
+    }),
+    defineAction({
+      name: 'list_page_actions',
+      description:
+        'List the WebMCP actions that are meaningful on the current route.',
+      inputSchema: emptyObjectSchema,
+      annotations: { readOnlyHint: true },
+      execute: handlers.listPageActions,
+    }),
+    defineAction({
+      name: 'run_shuffle_letters',
+      available: () => hasShuffleDemo(deps.document),
+      description: 'Fill and run the ready Shuffle demo with visible values.',
+      inputSchema: webMCPSchemas.runShuffleLetters,
+      execute: handlers.runShuffleLetters,
+    }),
+    defineAction({
+      name: 'stop_shuffle_letters',
+      available: () => hasShuffleDemo(deps.document),
+      description: 'Stop the running shuffle letters animation.',
+      inputSchema: emptyObjectSchema,
+      execute: handlers.stopShuffleLetters,
+    }),
+  ];
+
+  function listActions(): string[] {
+    return definitions
+      .filter(action => action.available())
+      .map(action => action.tool.name);
+  }
+  return {
+    listActions,
+    getTools: () =>
+      definitions
+        .filter(action => action.available())
+        .map(action => action.tool),
   };
 }
