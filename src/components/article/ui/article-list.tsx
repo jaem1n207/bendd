@@ -1,8 +1,8 @@
+import { getSeriesSummaries } from '@/lib/series';
 import { FluidHover } from '@/components/ui/fluid-hover';
 import { SeriesBanner } from '@/components/series';
 import {
   formatArticlesForDisplay,
-  getSeriesSummaries,
   readArticles,
   sortByDateDesc,
 } from '@/mdx/mdx';

@@ -12,14 +12,9 @@ export function SeriesNavigationBottom({
   route,
   articles,
   currentOrder,
+  previous: prev,
+  next,
 }: SeriesNavigationProps) {
-  const currentIndex = articles.findIndex(a => a.order === currentOrder);
-  const prev = currentIndex > 0 ? articles[currentIndex - 1] : undefined;
-  const next =
-    currentIndex >= 0 && currentIndex < articles.length - 1
-      ? articles[currentIndex + 1]
-      : undefined;
-
   return (
     <nav
       aria-label="시리즈 하단 네비게이션"

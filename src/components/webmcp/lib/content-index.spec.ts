@@ -1,17 +1,17 @@
-/* eslint-disable playwright/no-standalone-expect */
+import { getSeriesBadges } from '@/lib/series';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createWebMCPContentIndex } from '@/components/webmcp/lib/content-index';
 import {
-  getSeriesBadges,
   readArticles,
   readCraftArticles,
   sortByDateDesc,
   type Article,
 } from '@/mdx/mdx';
 
+vi.mock('@/lib/series', () => ({ getSeriesBadges: vi.fn() }));
+
 vi.mock('@/mdx/mdx', () => ({
-  getSeriesBadges: vi.fn(),
   readArticles: vi.fn(),
   readCraftArticles: vi.fn(),
   sortByDateDesc: vi.fn((articles: ReadonlyArray<Article>) => articles),

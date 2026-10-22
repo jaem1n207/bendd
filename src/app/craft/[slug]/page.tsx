@@ -1,3 +1,4 @@
+import { resolveSeries, SeriesStatus } from '@/lib/series';
 import type { Metadata } from 'next';
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
@@ -5,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { MdxLayout } from '@/components/layout/mdx';
 import { getOpenGraphVideos } from '@/lib/open-graph-video';
 import { siteMetadata } from '@/lib/site-metadata';
-import { findBySlug, getSeriesInfo, readCraftArticles } from '@/mdx/mdx';
+import { findBySlug, readCraftArticles } from '@/mdx/mdx';
 
 const getCraftArticles = cache(() => readCraftArticles());
 
@@ -85,17 +86,16 @@ export default async function CraftPage(props: {
     notFound();
   }
 
-  const seriesInfo =
+  const series =
     post.metadata.series && post.metadata.seriesOrder
-      ? getSeriesInfo(
-          articles,
-          post.metadata.series,
-          post.metadata.seriesOrder,
-          {
-            contentType: 'craft',
-          }
-        )
+      ? resolveSeries(articles, {
+          id: post.metadata.series,
+          currentOrder: post.metadata.seriesOrder,
+          contentType: 'craft',
+        })
       : undefined;
+  const seriesInfo =
+    series?.status === SeriesStatus.Ready ? series.info : undefined;
 
   return <MdxLayout post={post} type="craft" seriesInfo={seriesInfo} />;
 }

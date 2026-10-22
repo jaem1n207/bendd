@@ -90,7 +90,7 @@ Same frontmatter schema, different display formatters and route prefixes.
 
 ## Key Patterns
 
-- **MDX 함수 API**: 순수 함수 기반 — `readArticles()` → `sortByDateDesc()` / `findBySlug()` / `getSeriesInfo()` 등 조합
+- **MDX 함수 API**: 순수 함수 기반 — `readArticles()` → `sortByDateDesc()` / `findBySlug()` / `resolveSeries()` 등 조합
 - **Zustand persist**: localStorage with named keys (e.g., `sound-enabled`)
 - **Theme sync**: `useThemeManager` syncs next-themes with giscus iframe via `postMessage`
 - **Dynamic imports**: `ssr: false` must live in a Client Component wrapper; Server Component layouts import that wrapper
@@ -107,8 +107,8 @@ Same frontmatter schema, different display formatters and route prefixes.
 | `readCraftArticles`        | Function   | `src/mdx/mdx.ts`                                         | `craft/` 디렉토리에서 글 목록 로드                                |
 | `findBySlug`               | Function   | `src/mdx/mdx.ts`                                         | 슬러그로 단일 글 조회                                             |
 | `sortByDateDesc`           | Function   | `src/mdx/mdx.ts`                                         | 날짜 내림차순 정렬                                                |
-| `getSeriesInfo`            | Function   | `src/mdx/mdx.ts`                                         | 시리즈 메타데이터 + 글 목록 조회                                  |
-| `getSeriesSummaries`       | Function   | `src/mdx/mdx.ts`                                         | 전체 시리즈 요약 목록                                             |
+| `resolveSeries`            | Function   | `src/lib/series.ts`                                      | 시리즈 상태·경로·글 목록·이전/다음 조회                           |
+| `getSeriesSummaries`       | Function   | `src/lib/series.ts`                                      | 전체 시리즈 요약 목록                                             |
 | `formatArticlesForDisplay` | Function   | `src/mdx/mdx.ts`                                         | 글 목록을 ArticleInfo[]로 포맷 (시리즈 배지 포함)                 |
 | `formatCraftsForDisplay`   | Function   | `src/mdx/mdx.ts`                                         | craft 목록을 ArticleInfo[]로 포맷                                 |
 | `MetadataSchema`           | Zod schema | `src/mdx/mdx.ts:8`                                       | Frontmatter validation (title/summary/description limits)         |

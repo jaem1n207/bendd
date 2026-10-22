@@ -3,31 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { Article } from '@/mdx/mdx';
 
-vi.mock('@/lib/series', () => ({
-  getAllSeriesIds: vi.fn(() => [
-    'ai-coding-agent',
-    'synchronize-tab-scrolling',
-  ]),
-  getSeriesConfig: vi.fn((id: string) => {
-    switch (id) {
-      case 'ai-coding-agent':
-        return {
-          contentType: 'article',
-        };
-      case 'synchronize-tab-scrolling':
-        return {
-          contentType: 'craft',
-        };
-      default:
-        return undefined;
-    }
-  }),
-  seriesRoute: vi.fn(
-    (id: string, contentType: 'article' | 'craft' = 'article') =>
-      `/${contentType}/series/${id}`
-  ),
-}));
-
 vi.mock('@/lib/site-metadata', () => ({
   siteMetadata: { siteUrl: 'https://bendd.me' },
 }));
@@ -53,7 +28,7 @@ vi.mock('@/mdx/mdx', () => ({
   readCraftArticles: vi.fn(() => [createArticle('craft-demo', '2025-03-01')]),
 }));
 
-import sitemap from './sitemap';
+import sitemap from '@/app/sitemap';
 
 describe('sitemap', () => {
   it('정적 라우트(홈, craft, article)를 포함한다', () => {

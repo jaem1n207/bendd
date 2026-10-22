@@ -1,3 +1,3 @@
-import type { SeriesInfo } from '@/mdx/mdx';
+import type { SeriesInfo } from '@/lib/series';
 
 export type SeriesNavigationProps = SeriesInfo;

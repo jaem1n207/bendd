@@ -6,61 +6,62 @@ import { cache } from 'react';
 import { FluidHover } from '@/components/ui/fluid-hover';
 import { JsonLdScript } from '@/components/structured-data';
 import { Typography } from '@/components/ui/typography';
-import { getAllSeriesIds, getSeriesConfig, seriesRoute } from '@/lib/series';
+import {
+  getSeriesMetadata,
+  listSeriesRoutes,
+  resolveSeries,
+  SeriesStatus,
+} from '@/lib/series';
 import { siteMetadata } from '@/lib/site-metadata';
 import { createSeriesGraph } from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
-import { formatDate, getSeriesInfo, readArticles } from '@/mdx/mdx';
+import { formatDate, readArticles } from '@/mdx/mdx';
 
 const getArticles = cache(() => readArticles());
 
 export function generateStaticParams() {
-  return getAllSeriesIds('article').map(id => ({ id }));
+  return listSeriesRoutes('article').map(({ id }) => ({ id }));
 }
 
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
-  const config = getSeriesConfig(params.id);
-  if (!config || config.contentType !== 'article') notFound();
-
-  return {
-    title: `${config.name} 시리즈`,
-    description: config.description,
-    alternates: {
-      canonical: `${siteMetadata.siteUrl}${seriesRoute(params.id, 'article')}`,
-    },
-    openGraph: {
-      type: 'website',
-      url: `${siteMetadata.siteUrl}${seriesRoute(params.id, 'article')}`,
-      title: `${config.name} 시리즈`,
-      description: config.description,
-    },
-  };
+  const result = getSeriesMetadata(
+    { id: params.id, contentType: 'article' },
+    siteMetadata.siteUrl
+  );
+  if (result.status !== SeriesStatus.Ready) {
+    notFound();
+  }
+  return result.metadata;
 }
 
 export default async function SeriesPage(props: {
   params: Promise<{ id: string }>;
 }) {
   const params = await props.params;
-  const config = getSeriesConfig(params.id);
-  if (!config || config.contentType !== 'article') notFound();
-
-  const articles = getArticles();
-  const seriesInfo = getSeriesInfo(articles, params.id, -1, {
-    contentType: 'article',
-  });
-  if (!seriesInfo) notFound();
+  // Reject unknown kinds before reading or validating unrelated MDX files.
+  const query = { id: params.id, contentType: 'article' as const };
+  if (
+    getSeriesMetadata(query, siteMetadata.siteUrl).status !== SeriesStatus.Ready
+  ) {
+    notFound();
+  }
+  const result = resolveSeries(getArticles(), query);
+  if (result.status !== SeriesStatus.Ready) {
+    notFound();
+  }
+  const seriesInfo = result.info;
 
   const collectionJsonLd = createSeriesGraph({ seriesInfo });
 
   return (
     <main className="relative mx-auto my-0 min-h-screen max-w-2xl overflow-hidden px-6 py-32">
       <JsonLdScript data={collectionJsonLd} />
-      <Typography variant="h2">{config.name} 시리즈</Typography>
+      <Typography variant="h2">{seriesInfo.name} 시리즈</Typography>
       <Typography variant="p" className="!mt-2 text-muted-foreground">
-        {config.description}
+        {seriesInfo.description}
       </Typography>
       <Typography
         variant="p"

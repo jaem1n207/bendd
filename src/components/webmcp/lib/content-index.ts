@@ -1,5 +1,5 @@
+import { getSeriesBadges } from '@/lib/series';
 import {
-  getSeriesBadges,
   readArticles,
   readCraftArticles,
   sortByDateDesc,

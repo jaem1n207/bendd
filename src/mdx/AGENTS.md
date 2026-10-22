@@ -7,7 +7,7 @@
 
 ```
 src/mdx/
-├── mdx.ts              # 순수 함수 기반 콘텐츠 API (readArticles, sortByDateDesc, getSeriesInfo 등)
+├── mdx.ts              # 순수 함수 기반 콘텐츠 API (readArticles, sortByDateDesc, formatArticlesForDisplay 등)
 ├── custom-mdx.tsx      # CustomMDX renderer, component registry, plugin chain
 ├── mdx.module.css      # Container styles
 ├── common/
@@ -83,8 +83,12 @@ const post = findBySlug(articles, 'my-slug');
 formatArticlesForDisplay(sorted, articles); // ArticleInfo[] (시리즈 배지 포함)
 formatCraftsForDisplay(sorted); // ArticleInfo[] (시리즈 없음)
 
-// 시리즈 — 항상 전체 컬렉션을 명시적으로 전달
-getSeriesInfo(articles, 'ai-coding-agent', 1);
+// 시리즈 — @/lib/series에서 import하고 전체 컬렉션을 명시적으로 전달
+resolveSeries(articles, {
+  id: 'ai-coding-agent',
+  contentType: 'article',
+  currentOrder: 1,
+});
 getSeriesSummaries(articles);
 getSeriesBadges(articles);
 ```
