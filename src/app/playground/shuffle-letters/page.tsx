@@ -1,169 +1,25 @@
 'use client';
 
-import { shuffleLetters } from '@/lib/shuffle-letters';
+import { shuffleInputSchema, useShuffleDemo } from '@/components/shuffle';
 import { Button } from '@/components/ui/button';
-import { useCallback, useEffect, useRef, useState } from 'react';
-
-type ShuffleLettersPayload = {
-  text: string;
-  iterations: number;
-  fps: number;
-};
-
-type AgentSubmitEvent = SubmitEvent & {
-  agentInvoked?: boolean;
-  respondWith?: (promise: Promise<unknown>) => void;
-};
-
-const invalidPayloadResponse = {
-  ok: false,
-  error: 'text, iterations, fps 값이 올바르지 않습니다.',
-} as const;
-
-function parseShuffleLettersPayload(
-  detail: unknown
-): ShuffleLettersPayload | null {
-  if (typeof detail !== 'object' || detail === null) return null;
-
-  const { text, iterations, fps } = detail as Partial<
-    Record<keyof ShuffleLettersPayload, unknown>
-  >;
-
-  if (typeof text !== 'string' || text.trim() === '') return null;
-  if (
-    typeof iterations !== 'number' ||
-    !Number.isFinite(iterations) ||
-    !Number.isInteger(iterations) ||
-    iterations < 1 ||
-    iterations > 50
-  ) {
-    return null;
-  }
-  if (
-    typeof fps !== 'number' ||
-    !Number.isFinite(fps) ||
-    !Number.isInteger(fps) ||
-    fps < 1 ||
-    fps > 60
-  ) {
-    return null;
-  }
-
-  return { text, iterations, fps };
-}
 
 export default function ShuffleLettersDemo() {
-  const [text, setText] = useState(
-    '한글 English 123456789 @#$%^&*()_+-=[]{}|;:,.<>?'
-  );
-  const [iterations, setIterations] = useState(8);
-  const [fps, setFps] = useState(30);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const animatedTextRef = useRef<HTMLDivElement>(null);
-  const clearAnimationRef = useRef<(() => void) | null>(null);
-  const intendedDisplayTextRef = useRef(text);
-
-  const stopAnimation = useCallback(() => {
-    if (clearAnimationRef.current) {
-      clearAnimationRef.current();
-      clearAnimationRef.current = null;
-      setIsAnimating(false);
-
-      // 즉시 텍스트를 원래 상태로 되돌립니다.
-      if (animatedTextRef.current) {
-        animatedTextRef.current.textContent = intendedDisplayTextRef.current;
-      }
-    }
-  }, []);
-
-  const startAnimation = useCallback(
-    ({
-      text: nextText,
-      iterations: nextIterations,
-      fps: nextFps,
-    }: ShuffleLettersPayload) => {
-      if (clearAnimationRef.current || !animatedTextRef.current) return false;
-
-      intendedDisplayTextRef.current = nextText;
-      setText(nextText);
-      setIterations(nextIterations);
-      setFps(nextFps);
-      animatedTextRef.current.textContent = nextText;
-      setIsAnimating(true);
-      clearAnimationRef.current = shuffleLetters(animatedTextRef.current, {
-        iterations: nextIterations,
-        fps: nextFps,
-        onComplete: () => {
-          setIsAnimating(false);
-          clearAnimationRef.current = null;
-        },
-      });
-
-      return true;
-    },
-    []
-  );
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const payload = parseShuffleLettersPayload({ text, iterations, fps });
-    const started = payload ? startAnimation(payload) : false;
-    const nativeEvent = e.nativeEvent as AgentSubmitEvent;
-
-    if (nativeEvent.agentInvoked && nativeEvent.respondWith) {
-      nativeEvent.respondWith(
-        Promise.resolve(
-          payload
-            ? {
-                ok: started,
-                text: payload.text,
-                iterations: payload.iterations,
-                fps: payload.fps,
-              }
-            : invalidPayloadResponse
-        )
-      );
-    }
-  };
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isAnimating) {
-        stopAnimation();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAnimating, stopAnimation]);
-
-  useEffect(() => {
-    const handleRun = (event: Event) => {
-      const { detail } = event as CustomEvent<unknown>;
-      const payload = parseShuffleLettersPayload(detail);
-      if (!payload) return;
-      startAnimation(payload);
-    };
-
-    const handleStop = () => {
-      stopAnimation();
-    };
-
-    window.addEventListener('webmcp:run-shuffle-letters', handleRun);
-    window.addEventListener('webmcp:stop-shuffle-letters', handleStop);
-
-    return () => {
-      window.removeEventListener('webmcp:run-shuffle-letters', handleRun);
-      window.removeEventListener('webmcp:stop-shuffle-letters', handleStop);
-    };
-  }, [startAnimation, stopAnimation]);
-
-  const isValid =
-    text.trim() !== '' &&
-    iterations >= 1 &&
-    iterations <= 50 &&
-    fps >= 1 &&
-    fps <= 60;
+  const {
+    text,
+    setText,
+    iterations,
+    setIterations,
+    fps,
+    setFps,
+    isAnimating,
+    animatedTextRef,
+    handleSubmit,
+    isValid,
+  } = useShuffleDemo({
+    text: '한글 English 123456789 @#$%^&*()_+-=[]{}|;:,.<>?',
+    iterations: 8,
+    fps: 30,
+  });
 
   return (
     <main className="flex flex-col items-center gap-4 p-4">
@@ -213,8 +69,8 @@ export default function ShuffleLettersDemo() {
               type="number"
               value={iterations}
               onChange={e => setIterations(Number(e.target.value))}
-              min="1"
-              max="50"
+              min={shuffleInputSchema.properties.iterations.minimum}
+              max={shuffleInputSchema.properties.iterations.maximum}
               toolparamdescription="Number of random character replacements per letter. Use 1 through 50."
               className="w-full rounded-md border border-input px-3 py-2"
               required
@@ -230,8 +86,8 @@ export default function ShuffleLettersDemo() {
               type="number"
               value={fps}
               onChange={e => setFps(Number(e.target.value))}
-              min="1"
-              max="60"
+              min={shuffleInputSchema.properties.fps.minimum}
+              max={shuffleInputSchema.properties.fps.maximum}
               toolparamdescription="Animation frames per second. Use 1 through 60."
               className="w-full rounded-md border border-input px-3 py-2"
               required

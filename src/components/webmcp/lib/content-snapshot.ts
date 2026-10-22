@@ -1,5 +1,3 @@
-import type { WebMCPToolName } from '@/components/webmcp/lib/schemas';
-
 type ContentType = 'article' | 'craft';
 type SeriesTarget = 'series' | 'previous' | 'next';
 
@@ -17,19 +15,6 @@ type SnapshotFailure = {
 const contentSelector = '[data-webmcp-content]';
 const codeBlockSelector = 'pre[data-webmcp-code-block]';
 const headingSelector = 'article h2[id], article h3[id], article h4[id]';
-const shuffleLettersPathname = '/playground/shuffle-letters';
-
-const baseActions: WebMCPToolName[] = [
-  'navigate_site',
-  'get_site_context',
-  'toggle_theme',
-  'set_sound',
-  'copy_current_url',
-  'find_content',
-  'open_content',
-  'list_page_actions',
-];
-
 function cleanText(value: string | null | undefined) {
   return value?.replace(/\s+/g, ' ').trim() ?? '';
 }
@@ -40,13 +25,6 @@ function getDocument(docLike: Document | undefined) {
 
 function getContentRoot(doc: Document) {
   return doc.querySelector<HTMLElement>(contentSelector);
-}
-
-function isShuffleLettersPathname(pathname: string) {
-  return (
-    pathname === shuffleLettersPathname ||
-    pathname === `${shuffleLettersPathname}/`
-  );
 }
 
 function isContentType(value: string | undefined): value is ContentType {
@@ -191,27 +169,10 @@ export function getSeriesTargetHref(target: SeriesTarget, docLike?: Document) {
   };
 }
 
-export function getPageActions(pathname: string, docLike?: Document) {
-  const doc = getDocument(docLike);
-  const actions = new Set<WebMCPToolName>(baseActions);
-
-  if (getContentRoot(doc)) {
-    actions.add('get_current_content_context');
-    actions.add('jump_to_heading');
-  }
-
-  if (doc.querySelector(codeBlockSelector)) {
-    actions.add('copy_code_block');
-  }
-
-  if (doc.querySelector('[data-webmcp-series-target]')) {
-    actions.add('open_series');
-  }
-
-  if (isShuffleLettersPathname(pathname)) {
-    actions.add('run_shuffle_letters');
-    actions.add('stop_shuffle_letters');
-  }
-
-  return [...actions];
+export function getContentCapabilities(doc: Document) {
+  return {
+    content: Boolean(getContentRoot(doc)),
+    code: Boolean(doc.querySelector(codeBlockSelector)),
+    series: Boolean(doc.querySelector('[data-webmcp-series-target]')),
+  };
 }

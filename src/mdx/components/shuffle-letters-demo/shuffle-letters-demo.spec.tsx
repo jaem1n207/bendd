@@ -1,3 +1,4 @@
+import { runShuffleDemo, stopShuffleDemo } from '@/components/shuffle';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -108,19 +109,15 @@ describe('MDXShuffleLettersDemo WebMCP integration', () => {
     expect(reportComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('runs visible animation when the WebMCP custom event is dispatched', () => {
+  it('runs visible animation when the WebMCP action is called', () => {
     renderShuffleLettersDemo();
 
     act(() => {
-      window.dispatchEvent(
-        new CustomEvent('webmcp:run-shuffle-letters', {
-          detail: {
-            text: 'Agent text',
-            iterations: 9,
-            fps: 24,
-          },
-        })
-      );
+      runShuffleDemo({
+        text: 'Agent text',
+        iterations: 9,
+        fps: 24,
+      });
     });
 
     expect(screen.getByDisplayValue('Agent text')).toBeDefined();
@@ -177,7 +174,7 @@ describe('MDXShuffleLettersDemo WebMCP integration', () => {
     expect(respondWith).toHaveBeenCalledTimes(1);
     await expect(respondWith.mock.calls[0][0]).resolves.toEqual({
       ok: false,
-      error: 'text, iterations, fps 값이 올바르지 않습니다.',
+      error: 'text 값이 올바르지 않습니다.',
     });
     expect(shuffleLetters).not.toHaveBeenCalled();
     expect((screen.getByLabelText('텍스트') as HTMLInputElement).value).toBe(
@@ -185,50 +182,38 @@ describe('MDXShuffleLettersDemo WebMCP integration', () => {
     );
   });
 
-  it('stops animation when the WebMCP stop event is dispatched', () => {
+  it('stops animation when the WebMCP stop action is called', () => {
     renderShuffleLettersDemo();
 
     act(() => {
-      window.dispatchEvent(
-        new CustomEvent('webmcp:run-shuffle-letters', {
-          detail: {
-            text: 'Stop me',
-            iterations: 4,
-            fps: 12,
-          },
-        })
-      );
+      runShuffleDemo({
+        text: 'Stop me',
+        iterations: 4,
+        fps: 12,
+      });
     });
 
     act(() => {
-      window.dispatchEvent(new CustomEvent('webmcp:stop-shuffle-letters'));
+      stopShuffleDemo();
     });
 
     expect(shuffleMocks.stopAnimation).toHaveBeenCalledTimes(1);
   });
 
-  it('ignores duplicate run events while an animation is active', () => {
+  it('ignores duplicate run actions while an animation is active', () => {
     renderShuffleLettersDemo();
 
     act(() => {
-      window.dispatchEvent(
-        new CustomEvent('webmcp:run-shuffle-letters', {
-          detail: {
-            text: 'First run',
-            iterations: 4,
-            fps: 12,
-          },
-        })
-      );
-      window.dispatchEvent(
-        new CustomEvent('webmcp:run-shuffle-letters', {
-          detail: {
-            text: 'Second run',
-            iterations: 5,
-            fps: 20,
-          },
-        })
-      );
+      runShuffleDemo({
+        text: 'First run',
+        iterations: 4,
+        fps: 12,
+      });
+      runShuffleDemo({
+        text: 'Second run',
+        iterations: 5,
+        fps: 20,
+      });
     });
 
     expect(shuffleLetters).toHaveBeenCalledTimes(1);
@@ -248,30 +233,22 @@ describe('MDXShuffleLettersDemo WebMCP integration', () => {
     renderShuffleLettersDemo();
 
     act(() => {
-      window.dispatchEvent(
-        new CustomEvent('webmcp:run-shuffle-letters', {
-          detail,
-        })
-      );
+      runShuffleDemo(detail);
     });
 
     expect(shuffleLetters).not.toHaveBeenCalled();
   });
 
-  it('keeps agent text visible when run and stop are dispatched together', () => {
+  it('keeps agent text visible when run and stop are called together', () => {
     renderShuffleLettersDemo();
 
     act(() => {
-      window.dispatchEvent(
-        new CustomEvent('webmcp:run-shuffle-letters', {
-          detail: {
-            text: 'Agent text survives stop',
-            iterations: 4,
-            fps: 12,
-          },
-        })
-      );
-      window.dispatchEvent(new CustomEvent('webmcp:stop-shuffle-letters'));
+      runShuffleDemo({
+        text: 'Agent text survives stop',
+        iterations: 4,
+        fps: 12,
+      });
+      stopShuffleDemo();
     });
 
     expect(screen.getByText('Agent text survives stop')).toBeDefined();

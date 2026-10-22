@@ -18,7 +18,8 @@ import {
 import { cn } from '@/lib/utils';
 import { ClientTableOfContents } from '@/mdx/common/table-of-contents/client-table-of-contents';
 import { CustomMDX } from '@/mdx/custom-mdx';
-import { type Article, type SeriesInfo, formatDate } from '@/mdx/mdx';
+import { type Article, formatDate } from '@/mdx/mdx';
+import type { SeriesInfo } from '@/lib/series';
 
 interface MdxLayoutProps {
   post: Article;

@@ -1,3 +1,4 @@
+import { resolveSeries, SeriesStatus } from '@/lib/series';
 import type { Metadata } from 'next';
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
@@ -5,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { MdxLayout } from '@/components/layout/mdx';
 import { getOpenGraphVideos } from '@/lib/open-graph-video';
 import { siteMetadata } from '@/lib/site-metadata';
-import { findBySlug, getSeriesInfo, readArticles } from '@/mdx/mdx';
+import { findBySlug, readArticles } from '@/mdx/mdx';
 
 const getArticles = cache(() => readArticles());
 
@@ -85,17 +86,16 @@ export default async function ArticlePage(props: {
     notFound();
   }
 
-  const seriesInfo =
+  const series =
     post.metadata.series && post.metadata.seriesOrder
-      ? getSeriesInfo(
-          articles,
-          post.metadata.series,
-          post.metadata.seriesOrder,
-          {
-            contentType: 'article',
-          }
-        )
+      ? resolveSeries(articles, {
+          id: post.metadata.series,
+          currentOrder: post.metadata.seriesOrder,
+          contentType: 'article',
+        })
       : undefined;
+  const seriesInfo =
+    series?.status === SeriesStatus.Ready ? series.info : undefined;
 
   return <MdxLayout post={post} type="article" seriesInfo={seriesInfo} />;
 }

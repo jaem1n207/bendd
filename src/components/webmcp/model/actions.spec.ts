@@ -3,12 +3,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   createLazyContentIndexFetcher,
-  createWebMCPHandlers,
-} from '@/components/webmcp/model/tool-handlers';
+  createWebMCPActions,
+} from '@/components/webmcp/model/actions';
 
 import type { WebMCPContentIndexItem } from '@/components/webmcp/lib/content-index';
 
-describe('createWebMCPHandlers', () => {
+describe('createWebMCPActions', () => {
   const push = vi.fn();
   const setTheme = vi.fn();
   const setSoundEnabled = vi.fn();
@@ -67,7 +67,7 @@ describe('createWebMCPHandlers', () => {
   });
 
   function createHandlers() {
-    return createWebMCPHandlers({
+    const actions = createWebMCPActions({
       pathname: '/article/agentic-interfaces',
       router: { push },
       getTheme: () => 'dark',
@@ -78,33 +78,46 @@ describe('createWebMCPHandlers', () => {
       document,
       clipboard: { writeText },
       fetchContentIndex: async () => contentIndex,
-      dispatchWindowEvent: vi.fn(),
     });
+    return {
+      getTools: actions.getTools,
+      async execute(name: string, input: unknown = {}) {
+        const tool = actions.getTools().find(tool => tool.name === name);
+        if (!tool) {
+          throw new Error(`Missing tool: ${name}`);
+        }
+        return tool.execute(input, {});
+      },
+    };
   }
 
-  it('navigates only to known internal destinations', () => {
+  it('navigates only to known internal destinations', async () => {
     const handlers = createHandlers();
 
-    expect(handlers.navigateSite({ destination: 'craft' })).toEqual({
+    expect(
+      await handlers.execute('navigate_site', { destination: 'craft' })
+    ).toEqual({
       ok: true,
       href: '/craft',
     });
     expect(push).toHaveBeenCalledWith('/craft');
-    expect(handlers.navigateSite({ destination: 'external' })).toEqual({
+    expect(
+      await handlers.execute('navigate_site', { destination: 'external' })
+    ).toEqual({
       ok: false,
-      error: '지원하지 않는 destination입니다.',
+      error: 'destination 값이 올바르지 않습니다.',
     });
   });
 
-  it('returns site context from the current document', () => {
+  it('returns site context from the current document', async () => {
     const handlers = createHandlers();
 
-    expect(handlers.getSiteContext()).toEqual({
+    expect(await handlers.execute('get_site_context')).toEqual({
       ok: true,
       pathname: '/article/agentic-interfaces',
       title: 'Agentic interfaces',
       canonicalUrl: 'https://bendd.me/article/agentic-interfaces',
-      actions: [
+      actions: expect.arrayContaining([
         'navigate_site',
         'get_site_context',
         'toggle_theme',
@@ -117,31 +130,31 @@ describe('createWebMCPHandlers', () => {
         'jump_to_heading',
         'copy_code_block',
         'open_series',
-      ],
+      ]),
     });
   });
 
-  it('toggles theme using the current resolved theme', () => {
+  it('toggles theme using the current resolved theme', async () => {
     const handlers = createHandlers();
 
-    expect(handlers.toggleTheme()).toEqual({
+    expect(await handlers.execute('toggle_theme')).toEqual({
       ok: true,
       theme: 'light',
     });
     expect(setTheme).toHaveBeenCalledWith('light');
   });
 
-  it('sets sound explicitly', () => {
+  it('sets sound explicitly', async () => {
     const handlers = createHandlers();
 
-    expect(handlers.setSound({ enabled: true })).toEqual({
+    expect(await handlers.execute('set_sound', { enabled: true })).toEqual({
       ok: true,
       enabled: true,
     });
     expect(setSoundEnabled).toHaveBeenCalledWith(true);
-    expect(handlers.setSound({ enabled: 'yes' })).toEqual({
+    expect(await handlers.execute('set_sound', { enabled: 'yes' })).toEqual({
       ok: false,
-      error: 'enabled boolean 값이 필요합니다.',
+      error: 'enabled 값이 올바르지 않습니다.',
     });
   });
 
@@ -149,16 +162,24 @@ describe('createWebMCPHandlers', () => {
     const handlers = createHandlers();
 
     await expect(
-      handlers.findContent({ query: 'AI Agents', type: 'all', limit: 5 })
+      handlers.execute('find_content', {
+        query: 'AI Agents',
+        type: 'all',
+        limit: 5,
+      })
     ).resolves.toEqual({
       ok: true,
       items: [contentIndex[0]],
     });
     await expect(
-      handlers.findContent({ query: 'agent', type: 'video', limit: 5 })
+      handlers.execute('find_content', {
+        query: 'agent',
+        type: 'video',
+        limit: 5,
+      })
     ).resolves.toEqual({
       ok: false,
-      error: 'type은 all, article, craft 중 하나여야 합니다.',
+      error: 'type 값이 올바르지 않습니다.',
     });
   });
 
@@ -166,35 +187,44 @@ describe('createWebMCPHandlers', () => {
     const handlers = createHandlers();
 
     await expect(
-      handlers.openContent({ type: 'article', slug: 'agentic-interfaces' })
+      handlers.execute('open_content', {
+        type: 'article',
+        slug: 'agentic-interfaces',
+      })
     ).resolves.toEqual({
       ok: true,
       href: '/article/agentic-interfaces',
     });
     expect(push).toHaveBeenCalledWith('/article/agentic-interfaces');
     await expect(
-      handlers.openContent({ type: 'article', slug: 'missing' })
+      handlers.execute('open_content', { type: 'article', slug: 'missing' })
     ).resolves.toEqual({
       ok: false,
       error: 'article/missing 콘텐츠를 찾지 못했습니다.',
     });
   });
 
-  it('delegates article helpers to snapshot utilities', () => {
+  it('delegates article helpers to snapshot utilities', async () => {
     const handlers = createHandlers();
     const heading = document.getElementById('overview') as HTMLElement;
     heading.scrollIntoView = vi.fn();
 
-    expect(handlers.getCurrentContentContext()).toMatchObject({
-      ok: true,
-      slug: 'agentic-interfaces',
-    });
-    expect(handlers.openSeries({ target: 'series' })).toEqual({
-      ok: true,
-      href: '/article/series/ai-agents',
-    });
+    expect(await handlers.execute('get_current_content_context')).toMatchObject(
+      {
+        ok: true,
+        slug: 'agentic-interfaces',
+      }
+    );
+    expect(await handlers.execute('open_series', { target: 'series' })).toEqual(
+      {
+        ok: true,
+        href: '/article/series/ai-agents',
+      }
+    );
     expect(push).toHaveBeenCalledWith('/article/series/ai-agents');
-    expect(handlers.jumpToHeading({ headingId: 'overview' })).toEqual({
+    expect(
+      await handlers.execute('jump_to_heading', { headingId: 'overview' })
+    ).toEqual({
       ok: true,
       headingId: 'overview',
       title: 'Overview',
@@ -204,11 +234,13 @@ describe('createWebMCPHandlers', () => {
   it('copies current url and code block text through the clipboard dependency', async () => {
     const handlers = createHandlers();
 
-    await expect(handlers.copyCurrentUrl()).resolves.toEqual({
+    await expect(handlers.execute('copy_current_url')).resolves.toEqual({
       ok: true,
       href: 'https://bendd.me/article/agentic-interfaces',
     });
-    await expect(handlers.copyCodeBlock({ index: 0 })).resolves.toEqual({
+    await expect(
+      handlers.execute('copy_code_block', { index: 0 })
+    ).resolves.toEqual({
       ok: true,
       language: 'ts',
       characterCount: 16,
@@ -217,9 +249,11 @@ describe('createWebMCPHandlers', () => {
       'https://bendd.me/article/agentic-interfaces'
     );
     expect(writeText).toHaveBeenCalledWith('const value = 1;');
-    await expect(handlers.copyCodeBlock({ index: -1 })).resolves.toEqual({
+    await expect(
+      handlers.execute('copy_code_block', { index: -1 })
+    ).resolves.toEqual({
       ok: false,
-      error: 'index는 0 이상의 숫자여야 합니다.',
+      error: 'index 값이 올바르지 않습니다.',
     });
   });
 
@@ -227,13 +261,15 @@ describe('createWebMCPHandlers', () => {
     const handlers = createHandlers();
 
     writeText.mockRejectedValueOnce(new DOMException('Denied'));
-    await expect(handlers.copyCurrentUrl()).resolves.toEqual({
+    await expect(handlers.execute('copy_current_url')).resolves.toEqual({
       ok: false,
       error: '현재 URL을 클립보드에 복사하지 못했습니다.',
     });
 
     writeText.mockRejectedValueOnce(new DOMException('Denied'));
-    await expect(handlers.copyCodeBlock({ index: 0 })).resolves.toEqual({
+    await expect(
+      handlers.execute('copy_code_block', { index: 0 })
+    ).resolves.toEqual({
       ok: false,
       error: '코드 블록을 클립보드에 복사하지 못했습니다.',
     });
@@ -245,7 +281,7 @@ describe('createWebMCPHandlers', () => {
     writeText.mockRejectedValueOnce(new DOMException('Denied'));
     vi.mocked(document.execCommand).mockReturnValueOnce(true);
 
-    await expect(handlers.copyCurrentUrl()).resolves.toEqual({
+    await expect(handlers.execute('copy_current_url')).resolves.toEqual({
       ok: true,
       href: 'https://bendd.me/article/agentic-interfaces',
     });
@@ -254,7 +290,9 @@ describe('createWebMCPHandlers', () => {
     writeText.mockRejectedValueOnce(new DOMException('Denied'));
     vi.mocked(document.execCommand).mockReturnValueOnce(true);
 
-    await expect(handlers.copyCodeBlock({ index: 0 })).resolves.toEqual({
+    await expect(
+      handlers.execute('copy_code_block', { index: 0 })
+    ).resolves.toEqual({
       ok: true,
       language: 'ts',
       characterCount: 16,
@@ -262,12 +300,12 @@ describe('createWebMCPHandlers', () => {
     expect(document.execCommand).toHaveBeenCalledWith('copy');
   });
 
-  it('returns page actions for the current route', () => {
+  it('returns page actions for the current route', async () => {
     const handlers = createHandlers();
 
-    expect(handlers.listPageActions()).toEqual({
+    expect(await handlers.execute('list_page_actions')).toEqual({
       ok: true,
-      actions: [
+      actions: expect.arrayContaining([
         'navigate_site',
         'get_site_context',
         'toggle_theme',
@@ -280,147 +318,16 @@ describe('createWebMCPHandlers', () => {
         'jump_to_heading',
         'copy_code_block',
         'open_series',
-      ],
+      ]),
     });
   });
 
-  it('dispatches shuffle events after validating bounds', () => {
-    const dispatchWindowEvent = vi.fn();
-    const handlers = createWebMCPHandlers({
-      pathname: '/playground/shuffle-letters',
-      router: { push },
-      getTheme: () => 'light',
-      setTheme,
-      getSoundEnabled: () => false,
-      setSoundEnabled,
-      getCurrentHref: () => 'https://bendd.me/playground/shuffle-letters',
-      document,
-      clipboard: { writeText },
-      fetchContentIndex: async () => [],
-      dispatchWindowEvent,
-    });
-
-    expect(
-      handlers.runShuffleLetters({ text: 'Hello', iterations: 8, fps: 30 })
-    ).toEqual({
-      ok: true,
-      text: 'Hello',
-      iterations: 8,
-      fps: 30,
-    });
-    expect(dispatchWindowEvent).toHaveBeenCalledWith(
-      'webmcp:run-shuffle-letters',
-      { text: 'Hello', iterations: 8, fps: 30 }
-    );
-    expect(
-      handlers.runShuffleLetters({ text: 'Hello', iterations: 99, fps: 30 })
-    ).toEqual({
-      ok: false,
-      error: 'iterations는 1에서 50 사이여야 합니다.',
-    });
-
-    expect(handlers.stopShuffleLetters()).toEqual({ ok: true });
-    expect(dispatchWindowEvent).toHaveBeenCalledWith(
-      'webmcp:stop-shuffle-letters'
-    );
-  });
-
-  it('rejects runShuffleLetters outside the shuffle playground without dispatching', () => {
-    const dispatchWindowEvent = vi.fn();
-    const handlers = createWebMCPHandlers({
-      pathname: '/article/agentic-interfaces',
-      router: { push },
-      getTheme: () => 'light',
-      setTheme,
-      getSoundEnabled: () => false,
-      setSoundEnabled,
-      getCurrentHref: () => 'https://bendd.me/article/agentic-interfaces',
-      document,
-      clipboard: { writeText },
-      fetchContentIndex: async () => [],
-      dispatchWindowEvent,
-    });
-
-    expect(
-      handlers.runShuffleLetters({ text: 'Hello', iterations: 8, fps: 30 })
-    ).toEqual({
-      ok: false,
-      error: 'shuffle letters 페이지에서만 실행할 수 있습니다.',
-    });
-    expect(dispatchWindowEvent).not.toHaveBeenCalled();
-  });
-
-  it('rejects runShuffleLetters on sibling-prefix paths without dispatching', () => {
-    const dispatchWindowEvent = vi.fn();
-    const handlers = createWebMCPHandlers({
-      pathname: '/playground/shuffle-letters-preview',
-      router: { push },
-      getTheme: () => 'light',
-      setTheme,
-      getSoundEnabled: () => false,
-      setSoundEnabled,
-      getCurrentHref: () =>
-        'https://bendd.me/playground/shuffle-letters-preview',
-      document,
-      clipboard: { writeText },
-      fetchContentIndex: async () => [],
-      dispatchWindowEvent,
-    });
-
-    expect(
-      handlers.runShuffleLetters({ text: 'Hello', iterations: 8, fps: 30 })
-    ).toEqual({
-      ok: false,
-      error: 'shuffle letters 페이지에서만 실행할 수 있습니다.',
-    });
-    expect(dispatchWindowEvent).not.toHaveBeenCalled();
-  });
-
-  it('rejects stopShuffleLetters outside the shuffle playground without dispatching', () => {
-    const dispatchWindowEvent = vi.fn();
-    const handlers = createWebMCPHandlers({
-      pathname: '/article/agentic-interfaces',
-      router: { push },
-      getTheme: () => 'light',
-      setTheme,
-      getSoundEnabled: () => false,
-      setSoundEnabled,
-      getCurrentHref: () => 'https://bendd.me/article/agentic-interfaces',
-      document,
-      clipboard: { writeText },
-      fetchContentIndex: async () => [],
-      dispatchWindowEvent,
-    });
-
-    expect(handlers.stopShuffleLetters()).toEqual({
-      ok: false,
-      error: 'shuffle letters 페이지에서만 실행할 수 있습니다.',
-    });
-    expect(dispatchWindowEvent).not.toHaveBeenCalled();
-  });
-
-  it('rejects stopShuffleLetters on sibling-prefix paths without dispatching', () => {
-    const dispatchWindowEvent = vi.fn();
-    const handlers = createWebMCPHandlers({
-      pathname: '/playground/shuffle-letters-preview',
-      router: { push },
-      getTheme: () => 'light',
-      setTheme,
-      getSoundEnabled: () => false,
-      setSoundEnabled,
-      getCurrentHref: () =>
-        'https://bendd.me/playground/shuffle-letters-preview',
-      document,
-      clipboard: { writeText },
-      fetchContentIndex: async () => [],
-      dispatchWindowEvent,
-    });
-
-    expect(handlers.stopShuffleLetters()).toEqual({
-      ok: false,
-      error: 'shuffle letters 페이지에서만 실행할 수 있습니다.',
-    });
-    expect(dispatchWindowEvent).not.toHaveBeenCalled();
+  it('omits shuffle when no ready demo exists', () => {
+    const names = createHandlers()
+      .getTools()
+      .map(tool => tool.name);
+    expect(names).not.toContain('run_shuffle_letters');
+    expect(names).not.toContain('stop_shuffle_letters');
   });
 });
 

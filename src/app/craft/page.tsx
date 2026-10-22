@@ -1,3 +1,4 @@
+import { getSeriesSummaries } from '@/lib/series';
 import type { Metadata, ResolvingMetadata } from 'next';
 
 import { FluidHover } from '@/components/ui/fluid-hover';
@@ -8,7 +9,6 @@ import { siteMetadata } from '@/lib/site-metadata';
 import { createCraftIndexGraph } from '@/lib/structured-data';
 import {
   formatCraftsForDisplay,
-  getSeriesSummaries,
   readCraftArticles,
   sortByDateDesc,
 } from '@/mdx/mdx';

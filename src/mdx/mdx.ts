@@ -4,12 +4,7 @@ import { z } from 'zod';
 import { type Route } from 'next';
 
 import type { ArticleInfo } from '@/components/article/types/article';
-import {
-  getSeriesConfig,
-  seriesRoute,
-  type SeriesConfig,
-  type SeriesContentType,
-} from '@/lib/series';
+import { getSeriesBadges } from '@/lib/series';
 
 const MetadataSchema = z
   .object({
@@ -48,30 +43,6 @@ const MetadataSchema = z
 
 type Metadata = z.infer<typeof MetadataSchema>;
 export type Article = { metadata: Metadata; slug: string; content: string };
-
-export type SeriesArticleEntry = {
-  slug: string;
-  title: string;
-  order: number;
-  href: Route<''>;
-  publishedAt: string;
-};
-
-export type SeriesInfo = {
-  id: string;
-  name: string;
-  description: string;
-  contentType: SeriesContentType;
-  route: Route<''>;
-  articles: SeriesArticleEntry[];
-  currentOrder: number;
-};
-
-export type SeriesSummary = {
-  id: string;
-  config: SeriesConfig;
-  articleCount: number;
-};
 
 const validateMetadata = (metadata: Metadata): Metadata => {
   try {
@@ -234,95 +205,6 @@ export const sortByDateDesc = (
     if (dateDiff !== 0) return dateDiff;
     return (b.metadata.seriesOrder ?? 0) - (a.metadata.seriesOrder ?? 0);
   });
-
-// --- 시리즈 ---
-
-const groupBySeries = (
-  articles: ReadonlyArray<Article>
-): Map<string, Article[]> => {
-  const map = new Map<string, Article[]>();
-  for (const article of articles) {
-    if (article.metadata.series) {
-      const list = map.get(article.metadata.series) ?? [];
-      list.push(article);
-      map.set(article.metadata.series, list);
-    }
-  }
-  return map;
-};
-
-export const getSeriesInfo = (
-  articles: ReadonlyArray<Article>,
-  seriesId: string,
-  currentOrder: number,
-  options: { contentType?: SeriesContentType } = {}
-): SeriesInfo | undefined => {
-  const config = getSeriesConfig(seriesId);
-  if (!config) return undefined;
-  if (options.contentType && config.contentType !== options.contentType) {
-    return undefined;
-  }
-
-  const hrefPrefix = config.contentType === 'craft' ? '/craft' : '/article';
-
-  const seriesArticles = articles
-    .filter(a => a.metadata.series === seriesId)
-    .sort(
-      (a, b) => (a.metadata.seriesOrder ?? 0) - (b.metadata.seriesOrder ?? 0)
-    )
-    .map(a => ({
-      slug: a.slug,
-      title: a.metadata.title,
-      order: a.metadata.seriesOrder ?? 0,
-      href: `${hrefPrefix}/${a.slug}` as Route<''>,
-      publishedAt: a.metadata.publishedAt,
-    }));
-
-  if (seriesArticles.length === 0) return undefined;
-
-  return {
-    id: seriesId,
-    name: config.name,
-    description: config.description,
-    contentType: config.contentType,
-    route: seriesRoute(seriesId, config.contentType),
-    articles: seriesArticles,
-    currentOrder,
-  };
-};
-
-export const getSeriesBadges = (
-  articles: ReadonlyArray<Article>
-): Map<string, { id: string; name: string; order: number; total: number }> => {
-  const badges = new Map<
-    string,
-    { id: string; name: string; order: number; total: number }
-  >();
-  for (const [seriesId, group] of groupBySeries(articles)) {
-    const config = getSeriesConfig(seriesId);
-    if (!config) continue;
-    for (const article of group) {
-      badges.set(article.slug, {
-        id: seriesId,
-        name: config.name,
-        order: article.metadata.seriesOrder ?? 0,
-        total: group.length,
-      });
-    }
-  }
-  return badges;
-};
-
-export const getSeriesSummaries = (
-  articles: ReadonlyArray<Article>
-): SeriesSummary[] =>
-  [...groupBySeries(articles).entries()]
-    .map(([id, group]) => {
-      const config = getSeriesConfig(id);
-      if (!config) return null;
-      return { id, config, articleCount: group.length };
-    })
-    .filter((item): item is NonNullable<typeof item> => item !== null);
 
 // --- 포맷팅 ---
 

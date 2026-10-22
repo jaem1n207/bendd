@@ -1,44 +1,6 @@
 import { type Route } from 'next';
 
-import type { Article } from './mdx';
-
-// --- Mock setup ---
-
-vi.mock('@/lib/series', () => ({
-  getSeriesConfig: vi.fn((id: string) => {
-    const configs: Record<
-      string,
-      {
-        name: string;
-        description: string;
-        contentType: 'article' | 'craft';
-      }
-    > = {
-      'ai-coding-agent': {
-        name: 'AI 코딩 에이전트',
-        description:
-          'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
-        contentType: 'article',
-      },
-      'react-deep-dive': {
-        name: 'React 딥다이브',
-        description: 'React 내부 동작을 깊이 파헤치는 시리즈',
-        contentType: 'article',
-      },
-      'synchronize-tab-scrolling': {
-        name: '탭 스크롤 동기화 확장 프로그램',
-        description:
-          '탭 스크롤 동기화 확장 프로그램을 만들고 운영하며 배운 과정을 다루는 시리즈',
-        contentType: 'craft',
-      },
-    };
-    return configs[id];
-  }),
-  seriesRoute: vi.fn(
-    (id: string, contentType: 'article' | 'craft' = 'article') =>
-      `/${contentType}/series/${id}`
-  ),
-}));
+import type { Article } from '@/mdx/mdx';
 
 // --- Test fixtures ---
 
@@ -134,12 +96,12 @@ const CRAFT_ARTICLES: ReadonlyArray<Article> = [
 // --- Tests ---
 
 describe('formatDate', () => {
-  let formatDate: typeof import('./mdx').formatDate;
+  let formatDate: typeof import('@/mdx/mdx').formatDate;
 
   beforeEach(async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-03-15T12:00:00'));
-    ({ formatDate } = await import('./mdx'));
+    ({ formatDate } = await import('@/mdx/mdx'));
   });
 
   afterEach(() => {
@@ -220,10 +182,10 @@ describe('formatDate', () => {
 });
 
 describe('findBySlug', () => {
-  let findBySlug: typeof import('./mdx').findBySlug;
+  let findBySlug: typeof import('@/mdx/mdx').findBySlug;
 
   beforeAll(async () => {
-    ({ findBySlug } = await import('./mdx'));
+    ({ findBySlug } = await import('@/mdx/mdx'));
   });
 
   it('슬러그로 글을 찾는다', () => {
@@ -242,10 +204,10 @@ describe('findBySlug', () => {
 });
 
 describe('sortByDateDesc', () => {
-  let sortByDateDesc: typeof import('./mdx').sortByDateDesc;
+  let sortByDateDesc: typeof import('@/mdx/mdx').sortByDateDesc;
 
   beforeAll(async () => {
-    ({ sortByDateDesc } = await import('./mdx'));
+    ({ sortByDateDesc } = await import('@/mdx/mdx'));
   });
 
   it('날짜 내림차순으로 정렬한다', () => {
@@ -275,185 +237,13 @@ describe('sortByDateDesc', () => {
   });
 });
 
-describe('getSeriesInfo', () => {
-  let getSeriesInfo: typeof import('./mdx').getSeriesInfo;
-
-  beforeAll(async () => {
-    ({ getSeriesInfo } = await import('./mdx'));
-  });
-
-  it('시리즈 정보를 올바르게 반환한다', () => {
-    const info = getSeriesInfo(ARTICLES, 'ai-coding-agent', 1);
-    expect(info).toBeDefined();
-    expect(info!.id).toBe('ai-coding-agent');
-    expect(info!.name).toBe('AI 코딩 에이전트');
-    expect(info!.contentType).toBe('article');
-    expect(info!.route).toBe('/article/series/ai-coding-agent');
-    expect(info!.currentOrder).toBe(1);
-    expect(info!.articles).toHaveLength(3);
-  });
-
-  it('시리즈 글을 seriesOrder 오름차순으로 정렬한다', () => {
-    const info = getSeriesInfo(ARTICLES, 'ai-coding-agent', 1);
-    expect(info!.articles[0].order).toBe(1);
-    expect(info!.articles[1].order).toBe(2);
-    expect(info!.articles[2].order).toBe(3);
-  });
-
-  it('각 글에 올바른 href를 생성한다', () => {
-    const info = getSeriesInfo(ARTICLES, 'ai-coding-agent', 1);
-    expect(info!.articles[0].href).toBe('/article/ai-agent-part1');
-    expect(info!.articles[1].href).toBe('/article/ai-agent-part2');
-  });
-
-  it('craft 시리즈 글에는 craft href를 생성한다', () => {
-    const info = getSeriesInfo(CRAFT_ARTICLES, 'synchronize-tab-scrolling', 1, {
-      contentType: 'craft',
-    });
-    expect(info).toBeDefined();
-    expect(info!.contentType).toBe('craft');
-    expect(info!.route).toBe('/craft/series/synchronize-tab-scrolling');
-    expect(info!.articles[0].href).toBe(
-      '/craft/synchronize-tab-scrolling-product-story'
-    );
-  });
-
-  it('요청한 콘텐츠 타입과 다른 시리즈는 반환하지 않는다', () => {
-    expect(
-      getSeriesInfo(ARTICLES, 'ai-coding-agent', 1, {
-        contentType: 'craft',
-      })
-    ).toBeUndefined();
-  });
-
-  it('존재하지 않는 시리즈 ID는 undefined를 반환한다', () => {
-    expect(getSeriesInfo(ARTICLES, 'nonexistent', 1)).toBeUndefined();
-  });
-
-  it('시리즈 설정은 있지만 해당 글이 없으면 undefined를 반환한다', () => {
-    expect(getSeriesInfo([], 'ai-coding-agent', 1)).toBeUndefined();
-  });
-
-  it('currentOrder를 그대로 전달한다', () => {
-    const info = getSeriesInfo(ARTICLES, 'ai-coding-agent', -1);
-    expect(info!.currentOrder).toBe(-1);
-  });
-});
-
-describe('getSeriesBadges', () => {
-  let getSeriesBadges: typeof import('./mdx').getSeriesBadges;
-
-  beforeAll(async () => {
-    ({ getSeriesBadges } = await import('./mdx'));
-  });
-
-  it('시리즈에 속한 글의 배지를 반환한다', () => {
-    const badges = getSeriesBadges(ARTICLES);
-    expect(badges.size).toBe(3); // 3개의 시리즈 글
-
-    const badge = badges.get('ai-agent-part1');
-    expect(badge).toEqual({
-      id: 'ai-coding-agent',
-      name: 'AI 코딩 에이전트',
-      order: 1,
-      total: 3,
-    });
-  });
-
-  it('시리즈에 속하지 않은 글은 배지가 없다', () => {
-    const badges = getSeriesBadges(ARTICLES);
-    expect(badges.has('react-hooks')).toBe(false);
-    expect(badges.has('next-routing')).toBe(false);
-  });
-
-  it('total은 해당 시리즈의 전체 글 수를 반영한다', () => {
-    const badges = getSeriesBadges(ARTICLES);
-    expect(badges.get('ai-agent-part1')!.total).toBe(3);
-    expect(badges.get('ai-agent-part2')!.total).toBe(3);
-    expect(badges.get('ai-agent-part3')!.total).toBe(3);
-  });
-
-  it('빈 배열이면 빈 맵을 반환한다', () => {
-    expect(getSeriesBadges([]).size).toBe(0);
-  });
-
-  it('설정이 없는 시리즈 ID의 글은 무시한다', () => {
-    const articles = [
-      createArticle({
-        slug: 'unknown-series',
-        metadata: {
-          title: '알 수 없는 시리즈',
-          publishedAt: '2025-01-01',
-          category: 'etc',
-          description: '알 수 없는 시리즈에 속한 글',
-          summary: '알 수 없는 시리즈',
-          series: 'nonexistent-series',
-          seriesOrder: 1,
-        },
-      }),
-    ];
-    const badges = getSeriesBadges(articles);
-    expect(badges.size).toBe(0);
-  });
-});
-
-describe('getSeriesSummaries', () => {
-  let getSeriesSummaries: typeof import('./mdx').getSeriesSummaries;
-
-  beforeAll(async () => {
-    ({ getSeriesSummaries } = await import('./mdx'));
-  });
-
-  it('시리즈 요약 목록을 반환한다', () => {
-    const summaries = getSeriesSummaries(ARTICLES);
-    expect(summaries).toHaveLength(1); // ai-coding-agent만
-    expect(summaries[0]).toEqual({
-      id: 'ai-coding-agent',
-      config: {
-        name: 'AI 코딩 에이전트',
-        description:
-          'AI 코딩 에이전트를 효과적으로 활용하는 방법을 다루는 시리즈',
-        contentType: 'article',
-      },
-      articleCount: 3,
-    });
-  });
-
-  it('빈 배열이면 빈 배열을 반환한다', () => {
-    expect(getSeriesSummaries([])).toEqual([]);
-  });
-
-  it('시리즈가 없는 글만 있으면 빈 배열을 반환한다', () => {
-    const nonSeriesArticles = ARTICLES.filter(a => !a.metadata.series);
-    expect(getSeriesSummaries(nonSeriesArticles)).toEqual([]);
-  });
-
-  it('설정이 없는 시리즈 ID는 결과에 포함하지 않는다', () => {
-    const articles = [
-      createArticle({
-        slug: 'unknown',
-        metadata: {
-          title: '알 수 없는',
-          publishedAt: '2025-01-01',
-          category: 'etc',
-          description: '알 수 없는 시리즈에 속한 글',
-          summary: '알 수 없는',
-          series: 'nonexistent-series',
-          seriesOrder: 1,
-        },
-      }),
-    ];
-    expect(getSeriesSummaries(articles)).toEqual([]);
-  });
-});
-
 describe('formatArticlesForDisplay', () => {
-  let formatArticlesForDisplay: typeof import('./mdx').formatArticlesForDisplay;
+  let formatArticlesForDisplay: typeof import('@/mdx/mdx').formatArticlesForDisplay;
 
   beforeEach(async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-03-15T12:00:00'));
-    ({ formatArticlesForDisplay } = await import('./mdx'));
+    ({ formatArticlesForDisplay } = await import('@/mdx/mdx'));
   });
 
   afterEach(() => {
@@ -500,12 +290,12 @@ describe('formatArticlesForDisplay', () => {
 });
 
 describe('formatCraftsForDisplay', () => {
-  let formatCraftsForDisplay: typeof import('./mdx').formatCraftsForDisplay;
+  let formatCraftsForDisplay: typeof import('@/mdx/mdx').formatCraftsForDisplay;
 
   beforeEach(async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-03-15T12:00:00'));
-    ({ formatCraftsForDisplay } = await import('./mdx'));
+    ({ formatCraftsForDisplay } = await import('@/mdx/mdx'));
   });
 
   afterEach(() => {
@@ -545,13 +335,13 @@ describe('formatCraftsForDisplay', () => {
 });
 
 describe('readArticles', () => {
-  let readArticles: typeof import('./mdx').readArticles;
+  let readArticles: typeof import('@/mdx/mdx').readArticles;
   let fs: typeof import('node:fs');
 
   beforeAll(async () => {
     vi.mock('node:fs');
     fs = await import('node:fs');
-    ({ readArticles } = await import('./mdx'));
+    ({ readArticles } = await import('@/mdx/mdx'));
   });
 
   afterAll(() => {

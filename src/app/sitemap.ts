@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-import { getAllSeriesIds, getSeriesConfig, seriesRoute } from '@/lib/series';
+import { listSeriesRoutes } from '@/lib/series';
 import { siteMetadata } from '@/lib/site-metadata';
 import { readArticles, readCraftArticles } from '@/mdx/mdx';
 
@@ -20,11 +20,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: article.metadata.publishedAt,
   }));
 
-  const series = getAllSeriesIds().map(id => ({
-    url: `${siteMetadata.siteUrl}${seriesRoute(
-      id,
-      getSeriesConfig(id)?.contentType
-    )}`,
+  const series = listSeriesRoutes().map(({ route }) => ({
+    url: `${siteMetadata.siteUrl}${route}`,
     lastModified: new Date().toISOString().split('T')[0],
   }));
 

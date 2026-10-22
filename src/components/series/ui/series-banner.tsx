@@ -2,25 +2,26 @@ import { ArrowRight, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
 import { FluidHover } from '@/components/ui/fluid-hover';
-import { seriesRoute } from '@/lib/series';
 import { cn } from '@/lib/utils';
-import type { SeriesSummary } from '@/mdx/mdx';
+import type { SeriesSummary } from '@/lib/series';
 
 type SeriesBannerProps = {
   items: SeriesSummary[];
 };
 
 export function SeriesBanner({ items }: SeriesBannerProps) {
-  if (items.length === 0) return null;
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
     <FluidHover>
       <div className="mb-6 space-y-3">
-        {items.map(({ id, config, articleCount }) => (
+        {items.map(({ id, config, articleCount, route }) => (
           <Link
             data-fluid-hover-item=""
             key={id}
-            href={seriesRoute(id, config.contentType)}
+            href={route}
             className={cn(
               'group flex items-center justify-between rounded-xl border border-border/60 px-5 py-4',
               'transition-colors data-[fluid-hover-active]:border-primary/40'

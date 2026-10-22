@@ -7,6 +7,8 @@ export type WebMCPJSONSchema = {
   const?: string | number | boolean;
   title?: string;
   description?: string;
+  minLength?: number;
+  default?: string | number | boolean;
   minimum?: number;
   maximum?: number;
   anyOf?: readonly WebMCPJSONSchema[];

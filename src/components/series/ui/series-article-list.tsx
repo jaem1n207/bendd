@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { FluidHover } from '@/components/ui/fluid-hover';
 import { cn } from '@/lib/utils';
-import type { SeriesArticleEntry } from '@/mdx/mdx';
+import type { SeriesArticleEntry } from '@/lib/series';
 
 type SeriesArticleListProps = {
   articles: SeriesArticleEntry[];

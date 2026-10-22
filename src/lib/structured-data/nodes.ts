@@ -16,7 +16,8 @@ import type {
 } from 'schema-dts';
 
 import { siteMetadata } from '@/lib/site-metadata';
-import type { Article, SeriesInfo } from '@/mdx/mdx';
+import type { Article } from '@/mdx/mdx';
+import type { SeriesInfo } from '@/lib/series';
 
 import {
   absoluteUrl,

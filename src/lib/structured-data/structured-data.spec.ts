@@ -1,6 +1,6 @@
 /* eslint-disable playwright/no-standalone-expect */
 import type { Route } from 'next';
-import type { SeriesInfo } from '@/mdx/mdx';
+import type { SeriesInfo } from '@/lib/series';
 import type { Graph, Thing } from 'schema-dts';
 import { describe, expect, it } from 'vitest';
 

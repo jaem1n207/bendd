@@ -3,12 +3,11 @@
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
 
 import {
-  createHomeRevealPlan,
-  HOME_NOTE_DELAY,
+  createHomeSchedule,
   HomeViewport,
   type HomeRevealItem,
   type HomeRevealKind,
-} from '@/components/home/lib/home-reveal-plan';
+} from '@/components/home/lib/home-schedule';
 import styles from '@/components/home/ui/home-motion.module.css';
 import { HOME_REVEAL_COMPLETE } from '@/lib/home-reveal-events';
 
@@ -37,12 +36,6 @@ const finalFrame: Keyframe = {
   filter: 'blur(0px)',
   transform: 'translateY(0px)',
 };
-
-interface GroupSchedule {
-  bodyStart?: number;
-  bodyKind?: HomeRevealKind;
-  entries: number;
-}
 
 function revealKind(element: HTMLElement): HomeRevealKind {
   switch (element.dataset.revealKind) {
@@ -101,9 +94,8 @@ export function HomeMotion({ children }: { children: ReactNode }) {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     const active = new Map<HTMLElement, Animation>();
     const accents = new Map<HTMLElement, Animation>();
-    const schedules = new Map<string, GroupSchedule>();
-    const blurred = new Set<HTMLElement>();
-    let latest: { group: string; at: number } | undefined;
+    const schedule = createHomeSchedule();
+    const ids = new Map(elements.map((element, id) => [element, id]));
     let keyboardNavigation = false;
     let disposed = false;
     const cancelAccent = (element: HTMLElement) => {
@@ -117,7 +109,10 @@ export function HomeMotion({ children }: { children: ReactNode }) {
     };
     const cancel = (element: HTMLElement) => {
       cancelAccent(element);
-      blurred.delete(element);
+      const id = ids.get(element);
+      if (id !== undefined) {
+        schedule.release(id);
+      }
       const animation = active.get(element);
       if (!animation) {
         return;
@@ -158,10 +153,10 @@ export function HomeMotion({ children }: { children: ReactNode }) {
     }
 
     const describe = (targets: HTMLElement[]): HomeRevealItem[] =>
-      targets.map((element, id) => {
+      targets.map(element => {
         const group = element.closest<HTMLElement>('[data-reveal-group]');
         return {
-          id,
+          id: ids.get(element)!,
           group: group?.dataset.revealGroup ?? 'home',
           sequence: group?.dataset.revealSequence === 'list' ? 'list' : 'stack',
           kind: revealKind(element),
@@ -207,14 +202,9 @@ export function HomeMotion({ children }: { children: ReactNode }) {
     const start = (
       element: HTMLElement,
       phase: 'initial' | 'entering',
-      step: { delay: number; blur: number; distance: number },
-      epoch: number
+      step: { startAt: number; blur: number; distance: number }
     ) => {
-      cancel(element);
       element.dataset.revealState = phase;
-      if (step.blur > 0) {
-        blurred.add(element);
-      }
       const animation = element.animate(
         [
           {
@@ -226,7 +216,7 @@ export function HomeMotion({ children }: { children: ReactNode }) {
         ],
         {
           duration: 900,
-          delay: Math.max(0, epoch + step.delay - performance.now()),
+          delay: Math.max(0, step.startAt - performance.now()),
           easing: initialEase,
           fill: 'both',
         }
@@ -244,66 +234,16 @@ export function HomeMotion({ children }: { children: ReactNode }) {
     };
 
     const reveal = (targets: HTMLElement[], phase: 'initial' | 'entering') => {
-      const items = describe(targets);
-      const firstGroup = items[0]?.group;
-      if (!firstGroup) {
-        return;
-      }
-      const firstItems = items.filter(item => item.group === firstGroup);
-      const first =
-        firstItems.find(item => item.kind !== 'note') ?? firstItems[0];
-      let epoch = performance.now();
-      if (latest?.group !== firstGroup) {
-        if (latest) {
-          epoch = Math.max(epoch, latest.at + 120);
-        }
-      } else {
-        const previous = schedules.get(firstGroup);
-        if (previous?.bodyStart !== undefined) {
-          const gap =
-            first.kind === 'note'
-              ? HOME_NOTE_DELAY
-              : first.sequence === 'stack' || previous.bodyKind === 'heading'
-                ? 36
-                : previous.entries >= 4
-                  ? 0
-                  : 60;
-          epoch = Math.max(epoch, previous.bodyStart + gap);
-        }
-      }
-      const plan = createHomeRevealPlan(
-        items,
-        window.innerWidth <= 640 ? HomeViewport.Compact : HomeViewport.Wide,
-        {
-          blurBudget: 12 - blurred.size,
-          listEntries: new Map(
-            Array.from(schedules, ([group, schedule]) => [
-              group,
-              schedule.entries,
-            ])
-          ),
-        }
-      );
-      plan.forEach(step => {
-        const item = items[step.id];
-        const at = epoch + step.delay;
-        const schedule = schedules.get(item.group) ?? { entries: 0 };
-        if (item.kind !== 'note') {
-          if (schedule.bodyStart === undefined || at >= schedule.bodyStart) {
-            schedule.bodyStart = at;
-            schedule.bodyKind = item.kind;
-          }
-          if (item.kind !== 'heading') {
-            schedule.entries += 1;
-          }
-        }
-        schedules.set(item.group, schedule);
-        if (!latest || at >= latest.at) {
-          latest = { group: item.group, at };
-        }
-        start(targets[step.id], phase, step, epoch);
+      // Release previous handles before reserving slots for this cohort.
+      targets.forEach(cancel);
+      const plan = schedule.plan(describe(targets), {
+        now: performance.now(),
+        viewport:
+          window.innerWidth <= 640 ? HomeViewport.Compact : HomeViewport.Wide,
       });
+      plan.forEach(step => start(elements[step.id], phase, step));
     };
+
     const observer = new IntersectionObserver(
       entries => {
         const entering = new Set<HTMLElement>();
