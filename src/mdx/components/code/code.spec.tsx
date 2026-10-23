@@ -5,6 +5,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 
 import { MDXCustomLink } from '@/mdx/components/a/custom-link';
 import { MDXCode } from '@/mdx/components/code/code';
+import { MDXPre } from '@/mdx/components/pre/pre';
 
 const SHIKI_LANGUAGE_CLASS = 'language-ts';
 
@@ -18,7 +19,7 @@ test('hydrates without warnings after translation tools mark code as untranslata
       <MDXCustomLink href="https://developer.chrome.com/docs/extensions/reference/api/tabs">
         <MDXCode>Ctrl+Tab</MDXCode>
       </MDXCustomLink>
-      <pre>
+      <MDXPre>
         <MDXCode
           className={SHIKI_LANGUAGE_CLASS}
           data-language="ts"
@@ -26,16 +27,16 @@ test('hydrates without warnings after translation tools mark code as untranslata
         >
           <span data-line="">tabs.update()</span>
         </MDXCode>
-      </pre>
+      </MDXPre>
     </div>
   );
   const container = document.createElement('div');
   container.innerHTML = renderToString(content);
   document.body.append(container);
   const codes = container.querySelectorAll('code');
-  for (const code of codes) {
-    code.classList.add('notranslate');
-    code.setAttribute('translate', 'no');
+  for (const element of container.querySelectorAll('pre, code')) {
+    element.classList.add('notranslate');
+    element.setAttribute('translate', 'no');
   }
   const errors = vi.spyOn(console, 'error');
   const onRecoverableError = vi.fn();
