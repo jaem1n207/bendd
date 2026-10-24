@@ -190,7 +190,7 @@ class Figure {
       `<polygon points="${cx},${cy - height / 2} ${cx + width / 2},${cy} ${cx},${cy + height / 2} ${cx - width / 2},${cy}" fill="${C.paper}" stroke="${C.border}" stroke-width="1.2"/>`
     );
     this.bounds.push({ x: cx - width / 2, y: cy - height / 2, width, height });
-    this.text('상태가 같음?', cx, cy + 4, 12, 'ink', 600, 'center', width - 40);
+    this.text('상태가 같은가?', cx, cy + 4, 12, 'ink', 600, 'center', width - 40);
   }
 
   legend(items) {
