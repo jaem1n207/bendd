@@ -1,0 +1,178 @@
+[
+  {
+    "value": "입력은 바로 반영하고, 전환 요청은 하나씩",
+    "x": 40,
+    "y": 68,
+    "size": 28,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "시작은 A 탭 · Chrome 요청 1개 + 마지막 대기 목적지 1개",
+    "x": 40,
+    "y": 96,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "키 입력",
+    "x": 140,
+    "y": 164,
+    "size": 14,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "macOS 앱의 상태",
+    "x": 480,
+    "y": 164,
+    "size": 14,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "Chrome API",
+    "x": 820,
+    "y": 164,
+    "size": 14,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "B 확정",
+    "x": 308,
+    "y": 210,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "MRU [B, A]",
+    "x": 512,
+    "y": 228,
+    "size": 9,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "A 확정",
+    "x": 308,
+    "y": 290,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "MRU [A, B]",
+    "x": 512,
+    "y": 308,
+    "size": 9,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "B 확정",
+    "x": 308,
+    "y": 338,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "MRU [B, A]",
+    "x": 512,
+    "y": 356,
+    "size": 9,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "A 확정",
+    "x": 308,
+    "y": 386,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "MRU [A, B]",
+    "x": 512,
+    "y": 404,
+    "size": 9,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "B 활성화",
+    "x": 650,
+    "y": 250,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "대기 A",
+    "x": 668,
+    "y": 308,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "대기 B",
+    "x": 668,
+    "y": 356,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "대기 A",
+    "x": 692,
+    "y": 404,
+    "size": 12,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "B 응답",
+    "x": 650,
+    "y": 434,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "마지막 A 활성화",
+    "x": 650,
+    "y": 482,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "선택 입력",
+    "x": 84,
+    "y": 552,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "활성화 요청",
+    "x": 364,
+    "y": 552,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "완료 응답",
+    "x": 644,
+    "y": 552,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  }
+]

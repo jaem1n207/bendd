@@ -23,7 +23,7 @@ export function MDXPre({
         ref={preRef}
         data-webmcp-code-block
         className={cn(
-          'scroll-fade-x my-0 overflow-x-auto rounded-[inherit] bg-transparent px-0 py-3 [--scroll-fade-reveal:32px] [--scroll-fade-size:16px]',
+          'notranslate scroll-fade-x my-0 overflow-x-auto rounded-[inherit] bg-transparent px-0 py-3 [--scroll-fade-reveal:32px] [--scroll-fade-size:16px]',
           className
         )}
         {...props}
