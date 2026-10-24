@@ -105,6 +105,9 @@ export function ArticleItem({
       cancelled = true;
       animateRow.stop();
       cancelShuffles.forEach(cancel => cancel());
+    };
+    const handleFocus = () => {
+      stop();
       settle();
     };
 
@@ -144,9 +147,10 @@ export function ArticleItem({
       );
     });
 
-    item.addEventListener('focus', stop);
+    item.addEventListener('focus', handleFocus);
     return () => {
-      item.removeEventListener('focus', stop);
+      item.removeEventListener('focus', handleFocus);
+      // Motion 컨트롤이 먼저 해제되므로 cleanup에서는 취소만 한다.
       stop();
     };
   }, [
