@@ -43,6 +43,7 @@
 
 .section[data-depth='1'] .label {
   margin-right: 10px;
+  font-size: 0.75rem;
 }
 
 .nav:has(:focus-visible) .section[data-depth='0'] .label,
@@ -195,6 +196,7 @@
 
 .fullList a[data-depth='1'] {
   padding-left: 24px;
+  font-size: 0.75rem;
 }
 
 .fullList a:hover,
