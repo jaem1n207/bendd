@@ -1,0 +1,146 @@
+[
+  {
+    "value": "캡처를 시작한 화면과 끝난 화면이 같아야 해요",
+    "x": 40,
+    "y": 68,
+    "size": 28,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "탭 ID가 같아도 페이지가 이동했다면 결과를 버려요.",
+    "x": 40,
+    "y": 96,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "같음",
+    "x": 492,
+    "y": 166,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "바뀜",
+    "x": 424,
+    "y": 310,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "바뀜",
+    "x": 656,
+    "y": 286,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "같음",
+    "x": 840,
+    "y": 366,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "현재 화면 캡처",
+    "x": 56,
+    "y": 176,
+    "size": 14,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "시작 상태 A 기록",
+    "x": 56,
+    "y": 200,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "상태가 같은가?",
+    "x": 392,
+    "y": 184,
+    "size": 12,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "이미지 축소",
+    "x": 616,
+    "y": 184,
+    "size": 14,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "상태가 같은가?",
+    "x": 808,
+    "y": 304,
+    "size": 12,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "결과 폐기",
+    "x": 392,
+    "y": 432,
+    "size": 14,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "이미지를 붙이지 않음",
+    "x": 392,
+    "y": 456,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "미리보기 저장",
+    "x": 808,
+    "y": 432,
+    "size": 14,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "같은 탭·같은 페이지",
+    "x": 808,
+    "y": 456,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "각 단계에서 확인하는 값",
+    "x": 40,
+    "y": 344,
+    "size": 12,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "연결 · 창 · 탭 · 탐색 세대",
+    "x": 40,
+    "y": 368,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "상태는 캡처 완료 뒤와 이미지 축소 완료 뒤에 각각 확인해요.",
+    "x": 40,
+    "y": 552,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  }
+]

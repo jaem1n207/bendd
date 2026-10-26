@@ -1,0 +1,186 @@
+[
+  {
+    "value": "키 입력과 탭 제어를 나눠 처리했어요",
+    "x": 40,
+    "y": 68,
+    "size": 28,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "Chrome 프로필이 여러 개여도 입력과 전환창은 하나의 앱에서 처리해요.",
+    "x": 40,
+    "y": 96,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "프로필별 연결",
+    "x": 408,
+    "y": 204,
+    "size": 12,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "UNIX SOCKET",
+    "x": 344,
+    "y": 306,
+    "size": 8,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "NATIVE MSG",
+    "x": 632,
+    "y": 306,
+    "size": 8,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "KEY INPUT",
+    "x": 56,
+    "y": 164,
+    "size": 8,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "Ctrl+Tab · Control 해제 · Esc",
+    "x": 56,
+    "y": 188,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "APP / ONE PROCESS",
+    "x": 56,
+    "y": 280,
+    "size": 8,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "macOS 앱",
+    "x": 56,
+    "y": 308,
+    "size": 14,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "키 입력 · 선택 상태 관리",
+    "x": 56,
+    "y": 340,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "포커스를 유지하는 전환창",
+    "x": 56,
+    "y": 364,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "CGEventTap / NSPanel",
+    "x": 56,
+    "y": 420,
+    "size": 9,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "HOST",
+    "x": 424,
+    "y": 280,
+    "size": 8,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "Native Host",
+    "x": 424,
+    "y": 308,
+    "size": 14,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "메시지 중계",
+    "x": 424,
+    "y": 340,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "프로필마다 연결",
+    "x": 424,
+    "y": 364,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "CHROME / MV3",
+    "x": 712,
+    "y": 280,
+    "size": 8,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "Chrome 확장 프로그램",
+    "x": 712,
+    "y": 308,
+    "size": 14,
+    "weight": 600,
+    "mono": false
+  },
+  {
+    "value": "탭 정보 · 캡처 이미지",
+    "x": 712,
+    "y": 340,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "선택한 탭 활성화",
+    "x": 712,
+    "y": 364,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "tabs.update()",
+    "x": 712,
+    "y": 420,
+    "size": 9,
+    "weight": 400,
+    "mono": true
+  },
+  {
+    "value": "입력·활성화 요청",
+    "x": 84,
+    "y": 552,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  },
+  {
+    "value": "탭 정보·이미지·응답",
+    "x": 364,
+    "y": 552,
+    "size": 12,
+    "weight": 400,
+    "mono": false
+  }
+]
