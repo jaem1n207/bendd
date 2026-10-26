@@ -6,7 +6,7 @@
 
 | 원본 HTML                 | 본문 SVG                                                                    | 보여주는 내용                                                     |
 | ------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `architecture.html`       | `public/images/bringing-arc-tab-switching-to-chrome/architecture.svg`       | 앱·Native Host·확장의 역할과 메시지 방향                          |
+| `architecture.html`       | `public/images/bringing-arc-tab-switching-to-chrome/architecture.svg`       | 앱·Native Host·확장 프로그램의 역할과 메시지 방향                 |
 | `latest-intent.html`      | `public/images/bringing-arc-tab-switching-to-chrome/latest-intent.svg`      | B 응답을 기다리는 동안 A→B→A 선택이 이어지는 순서                 |
 | `preview-validation.html` | `public/images/bringing-arc-tab-switching-to-chrome/preview-validation.svg` | 캡처·축소 완료 후 상태를 확인하고 이미지를 저장하거나 버리는 분기 |
 
@@ -16,7 +16,7 @@
 
 ## 생략한 내용
 
-- 구조도는 프로세스 역할과 연결만 보여준다. 프로필이 여러 개일 때 같은 형태로 반복되는 Host·확장은 하나로 묶었다. 클래스, 메시지 포맷, 소켓 권한 등 세부 사항은 생략했다.
+- 구조도는 프로세스 역할과 연결만 보여준다. 프로필이 여러 개일 때 같은 형태로 반복되는 Host·확장 프로그램은 하나로 묶었다. 클래스, 메시지 포맷, 소켓 권한 등 세부 사항은 생략했다.
 - 시퀀스는 요청 1개와 마지막 대기 목적지 1개를 보여준다. 연결 세대·요청 순번 검증, 실패·취소 분기는 본문에 남겼다. 세로 간격은 실제 지연 시간을 뜻하지 않는다.
 - 캡처 흐름도는 두 번의 상태 대조에 집중한다. 캡처 불가 페이지, 이미지가 없을 때의 제목·아이콘 표시는 본문에서 설명한다.
 

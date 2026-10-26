@@ -1,7 +1,7 @@
 ---
 title: 'Chrome에 Arc식 탭 전환을 구현한 과정'
-summary: '익숙한 탭 전환을 만들며 만난 확장의 한계'
-description: 'Arc에서 익숙해진 탭 전환을 Chrome에서도 쓰려고 개인용 도구를 만들었어요. 확장만으로 처리할 수 없던 키 입력 때문에 macOS 앱을 더하고, 빠른 입력과 탭 전환 응답이 엇갈리는 문제를 풀어간 과정이에요.'
+summary: '익숙한 탭 전환을 만들며 만난 확장 프로그램의 한계'
+description: 'Arc에서 익숙해진 탭 전환을 Chrome에서도 쓰려고 개인용 도구를 만들었어요. 확장 프로그램만으로 처리할 수 없던 키 입력 때문에 macOS 앱을 더하고, 빠른 입력과 탭 전환 응답이 엇갈리는 문제를 풀어간 과정이에요.'
 category: 'interaction'
 publishedAt: '2026-10-24'
 video: '/images/bringing-arc-tab-switching-to-chrome/switching-demo.mp4'
@@ -67,17 +67,17 @@ Chrome도 [세로 탭을 공식 지원](https://blog.google/products-and-platfor
 
 | 방식                         | 감수해야 하는 제약                                      |
 | ---------------------------- | ------------------------------------------------------- |
-| 확장만 사용                  | 원하는 단축키와 Control 해제 시점을 처리하기 어려워요    |
+| 확장 프로그램만 사용                  | 원하는 단축키와 Control 해제 시점을 처리하기 어려워요    |
 | 보조 앱 + 페이지 안의 전환창 | 주소창·Chrome 내부 페이지에서 같은 전환창을 쓰기 어려워요 |
-| 보조 앱 + 네이티브 전환창 + 확장 | 보조 앱 설치와 macOS 권한 설정이 추가돼요              |
+| 보조 앱 + 네이티브 전환창 + 확장 프로그램 | 보조 앱 설치와 macOS 권한 설정이 추가돼요              |
 
-키 입력과 전환창은 **Swift/AppKit 앱**에 맡겼어요. 탭 정보 조회와 활성화는 **TypeScript로 작성한 Manifest V3 확장**에서 처리하도록 나눴어요. 앱은 `CGEventTap`으로 입력을 받고, Chrome의 포커스를 가져오지 않는 `NSPanel`로 후보를 보여줘요. 선택한 탭은 확장이 `tabs.update`로 활성화해요. 간단한 탭 카드 UI라 별도의 웹 런타임을 더하지 않고 AppKit으로 직접 그렸어요.
+키 입력과 전환창은 **Swift/AppKit 앱**에 맡겼어요. 탭 정보 조회와 활성화는 **TypeScript로 작성한 Manifest V3 확장 프로그램**에서 처리하도록 나눴어요. 앱은 `CGEventTap`으로 입력을 받고, Chrome의 포커스를 가져오지 않는 `NSPanel`로 후보를 보여줘요. 선택한 탭은 확장 프로그램이 `tabs.update`로 활성화해요. 간단한 탭 카드 UI라 별도의 웹 런타임을 더하지 않고 AppKit으로 직접 그렸어요.
 
 <VisualStack
   media={[
     {
       src: '/images/bringing-arc-tab-switching-to-chrome/architecture.svg',
-      alt: 'macOS 앱이 키 입력과 전환창을 처리하고, 프로필별 Native Host가 Unix socket과 Native Messaging으로 Chrome 확장의 탭 정보·활성화 요청을 중계하는 구조',
+      alt: 'macOS 앱이 키 입력과 전환창을 처리하고, 프로필별 Native Host가 Unix socket과 Native Messaging으로 Chrome 확장 프로그램의 탭 정보·활성화 요청을 중계하는 구조',
       width: 960,
       height: 600,
     },
@@ -85,9 +85,9 @@ Chrome도 [세로 탭을 공식 지원](https://blog.google/products-and-platfor
   caption="프로필별 연결은 Native Host가 중계하고, 입력과 전환창은 하나의 앱이 맡아요."
 />
 
-확장과 앱 사이는 [Native Messaging](https://developer.chrome.com/docs/extensions/develop/concepts/native-messaging)으로 연결했어요. 확장은 `connectNative()`로 중계 프로세스인 Native Host와 연결을 유지해요. Native Host는 사용자 전용 Unix socket으로 상주 앱에 메시지를 전달해요. 프로필이 늘어도 키 입력을 감시하는 앱과 전환창이 중복되지 않게 했어요.
+확장 프로그램과 앱 사이는 [Native Messaging](https://developer.chrome.com/docs/extensions/develop/concepts/native-messaging)으로 연결했어요. 확장 프로그램은 `connectNative()`로 중계 프로세스인 Native Host와 연결을 유지해요. Native Host는 사용자 전용 Unix socket으로 상주 앱에 메시지를 전달해요. 프로필이 늘어도 키 입력을 감시하는 앱과 전환창이 중복되지 않게 했어요.
 
-확장과 앱을 설치하면서 macOS 접근성 권한도 허용해야 했어요. 개발용 서명이 바뀌면 이 권한을 다시 등록해야 했고, 앱을 직접 종료해도 Native Host가 다시 실행하는 버그도 만났어요. 연결 복구와 직접 종료를 구분하도록 종료 상태를 기록하고, 앱을 직접 다시 열었을 때만 해제하게 고쳤어요.
+확장 프로그램과 앱을 설치하면서 macOS 접근성 권한도 허용해야 했어요. 개발용 서명이 바뀌면 이 권한을 다시 등록해야 했고, 앱을 직접 종료해도 Native Host가 다시 실행하는 버그도 만났어요. 연결 복구와 직접 종료를 구분하도록 종료 상태를 기록하고, 앱을 직접 다시 열었을 때만 해제하게 고쳤어요.
 
 ## 탭 전환을 다듬으며 만난 문제
 

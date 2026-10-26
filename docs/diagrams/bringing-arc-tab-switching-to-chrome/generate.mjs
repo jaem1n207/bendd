@@ -190,7 +190,16 @@ class Figure {
       `<polygon points="${cx},${cy - height / 2} ${cx + width / 2},${cy} ${cx},${cy + height / 2} ${cx - width / 2},${cy}" fill="${C.paper}" stroke="${C.border}" stroke-width="1.2"/>`
     );
     this.bounds.push({ x: cx - width / 2, y: cy - height / 2, width, height });
-    this.text('상태가 같은가?', cx, cy + 4, 12, 'ink', 600, 'center', width - 40);
+    this.text(
+      '상태가 같은가?',
+      cx,
+      cy + 4,
+      12,
+      'ink',
+      600,
+      'center',
+      width - 40
+    );
   }
 
   legend(items) {
@@ -260,7 +269,7 @@ ${this.nodes.join('\n')}
 const architecture = new Figure(
   'architecture',
   '키 입력과 탭 제어를 나눠 처리했어요',
-  '하나의 macOS 앱이 키 입력과 전환창을 맡고, 프로필별 Native Host가 Chrome 확장의 탭 정보와 활성화 요청을 중계해요.'
+  '하나의 macOS 앱이 키 입력과 전환창을 맡고, 프로필별 Native Host가 Chrome 확장 프로그램의 탭 정보와 활성화 요청을 중계해요.'
 );
 architecture.text(
   'Chrome 프로필이 여러 개여도 입력과 전환창은 하나의 앱에서 처리해요.',
@@ -323,7 +332,7 @@ architecture.text('메시지 중계', 424, 340, 12, 'ink');
 architecture.text('프로필마다 연결', 424, 364, 12, 'muted');
 architecture.rect(696, 256, 224, 192, 'paper', 'border');
 architecture.text('CHROME / MV3', 712, 280, 8, 'muted', 400, 'left', 192, true);
-architecture.text('Chrome 확장', 712, 308, 14, 'ink', 600);
+architecture.text('Chrome 확장 프로그램', 712, 308, 14, 'ink', 600);
 architecture.text('탭 정보 · 캡처 이미지', 712, 340, 12, 'ink');
 architecture.text('선택한 탭 활성화', 712, 364, 12, 'ink');
 architecture.text(
