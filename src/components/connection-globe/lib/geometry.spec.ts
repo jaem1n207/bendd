@@ -104,7 +104,7 @@ describe('connection globe geography', () => {
 
   it('keeps the zero-distance timeline while the shared anchor stays still', () => {
     const early = sceneAt(SEOUL, 320, 320, 3100);
-    const late = sceneAt(SEOUL, 320, 320, 4000);
+    const late = sceneAt(SEOUL, 320, 320, 3700);
     expect(early.phase).toBe('connecting');
     expect(late.routeProgress).toBeGreaterThan(early.routeProgress);
     expect(late.head).toEqual(early.head);
@@ -174,8 +174,8 @@ describe('connection globe geography', () => {
   );
 
   it('keeps the route visibly advancing instead of spending its end almost still', () => {
-    const early = timelineAt(ROUTE_START_MS + 600).routeProgress;
-    const settling = timelineAt(DURATION_MS - 400).routeProgress;
+    const early = timelineAt(ROUTE_START_MS + 400).routeProgress;
+    const settling = timelineAt(DURATION_MS - 160).routeProgress;
     expect(early).toBeGreaterThan(0.5);
     expect(early).toBeLessThan(0.8);
     expect(settling).toBeGreaterThan(early);

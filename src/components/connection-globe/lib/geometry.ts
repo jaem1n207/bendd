@@ -24,7 +24,7 @@ const FORMATION_MS = 1000;
 const VISITOR_HOLD_MS = 200;
 const CAMERA_MS = 1800;
 const CAMERA_START_MS = FORMATION_MS + VISITOR_HOLD_MS;
-const ROUTE_MS = 1600;
+const ROUTE_MS = 800;
 export const ROUTE_START_MS = CAMERA_START_MS + CAMERA_MS;
 export const DURATION_MS = ROUTE_START_MS + ROUTE_MS;
 export const EARTH_RADIUS_METERS = 6371008.8;
@@ -36,7 +36,7 @@ const FINAL_CAMERA_SCALE = 1.06;
 const RADIANS = Math.PI / 180;
 const cameraEase = cubicBezier(0.645, 0.045, 0.355, 1);
 const formationEase = cubicBezier(0.22, 1, 0.36, 1);
-const routeEase = cubicBezier(0.3, 0.6, 0.4, 1);
+const routeEase = cubicBezier(0.25, 0.4, 0.65, 1);
 const numberFormat = new Intl.NumberFormat('ko-KR');
 
 export function clamp(value: number, min = 0, max = 1) {
