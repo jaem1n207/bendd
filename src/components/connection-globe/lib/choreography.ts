@@ -3,6 +3,8 @@ import { cubicBezier } from 'motion/react';
 import {
   clamp,
   createJourney,
+  DURATION_MS,
+  ROUTE_START_MS,
   type Camera,
   type Coordinates,
 } from '@/components/connection-globe/lib/geometry';
@@ -18,8 +20,8 @@ export const SETTLE_TIMING = {
   assemblyEnd: 2800,
   cameraStart: 3000,
   connectionStart: 4400,
-  arrival: 6000,
-  duration: 6600,
+  arrival: 5200,
+  duration: 5800,
 };
 
 /** Every visual samples the same clock, including scrubbing and reduced motion. */
@@ -68,7 +70,9 @@ export function settleFrame(time: number) {
         ? 1000
         : time < connectionStart
           ? 1200 + progress(time, cameraStart, connectionStart) * 1800
-          : 3000 + progress(time, connectionStart, arrival) * 1600,
+          : ROUTE_START_MS +
+            progress(time, connectionStart, arrival) *
+              (DURATION_MS - ROUTE_START_MS),
   };
 }
 

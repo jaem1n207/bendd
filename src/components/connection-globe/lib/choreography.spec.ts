@@ -8,12 +8,29 @@ import {
 } from '@/components/connection-globe/lib/choreography';
 import {
   GLOBE_RADIUS,
+  formatDistance,
   SEOUL,
 } from '@/components/connection-globe/lib/geometry';
 
 const london = { latitude: 51.5074, longitude: -0.1278 };
 
 describe('home Settle choreography', () => {
+  it('finishes the shared route and distance count in 800ms with a short deceleration', () => {
+    const journey = createSettleJourney(london, 760, 414);
+    expect(journey.sample(4400).routeProgress).toBe(0);
+    const late = journey.sample(5040).routeProgress;
+    // Keep visible travel in the last 160ms instead of lingering near the end.
+    expect(late).toBeGreaterThan(0.8);
+    expect(late).toBeLessThan(0.95);
+    expect(formatDistance(10000000, late)).not.toBe('10,000 km');
+    expect(journey.sample(5199).phase).toBe('connecting');
+    const arrival = journey.sample(5200);
+    expect(arrival.routeProgress).toBe(1);
+    expect(formatDistance(10000000, arrival.routeProgress)).toBe('10,000 km');
+    expect(arrival.phase).toBe('arrived');
+    expect(journey.sample(5800).phase).toBe('complete');
+  });
+
   it('hands the contours over to landing grains before assembly finishes, without drawing a route early', () => {
     const journey = createSettleJourney(london, 760, 414);
     expect(journey.sample(1000).formationProgress).toBe(0);
@@ -44,7 +61,7 @@ describe('home Settle choreography', () => {
 
   it.each([320, 760])('hands the camera over continuously at %i px', width => {
     const journey = createSettleJourney(london, width, 414);
-    for (const time of [2800, 3000, 4400, 6000]) {
+    for (const time of [2800, 3000, 4400, 5200]) {
       const before = journey.sample(time - 0.001).camera;
       const after = journey.sample(time).camera;
       expect(before.phi).toBeCloseTo(after.phi, 4);
@@ -89,12 +106,12 @@ describe('home Settle choreography', () => {
   });
 
   it('preserves the nearby cluster and unavailable-location contracts', () => {
-    const nearby = createSettleJourney(SEOUL, 320, 320).sample(6600);
+    const nearby = createSettleJourney(SEOUL, 320, 320).sample(5800);
     expect(nearby.nearby).toBe(true);
     expect(nearby.routes).toEqual([]);
     expect(nearby.destination.x).toBeCloseTo(160);
     expect(nearby.destination.y).toBeCloseTo(160);
-    const unavailable = createSettleJourney(null, 320, 320).sample(6600);
+    const unavailable = createSettleJourney(null, 320, 320).sample(5800);
     expect(unavailable.nearby).toBe(false);
     expect(unavailable.routes).toEqual([]);
     expect(unavailable.destination.visible).toBe(true);

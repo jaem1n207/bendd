@@ -404,7 +404,7 @@ test('pauses outside the viewport and resumes the same journey', async ({
   const paused = await sampleClock(stage);
   expect(new Set(paused).size).toBe(1);
   expect(paused[0]).toBeGreaterThan(0);
-  expect(paused[0]).toBeLessThan(6600);
+  expect(paused[0]).toBeLessThan(5800);
   await stage.scrollIntoViewIfNeeded();
   await expect
     .poll(async () => Number(await stage.getAttribute('data-elapsed')))
@@ -656,14 +656,14 @@ test('reduced motion stays at the final frame on mobile and preserves it across 
     'data-test-fade-opacity',
     '0,1'
   );
-  expect(new Set(await sampleClock(stage))).toEqual(new Set([6600]));
+  expect(new Set(await sampleClock(stage))).toEqual(new Set([5800]));
   await expect(section.locator('[data-distance-value]')).toBeVisible();
   await page.getByRole('button', { name: '테마 전환' }).click();
   await expect(page.locator('html')).toHaveClass(/dark/);
   await expect(stage).toHaveAttribute('data-phase', 'complete', {
     timeout: 10000,
   });
-  expect(new Set(await sampleClock(stage))).toEqual(new Set([6600]));
+  expect(new Set(await sampleClock(stage))).toEqual(new Set([5800]));
   const width = await page.evaluate(() => ({
     page: document.documentElement.scrollWidth,
     viewport: window.innerWidth,
@@ -684,9 +684,9 @@ for (const [name, location] of Object.entries({
     await expect(stage).toHaveAttribute('data-phase', 'complete', {
       timeout: 10000,
     });
-    expect(new Set(await sampleClock(stage))).toEqual(new Set([6600]));
+    expect(new Set(await sampleClock(stage))).toEqual(new Set([5800]));
     await page.emulateMedia({ reducedMotion: 'no-preference' });
-    expect(new Set(await sampleClock(stage))).toEqual(new Set([6600]));
+    expect(new Set(await sampleClock(stage))).toEqual(new Set([5800]));
   });
 }
 
