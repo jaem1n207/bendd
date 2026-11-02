@@ -106,6 +106,8 @@ export const techStackGroups: readonly TechStackGroup[] = [
       { id: 'netlify', name: 'Netlify', darkContrast: true },
       { id: 'argocd', name: 'Argo CD' },
       { id: 'sentry', name: 'Sentry', darkContrast: true },
+      { id: 'posthog', name: 'PostHog' },
+      { id: 'google-analytics', name: 'Google Analytics' },
       { id: 'umami', name: 'Umami', monochrome: true },
       { id: 'datadog', name: 'Datadog' },
     ],
