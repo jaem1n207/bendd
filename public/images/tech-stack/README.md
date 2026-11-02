@@ -16,6 +16,11 @@ The Grok mark comes from
 MIT; see `LICENSE-LobeIcons.txt`. The Obsidian mark uses `logos:obsidian-icon`
 from the SVG Logos collection above.
 
+The PostHog and Google Analytics marks come directly from SVG Logos (CC0-1.0):
+
+- [PostHog icon](https://github.com/gilbarbara/logos/blob/main/logos/posthog-icon.svg).
+- [Google Analytics](https://github.com/gilbarbara/logos/blob/main/logos/google-analytics.svg).
+
 These assets come directly from the projects' public websites:
 
 - [ArkType favicon](https://arktype.io/image/favicon.svg).
