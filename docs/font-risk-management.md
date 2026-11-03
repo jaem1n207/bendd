@@ -1,5 +1,10 @@
 # Font Risk Management
 
+> 2026-11-04 현재 구현은 [웹폰트 최적화 보고서](font-optimization.md)와
+> [수동 생성 안내](../src/app/fonts/README.md)가 기준이다. 아래의
+> `next/font` 선언·build 자동 생성·전체 폰트 preload 정책 설명은 이전 구현의 기록이다.
+> 현재는 커밋된 생성 파일을 사용하며 font-display와 fallback metrics는 보존한다.
+
 ## Summary
 
 bendd.me는 Korean/English technical writing의 기본 sans font로

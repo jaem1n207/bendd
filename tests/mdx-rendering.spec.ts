@@ -11,7 +11,7 @@ type RuntimeFontFace = {
   src: string;
 };
 
-async function assertPretendardContentFontContract(
+async function assertContentFontContract(
   page: Page,
   route: string
 ): Promise<void> {
@@ -30,14 +30,17 @@ async function assertPretendardContentFontContract(
 
   const articleMetrics = await getFontMetrics(article);
 
-  expect(articleMetrics.fontFamily).toContain('Pretendard');
-  expect(articleMetrics.fontFamily).not.toContain('Gaegu');
+  expect(articleMetrics.fontFamily).toContain('Bendd Content');
+  expect(articleMetrics.fontFamily).not.toMatch(/Gaegu|Bendd Notes/);
   expect(
     articleMetrics.lineHeight / articleMetrics.fontSize
   ).toBeGreaterThanOrEqual(1.7);
 
   await assertCodeFontIsolationIfVisible(article, articleMetrics.fontFamily);
   assertSameOriginFontRequests(fontRequests, page.url());
+  expect(
+    fontRequests.some(url => /\/(notes|home|serif)-extended\./.test(url))
+  ).toBe(false);
   await assertPretendardFontFace(page);
 }
 
@@ -68,7 +71,7 @@ async function assertCodeFontIsolationIfVisible(
   );
 
   expect(codeFontFamily).not.toBe(contentFontFamily);
-  expect(codeFontFamily).not.toContain('Gaegu');
+  expect(codeFontFamily).not.toMatch(/Gaegu|Bendd Notes/);
 }
 
 function assertSameOriginFontRequests(
@@ -86,11 +89,11 @@ function assertSameOriginFontRequests(
 async function assertPretendardFontFace(page: Page): Promise<void> {
   const fontFaces = await getRuntimeFontFaces(page);
 
-  expect(fontFaces.some(({ fontFamily }) => fontFamily.includes('Gaegu'))).toBe(
-    false
-  );
-  const pretendardFontFace = fontFaces.find(({ fontFamily }) =>
-    fontFamily.includes('Pretendard')
+  const pretendardFontFace = fontFaces.find(
+    ({ fontFamily, src }) =>
+      fontFamily.includes('Bendd Content') &&
+      !fontFamily.includes('Fallback') &&
+      src.includes('content-extended')
   );
   expect(pretendardFontFace).toBeDefined();
 
@@ -107,9 +110,15 @@ async function assertPretendardFontFace(page: Page): Promise<void> {
     .replaceAll("'", '');
 
   expect(pretendardFontPath).toBeTruthy();
+  expect(preloadedFontHrefs.some(href => href.includes('content-core.'))).toBe(
+    true
+  );
   expect(
     preloadedFontHrefs.some(href => href.endsWith(pretendardFontPath ?? ''))
   ).toBe(false);
+  expect(preloadedFontHrefs.some(href => href.includes('-extended.'))).toBe(
+    false
+  );
 }
 
 async function getRuntimeFontFaces(page: Page): Promise<RuntimeFontFace[]> {
@@ -124,9 +133,7 @@ async function getRuntimeFontFaces(page: Page): Promise<RuntimeFontFace[]> {
 
             const fontFamily = rule.style.getPropertyValue('font-family');
 
-            return (
-              fontFamily.includes('Gaegu') || fontFamily.includes('Pretendard')
-            );
+            return fontFamily.includes('Bendd Content');
           })
           .map(rule => ({
             fontFamily: rule.style.getPropertyValue('font-family'),
@@ -191,10 +198,7 @@ test.describe('MDX article detail pages', () => {
   test('should keep article typography on the Pretendard font contract', async ({
     page,
   }) => {
-    await assertPretendardContentFontContract(
-      page,
-      '/article/naming-tokens-in-design'
-    );
+    await assertContentFontContract(page, '/article/naming-tokens-in-design');
   });
 
   test('should isolate code, table, and interactive font surfaces', async ({
@@ -238,7 +242,7 @@ test.describe('MDX article detail pages', () => {
       ]);
 
     expect(codeFontFamily).not.toBe(articleFontFamily);
-    expect(codeFontFamily).not.toContain('Gaegu');
+    expect(codeFontFamily).not.toMatch(/Gaegu|Bendd Notes/);
     expect(tableFontFamily).toBe(articleFontFamily);
     expect(buttonFontFamily).toBe(articleFontFamily);
     expect(roleFontFamily).toBe(articleFontFamily);
@@ -276,7 +280,7 @@ test.describe('MDX craft detail pages', () => {
   test('should use the same Pretendard font contract on craft details', async ({
     page,
   }) => {
-    await assertPretendardContentFontContract(
+    await assertContentFontContract(
       page,
       '/craft/implement-rauno-style-text-animation'
     );
@@ -313,10 +317,10 @@ test.describe('MDX craft detail pages', () => {
       ),
     ]);
 
-    expect(articleFontFamily).toContain('Pretendard');
+    expect(articleFontFamily).toContain('Bendd Content');
     expect(captionFontFamily).toBe(articleFontFamily);
     expect(deepDiveFontFamily).toBe(articleFontFamily);
-    expect(captionFontFamily).not.toContain('Gaegu');
-    expect(deepDiveFontFamily).not.toContain('Gaegu');
+    expect(captionFontFamily).not.toMatch(/Gaegu|Bendd Notes/);
+    expect(deepDiveFontFamily).not.toMatch(/Gaegu|Bendd Notes/);
   });
 });

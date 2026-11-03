@@ -10,7 +10,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { IntentLink as Link } from '@/components/ui/intent-link';
-import localFont from 'next/font/local';
+import { fontPreloads } from '@/app/fonts/generated';
 import type { ReactNode } from 'react';
 
 import { TextShuffleDemo } from '@/components/home/ui/craft-demos';
@@ -26,44 +26,6 @@ import { HomeProfile } from '@/components/profile';
 import { ConnectionGlobe } from '@/components/connection-globe';
 import { GitHub } from '@/components/ui/icons';
 import type { Article } from '@/mdx/mdx';
-
-// Small, build-generated subsets can finish during the font block period.
-// Keep their preloads on the home route, away from long-form article pages.
-const homeSans = localFont({
-  src: '../../../app/fonts/PretendardHome.woff2',
-  variable: '--font-home-sans',
-  weight: '100 900',
-  display: 'block',
-  preload: true,
-  adjustFontFallback: false,
-});
-
-const homeNotes = localFont({
-  src: '../../../../public/fonts/gaegu-notes.woff2',
-  variable: '--font-home-notes',
-  weight: '400',
-  display: 'block',
-  preload: true,
-  adjustFontFallback: false,
-});
-
-const profileSerif = localFont({
-  src: '../../../../public/fonts/profile/profile-serif.woff2',
-  variable: '--font-profile-serif',
-  weight: '200 900',
-  display: 'block',
-  preload: true,
-  adjustFontFallback: false,
-});
-
-const profileDots = localFont({
-  src: '../../../../public/fonts/profile/profile-dots.woff2',
-  variable: '--font-profile-dots',
-  weight: '100 900',
-  display: 'block',
-  preload: true,
-  adjustFontFallback: false,
-});
 
 function SectionHeading({
   id,
@@ -119,9 +81,17 @@ export function HomeStudio({
   articles: Pick<Article, 'slug' | 'metadata'>[];
 }) {
   return (
-    <div
-      className={`${styles.page} ${homeSans.variable} ${homeNotes.variable} ${profileSerif.variable} ${profileDots.variable}`}
-    >
+    <div className={`${styles.page} font-home`}>
+      {fontPreloads.home.map(href => (
+        <link
+          key={href}
+          rel="preload"
+          href={href}
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+      ))}
       <HomeMotion>
         <div className={styles.studio}>
           <div className={styles.masthead}>

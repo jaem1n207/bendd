@@ -53,6 +53,8 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/.font-tools-venv/
+/output/playwright/font-optimization/
 
 # AI agent local configs
 CLAUDE.local.md
