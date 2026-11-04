@@ -39,7 +39,9 @@ async function assertContentFontContract(
   await assertCodeFontIsolationIfVisible(article, articleMetrics.fontFamily);
   assertSameOriginFontRequests(fontRequests, page.url());
   expect(
-    fontRequests.some(url => /\/(notes|home|serif)-extended\./.test(url))
+    fontRequests.some(url =>
+      /\/(notes|home|serif|dots)-(core|extended)\./.test(url)
+    )
   ).toBe(false);
   await assertPretendardFontFace(page);
 }
@@ -111,7 +113,7 @@ async function assertPretendardFontFace(page: Page): Promise<void> {
 
   expect(pretendardFontPath).toBeTruthy();
   expect(preloadedFontHrefs.some(href => href.includes('content-core.'))).toBe(
-    true
+    false
   );
   expect(
     preloadedFontHrefs.some(href => href.endsWith(pretendardFontPath ?? ''))

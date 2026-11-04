@@ -28,6 +28,8 @@ LATIN = set(range(0x20, 0x180))
 # Browser-default shaping is used even without an explicit CSS feature setting.
 # chws is default horizontal CJK spacing; tnum is requested in component CSS.
 FEATURES = ['ccmp', 'locl', 'rlig', 'liga', 'clig', 'calt', 'kern', 'mark', 'mkmk', 'chws', 'tnum']
+# 홈 장식 폰트는 두 조각을 항상 함께 로드하므로 단일 파일로 처리 비용을 줄인다.
+WHOLE_ROLES = {'interface', 'home', 'notes', 'serif'}
 HINT_TABLES = ['fpgm', 'prep', 'cvt ', 'hdmx', 'LTSH', 'VDMX', 'gasp']
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output-root', type=Path, default=ROOT, help='Write diagnostic outputs outside the working tree')
@@ -268,10 +270,9 @@ for key, family, inputs, display, weight, limits, scope in fonts:
     (OUT / license_name).write_bytes(license_data)
     written.add(license_name)
     entry = {'licenseUrl': f'/fonts/optimized/{license_name}', 'key': key, 'family': family, 'stack': stack, 'display': display, 'cssWeight': weight, 'usedAxisLimits': limits, 'inputs': before, 'files': []}
-    # Keep the existing UI subset intact: splitting its mixed-script kerning
-    # pairs changes native pixels. Other roles have core/extended families,
-    # both ahead of the original fallback. Extended carries core shaping helpers.
-    for part, codes in ([('core', coverage)] if key == 'interface' else [('extended', coverage - core), ('core', coverage & core)]):
+    # UI는 혼합 문자 커닝을, 홈 장식은 항상 함께 쓰는 파일의 처리 비용을 보존한다.
+    # 나머지 역할은 core/extended를 원래 fallback 앞에 선언한다.
+    for part, codes in ([('core', coverage)] if key in WHOLE_ROLES else [('extended', coverage - core), ('core', coverage & core)]):
         if not codes:
             # A source with only ASCII (Doto) has no extended glyphs to fetch.
             continue

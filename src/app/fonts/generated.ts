@@ -8,9 +8,9 @@ export const fontPreloads = {
     '/fonts/optimized/mono-700-core.6e711f204587.woff2',
   ],
   home: [
-    '/fonts/optimized/home-core.3e7f8007a40b.woff2',
-    '/fonts/optimized/notes-core.274d6c04b4d3.woff2',
-    '/fonts/optimized/serif-core.e16fc14dcc38.woff2',
+    '/fonts/optimized/home-core.c3f027e61a15.woff2',
+    '/fonts/optimized/notes-core.3fb79184a9a6.woff2',
+    '/fonts/optimized/serif-core.3f6c7dc4cb58.woff2',
     '/fonts/optimized/dots-core.98c6ce376184.woff2',
   ],
   homeGlobal: [

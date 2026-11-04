@@ -1,3 +1,4 @@
+import { FontPreloads } from '@/app/fonts/font-preloads';
 import {
   ArrowUpRight,
   BriefcaseBusiness,
@@ -10,7 +11,6 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { IntentLink as Link } from '@/components/ui/intent-link';
-import { fontPreloads } from '@/app/fonts/generated';
 import type { ReactNode } from 'react';
 
 import { TextShuffleDemo } from '@/components/home/ui/craft-demos';
@@ -82,16 +82,7 @@ export function HomeStudio({
 }) {
   return (
     <div className={`${styles.page} font-home`}>
-      {fontPreloads.home.map(href => (
-        <link
-          key={href}
-          rel="preload"
-          href={href}
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-      ))}
+      <FontPreloads />
       <HomeMotion>
         <div className={styles.studio}>
           <div className={styles.masthead}>

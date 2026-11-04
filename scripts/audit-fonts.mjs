@@ -65,6 +65,7 @@ const overrides = process.env.FONT_AUDIT_FONT_OVERRIDE
       )
     )
   : null;
+const AUDIT_FETCH_RETRIES = 2;
 const fontTransfers = new WeakMap();
 const cssOverride =
   overrides && process.env.FONT_AUDIT_CSS_OVERRIDE
@@ -91,7 +92,7 @@ async function context(viewport, colorScheme = 'light') {
     if (target.pathname.endsWith('.gif')) {
       // Native GIF animation is outside the JS clock. Freeze the encoded
       // image's first frame in the audit only; never mask DOM font pixels.
-      const response = await route.fetch();
+      const response = await route.fetch({ maxRetries: AUDIT_FETCH_RETRIES });
       const frozen = spawnSync(
         process.env.FONT_AUDIT_PYTHON || 'python3',
         [
@@ -106,7 +107,7 @@ async function context(viewport, colorScheme = 'light') {
       return route.fulfill({ contentType: 'image/png', body: frozen.stdout });
     }
     if (cssOverride && target.pathname.endsWith('.css')) {
-      const response = await route.fetch();
+      const response = await route.fetch({ maxRetries: AUDIT_FETCH_RETRIES });
       const headers = { ...response.headers() };
       delete headers['content-encoding'];
       delete headers['content-length'];

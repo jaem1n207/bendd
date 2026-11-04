@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-const HOME_FONT_BUDGET_BYTES = 500_000;
+const HOME_FONT_BUDGET_BYTES = 170_000;
+const HOME_FONT_REQUEST_BUDGET = 6;
 
 test.use({ contextOptions: { reducedMotion: 'reduce' } });
 
@@ -35,6 +36,7 @@ test('홈은 생성된 core를 preload하고 큰 본문 폰트를 받지 않는�
   await page.waitForLoadState('networkidle');
 
   expect(fontUrls.length).toBeGreaterThan(0);
+  expect(new Set(fontUrls).size).toBeLessThanOrEqual(HOME_FONT_REQUEST_BUDGET);
   expect(fontUrls.every(url => url.startsWith('/fonts/optimized/'))).toBe(true);
   expect(fontUrls.some(url => url.includes('/content-extended.'))).toBe(false);
 
@@ -63,4 +65,22 @@ test('홈 Tech Stack 설명 간격은 CSS 청크 순서와 무관하게 유지�
   await expect(description).toHaveCSS('margin-top', '4px');
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(description).toHaveCSS('margin-top', '0px');
+});
+
+test('Shuffle은 사용하지 않는 mono 폰트를 preload하지 않는다', async ({
+  page,
+}) => {
+  const fontUrls: string[] = [];
+  page.on('request', request => {
+    if (request.resourceType() === 'font') {
+      fontUrls.push(request.url());
+    }
+  });
+  await page.goto('/playground/shuffle-letters');
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForLoadState('networkidle');
+  expect(fontUrls.length).toBeGreaterThan(0);
+  expect(fontUrls.some(url => url.includes('/mono-'))).toBe(false);
+  expect(fontUrls.some(url => url.includes('/content-core.'))).toBe(false);
+  await expect(page.locator('link[rel="preload"][as="font"]')).toHaveCount(0);
 });

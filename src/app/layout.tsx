@@ -1,7 +1,6 @@
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
-import { FontPreloads } from '@/app/fonts/font-preloads';
 
 import {
   AnalyticsConsentControl,
@@ -77,7 +76,6 @@ export default function RootLayout({
       dir="ltr"
     >
       <body className="antialiased">
-        <FontPreloads />
         <BrowserDetector />
         <PathnameHistoryTracker />
         <ThemeProvider

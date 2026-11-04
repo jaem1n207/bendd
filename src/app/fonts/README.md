@@ -22,7 +22,7 @@ pnpm fonts:optimize
 `scripts/font-sources/fira/`에 보관한다. 생성물의 내부 이름은 OFL Reserved
 Font Name을 사용하지 않는 Bendd 이름이다. 저작권·라이선스는 보존한다.
 
-core와 extended는 같은 CSS family 안에 선언하며 fallback은 그 뒤에 둔다.
+분할하는 content/code-ui/mono의 core와 extended는 같은 CSS family 안에 선언하며 fallback은 그 뒤에 둔다.
 ASCII와 흔한 구두점만으로는 extended를 요청하지 않는다. extended의 core
 보조 글리프는 조합·커닝에 필요하며 정확한 cmap에서 unicode-range를 만든다.
 새로 생성하는 sans core에는 결합 문자를 **인코딩하지 않는다**. Fira는 원래 cmap과 경계를 보존하는 예외다. 그러면 브라우저가 악센트 글자를
@@ -31,3 +31,11 @@ core의 기본 글자와 결합 문자로 분해해 원본과 다른 픽셀을 �
 기존 `font-display`와 fallback family/metric 조정은 그대로 유지한다.
 UI 폰트의 분할, wght 축 축소 등 픽셀이 달라지는 최적화는 기본값에서 제외한다.
 자세한 측정·예외·검증 재실행 방법은 [측정 보고서](../../../docs/font-optimization.md)를 참고한다.
+
+UI는 커닝 보존을 위해, Home/notes/serif는 홈에서 항상 양쪽 조각이 필요하고
+재방문 처리 비용이 증가해 단일 파일을 사용한다. 상세 시간 측정은
+[로딩 성능 보고서](../../../docs/font-performance.md)를 참고한다.
+
+`generated.ts`는 사용 가능한 core URL 목록이다. 실제 preload 정책은
+`FontPreloads`가 결정한다. 비홈은 측정에서 FCP 지연이 관측되어 CSS 발견
+경로를 유지하며, 홈만 필요한 6개 파일을 preload한다.
