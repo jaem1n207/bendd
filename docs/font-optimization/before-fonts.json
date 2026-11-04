@@ -1,0 +1,554 @@
+[
+  {
+    "file": "src/app/fonts/PretendardVariable.woff2",
+    "bytes": 2057688,
+    "sha256": "9599f12fd42fc0bce1cd50b47a0c022e108d7aa64dd0d1bb0ed44f3282d900b4",
+    "glyphs": 14757,
+    "characters": 14336,
+    "axes": {
+      "wght": [45.0, 400.0, 930.0]
+    },
+    "features": {
+      "GSUB": [
+        "aalt",
+        "calt",
+        "case",
+        "ccmp",
+        "clig",
+        "cv01",
+        "cv02",
+        "cv03",
+        "cv04",
+        "cv05",
+        "cv07",
+        "cv08",
+        "cv09",
+        "cv10",
+        "cv11",
+        "cv12",
+        "cv13",
+        "dlig",
+        "dnom",
+        "frac",
+        "fwid",
+        "locl",
+        "numr",
+        "ordn",
+        "pnum",
+        "pwid",
+        "rlig",
+        "salt",
+        "sinf",
+        "ss01",
+        "ss02",
+        "ss03",
+        "ss05",
+        "ss06",
+        "ss07",
+        "ss08",
+        "ss10",
+        "ss11",
+        "ss12",
+        "ss13",
+        "ss14",
+        "ss15",
+        "ss16",
+        "subs",
+        "sups",
+        "tnum",
+        "zero"
+      ],
+      "GPOS": ["cpsp", "kern", "mark", "mkmk"]
+    },
+    "hintTables": [],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "src/app/fonts/PretendardInterface.woff2",
+    "bytes": 56848,
+    "sha256": "d9d08e353646e9f5456da98363229f6c2e3af8212da3e0e5e34f789c60528aeb",
+    "glyphs": 533,
+    "characters": 200,
+    "axes": {
+      "wght": [45.0, 400.0, 930.0]
+    },
+    "features": {
+      "GSUB": [
+        "aalt",
+        "calt",
+        "case",
+        "clig",
+        "cv01",
+        "cv02",
+        "cv03",
+        "cv04",
+        "cv05",
+        "cv08",
+        "cv09",
+        "cv10",
+        "cv11",
+        "cv13",
+        "dlig",
+        "dnom",
+        "frac",
+        "fwid",
+        "locl",
+        "numr",
+        "ordn",
+        "pnum",
+        "pwid",
+        "salt",
+        "sinf",
+        "ss01",
+        "ss02",
+        "ss03",
+        "ss05",
+        "ss06",
+        "ss07",
+        "ss08",
+        "subs",
+        "sups",
+        "tnum",
+        "zero"
+      ],
+      "GPOS": ["cpsp", "kern"]
+    },
+    "hintTables": [],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "src/app/fonts/PretendardHome.woff2",
+    "bytes": 108676,
+    "sha256": "74299f9f203921b199976bb421882fcae349c4c13efa9ce22229053725a1c48c",
+    "glyphs": 848,
+    "characters": 514,
+    "axes": {
+      "wght": [45.0, 400.0, 930.0]
+    },
+    "features": {
+      "GSUB": [
+        "aalt",
+        "calt",
+        "case",
+        "clig",
+        "cv01",
+        "cv02",
+        "cv03",
+        "cv04",
+        "cv05",
+        "cv08",
+        "cv09",
+        "cv10",
+        "cv11",
+        "cv13",
+        "dlig",
+        "dnom",
+        "frac",
+        "fwid",
+        "locl",
+        "numr",
+        "ordn",
+        "pnum",
+        "pwid",
+        "salt",
+        "sinf",
+        "ss01",
+        "ss02",
+        "ss03",
+        "ss05",
+        "ss06",
+        "ss07",
+        "ss08",
+        "subs",
+        "sups",
+        "tnum",
+        "zero"
+      ],
+      "GPOS": ["cpsp", "kern"]
+    },
+    "hintTables": [],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "public/fonts/gaegu-notes.woff2",
+    "bytes": 11068,
+    "sha256": "66de552ee38ae51992ac4506efdea73fea05687031cc13a0622ebb0aa9500713",
+    "glyphs": 38,
+    "characters": 37,
+    "axes": {},
+    "features": {},
+    "hintTables": ["fpgm", "prep", "cvt ", "gasp"],
+    "instructedGlyphs": 36
+  },
+  {
+    "file": "public/fonts/profile/profile-serif.woff2",
+    "bytes": 9256,
+    "sha256": "b6464236d2af7e0f615583058913467da63081410c92a5b0c1455ef6d8d2d4c0",
+    "glyphs": 31,
+    "characters": 22,
+    "axes": {
+      "wght": [200.0, 200.0, 900.0]
+    },
+    "features": {
+      "GSUB": ["aalt", "calt", "fwid", "hwid", "locl", "pwid", "vert", "vrt2"],
+      "GPOS": ["chws", "halt", "kern", "palt", "vchw", "vhal", "vpal"]
+    },
+    "hintTables": ["prep", "gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "public/fonts/profile/profile-dots.woff2",
+    "bytes": 1636,
+    "sha256": "f573fffb0636608473f43b43eb061c01cceaddc31df776941b4ba70828609806",
+    "glyphs": 16,
+    "characters": 15,
+    "axes": {
+      "ROND": [0.0, 0.0, 100.0],
+      "wght": [100.0, 900.0, 900.0]
+    },
+    "features": {},
+    "hintTables": ["prep", "gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "src/app/api/og/Inter-SemiBold.ttf",
+    "bytes": 315756,
+    "sha256": "f036a45770ce2ad43dfee7f4eac8f8b3784608a24ff00c63dd56704434e014e8",
+    "glyphs": 2547,
+    "characters": 2505,
+    "axes": {},
+    "features": {
+      "GSUB": [
+        "aalt",
+        "calt",
+        "case",
+        "ccmp",
+        "cv01",
+        "cv02",
+        "cv03",
+        "cv04",
+        "cv05",
+        "cv06",
+        "cv07",
+        "cv08",
+        "cv09",
+        "cv10",
+        "cv11",
+        "dlig",
+        "dnom",
+        "frac",
+        "locl",
+        "numr",
+        "ordn",
+        "pnum",
+        "salt",
+        "sinf",
+        "ss01",
+        "ss02",
+        "ss03",
+        "ss04",
+        "subs",
+        "sups",
+        "tnum",
+        "zero"
+      ],
+      "GPOS": ["cpsp", "kern", "mark"]
+    },
+    "hintTables": ["prep", "gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/400-cyrillic-ext.woff2",
+    "bytes": 9900,
+    "sha256": "d76a84a74d7c8836493fbf9ede84e70f2f3235bd90578140de333e4807814484",
+    "glyphs": 237,
+    "characters": 191,
+    "axes": {},
+    "features": {
+      "GSUB": [],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/400-cyrillic.woff2",
+    "bytes": 5660,
+    "sha256": "6f4454c55de1a4df5f2fbdc829591a6076146df920662ebd00999c511433f117",
+    "glyphs": 139,
+    "characters": 105,
+    "axes": {},
+    "features": {
+      "GSUB": [],
+      "GPOS": ["mark"]
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/400-greek-ext.woff2",
+    "bytes": 4776,
+    "sha256": "d89ca8cd7585c6a1dd40d561b5f5bb7a62e085594791e01709f31d9f4b495087",
+    "glyphs": 274,
+    "characters": 236,
+    "axes": {},
+    "features": {
+      "GSUB": ["calt"],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/400-greek.woff2",
+    "bytes": 6564,
+    "sha256": "e01411170c1145cf3ae128819fc2bd3622be50f99fef70d9dbfd7d55ede81cbd",
+    "glyphs": 158,
+    "characters": 124,
+    "axes": {},
+    "features": {
+      "GSUB": ["calt"],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/400-latin-ext.woff2",
+    "bytes": 7392,
+    "sha256": "550c53511ca4410ce8c45c9fa6924e1816590b67a5bf3cb564ad2319dbc2be78",
+    "glyphs": 239,
+    "characters": 162,
+    "axes": {},
+    "features": {
+      "GSUB": ["locl"],
+      "GPOS": ["mark", "mkmk"]
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/400-latin.woff2",
+    "bytes": 10756,
+    "sha256": "381d3214b878f132fd33d8af72bdf1f9415aef024aed80309d5052d7da54917e",
+    "glyphs": 272,
+    "characters": 225,
+    "axes": {},
+    "features": {
+      "GSUB": ["dnom", "frac", "locl", "numr"],
+      "GPOS": ["mark", "mkmk"]
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/400-symbols.woff2",
+    "bytes": 2904,
+    "sha256": "2004cbb08ece9a8d66c69290bd303b3576b7f3b148ccf47cc8431a60cd99a7c9",
+    "glyphs": 156,
+    "characters": 153,
+    "axes": {},
+    "features": {
+      "GSUB": ["tnum"],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/500-cyrillic-ext.woff2",
+    "bytes": 9800,
+    "sha256": "35d79bc9a27f5adf01b1c530b31321c2486a65e8281306cc33374e4b0d967d7d",
+    "glyphs": 237,
+    "characters": 191,
+    "axes": {},
+    "features": {
+      "GSUB": [],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/500-cyrillic.woff2",
+    "bytes": 5648,
+    "sha256": "6d4b03fb5f50e863a75e9cbb724aeaf46a96d27860198577324e18dba0582469",
+    "glyphs": 139,
+    "characters": 105,
+    "axes": {},
+    "features": {
+      "GSUB": [],
+      "GPOS": ["mark"]
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/500-greek-ext.woff2",
+    "bytes": 4648,
+    "sha256": "0605b2dabcf99f9fe8a0de397d8a7a388b7a71e03da02dd7c35663323d6b03fb",
+    "glyphs": 274,
+    "characters": 236,
+    "axes": {},
+    "features": {
+      "GSUB": ["calt"],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/500-greek.woff2",
+    "bytes": 6596,
+    "sha256": "7f75df321c1025b6d15d944b8430d10f91bac64ea5c1f45f15dea4b2b786d204",
+    "glyphs": 158,
+    "characters": 124,
+    "axes": {},
+    "features": {
+      "GSUB": ["calt"],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/500-latin-ext.woff2",
+    "bytes": 7408,
+    "sha256": "7e5414b7fc4290141e82dfb0ba386d1332a0dc0b5476e2fb2f8a0b8c898cb9b0",
+    "glyphs": 239,
+    "characters": 162,
+    "axes": {},
+    "features": {
+      "GSUB": ["locl"],
+      "GPOS": ["mark", "mkmk"]
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/500-latin.woff2",
+    "bytes": 10664,
+    "sha256": "ad82568cba5d68b67e6b0c9481b4cf571b3475d69b8f14306504d9cfe651c29f",
+    "glyphs": 272,
+    "characters": 225,
+    "axes": {},
+    "features": {
+      "GSUB": ["dnom", "frac", "locl", "numr"],
+      "GPOS": ["mark", "mkmk"]
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/500-symbols.woff2",
+    "bytes": 2872,
+    "sha256": "6160189af872995f852288c3695e66b66195be4f5dcfc0296a4e51f7a18c630e",
+    "glyphs": 156,
+    "characters": 153,
+    "axes": {},
+    "features": {
+      "GSUB": ["tnum"],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/700-cyrillic-ext.woff2",
+    "bytes": 9924,
+    "sha256": "0b73577b537fadf6224c0dd13ff0117a130d53f750860b26ec11f7fa5b6737d0",
+    "glyphs": 237,
+    "characters": 191,
+    "axes": {},
+    "features": {
+      "GSUB": [],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/700-cyrillic.woff2",
+    "bytes": 5732,
+    "sha256": "07f0aa0363a62b83727cb8b5d3cf2a2536e6ad228c4d5e726f4d42e9930f6e1c",
+    "glyphs": 139,
+    "characters": 105,
+    "axes": {},
+    "features": {
+      "GSUB": [],
+      "GPOS": ["mark"]
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/700-greek-ext.woff2",
+    "bytes": 4720,
+    "sha256": "ddf66fe1e62ee3bb918581cdec860cb632f9426f0699b868811131fb8f61f93f",
+    "glyphs": 274,
+    "characters": 236,
+    "axes": {},
+    "features": {
+      "GSUB": ["calt"],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/700-greek.woff2",
+    "bytes": 6612,
+    "sha256": "bc36f7599a2a2a6e01ee2879fdc13d96f113be7ee5fbeb035afe7464f78c8ab8",
+    "glyphs": 158,
+    "characters": 124,
+    "axes": {},
+    "features": {
+      "GSUB": ["calt"],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/700-latin-ext.woff2",
+    "bytes": 7352,
+    "sha256": "e089cbad23268834fd4922595b238709ce67eeb0436c562a08a2fdcb44eb1243",
+    "glyphs": 239,
+    "characters": 162,
+    "axes": {},
+    "features": {
+      "GSUB": ["locl"],
+      "GPOS": ["mark", "mkmk"]
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/700-latin.woff2",
+    "bytes": 10612,
+    "sha256": "5afdb884ea57b4d82ae667a4e4cc5769c8945f23e287751b844c6a0d78766355",
+    "glyphs": 272,
+    "characters": 225,
+    "axes": {},
+    "features": {
+      "GSUB": ["dnom", "frac", "locl", "numr"],
+      "GPOS": ["mark", "mkmk"]
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  },
+  {
+    "file": "scripts/font-sources/fira/700-symbols.woff2",
+    "bytes": 2872,
+    "sha256": "3f132e33ac795590b4ca4f504faf23f7ffddd4dd5764fd344e113077b378dc7e",
+    "glyphs": 156,
+    "characters": 153,
+    "axes": {},
+    "features": {
+      "GSUB": ["tnum"],
+      "GPOS": []
+    },
+    "hintTables": ["gasp"],
+    "instructedGlyphs": 0
+  }
+]

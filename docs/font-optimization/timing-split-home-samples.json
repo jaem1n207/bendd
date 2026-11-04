@@ -1,0 +1,3840 @@
+{
+  "browser": "151.0.7922.34",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M1 Pro",
+    "measuredAt": "2026-11-03T22:46:48.366Z"
+  },
+  "conditions": {
+    "viewport": "1440x900 DPR1",
+    "latencyMs": 40,
+    "downloadBps": 1250000,
+    "uploadBps": 125000,
+    "cpuRate": 4,
+    "windowMs": 7000,
+    "rounds": 5,
+    "settling": "Observe at least 7s and wait up to 30s for loaded fonts and two frames; resume complete pairs without rerunning them",
+    "external": "DNS blocked; visitor location stubbed using CDP Fetch; no Playwright routing",
+    "cache": "cold=new context; warm=new page in same context after cold visit; HTTP cache enabled",
+    "fontMetric": "DOMContentLoaded then document.fonts.ready + two requestAnimationFrame callbacks; readiness proxy, not direct glyph paint timestamp"
+  },
+  "samples": [
+    {
+      "round": 0,
+      "route": "/",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 2112,
+      "lcpElement": "<p data-reveal=\"true\" data-reveal-state=\"visible\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 965.8999999761581,
+      "fcp": 580,
+      "ttfb": 12.599999994039536,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 157.7999999821186
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 130.09999999403954
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 166
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 376.7999999821186
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 11056,
+          "bodyBytes": 10756,
+          "end": 539.2999999821186
+        },
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 638.8999999761581
+        }
+      ],
+      "requests": 47,
+      "networkRequests": 47,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 732254,
+      "fontTransferBytes": 204335
+    },
+    {
+      "round": 0,
+      "route": "/",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 720,
+      "lcpElement": "<p data-reveal=\"true\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 621.0999999940395,
+      "fcp": 268,
+      "ttfb": 6.5999999940395355,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 65.80000001192093
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 66.5
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 66.80000001192093
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 67.5
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10756,
+          "end": 151.59999999403954
+        },
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 154
+        }
+      ],
+      "requests": 47,
+      "networkRequests": 9,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 20688,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 0,
+      "route": "/",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 992,
+      "lcpElement": "<p data-reveal=\"true\" data-reveal-state=\"visible\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 884,
+      "fcp": 448,
+      "ttfb": 11.400000005960464,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 205.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/home-core.3e7f8007a40b.woff2",
+          "transferBytes": 20132,
+          "bodyBytes": 19832,
+          "end": 223.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 232.90000000596046
+        },
+        {
+          "url": "/fonts/optimized/notes-core.274d6c04b4d3.woff2",
+          "transferBytes": 856,
+          "bodyBytes": 556,
+          "end": 187.5
+        },
+        {
+          "url": "/fonts/optimized/serif-core.e16fc14dcc38.woff2",
+          "transferBytes": 1624,
+          "bodyBytes": 1324,
+          "end": 194.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/dots-core.98c6ce376184.woff2",
+          "transferBytes": 1720,
+          "bodyBytes": 1420,
+          "end": 198
+        },
+        {
+          "url": "/fonts/optimized/serif-extended.3f6c7dc4cb58.woff2",
+          "transferBytes": 9132,
+          "bodyBytes": 8832,
+          "end": 453.7999999821186
+        },
+        {
+          "url": "/fonts/optimized/notes-extended.3fb79184a9a6.woff2",
+          "transferBytes": 6356,
+          "bodyBytes": 6056,
+          "end": 461.90000000596046
+        },
+        {
+          "url": "/fonts/optimized/home-extended.c3f027e61a15.woff2",
+          "transferBytes": 92124,
+          "bodyBytes": 91824,
+          "end": 652.0999999940395
+        }
+      ],
+      "requests": 50,
+      "networkRequests": 50,
+      "fontRequests": 9,
+      "cachedFontRequests": 0,
+      "transferBytes": 717408,
+      "fontTransferBytes": 189484
+    },
+    {
+      "round": 0,
+      "route": "/",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 724,
+      "lcpElement": "<p data-reveal=\"true\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 704.3000000119209,
+      "fcp": 312,
+      "ttfb": 3.2000000178813934,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 63.400000005960464
+        },
+        {
+          "url": "/fonts/optimized/dots-core.98c6ce376184.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1420,
+          "end": 64.09999999403954
+        },
+        {
+          "url": "/fonts/optimized/home-core.3e7f8007a40b.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 19832,
+          "end": 63.70000001788139
+        },
+        {
+          "url": "/fonts/optimized/notes-core.274d6c04b4d3.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 556,
+          "end": 63.900000005960464
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 63.599999994039536
+        },
+        {
+          "url": "/fonts/optimized/serif-core.e16fc14dcc38.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1324,
+          "end": 64
+        },
+        {
+          "url": "/fonts/optimized/serif-extended.3f6c7dc4cb58.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 8832,
+          "end": 144.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/notes-extended.3fb79184a9a6.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 6056,
+          "end": 145.2000000178814
+        },
+        {
+          "url": "/fonts/optimized/home-extended.c3f027e61a15.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 91824,
+          "end": 165.2000000178814
+        }
+      ],
+      "requests": 50,
+      "networkRequests": 9,
+      "fontRequests": 9,
+      "cachedFontRequests": 9,
+      "transferBytes": 20531,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 0,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 516,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.007169805472835756,
+      "fontReady": 3141.9000000059605,
+      "fcp": 516,
+      "ttfb": 22.80000001192093,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 610.2000000178814
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 11056,
+          "bodyBytes": 10756,
+          "end": 574.4000000059605
+        },
+        {
+          "url": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 788
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 2057988,
+          "bodyBytes": 2057688,
+          "end": 2967.300000011921
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 1840.300000011921
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 1860.7000000178814
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 1920.5
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 2123.5
+        }
+      ],
+      "requests": 67,
+      "networkRequests": 67,
+      "fontRequests": 8,
+      "cachedFontRequests": 0,
+      "transferBytes": 3195375,
+      "fontTransferBytes": 2274671
+    },
+    {
+      "round": 0,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 300,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.0003674838595920139,
+      "fontReady": 743.8000000119209,
+      "fcp": 300,
+      "ttfb": 3,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 125.59999999403954
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10756,
+          "end": 151.30000001192093
+        },
+        {
+          "url": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 152.30000001192093
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 2057688,
+          "end": 323.2000000178814
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 1511.5
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 1512.2000000178814
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 1512.7000000178814
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 1513.0999999940395
+        }
+      ],
+      "requests": 67,
+      "networkRequests": 10,
+      "fontRequests": 8,
+      "cachedFontRequests": 8,
+      "transferBytes": 41393,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 0,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 516,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.0003008696630658436,
+      "fontReady": 2565.800000011921,
+      "fcp": 516,
+      "ttfb": 17.5,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 21544,
+          "bodyBytes": 21244,
+          "end": 217
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 238.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 213.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 10936,
+          "bodyBytes": 10636,
+          "end": 221
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 221.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 1804552,
+          "bodyBytes": 1804252,
+          "end": 2408.4000000059605
+        }
+      ],
+      "requests": 65,
+      "networkRequests": 65,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2825228,
+      "fontTransferBytes": 1903348
+    },
+    {
+      "round": 0,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 320,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0,
+      "fontReady": 833.5,
+      "fcp": 320,
+      "ttfb": 3.699999988079071,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 21244,
+          "end": 78
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 78.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 78.09999999403954
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10636,
+          "end": 78.69999998807907
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 78.7999999821186
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1804252,
+          "end": 182.89999997615814
+        }
+      ],
+      "requests": 61,
+      "networkRequests": 9,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 28703,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 0,
+      "route": "/playground/shuffle-letters",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 300,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0.00012962279771090536,
+      "fontReady": 2587.4000000059605,
+      "fcp": 300,
+      "ttfb": 25.30000001192093,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 443.59999999403954
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 2057988,
+          "bodyBytes": 2057688,
+          "end": 2504.2000000178814
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 1205.7000000178814
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 1177
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 1214
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 1449.300000011921
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 41,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2712658,
+      "fontTransferBytes": 2251271,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8918.09999999404,
+        "elapsedMs": 1894,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 0,
+      "route": "/playground/shuffle-letters",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 188,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 450.69999998807907,
+      "fcp": 188,
+      "ttfb": 9,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 100.80000001192093
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 2057688,
+          "end": 158.69999998807907
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 638.9000000059605
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 639.5
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 640.3000000119209
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 640.8000000119209
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 6,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 18706,
+      "fontTransferBytes": 0,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8836.699999988079,
+        "elapsedMs": 1818.2999999821186,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 0,
+      "route": "/playground/shuffle-letters",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 328,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 2123.5,
+      "fcp": 328,
+      "ttfb": 18.30000001192093,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 21544,
+          "bodyBytes": 21244,
+          "end": 172.90000000596046
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 208.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 149
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 10936,
+          "bodyBytes": 10636,
+          "end": 182.5
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 205.2000000178814
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 1804552,
+          "bodyBytes": 1804252,
+          "end": 2015.2000000178814
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 41,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2364987,
+      "fontTransferBytes": 1903348,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8827.40000000596,
+        "elapsedMs": 1814.199999988079,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 0,
+      "route": "/playground/shuffle-letters",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 196,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 423.09999999403954,
+      "fcp": 196,
+      "ttfb": 4.699999988079071,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 21244,
+          "end": 57.5
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 57.599999994039536
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 57.900000005960464
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10636,
+          "end": 58.29999998211861
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 58.5
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1804252,
+          "end": 120.69999998807907
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 6,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 18550,
+      "fontTransferBytes": 0,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8828.799999982119,
+        "elapsedMs": 1813.0999999940395,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 1,
+      "route": "/",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 1004,
+      "lcpElement": "<p data-reveal=\"true\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 944.0999999940395,
+      "fcp": 496,
+      "ttfb": 4.5,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 225.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/notes-core.274d6c04b4d3.woff2",
+          "transferBytes": 856,
+          "bodyBytes": 556,
+          "end": 184.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 201.5
+        },
+        {
+          "url": "/fonts/optimized/home-core.3e7f8007a40b.woff2",
+          "transferBytes": 20132,
+          "bodyBytes": 19832,
+          "end": 220.69999998807907
+        },
+        {
+          "url": "/fonts/optimized/serif-core.e16fc14dcc38.woff2",
+          "transferBytes": 1624,
+          "bodyBytes": 1324,
+          "end": 192
+        },
+        {
+          "url": "/fonts/optimized/dots-core.98c6ce376184.woff2",
+          "transferBytes": 1720,
+          "bodyBytes": 1420,
+          "end": 195.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/serif-extended.3f6c7dc4cb58.woff2",
+          "transferBytes": 9132,
+          "bodyBytes": 8832,
+          "end": 453.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/notes-extended.3fb79184a9a6.woff2",
+          "transferBytes": 6356,
+          "bodyBytes": 6056,
+          "end": 457
+        },
+        {
+          "url": "/fonts/optimized/home-extended.c3f027e61a15.woff2",
+          "transferBytes": 92124,
+          "bodyBytes": 91824,
+          "end": 649.1999999880791
+        }
+      ],
+      "requests": 50,
+      "networkRequests": 50,
+      "fontRequests": 9,
+      "cachedFontRequests": 0,
+      "transferBytes": 717408,
+      "fontTransferBytes": 189484
+    },
+    {
+      "round": 1,
+      "route": "/",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 964,
+      "lcpElement": "<p data-reveal=\"true\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 984.9000000059605,
+      "fcp": 176,
+      "ttfb": 9.699999988079071,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 68
+        },
+        {
+          "url": "/fonts/optimized/home-core.3e7f8007a40b.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 19832,
+          "end": 69.19999998807907
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 69.09999999403954
+        },
+        {
+          "url": "/fonts/optimized/notes-core.274d6c04b4d3.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 556,
+          "end": 69.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/serif-core.e16fc14dcc38.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1324,
+          "end": 70.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/dots-core.98c6ce376184.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1420,
+          "end": 70.5
+        },
+        {
+          "url": "/fonts/optimized/notes-extended.3fb79184a9a6.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 6056,
+          "end": 226.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/serif-extended.3f6c7dc4cb58.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 8832,
+          "end": 227.09999999403954
+        },
+        {
+          "url": "/fonts/optimized/home-extended.c3f027e61a15.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 91824,
+          "end": 247.09999999403954
+        }
+      ],
+      "requests": 50,
+      "networkRequests": 9,
+      "fontRequests": 9,
+      "cachedFontRequests": 9,
+      "transferBytes": 20531,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 1,
+      "route": "/",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 2000,
+      "lcpElement": "<p data-reveal=\"true\" data-reveal-state=\"visible\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 844.9000000059605,
+      "fcp": 492,
+      "ttfb": 12.200000017881393,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 137.90000000596046
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 109.09999999403954
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 147.40000000596046
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 365.90000000596046
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 11056,
+          "bodyBytes": 10756,
+          "end": 517.4000000059605
+        },
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 586.5999999940395
+        }
+      ],
+      "requests": 47,
+      "networkRequests": 47,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 732254,
+      "fontTransferBytes": 204335
+    },
+    {
+      "round": 1,
+      "route": "/",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 724,
+      "lcpElement": "<p data-reveal=\"true\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 647.4000000059605,
+      "fcp": 280,
+      "ttfb": 3.699999988079071,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 60.400000005960464
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 61.400000005960464
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 61.19999998807907
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 61.5
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10756,
+          "end": 153.40000000596046
+        },
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 155.40000000596046
+        }
+      ],
+      "requests": 47,
+      "networkRequests": 9,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 20688,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 1,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 504,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.0003008696630658436,
+      "fontReady": 4527.5,
+      "fcp": 504,
+      "ttfb": 5.800000011920929,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 21544,
+          "bodyBytes": 21244,
+          "end": 193.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 232.90000000596046
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 211.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 10936,
+          "bodyBytes": 10636,
+          "end": 214.69999998807907
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 216
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 1804552,
+          "bodyBytes": 1804252,
+          "end": 2394
+        }
+      ],
+      "requests": 65,
+      "networkRequests": 65,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2825228,
+      "fontTransferBytes": 1903348
+    },
+    {
+      "round": 1,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 348,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0,
+      "fontReady": 706.5,
+      "fcp": 348,
+      "ttfb": 4.399999976158142,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 21244,
+          "end": 60.099999994039536
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 60.89999997615814
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10636,
+          "end": 61.19999998807907
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 61.099999994039536
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 61.29999998211861
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1804252,
+          "end": 158.09999999403954
+        }
+      ],
+      "requests": 65,
+      "networkRequests": 10,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 41221,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 1,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 408,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.004569255704317236,
+      "fontReady": 3077.800000011921,
+      "fcp": 408,
+      "ttfb": 10.800000011920929,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 547.5
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 11056,
+          "bodyBytes": 10756,
+          "end": 484
+        },
+        {
+          "url": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 508
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 2057988,
+          "bodyBytes": 2057688,
+          "end": 2904.300000011921
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 1414
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 1439.199999988079
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 1506.5
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 1676.5
+        }
+      ],
+      "requests": 67,
+      "networkRequests": 67,
+      "fontRequests": 8,
+      "cachedFontRequests": 0,
+      "transferBytes": 3195375,
+      "fontTransferBytes": 2274671
+    },
+    {
+      "round": 1,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 320,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.0003674838595920139,
+      "fontReady": 764.8000000119209,
+      "fcp": 320,
+      "ttfb": 2.9000000059604645,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 125.69999998807907
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10756,
+          "end": 152.5
+        },
+        {
+          "url": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 153.5
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 2057688,
+          "end": 342.30000001192093
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 1538.9000000059605
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 1539.0999999940395
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 1539.9000000059605
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 1540.0999999940395
+        }
+      ],
+      "requests": 67,
+      "networkRequests": 10,
+      "fontRequests": 8,
+      "cachedFontRequests": 8,
+      "transferBytes": 41393,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 1,
+      "route": "/playground/shuffle-letters",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 312,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 2101.300000011921,
+      "fcp": 312,
+      "ttfb": 12.599999994039536,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 21544,
+          "bodyBytes": 21244,
+          "end": 171.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 149.90000000596046
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 208.5
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 10936,
+          "bodyBytes": 10636,
+          "end": 183.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 203.90000000596046
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 1804552,
+          "bodyBytes": 1804252,
+          "end": 2009.800000011921
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 41,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2364987,
+      "fontTransferBytes": 1903348,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8871.800000011921,
+        "elapsedMs": 1862.9000000059605,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 1,
+      "route": "/playground/shuffle-letters",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 216,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 441.90000000596046,
+      "fcp": 216,
+      "ttfb": 4.200000017881393,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 55
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 54.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 21244,
+          "end": 54.60000002384186
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10636,
+          "end": 55.60000002384186
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 55.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1804252,
+          "end": 129
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 6,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 18550,
+      "fontTransferBytes": 0,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8813.800000011921,
+        "elapsedMs": 1781.300000011921,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 1,
+      "route": "/playground/shuffle-letters",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 272,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0.00012962279771090536,
+      "fontReady": 2697.100000023842,
+      "fcp": 272,
+      "ttfb": 17,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 436.7000000178814
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 2057988,
+          "bodyBytes": 2057688,
+          "end": 2570.5
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 977
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 950.3000000119209
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 986.2000000178814
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 1221.5
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 41,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2712658,
+      "fontTransferBytes": 2251271,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8899.100000023842,
+        "elapsedMs": 1846,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 1,
+      "route": "/playground/shuffle-letters",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 360,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0.00012962279771090536,
+      "fontReady": 691.5,
+      "fcp": 360,
+      "ttfb": 17.400000005960464,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 179.5
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 2057688,
+          "end": 371.5
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 917.8000000119209
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 918.8000000119209
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 919.0999999940395
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 919.5999999940395
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 6,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 18706,
+      "fontTransferBytes": 0,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8998.09999999404,
+        "elapsedMs": 1970.2999999821186,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 2,
+      "route": "/",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 1208,
+      "lcpElement": "<p data-reveal=\"true\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 1159.199999988079,
+      "fcp": 732,
+      "ttfb": 14.300000011920929,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 154.69999998807907
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 129.30000001192093
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 171.59999999403954
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 398.30000001192093
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 11056,
+          "bodyBytes": 10756,
+          "end": 618.8000000119209
+        },
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 666.0999999940395
+        }
+      ],
+      "requests": 47,
+      "networkRequests": 47,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 732254,
+      "fontTransferBytes": 204335
+    },
+    {
+      "round": 2,
+      "route": "/",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 740,
+      "lcpElement": "<p data-reveal=\"true\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 691.9000000059605,
+      "fcp": 296,
+      "ttfb": 3.5,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 61.70000001788139
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 62.400000005960464
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 63.80000001192093
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 64.30000001192093
+        },
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 166.40000000596046
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10756,
+          "end": 166.90000000596046
+        }
+      ],
+      "requests": 47,
+      "networkRequests": 9,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 20688,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 2,
+      "route": "/",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 1300,
+      "lcpElement": "<p data-reveal=\"true\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 1243.0999999940395,
+      "fcp": 664,
+      "ttfb": 15.599999994039536,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 228.7000000178814
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 208.5
+        },
+        {
+          "url": "/fonts/optimized/notes-core.274d6c04b4d3.woff2",
+          "transferBytes": 856,
+          "bodyBytes": 556,
+          "end": 189
+        },
+        {
+          "url": "/fonts/optimized/home-core.3e7f8007a40b.woff2",
+          "transferBytes": 20132,
+          "bodyBytes": 19832,
+          "end": 225.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/serif-core.e16fc14dcc38.woff2",
+          "transferBytes": 1624,
+          "bodyBytes": 1324,
+          "end": 195.2000000178814
+        },
+        {
+          "url": "/fonts/optimized/dots-core.98c6ce376184.woff2",
+          "transferBytes": 1720,
+          "bodyBytes": 1420,
+          "end": 199
+        },
+        {
+          "url": "/fonts/optimized/serif-extended.3f6c7dc4cb58.woff2",
+          "transferBytes": 9132,
+          "bodyBytes": 8832,
+          "end": 563.5999999940395
+        },
+        {
+          "url": "/fonts/optimized/notes-extended.3fb79184a9a6.woff2",
+          "transferBytes": 6356,
+          "bodyBytes": 6056,
+          "end": 555.5
+        },
+        {
+          "url": "/fonts/optimized/home-extended.c3f027e61a15.woff2",
+          "transferBytes": 92124,
+          "bodyBytes": 91824,
+          "end": 650
+        }
+      ],
+      "requests": 50,
+      "networkRequests": 50,
+      "fontRequests": 9,
+      "cachedFontRequests": 0,
+      "transferBytes": 717408,
+      "fontTransferBytes": 189484
+    },
+    {
+      "round": 2,
+      "route": "/",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 844,
+      "lcpElement": "<p data-reveal=\"true\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 843.4000000059605,
+      "fcp": 420,
+      "ttfb": 3.7000000178813934,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 62.60000002384186
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 63.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/notes-core.274d6c04b4d3.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 556,
+          "end": 63.70000001788139
+        },
+        {
+          "url": "/fonts/optimized/home-core.3e7f8007a40b.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 19832,
+          "end": 63.400000005960464
+        },
+        {
+          "url": "/fonts/optimized/serif-core.e16fc14dcc38.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1324,
+          "end": 63.900000005960464
+        },
+        {
+          "url": "/fonts/optimized/dots-core.98c6ce376184.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1420,
+          "end": 64.2000000178814
+        },
+        {
+          "url": "/fonts/optimized/serif-extended.3f6c7dc4cb58.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 8832,
+          "end": 206.60000002384186
+        },
+        {
+          "url": "/fonts/optimized/notes-extended.3fb79184a9a6.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 6056,
+          "end": 207.5
+        },
+        {
+          "url": "/fonts/optimized/home-extended.c3f027e61a15.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 91824,
+          "end": 229.5
+        }
+      ],
+      "requests": 50,
+      "networkRequests": 9,
+      "fontRequests": 9,
+      "cachedFontRequests": 9,
+      "transferBytes": 20531,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 2,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 532,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.007169805472835756,
+      "fontReady": 3233.7999999821186,
+      "fcp": 532,
+      "ttfb": 14.399999976158142,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 673.1999999880791
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 11056,
+          "bodyBytes": 10756,
+          "end": 616.8999999761581
+        },
+        {
+          "url": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 618.0999999940395
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 2057988,
+          "bodyBytes": 2057688,
+          "end": 3061.2999999821186
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 1598.5
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 1623.5999999940395
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 1672.8999999761581
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 1882.7999999821186
+        }
+      ],
+      "requests": 67,
+      "networkRequests": 67,
+      "fontRequests": 8,
+      "cachedFontRequests": 0,
+      "transferBytes": 3195375,
+      "fontTransferBytes": 2274671
+    },
+    {
+      "round": 2,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 308,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.0003674838595920139,
+      "fontReady": 732.8999999761581,
+      "fcp": 308,
+      "ttfb": 4,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 124.19999998807907
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10756,
+          "end": 149.7999999821186
+        },
+        {
+          "url": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 150.59999999403954
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 2057688,
+          "end": 328.89999997615814
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 1602
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 1603.199999988079
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 1603.7999999821186
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 1604.7999999821186
+        }
+      ],
+      "requests": 67,
+      "networkRequests": 10,
+      "fontRequests": 8,
+      "cachedFontRequests": 8,
+      "transferBytes": 41393,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 2,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 484,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.0003008696630658436,
+      "fontReady": 2695,
+      "fcp": 484,
+      "ttfb": 13.600000023841858,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 21544,
+          "bodyBytes": 21244,
+          "end": 231.60000002384186
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 250.7000000178814
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 214.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 10936,
+          "bodyBytes": 10636,
+          "end": 228
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 230.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 1804552,
+          "bodyBytes": 1804252,
+          "end": 2440
+        }
+      ],
+      "requests": 65,
+      "networkRequests": 65,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2825228,
+      "fontTransferBytes": 1903348
+    },
+    {
+      "round": 2,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 372,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0,
+      "fontReady": 1068.7999999821186,
+      "fcp": 372,
+      "ttfb": 10.5,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 21244,
+          "end": 73.5
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 74.69999998807907
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 75
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10636,
+          "end": 75.09999999403954
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 75.39999997615814
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1804252,
+          "end": 180.69999998807907
+        }
+      ],
+      "requests": 65,
+      "networkRequests": 10,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 41221,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 2,
+      "route": "/playground/shuffle-letters",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 292,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0.00012962279771090536,
+      "fontReady": 2820.199999988079,
+      "fcp": 292,
+      "ttfb": 27.30000001192093,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 445.80000001192093
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 2057988,
+          "bodyBytes": 2057688,
+          "end": 2657.4000000059605
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 1112.800000011921
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 1084.0999999940395
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 1121.0999999940395
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 1358
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 41,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2712658,
+      "fontTransferBytes": 2251271,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 9065.09999999404,
+        "elapsedMs": 1983.0999999940395,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 2,
+      "route": "/playground/shuffle-letters",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 528,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 853.9000000059605,
+      "fcp": 528,
+      "ttfb": 61.099999994039536,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 145.80000001192093
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 2057688,
+          "end": 490.7000000178814
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 1097.0999999940395
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 1097.7000000178814
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 1098.2000000178814
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 1098.5999999940395
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 6,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 18706,
+      "fontTransferBytes": 0,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 9044.90000000596,
+        "elapsedMs": 2009.199999988079,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 2,
+      "route": "/playground/shuffle-letters",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 348,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 2150.9000000059605,
+      "fcp": 348,
+      "ttfb": 83.40000000596046,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 21544,
+          "bodyBytes": 21244,
+          "end": 213.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 249.2000000178814
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 190.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 10936,
+          "bodyBytes": 10636,
+          "end": 224.09999999403954
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 244.5
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 1804552,
+          "bodyBytes": 1804252,
+          "end": 2051.5999999940395
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 41,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2364987,
+      "fontTransferBytes": 1903348,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8826.09999999404,
+        "elapsedMs": 1810.7999999821186,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 2,
+      "route": "/playground/shuffle-letters",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 192,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 400.30000001192093,
+      "fcp": 192,
+      "ttfb": 4.5,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 21244,
+          "end": 59.70000001788139
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 60.20000001788139
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 60.099999994039536
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10636,
+          "end": 60.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 60.5
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1804252,
+          "end": 122.7000000178814
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 6,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 18550,
+      "fontTransferBytes": 0,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8826,
+        "elapsedMs": 1810.5,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 3,
+      "route": "/",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 2064,
+      "lcpElement": "<p data-reveal=\"true\" data-reveal-state=\"visible\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 927.8000000119209,
+      "fcp": 532,
+      "ttfb": 4.9000000059604645,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 198.10000002384186
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 192.7000000178814
+        },
+        {
+          "url": "/fonts/optimized/home-core.3e7f8007a40b.woff2",
+          "transferBytes": 20132,
+          "bodyBytes": 19832,
+          "end": 211.60000002384186
+        },
+        {
+          "url": "/fonts/optimized/notes-core.274d6c04b4d3.woff2",
+          "transferBytes": 856,
+          "bodyBytes": 556,
+          "end": 191
+        },
+        {
+          "url": "/fonts/optimized/serif-core.e16fc14dcc38.woff2",
+          "transferBytes": 1624,
+          "bodyBytes": 1324,
+          "end": 195.90000000596046
+        },
+        {
+          "url": "/fonts/optimized/dots-core.98c6ce376184.woff2",
+          "transferBytes": 1720,
+          "bodyBytes": 1420,
+          "end": 200.60000002384186
+        },
+        {
+          "url": "/fonts/optimized/serif-extended.3f6c7dc4cb58.woff2",
+          "transferBytes": 9132,
+          "bodyBytes": 8832,
+          "end": 497.10000002384186
+        },
+        {
+          "url": "/fonts/optimized/notes-extended.3fb79184a9a6.woff2",
+          "transferBytes": 6356,
+          "bodyBytes": 6056,
+          "end": 515.1000000238419
+        },
+        {
+          "url": "/fonts/optimized/home-extended.c3f027e61a15.woff2",
+          "transferBytes": 92124,
+          "bodyBytes": 91824,
+          "end": 657.7000000178814
+        }
+      ],
+      "requests": 50,
+      "networkRequests": 50,
+      "fontRequests": 9,
+      "cachedFontRequests": 0,
+      "transferBytes": 717408,
+      "fontTransferBytes": 189484
+    },
+    {
+      "round": 3,
+      "route": "/",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 712,
+      "lcpElement": "<p data-reveal=\"true\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 669.3000000119209,
+      "fcp": 308,
+      "ttfb": 2.4000000059604645,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 62.900000005960464
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 63
+        },
+        {
+          "url": "/fonts/optimized/notes-core.274d6c04b4d3.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 556,
+          "end": 63.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/home-core.3e7f8007a40b.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 19832,
+          "end": 63.19999998807907
+        },
+        {
+          "url": "/fonts/optimized/dots-core.98c6ce376184.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1420,
+          "end": 64.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/serif-core.e16fc14dcc38.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1324,
+          "end": 64.09999999403954
+        },
+        {
+          "url": "/fonts/optimized/serif-extended.3f6c7dc4cb58.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 8832,
+          "end": 148.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/notes-extended.3fb79184a9a6.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 6056,
+          "end": 148.69999998807907
+        },
+        {
+          "url": "/fonts/optimized/home-extended.c3f027e61a15.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 91824,
+          "end": 169.40000000596046
+        }
+      ],
+      "requests": 50,
+      "networkRequests": 9,
+      "fontRequests": 9,
+      "cachedFontRequests": 9,
+      "transferBytes": 20531,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 3,
+      "route": "/",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 1968,
+      "lcpElement": "<p data-reveal=\"true\" data-reveal-state=\"visible\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 813.3999999761581,
+      "fcp": 448,
+      "ttfb": 11.599999994039536,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 129.89999997615814
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 102.09999999403954
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 139.5
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 365.19999998807907
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 11056,
+          "bodyBytes": 10756,
+          "end": 447.89999997615814
+        },
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 570.2999999821186
+        }
+      ],
+      "requests": 47,
+      "networkRequests": 47,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 732254,
+      "fontTransferBytes": 204335
+    },
+    {
+      "round": 3,
+      "route": "/",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 1744,
+      "lcpElement": "<p data-reveal=\"true\" data-reveal-state=\"visible\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 599.3000000119209,
+      "fcp": 260,
+      "ttfb": 2.300000011920929,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 59.10000002384186
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 59.5
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 59.70000001788139
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 59.80000001192093
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10756,
+          "end": 141.30000001192093
+        },
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 144.30000001192093
+        }
+      ],
+      "requests": 47,
+      "networkRequests": 9,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 20688,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 3,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 532,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.0003008696630658436,
+      "fontReady": 2543.9000000059605,
+      "fcp": 532,
+      "ttfb": 11.299999982118607,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 21544,
+          "bodyBytes": 21244,
+          "end": 222.19999998807907
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 215
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 240
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 10936,
+          "bodyBytes": 10636,
+          "end": 221
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 223.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 1804552,
+          "bodyBytes": 1804252,
+          "end": 2401.2999999821186
+        }
+      ],
+      "requests": 65,
+      "networkRequests": 65,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2825228,
+      "fontTransferBytes": 1903348
+    },
+    {
+      "round": 3,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 320,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0,
+      "fontReady": 646.3000000119209,
+      "fcp": 320,
+      "ttfb": 2.300000011920929,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 21244,
+          "end": 64.2000000178814
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10636,
+          "end": 65
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 64.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 64.60000002384186
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 65.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1804252,
+          "end": 154.40000000596046
+        }
+      ],
+      "requests": 60,
+      "networkRequests": 8,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 28703,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 3,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 364,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.004569255704317236,
+      "fontReady": 19767.09999999404,
+      "fcp": 364,
+      "ttfb": 7.199999988079071,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 523.5999999940395
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 11056,
+          "bodyBytes": 10756,
+          "end": 443.30000001192093
+        },
+        {
+          "url": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 446.69999998807907
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 2057988,
+          "bodyBytes": 2057688,
+          "end": 2857.699999988079
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 1297.699999988079
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 1320.199999988079
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 1391.0999999940395
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 1607.300000011921
+        }
+      ],
+      "requests": 67,
+      "networkRequests": 67,
+      "fontRequests": 8,
+      "cachedFontRequests": 0,
+      "transferBytes": 3195375,
+      "fontTransferBytes": 2274671
+    },
+    {
+      "round": 3,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 400,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.003430505814833569,
+      "fontReady": 1063.5,
+      "fcp": 400,
+      "ttfb": 23.5,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 202
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10756,
+          "end": 202.09999999403954
+        },
+        {
+          "url": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 438.5
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 2057688,
+          "end": 445.80000001192093
+        }
+      ],
+      "requests": 58,
+      "networkRequests": 9,
+      "fontRequests": 4,
+      "cachedFontRequests": 4,
+      "transferBytes": 28684,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 3,
+      "route": "/playground/shuffle-letters",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 304,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 2113.199999988079,
+      "fcp": 304,
+      "ttfb": 13.5,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 21544,
+          "bodyBytes": 21244,
+          "end": 175.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 152.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 211.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 10936,
+          "bodyBytes": 10636,
+          "end": 187.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 206.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 1804552,
+          "bodyBytes": 1804252,
+          "end": 2013.9000000059605
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 41,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2364987,
+      "fontTransferBytes": 1903348,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8852.5,
+        "elapsedMs": 1838.5,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 3,
+      "route": "/playground/shuffle-letters",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 200,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 421.2000000178814,
+      "fcp": 200,
+      "ttfb": 4.9000000059604645,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 21244,
+          "end": 61.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 61.599999994039536
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 61.70000001788139
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10636,
+          "end": 62.599999994039536
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 62.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1804252,
+          "end": 125.5
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 6,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 18550,
+      "fontTransferBytes": 0,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 9695.800000011921,
+        "elapsedMs": 2402.4000000059605,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 3,
+      "route": "/playground/shuffle-letters",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 844,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0.00012962279771090536,
+      "fontReady": 3173.7000000178814,
+      "fcp": 844,
+      "ttfb": 57.70000001788139,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 921
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 2057988,
+          "bodyBytes": 2057688,
+          "end": 3040.5
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 1606.2000000178814
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 1582.4000000059605
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 1618.300000011921
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 1853.4000000059605
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 41,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2712658,
+      "fontTransferBytes": 2251271,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8967,
+        "elapsedMs": 1899.0999999940395,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 3,
+      "route": "/playground/shuffle-letters",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 188,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 432.80000001192093,
+      "fcp": 188,
+      "ttfb": 10,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 104.09999999403954
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 2057688,
+          "end": 163.5
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 609.3000000119209
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 610.0999999940395
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 610.5
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 611.0999999940395
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 6,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 18706,
+      "fontTransferBytes": 0,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8829.40000000596,
+        "elapsedMs": 1812.5,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 4,
+      "route": "/",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 2016,
+      "lcpElement": "<p data-reveal=\"true\" data-reveal-state=\"visible\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 881.3000000119209,
+      "fcp": 500,
+      "ttfb": 7.0999999940395355,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 145.80000001192093
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 115.40000000596046
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 151.40000000596046
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 519.9000000059605
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 11056,
+          "bodyBytes": 10756,
+          "end": 545
+        },
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 674.5999999940395
+        }
+      ],
+      "requests": 47,
+      "networkRequests": 47,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 732254,
+      "fontTransferBytes": 204335
+    },
+    {
+      "round": 4,
+      "route": "/",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 1716,
+      "lcpElement": "<p data-reveal=\"true\" data-reveal-state=\"visible\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 556.1999999880791,
+      "fcp": 236,
+      "ttfb": 2.9000000059604645,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 57.5
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 58.30000001192093
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 59.599999994039536
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 60
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10756,
+          "end": 135.80000001192093
+        },
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 137.69999998807907
+        }
+      ],
+      "requests": 47,
+      "networkRequests": 9,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 20688,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 4,
+      "route": "/",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 988,
+      "lcpElement": "<p data-reveal=\"true\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 881.2000000178814,
+      "fcp": 464,
+      "ttfb": 37,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 197.7000000178814
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 224.90000000596046
+        },
+        {
+          "url": "/fonts/optimized/notes-core.274d6c04b4d3.woff2",
+          "transferBytes": 856,
+          "bodyBytes": 556,
+          "end": 181.90000000596046
+        },
+        {
+          "url": "/fonts/optimized/serif-core.e16fc14dcc38.woff2",
+          "transferBytes": 1624,
+          "bodyBytes": 1324,
+          "end": 189.30000001192093
+        },
+        {
+          "url": "/fonts/optimized/home-core.3e7f8007a40b.woff2",
+          "transferBytes": 20132,
+          "bodyBytes": 19832,
+          "end": 218
+        },
+        {
+          "url": "/fonts/optimized/dots-core.98c6ce376184.woff2",
+          "transferBytes": 1720,
+          "bodyBytes": 1420,
+          "end": 192.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/serif-extended.3f6c7dc4cb58.woff2",
+          "transferBytes": 9132,
+          "bodyBytes": 8832,
+          "end": 451.90000000596046
+        },
+        {
+          "url": "/fonts/optimized/notes-extended.3fb79184a9a6.woff2",
+          "transferBytes": 6356,
+          "bodyBytes": 6056,
+          "end": 455.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/home-extended.c3f027e61a15.woff2",
+          "transferBytes": 92124,
+          "bodyBytes": 91824,
+          "end": 646.2000000178814
+        }
+      ],
+      "requests": 50,
+      "networkRequests": 50,
+      "fontRequests": 9,
+      "cachedFontRequests": 0,
+      "transferBytes": 717408,
+      "fontTransferBytes": 189484
+    },
+    {
+      "round": 4,
+      "route": "/",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 716,
+      "lcpElement": "<p data-reveal=\"true\" data-reveal-state=\"visible\">아이디어를 직접 구현하고 반복해서 사용해 보며, 작은 어색함까지 다듬는 데 기꺼이 시간을 씁니다. 그렇게 쌓인 디테일이<!-- --> <strong class=\"home-profile_inkMark__SSMGD\">제품 고유의 사용감</strong>을 만들고, 사용자가 그 제품을 다시 선택하는 이유가 된다고 믿습니다.</p>",
+      "cls": 0,
+      "fontReady": 646.5,
+      "fcp": 300,
+      "ttfb": 3,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 65.90000000596046
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 66.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/home-core.3e7f8007a40b.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 19832,
+          "end": 67.2000000178814
+        },
+        {
+          "url": "/fonts/optimized/notes-core.274d6c04b4d3.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 556,
+          "end": 67.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/dots-core.98c6ce376184.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1420,
+          "end": 67.7000000178814
+        },
+        {
+          "url": "/fonts/optimized/serif-core.e16fc14dcc38.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1324,
+          "end": 67.60000002384186
+        },
+        {
+          "url": "/fonts/optimized/serif-extended.3f6c7dc4cb58.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 8832,
+          "end": 148.7000000178814
+        },
+        {
+          "url": "/fonts/optimized/notes-extended.3fb79184a9a6.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 6056,
+          "end": 149.7000000178814
+        },
+        {
+          "url": "/fonts/optimized/home-extended.c3f027e61a15.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 91824,
+          "end": 169.2000000178814
+        }
+      ],
+      "requests": 50,
+      "networkRequests": 9,
+      "fontRequests": 9,
+      "cachedFontRequests": 9,
+      "transferBytes": 20531,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 4,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 468,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.004569255704317236,
+      "fontReady": 3101.699999988079,
+      "fcp": 468,
+      "ttfb": 10.699999988079071,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 611.0999999940395
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 11056,
+          "bodyBytes": 10756,
+          "end": 542.7999999821186
+        },
+        {
+          "url": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 557.1999999880791
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 2057988,
+          "bodyBytes": 2057688,
+          "end": 2908.0999999940395
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 1434.5
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 1479.8999999761581
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 1503.7999999821186
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 1714
+        }
+      ],
+      "requests": 67,
+      "networkRequests": 67,
+      "fontRequests": 8,
+      "cachedFontRequests": 0,
+      "transferBytes": 3195375,
+      "fontTransferBytes": 2274671
+    },
+    {
+      "round": 4,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 312,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0.0003674838595920139,
+      "fontReady": 709,
+      "fcp": 312,
+      "ttfb": 3.199999988079071,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 127.19999998807907
+        },
+        {
+          "url": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10756,
+          "end": 152.40000000596046
+        },
+        {
+          "url": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 153
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 2057688,
+          "end": 337.7999999821186
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 1426.5
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 1426.9000000059605
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 1427.0999999940395
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 1427.699999988079
+        }
+      ],
+      "requests": 67,
+      "networkRequests": 10,
+      "fontRequests": 8,
+      "cachedFontRequests": 8,
+      "transferBytes": 41393,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 4,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 472,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0,
+      "fontReady": 10270.59999999404,
+      "fcp": 472,
+      "ttfb": 10.900000005960464,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 21544,
+          "bodyBytes": 21244,
+          "end": 210.09999999403954
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 236.59999999403954
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 213.5
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 10936,
+          "bodyBytes": 10636,
+          "end": 218.5
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 219.80000001192093
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 1804552,
+          "bodyBytes": 1804252,
+          "end": 2060.7000000178814
+        }
+      ],
+      "requests": 53,
+      "networkRequests": 53,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2476148,
+      "fontTransferBytes": 1903348
+    },
+    {
+      "round": 4,
+      "route": "/article/naming-tokens-in-design",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 340,
+      "lcpElement": "<p>“이 버튼 색상을 primary로 바꿔주세요”라는 디자이너의 요청에 당황한 적 있나요? CSS 파일을 뒤져보니 <code class=\"notranslate\" translate=\"no\">--blue-500</code>, <code class=\"notranslate\" translate=\"no\">--primary-blue</code>, <code class=\"notranslate\" translate=\"no\">--main-color</code> 같은 비슷한 이름들만 가득하고, 정작 어떤 걸 써야 할지 모르겠어요.</p>",
+      "cls": 0,
+      "fontReady": 703.5999999940395,
+      "fcp": 340,
+      "ttfb": 3.0999999940395355,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 21244,
+          "end": 63.900000005960464
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 64.7000000178814
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 65
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10636,
+          "end": 65.2000000178814
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 65.40000000596046
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1804252,
+          "end": 162.59999999403954
+        }
+      ],
+      "requests": 65,
+      "networkRequests": 15,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 98220,
+      "fontTransferBytes": 0
+    },
+    {
+      "round": 4,
+      "route": "/playground/shuffle-letters",
+      "variant": "before",
+      "cache": "cold",
+      "lcp": 236,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0.00012962279771090536,
+      "fontReady": 2628.899999976158,
+      "fcp": 236,
+      "ttfb": 12.099999994039536,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 57148,
+          "bodyBytes": 56848,
+          "end": 429.69999998807907
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 2057988,
+          "bodyBytes": 2057688,
+          "end": 2513
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 9556,
+          "bodyBytes": 9256,
+          "end": 1186.7999999821186
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 1936,
+          "bodyBytes": 1636,
+          "end": 1160.5999999940395
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 11368,
+          "bodyBytes": 11068,
+          "end": 1197.7999999821186
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 108976,
+          "bodyBytes": 108676,
+          "end": 1432.8999999761581
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 41,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2712658,
+      "fontTransferBytes": 2251271,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8849.299999982119,
+        "elapsedMs": 1839.699999988079,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 4,
+      "route": "/playground/shuffle-letters",
+      "variant": "before",
+      "cache": "warm",
+      "lcp": 180,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 420.30000001192093,
+      "fcp": 180,
+      "ttfb": 3.2000000178813934,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/_next/static/media/32bd0481769c3c13.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 56848,
+          "end": 101
+        },
+        {
+          "url": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 2057688,
+          "end": 154.5
+        },
+        {
+          "url": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 9256,
+          "end": 609.3000000119209
+        },
+        {
+          "url": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1636,
+          "end": 609.5999999940395
+        },
+        {
+          "url": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 11068,
+          "end": 609.9000000059605
+        },
+        {
+          "url": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 108676,
+          "end": 610.4000000059605
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 6,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 18706,
+      "fontTransferBytes": 0,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8829.5,
+        "elapsedMs": 1812.4000000059605,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 4,
+      "route": "/playground/shuffle-letters",
+      "variant": "after",
+      "cache": "cold",
+      "lcp": 300,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 2109,
+      "fcp": 300,
+      "ttfb": 6.299999982118607,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 21544,
+          "bodyBytes": 21244,
+          "end": 176.5
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 11028,
+          "bodyBytes": 10728,
+          "end": 153.7999999821186
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 10936,
+          "bodyBytes": 10636,
+          "end": 187.39999997615814
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 40076,
+          "bodyBytes": 39776,
+          "end": 212.5
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 10912,
+          "bodyBytes": 10612,
+          "end": 207.39999997615814
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 1804552,
+          "bodyBytes": 1804252,
+          "end": 2015
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 41,
+      "fontRequests": 6,
+      "cachedFontRequests": 0,
+      "transferBytes": 2364987,
+      "fontTransferBytes": 1903348,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8821,
+        "elapsedMs": 1814.5,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    },
+    {
+      "round": 4,
+      "route": "/playground/shuffle-letters",
+      "variant": "after",
+      "cache": "warm",
+      "lcp": 172,
+      "lcpElement": "<div class=\"min-h-8 text-center text-lg font-medium\">한글 English 123456789 @#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?</div>",
+      "cls": 0,
+      "fontReady": 402.5,
+      "fcp": 172,
+      "ttfb": 3.4000000059604645,
+      "fontsLoaded": "loaded",
+      "fontResources": [
+        {
+          "url": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 21244,
+          "end": 57.599999994039536
+        },
+        {
+          "url": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10728,
+          "end": 58.5
+        },
+        {
+          "url": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 39776,
+          "end": 57.79999998211861
+        },
+        {
+          "url": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10612,
+          "end": 58.79999998211861
+        },
+        {
+          "url": "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 10636,
+          "end": 58.69999998807907
+        },
+        {
+          "url": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "transferBytes": 0,
+          "bodyBytes": 1804252,
+          "end": 120.59999999403954
+        }
+      ],
+      "requests": 41,
+      "networkRequests": 6,
+      "fontRequests": 6,
+      "cachedFontRequests": 6,
+      "transferBytes": 18550,
+      "fontTransferBytes": 0,
+      "shuffle": {
+        "fontStatus": "loaded",
+        "time": 8824.199999988079,
+        "elapsedMs": 1811.9000000059605,
+        "note": "Animation completes after the fixed loading window; not included in LCP/FCP."
+      }
+    }
+  ]
+}

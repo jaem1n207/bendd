@@ -1,0 +1,2889 @@
+{
+  "browser": "151.0.7922.34",
+  "platform": "macOS 27.0.1",
+  "framework": "Next.js 16.4.3 / React 19.3.0",
+  "viewport": "1440×900 light;390×844 light/dark;DPR1",
+  "baseline": "origin/main 545b5b5; unmodified tracked content; separate production build",
+  "conditions": "seed=42;clock=2026-11-04T03:00:01Z+10s;reducedMotion=reduce;canvas hidden;videos and GIFs held at first frame;no text masks;external requests blocked;home scrolled through lazy sections before screenshot",
+  "pages": [
+    {
+      "route": "/",
+      "contentHash": "2fd567d5c0ee4a81e1fdfddfe5cf811d0b74af9878304fea1d5fc3df21a4107b",
+      "beforeBytes": 198240,
+      "afterBytes": 158636,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [
+        "/fonts/optimized/interface-core.a1faad137cde.woff2",
+        "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+        "/fonts/optimized/home-core.c3f027e61a15.woff2",
+        "/fonts/optimized/notes-core.3fb79184a9a6.woff2",
+        "/fonts/optimized/serif-core.3f6c7dc4cb58.woff2",
+        "/fonts/optimized/dots-core.98c6ce376184.woff2"
+      ],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [
+        "/fonts/optimized/dots-core.98c6ce376184.woff2",
+        "/fonts/optimized/home-core.c3f027e61a15.woff2",
+        "/fonts/optimized/interface-core.a1faad137cde.woff2",
+        "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+        "/fonts/optimized/notes-core.3fb79184a9a6.woff2",
+        "/fonts/optimized/serif-core.3f6c7dc4cb58.woff2"
+      ],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/serif-core.3f6c7dc4cb58.woff2",
+          "bytes": 8832,
+          "encodedBytes": 8832,
+          "transferBytes": 9847,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/notes-core.3fb79184a9a6.woff2",
+          "bytes": 6056,
+          "encodedBytes": 6056,
+          "transferBytes": 7071,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/dots-core.98c6ce376184.woff2",
+          "bytes": 1420,
+          "encodedBytes": 1420,
+          "transferBytes": 2434,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/home-core.c3f027e61a15.woff2",
+          "bytes": 91824,
+          "encodedBytes": 91824,
+          "transferBytes": 92841,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        }
+      ],
+      "beforeFullPageBytes": 198240,
+      "afterFullPageBytes": 158636
+    },
+    {
+      "route": "/article",
+      "contentHash": "365425b2604fffcb5ce5fea39c70407a83f86359aadc07d46ea402dba09dd24a",
+      "beforeBytes": 2245172,
+      "afterBytes": 1844028,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/chrome-korean-ime-input-scroll-bug-fix",
+      "contentHash": "063dc9e1b3efd7f72ff02b88d18fcda111077af1bb11855240baffdda06ef2d3",
+      "beforeBytes": 2266540,
+      "afterBytes": 1886612,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/difference-between-put-patch",
+      "contentHash": "ee8335a913d347b8c27e5aaf67c04e75ac67b9308b112e2a13573fd48161037b",
+      "beforeBytes": 2255928,
+      "afterBytes": 1876000,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/enhancing-type-safety-in-mdx-with-reusable-utility-functions",
+      "contentHash": "01be8104d81b2fda95ef2fcd942f73076b08f2bd6693002a3584206e1cd8785f",
+      "beforeBytes": 2255928,
+      "afterBytes": 1854756,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/fix-compacting-conversation",
+      "contentHash": "c7b42602c4cfa88014e5d0680f071f81c7fe8190b755a6d92e12e5d2f98ae41f",
+      "beforeBytes": 2269444,
+      "afterBytes": 1889516,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/6ee030e041c29623-s.woff2",
+          "bytes": 2904,
+          "encodedBytes": 2904,
+          "transferBytes": 3918,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-400-symbols.2004cbb08ece.woff2",
+          "bytes": 2904,
+          "encodedBytes": 2904,
+          "transferBytes": 3918,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/http-request-methods",
+      "contentHash": "21efb96a4583edd10896a61c37b40988a53f743868a53687a015d99cc85f443c",
+      "beforeBytes": 2266540,
+      "afterBytes": 1886612,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/immediate-motion-component",
+      "contentHash": "0fc1dfe607371abb0fe05e13c905237f27b427f4438726970ce40b75207f1612",
+      "beforeBytes": 2266540,
+      "afterBytes": 1886612,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/improving-mdx-utilities-with-functional-programming",
+      "contentHash": "059cd583694fae43d9da8375f16ba2a06e1b9d51ef928aa14e122efc803df921",
+      "beforeBytes": 2255928,
+      "afterBytes": 1854756,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/managing-cross-cutting-concerns-sound-playback",
+      "contentHash": "1d293509b0f0e2d46d96b2d5d7734be13d453e0a244b901dba512a7ac563a9ed",
+      "beforeBytes": 2266540,
+      "afterBytes": 1865368,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/naming-tokens-in-design",
+      "contentHash": "09951d24470bfbf6e5cc14e1f593c419933e41946b1c8eb2dbfa1b521c565ef4",
+      "beforeBytes": 2266540,
+      "afterBytes": 1886612,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/perfect-dark-mode",
+      "contentHash": "12836f8afc236298392a2ae693cfd4c600a052f5cc95792c5b0c38e8332043f3",
+      "beforeBytes": 2266540,
+      "afterBytes": 1886612,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/precise-scroll-sync-toc-refactoring",
+      "contentHash": "95e28c71070449f07d014252b7c97363b1074b3e58d765fb8081da329427c808",
+      "beforeBytes": 2266540,
+      "afterBytes": 1865368,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/save-tokens-for-ai-agent",
+      "contentHash": "b0ef9e2a366b2e2166e1f02245683c28e1fccc3260a30a382cc15aad368772f5",
+      "beforeBytes": 2269444,
+      "afterBytes": 1889516,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/6ee030e041c29623-s.woff2",
+          "bytes": 2904,
+          "encodedBytes": 2904,
+          "transferBytes": 3918,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-400-symbols.2004cbb08ece.woff2",
+          "bytes": 2904,
+          "encodedBytes": 2904,
+          "transferBytes": 3918,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/script-loading-optimization",
+      "contentHash": "cbf4bb1b0ea42961c697136f4776ec86684a6aeb56bca053d71ef3a626fa2cf1",
+      "beforeBytes": 2266540,
+      "afterBytes": 1886612,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/series/ai-coding-agent",
+      "contentHash": "5ee9b52cb9c47ba27bfb019ea8ccec30a4ebb8abe4ac2376719cf76ad9dab951",
+      "beforeBytes": 2245172,
+      "afterBytes": 1844028,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/article/zustand-vs-context-performance",
+      "contentHash": "416c9febc4c9340658d2340b3a6d9d998e5ccc9fb9538fb2ac50b8f2be7bb69d",
+      "beforeBytes": 2266540,
+      "afterBytes": 1886612,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/craft",
+      "contentHash": "59eb4bb69c7d3e5883ca5e3d51e5502d2c84448f124fa6887ec567c71781445d",
+      "beforeBytes": 2245172,
+      "afterBytes": 1865272,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/craft/bringing-arc-tab-switching-to-chrome",
+      "contentHash": "71766bc33df480bad5f79eb9aee81b465a00faec6da1ea6be1cdf176c8b2dd4b",
+      "beforeBytes": 2266540,
+      "afterBytes": 1865368,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/craft/implement-rauno-style-text-animation",
+      "contentHash": "c22a039fc78660b6bbee9c8d257f36228705658588b4bb7f17991e6e3c59b381",
+      "beforeBytes": 2266540,
+      "afterBytes": 1886612,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/craft/map-a-small-connection",
+      "contentHash": "8c56750351c92a62054beb3ebe606b984a2b60e3e5291fdb5884f00108ddc879",
+      "beforeBytes": 2255928,
+      "afterBytes": 1876000,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/craft/series/synchronize-tab-scrolling",
+      "contentHash": "3ad5e4d377b86cfe36f132f015fa0767c2c50155fa352aea975cecb991fca629",
+      "beforeBytes": 2245172,
+      "afterBytes": 1844028,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/craft/synchronize-tab-scrolling-product-story",
+      "contentHash": "efb0e2adc38536782b5ff924bdedd8977941268e7878fe0c23115183f0221376",
+      "beforeBytes": 2266540,
+      "afterBytes": 1886612,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/dbddaa124a0a717a-s.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/c856374feb52eee1-s.woff2",
+          "bytes": 10756,
+          "encodedBytes": 10756,
+          "transferBytes": 11772,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+          "bytes": 10728,
+          "encodedBytes": 10728,
+          "transferBytes": 11744,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+          "bytes": 10612,
+          "encodedBytes": 10612,
+          "transferBytes": 11628,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-core.15208a570cc7.woff2",
+          "bytes": 21244,
+          "encodedBytes": 21244,
+          "transferBytes": 22260,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    },
+    {
+      "route": "/playground/shuffle-letters",
+      "contentHash": "446bdbd0b3d804690fe8ff2184e67c79205eec0b1e8b233e12c7b72ee5c531f8",
+      "beforeBytes": 2245172,
+      "afterBytes": 1844028,
+      "beforePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterPreloads": [],
+      "beforeUniquePreloads": [
+        "/_next/static/media/600f9a711935f61e.p.woff2",
+        "/_next/static/media/7c52258a2176a7b5.p.woff2",
+        "/_next/static/media/cd7a16c581880124.p.woff2",
+        "/_next/static/media/eab87b6e004fdbcb.p.woff2"
+      ],
+      "afterUniquePreloads": [],
+      "beforeFiles": [
+        {
+          "file": "/_next/static/media/32bd0481769c3c13.woff2",
+          "bytes": 56848,
+          "encodedBytes": 56848,
+          "transferBytes": 57864,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/ff840cfebfb63b0c-s.woff2",
+          "bytes": 2057688,
+          "encodedBytes": 2057688,
+          "transferBytes": 2058708,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/600f9a711935f61e.p.woff2",
+          "bytes": 9256,
+          "encodedBytes": 9256,
+          "transferBytes": 10271,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/7c52258a2176a7b5.p.woff2",
+          "bytes": 1636,
+          "encodedBytes": 1636,
+          "transferBytes": 2650,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/cd7a16c581880124.p.woff2",
+          "bytes": 11068,
+          "encodedBytes": 11068,
+          "transferBytes": 12084,
+          "status": 200
+        },
+        {
+          "file": "/_next/static/media/eab87b6e004fdbcb.p.woff2",
+          "bytes": 108676,
+          "encodedBytes": 108676,
+          "transferBytes": 109694,
+          "status": 200
+        }
+      ],
+      "afterFiles": [
+        {
+          "file": "/fonts/optimized/interface-core.a1faad137cde.woff2",
+          "bytes": 39776,
+          "encodedBytes": 39776,
+          "transferBytes": 40792,
+          "status": 200
+        },
+        {
+          "file": "/fonts/optimized/content-extended.6e0e7746e7bd.woff2",
+          "bytes": 1804252,
+          "encodedBytes": 1804252,
+          "transferBytes": 1805272,
+          "status": 200
+        }
+      ]
+    }
+  ],
+  "pixels": [
+    {
+      "file": "home-1440-light.png",
+      "beforeSize": [1440, 5960],
+      "afterSize": [1440, 5960],
+      "pixels": 0,
+      "totalPixels": 8582400,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "article--enhancing-type-safety-in-mdx-with-reusable-utility-functions-1440-light.png",
+      "beforeSize": [1440, 8323],
+      "afterSize": [1440, 8323],
+      "pixels": 0,
+      "totalPixels": 11985120,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "article--fix-compacting-conversation-1440-light.png",
+      "beforeSize": [1440, 17768],
+      "afterSize": [1440, 17768],
+      "pixels": 0,
+      "totalPixels": 25585920,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "article--save-tokens-for-ai-agent-1440-light.png",
+      "beforeSize": [1440, 20946],
+      "afterSize": [1440, 20946],
+      "pixels": 0,
+      "totalPixels": 30162240,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "craft--implement-rauno-style-text-animation-1440-light.png",
+      "beforeSize": [1440, 13731],
+      "afterSize": [1440, 13731],
+      "pixels": 0,
+      "totalPixels": 19772640,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "playground--shuffle-letters-1440-light.png",
+      "beforeSize": [1440, 1149],
+      "afterSize": [1440, 1149],
+      "pixels": 0,
+      "totalPixels": 1654560,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "home-390-light.png",
+      "beforeSize": [390, 6751],
+      "afterSize": [390, 6751],
+      "pixels": 0,
+      "totalPixels": 2632890,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "article--save-tokens-for-ai-agent-390-light.png",
+      "beforeSize": [390, 26300],
+      "afterSize": [390, 26300],
+      "pixels": 0,
+      "totalPixels": 10257000,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "article--fix-compacting-conversation-390-light.png",
+      "beforeSize": [390, 21508],
+      "afterSize": [390, 21508],
+      "pixels": 0,
+      "totalPixels": 8388120,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "article--enhancing-type-safety-in-mdx-with-reusable-utility-functions-390-light.png",
+      "beforeSize": [390, 8671],
+      "afterSize": [390, 8671],
+      "pixels": 0,
+      "totalPixels": 3381690,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "craft--implement-rauno-style-text-animation-390-light.png",
+      "beforeSize": [390, 15241],
+      "afterSize": [390, 15241],
+      "pixels": 0,
+      "totalPixels": 5943990,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "playground--shuffle-letters-390-light.png",
+      "beforeSize": [390, 1185],
+      "afterSize": [390, 1185],
+      "pixels": 0,
+      "totalPixels": 462150,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "home-390-dark.png",
+      "beforeSize": [390, 6751],
+      "afterSize": [390, 6751],
+      "pixels": 0,
+      "totalPixels": 2632890,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "article--save-tokens-for-ai-agent-390-dark.png",
+      "beforeSize": [390, 26300],
+      "afterSize": [390, 26300],
+      "pixels": 0,
+      "totalPixels": 10257000,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "article--fix-compacting-conversation-390-dark.png",
+      "beforeSize": [390, 21508],
+      "afterSize": [390, 21508],
+      "pixels": 0,
+      "totalPixels": 8388120,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "article--enhancing-type-safety-in-mdx-with-reusable-utility-functions-390-dark.png",
+      "beforeSize": [390, 8671],
+      "afterSize": [390, 8671],
+      "pixels": 0,
+      "totalPixels": 3381690,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "craft--implement-rauno-style-text-animation-390-dark.png",
+      "beforeSize": [390, 15241],
+      "afterSize": [390, 15241],
+      "pixels": 0,
+      "totalPixels": 5943990,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "playground--shuffle-letters-390-dark.png",
+      "beforeSize": [390, 1185],
+      "afterSize": [390, 1185],
+      "pixels": 0,
+      "totalPixels": 462150,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "specimen.png",
+      "beforeSize": [1440, 2839],
+      "afterSize": [1440, 2839],
+      "pixels": 0,
+      "totalPixels": 4088160,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "coverage-ui.png",
+      "beforeSize": [1440, 6281],
+      "afterSize": [1440, 6281],
+      "pixels": 0,
+      "totalPixels": 9044640,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "coverage-home.png",
+      "beforeSize": [1440, 6281],
+      "afterSize": [1440, 6281],
+      "pixels": 0,
+      "totalPixels": 9044640,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    },
+    {
+      "file": "coverage-mono.png",
+      "beforeSize": [1440, 900],
+      "afterSize": [1440, 900],
+      "pixels": 0,
+      "totalPixels": 1296000,
+      "boundingBox": null,
+      "maxChannelDelta": 0
+    }
+  ],
+  "pixelCount": 183348000,
+  "changedPixels": 0,
+  "delivery": [
+    {
+      "font": "content",
+      "part": "core",
+      "character": null,
+      "files": ["/fonts/optimized/content-core.15208a570cc7.woff2"]
+    },
+    {
+      "font": "content",
+      "part": "extended",
+      "character": "ª",
+      "files": [
+        "/fonts/optimized/content-core.15208a570cc7.woff2",
+        "/fonts/optimized/content-extended.6e0e7746e7bd.woff2"
+      ]
+    },
+    {
+      "font": "interface",
+      "part": "core",
+      "character": null,
+      "files": ["/fonts/optimized/interface-core.a1faad137cde.woff2"]
+    },
+    {
+      "font": "home",
+      "part": "core",
+      "character": null,
+      "files": ["/fonts/optimized/home-core.c3f027e61a15.woff2"]
+    },
+    {
+      "font": "code-ui",
+      "part": "core",
+      "character": null,
+      "files": ["/fonts/optimized/content-core.15208a570cc7.woff2"]
+    },
+    {
+      "font": "code-ui",
+      "part": "extended",
+      "character": "ª",
+      "files": [
+        "/fonts/optimized/content-core.15208a570cc7.woff2",
+        "/fonts/optimized/code-ui-extended.04d9b84c1a6c.woff2"
+      ]
+    },
+    {
+      "font": "notes",
+      "part": "core",
+      "character": null,
+      "files": ["/fonts/optimized/notes-core.3fb79184a9a6.woff2"]
+    },
+    {
+      "font": "serif",
+      "part": "core",
+      "character": null,
+      "files": ["/fonts/optimized/serif-core.3f6c7dc4cb58.woff2"]
+    },
+    {
+      "font": "dots",
+      "part": "core",
+      "character": null,
+      "files": ["/fonts/optimized/dots-core.98c6ce376184.woff2"]
+    },
+    {
+      "font": "mono-400",
+      "part": "core",
+      "character": null,
+      "files": ["/fonts/optimized/mono-400-core.f44220b399b2.woff2"]
+    },
+    {
+      "font": "mono-400",
+      "part": "extended",
+      "character": "Ā",
+      "files": [
+        "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+        "/fonts/optimized/mono-400-extended.550c53511ca4.woff2"
+      ]
+    },
+    {
+      "font": "mono-400",
+      "part": "symbols",
+      "character": " ",
+      "files": [
+        "/fonts/optimized/mono-400-core.f44220b399b2.woff2",
+        "/fonts/optimized/mono-400-symbols.2004cbb08ece.woff2"
+      ]
+    },
+    {
+      "font": "mono-500",
+      "part": "core",
+      "character": null,
+      "files": ["/fonts/optimized/mono-500-core.5578d456e840.woff2"]
+    },
+    {
+      "font": "mono-500",
+      "part": "extended",
+      "character": "Ā",
+      "files": [
+        "/fonts/optimized/mono-500-core.5578d456e840.woff2",
+        "/fonts/optimized/mono-500-extended.7e5414b7fc42.woff2"
+      ]
+    },
+    {
+      "font": "mono-700",
+      "part": "core",
+      "character": null,
+      "files": ["/fonts/optimized/mono-700-core.6e711f204587.woff2"]
+    },
+    {
+      "font": "mono-700",
+      "part": "extended",
+      "character": "Ā",
+      "files": [
+        "/fonts/optimized/mono-700-core.6e711f204587.woff2",
+        "/fonts/optimized/mono-700-extended.e089cbad2326.woff2"
+      ]
+    }
+  ],
+  "checks": {
+    "unit": "807 tests / 91 files passed",
+    "browser": "15 home / MDX / Shuffle tests passed",
+    "delivery": "16 fresh-context probes passed",
+    "build": "production passed",
+    "types": "passed",
+    "lint": "passed",
+    "format": "passed",
+    "availability": "tests/lint/format passed",
+    "incident": "tests/lint/format passed",
+    "sentry": "tests/lint/format passed",
+    "preloadFix": "Home only; other routes discover fonts through CSS; unused decorative and mono files not preloaded",
+    "homeBudget": "6 font requests / 170,000 B budget passed"
+  },
+  "regressionsFixed": [
+    {
+      "trigger": "Removing next/font changed CSS chunk order",
+      "beforeFix": "Tech Stack description margin-top changed 4px to 0px; desktop home 12px shorter",
+      "fix": "Scope desktop and mobile description rules under .group; preserve original 4px desktop / 0px mobile margin",
+      "final": "0 changed pixels"
+    }
+  ],
+  "timingReport": "../font-performance.md"
+}

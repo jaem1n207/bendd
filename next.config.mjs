@@ -33,6 +33,15 @@ const nextConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      {
+        source: '/fonts/optimized/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       ...CACHED_ASSET_PATHS.map(source => ({
         source,
         headers: [{ key: 'Cache-Control', value: PUBLIC_ASSET_CACHE }],

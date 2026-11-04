@@ -1,8 +1,6 @@
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
-import { Fira_Mono as FontMono } from 'next/font/google';
-import localFont from 'next/font/local';
 
 import {
   AnalyticsConsentControl,
@@ -22,32 +20,7 @@ import { siteMetadata } from '@/lib/site-metadata';
 import { cn } from '@/lib/utils';
 
 import '@/globals.css';
-
-const fontPretendard = localFont({
-  src: './fonts/PretendardVariable.woff2',
-  display: 'swap',
-  preload: false,
-  weight: '100 900',
-  variable: '--font-content-sans',
-  fallback: ['system-ui', 'Apple SD Gothic Neo', 'Malgun Gothic', 'sans-serif'],
-});
-
-const fontInterface = localFont({
-  src: './fonts/PretendardInterface.woff2',
-  display: 'swap',
-  preload: false,
-  weight: '100 900',
-  variable: '--font-interface-sans',
-  adjustFontFallback: false,
-});
-
-const fontMono = FontMono({
-  subsets: ['latin'],
-  display: 'block',
-  preload: false,
-  variable: '--font-mono',
-  weight: ['400', '500', '700'],
-});
+import '@/app/fonts/generated.css';
 
 export const metadata = {
   metadataBase: new URL(
@@ -99,12 +72,7 @@ export default function RootLayout({
     <html
       lang={siteMetadata.language}
       suppressHydrationWarning
-      className={cn(
-        'bg-background text-foreground',
-        fontPretendard.variable,
-        fontInterface.variable,
-        fontMono.variable
-      )}
+      className={cn('bg-background text-foreground', 'font-global')}
       dir="ltr"
     >
       <body className="antialiased">

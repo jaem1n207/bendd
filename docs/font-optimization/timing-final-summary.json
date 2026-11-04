@@ -1,0 +1,1295 @@
+{
+  "conditions": {
+    "routes": [
+      "/",
+      "/article/naming-tokens-in-design",
+      "/playground/shuffle-letters"
+    ],
+    "viewport": "1440x900 DPR1",
+    "latencyMs": 40,
+    "downloadBps": 1250000,
+    "uploadBps": 125000,
+    "cpuRate": 4,
+    "windowMs": 7000,
+    "rounds": 5,
+    "settling": "Observe at least 7s and wait up to 30s for loaded fonts and two frames; resume complete pairs without rerunning them",
+    "external": "DNS blocked; visitor location stubbed using CDP Fetch; no Playwright routing",
+    "cache": "cold=new context; warm=new page in same context after cold visit; HTTP cache enabled",
+    "fontMetric": "DOMContentLoaded then document.fonts.ready + two requestAnimationFrame callbacks; readiness proxy, not direct glyph paint timestamp"
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M1 Pro",
+    "measuredAt": "2026-11-03T23:51:07.379Z"
+  },
+  "browser": "151.0.7922.34",
+  "summary": [
+    {
+      "route": "/",
+      "cache": "cold",
+      "count": 5,
+      "metrics": {
+        "fcp": {
+          "before": {
+            "median": 508,
+            "min": 476,
+            "max": 708
+          },
+          "after": {
+            "median": 420,
+            "min": 404,
+            "max": 464
+          },
+          "pairedDelta": {
+            "median": -56,
+            "min": -304,
+            "max": -44
+          }
+        },
+        "lcp": {
+          "before": {
+            "median": 1988,
+            "min": 1268,
+            "max": 2040
+          },
+          "after": {
+            "median": 1968,
+            "min": 1960,
+            "max": 1980
+          },
+          "pairedDelta": {
+            "median": -8,
+            "min": -80,
+            "max": 700
+          }
+        },
+        "fontReady": {
+          "before": {
+            "median": 837.1999999880791,
+            "min": 806.8000000119209,
+            "max": 1244.1000000238419
+          },
+          "after": {
+            "median": 550.5,
+            "min": 518.1000000238419,
+            "max": 560.7999999821186
+          },
+          "pairedDelta": {
+            "median": -298.30000001192093,
+            "min": -693.6000000238419,
+            "max": -246.00000002980232
+          }
+        },
+        "fontNetworkEnd": {
+          "before": {
+            "median": 608.9000000059605,
+            "min": 593,
+            "max": 768
+          },
+          "after": {
+            "median": 469.7999999821186,
+            "min": 431.30000001192093,
+            "max": 481.7999999821186
+          },
+          "pairedDelta": {
+            "median": -169.19999995827675,
+            "min": -288.2000000178814,
+            "max": -111.2000000178814
+          }
+        },
+        "fontLoadEnd": {
+          "before": {
+            "median": 829.4000000059605,
+            "min": 799,
+            "max": 1232.9000000059605
+          },
+          "after": {
+            "median": 524.5,
+            "min": 490.7000000178814,
+            "max": 552.1999999880791
+          },
+          "pairedDelta": {
+            "median": -315.80000001192093,
+            "min": -708.4000000059605,
+            "max": -246.80000001192093
+          }
+        },
+        "requests": {
+          "before": {
+            "median": 47,
+            "min": 47,
+            "max": 47
+          },
+          "after": {
+            "median": 47,
+            "min": 47,
+            "max": 47
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "networkRequests": {
+          "before": {
+            "median": 47,
+            "min": 47,
+            "max": 47
+          },
+          "after": {
+            "median": 47,
+            "min": 47,
+            "max": 47
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "fontRequests": {
+          "before": {
+            "median": 6,
+            "min": 6,
+            "max": 6
+          },
+          "after": {
+            "median": 6,
+            "min": 6,
+            "max": 6
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "cachedFontRequests": {
+          "before": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "after": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "fontTransferBytes": {
+          "before": {
+            "median": 204335,
+            "min": 204335,
+            "max": 204335
+          },
+          "after": {
+            "median": 164729,
+            "min": 164729,
+            "max": 164729
+          },
+          "pairedDelta": {
+            "median": -39606,
+            "min": -39606,
+            "max": -39606
+          }
+        },
+        "transferBytes": {
+          "before": {
+            "median": 732254,
+            "min": 732254,
+            "max": 732254
+          },
+          "after": {
+            "median": 692530,
+            "min": 692530,
+            "max": 692530
+          },
+          "pairedDelta": {
+            "median": -39724,
+            "min": -39724,
+            "max": -39724
+          }
+        },
+        "cls": {
+          "before": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "after": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        }
+      }
+    },
+    {
+      "route": "/",
+      "cache": "warm",
+      "count": 5,
+      "metrics": {
+        "fcp": {
+          "before": {
+            "median": 248,
+            "min": 152,
+            "max": 252
+          },
+          "after": {
+            "median": 228,
+            "min": 220,
+            "max": 236
+          },
+          "pairedDelta": {
+            "median": -16,
+            "min": -24,
+            "max": 84
+          }
+        },
+        "lcp": {
+          "before": {
+            "median": 1664,
+            "min": 740,
+            "max": 1720
+          },
+          "after": {
+            "median": 1668,
+            "min": 1656,
+            "max": 1740
+          },
+          "pairedDelta": {
+            "median": -8,
+            "min": -40,
+            "max": 944
+          }
+        },
+        "fontReady": {
+          "before": {
+            "median": 578.8000000119209,
+            "min": 527.3999999761581,
+            "max": 751.9000000059605
+          },
+          "after": {
+            "median": 527.5,
+            "min": 512.5999999940395,
+            "max": 579.8000000119209
+          },
+          "pairedDelta": {
+            "median": -54.30000001192093,
+            "min": -172.09999999403954,
+            "max": -6.299999982118607
+          }
+        },
+        "fontNetworkEnd": {
+          "before": {
+            "median": 145.7999999821186,
+            "min": 135.2999999821186,
+            "max": 314.80000001192093
+          },
+          "after": {
+            "median": 68.7000000178814,
+            "min": 62.29999998211861,
+            "max": 71.69999998807907
+          },
+          "pairedDelta": {
+            "median": -79,
+            "min": -246.09999999403954,
+            "max": -73
+          }
+        },
+        "fontLoadEnd": {
+          "before": {
+            "median": 556.6000000238419,
+            "min": 507.39999997615814,
+            "max": 709.0999999940395
+          },
+          "after": {
+            "median": 505.80000001192093,
+            "min": 476.39999997615814,
+            "max": 555.3000000119209
+          },
+          "pairedDelta": {
+            "median": -71.10000002384186,
+            "min": -153.7999999821186,
+            "max": -12.299999982118607
+          }
+        },
+        "requests": {
+          "before": {
+            "median": 47,
+            "min": 47,
+            "max": 47
+          },
+          "after": {
+            "median": 47,
+            "min": 47,
+            "max": 47
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "networkRequests": {
+          "before": {
+            "median": 9,
+            "min": 9,
+            "max": 9
+          },
+          "after": {
+            "median": 9,
+            "min": 9,
+            "max": 9
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "fontRequests": {
+          "before": {
+            "median": 6,
+            "min": 6,
+            "max": 6
+          },
+          "after": {
+            "median": 6,
+            "min": 6,
+            "max": 6
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "cachedFontRequests": {
+          "before": {
+            "median": 6,
+            "min": 6,
+            "max": 6
+          },
+          "after": {
+            "median": 6,
+            "min": 6,
+            "max": 6
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "fontTransferBytes": {
+          "before": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "after": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "transferBytes": {
+          "before": {
+            "median": 20688,
+            "min": 20688,
+            "max": 20688
+          },
+          "after": {
+            "median": 20534,
+            "min": 20534,
+            "max": 20534
+          },
+          "pairedDelta": {
+            "median": -154,
+            "min": -154,
+            "max": -154
+          }
+        },
+        "cls": {
+          "before": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "after": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        }
+      }
+    },
+    {
+      "route": "/article/naming-tokens-in-design",
+      "cache": "cold",
+      "count": 5,
+      "metrics": {
+        "fcp": {
+          "before": {
+            "median": 380,
+            "min": 372,
+            "max": 404
+          },
+          "after": {
+            "median": 384,
+            "min": 372,
+            "max": 404
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": -4,
+            "max": 12
+          }
+        },
+        "lcp": {
+          "before": {
+            "median": 380,
+            "min": 372,
+            "max": 404
+          },
+          "after": {
+            "median": 384,
+            "min": 372,
+            "max": 404
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": -4,
+            "max": 12
+          }
+        },
+        "fontReady": {
+          "before": {
+            "median": 3042.2999999821186,
+            "min": 2994.5999999940395,
+            "max": 3051.0999999940395
+          },
+          "after": {
+            "median": 2529.4000000059605,
+            "min": 2526.5,
+            "max": 2536.5999999940395
+          },
+          "pairedDelta": {
+            "median": -514.5,
+            "min": -522.5999999940395,
+            "max": -464.60000002384186
+          }
+        },
+        "fontNetworkEnd": {
+          "before": {
+            "median": 2872.9000000059605,
+            "min": 2839.5,
+            "max": 2878.2000000178814
+          },
+          "after": {
+            "median": 2389.5999999940395,
+            "min": 2385.9000000059605,
+            "max": 2392.9000000059605
+          },
+          "pairedDelta": {
+            "median": -484.7000000178814,
+            "min": -487.19999998807907,
+            "max": -453.59999999403954
+          }
+        },
+        "fontLoadEnd": {
+          "before": {
+            "median": 3029.5999999940395,
+            "min": 2986.4000000059605,
+            "max": 3037
+          },
+          "after": {
+            "median": 2518.5999999940395,
+            "min": 2516.2999999821186,
+            "max": 2524.4000000059605
+          },
+          "pairedDelta": {
+            "median": -508.80000001192093,
+            "min": -520.7000000178814,
+            "max": -468.5
+          }
+        },
+        "requests": {
+          "before": {
+            "median": 67,
+            "min": 67,
+            "max": 67
+          },
+          "after": {
+            "median": 64,
+            "min": 64,
+            "max": 64
+          },
+          "pairedDelta": {
+            "median": -3,
+            "min": -3,
+            "max": -3
+          }
+        },
+        "networkRequests": {
+          "before": {
+            "median": 67,
+            "min": 67,
+            "max": 67
+          },
+          "after": {
+            "median": 64,
+            "min": 64,
+            "max": 64
+          },
+          "pairedDelta": {
+            "median": -3,
+            "min": -3,
+            "max": -3
+          }
+        },
+        "fontRequests": {
+          "before": {
+            "median": 8,
+            "min": 8,
+            "max": 8
+          },
+          "after": {
+            "median": 5,
+            "min": 5,
+            "max": 5
+          },
+          "pairedDelta": {
+            "median": -3,
+            "min": -3,
+            "max": -3
+          }
+        },
+        "cachedFontRequests": {
+          "before": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "after": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "fontTransferBytes": {
+          "before": {
+            "median": 2274671,
+            "min": 2274671,
+            "max": 2274671
+          },
+          "after": {
+            "median": 1891696,
+            "min": 1891696,
+            "max": 1891696
+          },
+          "pairedDelta": {
+            "median": -382975,
+            "min": -382975,
+            "max": -382975
+          }
+        },
+        "transferBytes": {
+          "before": {
+            "median": 3195375,
+            "min": 3195375,
+            "max": 3195375
+          },
+          "after": {
+            "median": 2813344,
+            "min": 2813344,
+            "max": 2813344
+          },
+          "pairedDelta": {
+            "median": -382031,
+            "min": -382031,
+            "max": -382031
+          }
+        },
+        "cls": {
+          "before": {
+            "median": 0.004569255704317236,
+            "min": 0.004569255704317236,
+            "max": 0.004569255704317236
+          },
+          "after": {
+            "median": 0.0006541831938818158,
+            "min": 0.0006541831938818158,
+            "max": 0.0006541831938818158
+          },
+          "pairedDelta": {
+            "median": -0.00391507251043542,
+            "min": -0.00391507251043542,
+            "max": -0.00391507251043542
+          }
+        }
+      }
+    },
+    {
+      "route": "/article/naming-tokens-in-design",
+      "cache": "warm",
+      "count": 5,
+      "metrics": {
+        "fcp": {
+          "before": {
+            "median": 296,
+            "min": 292,
+            "max": 316
+          },
+          "after": {
+            "median": 304,
+            "min": 296,
+            "max": 312
+          },
+          "pairedDelta": {
+            "median": 8,
+            "min": -20,
+            "max": 16
+          }
+        },
+        "lcp": {
+          "before": {
+            "median": 296,
+            "min": 292,
+            "max": 316
+          },
+          "after": {
+            "median": 304,
+            "min": 296,
+            "max": 312
+          },
+          "pairedDelta": {
+            "median": 8,
+            "min": -20,
+            "max": 16
+          }
+        },
+        "fontReady": {
+          "before": {
+            "median": 707.7000000178814,
+            "min": 688.0999999940395,
+            "max": 745.9000000059605
+          },
+          "after": {
+            "median": 668,
+            "min": 661.7000000178814,
+            "max": 722.5
+          },
+          "pairedDelta": {
+            "median": -26.399999976158142,
+            "min": -79.30000001192093,
+            "max": 9
+          }
+        },
+        "fontNetworkEnd": {
+          "before": {
+            "median": 1407.7000000178814,
+            "min": 1378.0999999940395,
+            "max": 4279.0999999940395
+          },
+          "after": {
+            "median": 192.40000000596046,
+            "min": 184.80000001192093,
+            "max": 195.09999999403954
+          },
+          "pairedDelta": {
+            "median": -1222.9000000059605,
+            "min": -4093.199999988079,
+            "max": -1185.699999988079
+          }
+        },
+        "fontLoadEnd": {
+          "before": {
+            "median": 690.2000000178814,
+            "min": 670.0999999940395,
+            "max": 728.0999999940395
+          },
+          "after": {
+            "median": 655.3000000119209,
+            "min": 642,
+            "max": 700.6999999880791
+          },
+          "pairedDelta": {
+            "median": -28.099999994039536,
+            "min": -82.19999998807907,
+            "max": 2.699999988079071
+          }
+        },
+        "requests": {
+          "before": {
+            "median": 67,
+            "min": 67,
+            "max": 67
+          },
+          "after": {
+            "median": 64,
+            "min": 64,
+            "max": 64
+          },
+          "pairedDelta": {
+            "median": -3,
+            "min": -3,
+            "max": -3
+          }
+        },
+        "networkRequests": {
+          "before": {
+            "median": 10,
+            "min": 10,
+            "max": 10
+          },
+          "after": {
+            "median": 10,
+            "min": 10,
+            "max": 10
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "fontRequests": {
+          "before": {
+            "median": 8,
+            "min": 8,
+            "max": 8
+          },
+          "after": {
+            "median": 5,
+            "min": 5,
+            "max": 5
+          },
+          "pairedDelta": {
+            "median": -3,
+            "min": -3,
+            "max": -3
+          }
+        },
+        "cachedFontRequests": {
+          "before": {
+            "median": 8,
+            "min": 8,
+            "max": 8
+          },
+          "after": {
+            "median": 5,
+            "min": 5,
+            "max": 5
+          },
+          "pairedDelta": {
+            "median": -3,
+            "min": -3,
+            "max": -3
+          }
+        },
+        "fontTransferBytes": {
+          "before": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "after": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "transferBytes": {
+          "before": {
+            "median": 41393,
+            "min": 41393,
+            "max": 41393
+          },
+          "after": {
+            "median": 41217,
+            "min": 41217,
+            "max": 41217
+          },
+          "pairedDelta": {
+            "median": -176,
+            "min": -176,
+            "max": -176
+          }
+        },
+        "cls": {
+          "before": {
+            "median": 0.0003674838595920139,
+            "min": 0.0003674838595920139,
+            "max": 0.0003674838595920139
+          },
+          "after": {
+            "median": 0.0003674838595920139,
+            "min": 0.0003674838595920139,
+            "max": 0.0003674838595920139
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        }
+      }
+    },
+    {
+      "route": "/playground/shuffle-letters",
+      "cache": "cold",
+      "count": 5,
+      "metrics": {
+        "fcp": {
+          "before": {
+            "median": 264,
+            "min": 240,
+            "max": 276
+          },
+          "after": {
+            "median": 248,
+            "min": 232,
+            "max": 264
+          },
+          "pairedDelta": {
+            "median": -12,
+            "min": -16,
+            "max": -8
+          }
+        },
+        "lcp": {
+          "before": {
+            "median": 264,
+            "min": 240,
+            "max": 276
+          },
+          "after": {
+            "median": 248,
+            "min": 232,
+            "max": 264
+          },
+          "pairedDelta": {
+            "median": -12,
+            "min": -16,
+            "max": -8
+          }
+        },
+        "fontReady": {
+          "before": {
+            "median": 2640.0999999940395,
+            "min": 2621.7999999821186,
+            "max": 2655.2999999821186
+          },
+          "after": {
+            "median": 2058.9000000059605,
+            "min": 2051.0999999940395,
+            "max": 2091
+          },
+          "pairedDelta": {
+            "median": -570.6999999880791,
+            "min": -582.2999999821186,
+            "max": -564.2999999821186
+          }
+        },
+        "fontNetworkEnd": {
+          "before": {
+            "median": 2529.600000023842,
+            "min": 2522.5,
+            "max": 2550.5999999940395
+          },
+          "after": {
+            "median": 1966.9000000059605,
+            "min": 1958.699999988079,
+            "max": 1989.5
+          },
+          "pairedDelta": {
+            "median": -563.8000000119209,
+            "min": -565,
+            "max": -554.2000000178814
+          }
+        },
+        "fontLoadEnd": {
+          "before": {
+            "median": 2627.4000000059605,
+            "min": 2619.5,
+            "max": 2648.699999988079
+          },
+          "after": {
+            "median": 2052.5,
+            "min": 2041.9000000059605,
+            "max": 2077.9000000059605
+          },
+          "pairedDelta": {
+            "median": -574.9000000059605,
+            "min": -577.5999999940395,
+            "max": -563.4000000059605
+          }
+        },
+        "requests": {
+          "before": {
+            "median": 41,
+            "min": 41,
+            "max": 41
+          },
+          "after": {
+            "median": 37,
+            "min": 37,
+            "max": 37
+          },
+          "pairedDelta": {
+            "median": -4,
+            "min": -4,
+            "max": -4
+          }
+        },
+        "networkRequests": {
+          "before": {
+            "median": 41,
+            "min": 41,
+            "max": 41
+          },
+          "after": {
+            "median": 37,
+            "min": 37,
+            "max": 37
+          },
+          "pairedDelta": {
+            "median": -4,
+            "min": -4,
+            "max": -4
+          }
+        },
+        "fontRequests": {
+          "before": {
+            "median": 6,
+            "min": 6,
+            "max": 6
+          },
+          "after": {
+            "median": 2,
+            "min": 2,
+            "max": 2
+          },
+          "pairedDelta": {
+            "median": -4,
+            "min": -4,
+            "max": -4
+          }
+        },
+        "cachedFontRequests": {
+          "before": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "after": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "fontTransferBytes": {
+          "before": {
+            "median": 2251271,
+            "min": 2251271,
+            "max": 2251271
+          },
+          "after": {
+            "median": 1846064,
+            "min": 1846064,
+            "max": 1846064
+          },
+          "pairedDelta": {
+            "median": -405207,
+            "min": -405207,
+            "max": -405207
+          }
+        },
+        "transferBytes": {
+          "before": {
+            "median": 2712658,
+            "min": 2712658,
+            "max": 2712658
+          },
+          "after": {
+            "median": 2307420,
+            "min": 2307420,
+            "max": 2307420
+          },
+          "pairedDelta": {
+            "median": -405238,
+            "min": -405238,
+            "max": -405238
+          }
+        },
+        "cls": {
+          "before": {
+            "median": 0.00012962279771090536,
+            "min": 0.00012962279771090536,
+            "max": 0.00012962279771090536
+          },
+          "after": {
+            "median": 0.00012962279771090536,
+            "min": 0.00012962279771090536,
+            "max": 0.00012962279771090536
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        }
+      }
+    },
+    {
+      "route": "/playground/shuffle-letters",
+      "cache": "warm",
+      "count": 5,
+      "metrics": {
+        "fcp": {
+          "before": {
+            "median": 188,
+            "min": 184,
+            "max": 196
+          },
+          "after": {
+            "median": 188,
+            "min": 184,
+            "max": 216
+          },
+          "pairedDelta": {
+            "median": 4,
+            "min": -12,
+            "max": 32
+          }
+        },
+        "lcp": {
+          "before": {
+            "median": 188,
+            "min": 184,
+            "max": 196
+          },
+          "after": {
+            "median": 188,
+            "min": 184,
+            "max": 216
+          },
+          "pairedDelta": {
+            "median": 4,
+            "min": -12,
+            "max": 32
+          }
+        },
+        "fontReady": {
+          "before": {
+            "median": 431,
+            "min": 417.69999998807907,
+            "max": 467.90000000596046
+          },
+          "after": {
+            "median": 420.40000000596046,
+            "min": 406.60000002384186,
+            "max": 439.09999999403954
+          },
+          "pairedDelta": {
+            "median": -21.899999976158142,
+            "min": -35.5,
+            "max": 21.400000005960464
+          }
+        },
+        "fontNetworkEnd": {
+          "before": {
+            "median": 602.3999999761581,
+            "min": 600.2000000178814,
+            "max": 643.3000000119209
+          },
+          "after": {
+            "median": 129,
+            "min": 124,
+            "max": 134.69999998807907
+          },
+          "pairedDelta": {
+            "median": -476.2000000178814,
+            "min": -517.9000000059605,
+            "max": -467.69999998807907
+          }
+        },
+        "fontLoadEnd": {
+          "before": {
+            "median": 417.09999999403954,
+            "min": 404,
+            "max": 454
+          },
+          "after": {
+            "median": 412.5,
+            "min": 396.2000000178814,
+            "max": 429.69999998807907
+          },
+          "pairedDelta": {
+            "median": -17.799999982118607,
+            "min": -41.5,
+            "max": 25.69999998807907
+          }
+        },
+        "requests": {
+          "before": {
+            "median": 41,
+            "min": 41,
+            "max": 41
+          },
+          "after": {
+            "median": 37,
+            "min": 37,
+            "max": 37
+          },
+          "pairedDelta": {
+            "median": -4,
+            "min": -4,
+            "max": -4
+          }
+        },
+        "networkRequests": {
+          "before": {
+            "median": 6,
+            "min": 6,
+            "max": 6
+          },
+          "after": {
+            "median": 6,
+            "min": 6,
+            "max": 6
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "fontRequests": {
+          "before": {
+            "median": 6,
+            "min": 6,
+            "max": 6
+          },
+          "after": {
+            "median": 2,
+            "min": 2,
+            "max": 2
+          },
+          "pairedDelta": {
+            "median": -4,
+            "min": -4,
+            "max": -4
+          }
+        },
+        "cachedFontRequests": {
+          "before": {
+            "median": 6,
+            "min": 6,
+            "max": 6
+          },
+          "after": {
+            "median": 2,
+            "min": 2,
+            "max": 2
+          },
+          "pairedDelta": {
+            "median": -4,
+            "min": -4,
+            "max": -4
+          }
+        },
+        "fontTransferBytes": {
+          "before": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "after": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        },
+        "transferBytes": {
+          "before": {
+            "median": 18706,
+            "min": 18706,
+            "max": 18706
+          },
+          "after": {
+            "median": 18552,
+            "min": 18552,
+            "max": 18552
+          },
+          "pairedDelta": {
+            "median": -154,
+            "min": -154,
+            "max": -154
+          }
+        },
+        "cls": {
+          "before": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "after": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "pairedDelta": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          }
+        }
+      }
+    }
+  ]
+}
