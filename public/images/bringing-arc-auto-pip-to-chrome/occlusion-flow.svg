@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1040" viewBox="0 0 960 1040" role="img" aria-labelledby="title desc">
+<title id="title">Chrome 가림 판단에서 커스텀 PiP까지</title><desc id="desc">macOS 가림 판정부터 커스텀 renderer까지 이어지는 여섯 단계</desc>
+<rect width="960" height="1040" rx="24" fill="hsl(40 25% 96%)"/>
+<g font-family="system-ui, sans-serif" text-anchor="middle">
+<rect x="64" y="32" width="832" height="136" rx="16" fill="hsl(0 0% 100%)" stroke="hsl(220 15% 78%)"/><text x="480" y="83" fill="hsl(220 20% 18%)" font-size="26" font-weight="650">macOS</text><text x="480" y="128" fill="hsl(220 12% 36%)" font-size="22">NSWindow.occlusionState</text>
+<path d="M480 172 v20 m-7 -6 7 7 7 -7" fill="none" stroke="hsl(220 12% 44%)" stroke-width="3"/>
+<rect x="64" y="200" width="832" height="136" rx="16" fill="hsl(0 0% 100%)" stroke="hsl(220 15% 78%)"/><text x="480" y="251" fill="hsl(220 20% 18%)" font-size="26" font-weight="650">Chromium macOS</text><text x="480" y="296" fill="hsl(220 12% 36%)" font-size="22">occlusion checker</text>
+<path d="M480 340 v20 m-7 -6 7 7 7 -7" fill="none" stroke="hsl(220 12% 44%)" stroke-width="3"/>
+<rect x="64" y="368" width="832" height="136" rx="16" fill="hsl(0 0% 100%)" stroke="hsl(220 15% 78%)"/><text x="480" y="419" fill="hsl(220 20% 18%)" font-size="26" font-weight="650">WebContents</text><text x="480" y="464" fill="hsl(220 12% 36%)" font-size="22">VISIBLE / OCCLUDED / HIDDEN</text>
+<path d="M480 508 v20 m-7 -6 7 7 7 -7" fill="none" stroke="hsl(220 12% 44%)" stroke-width="3"/>
+<rect x="64" y="536" width="832" height="136" rx="16" fill="hsl(0 0% 100%)" stroke="hsl(220 15% 78%)"/><text x="480" y="587" fill="hsl(220 20% 18%)" font-size="26" font-weight="650">자동 PiP helper</text><text x="480" y="632" fill="hsl(220 12% 36%)" font-size="22">가림 상태와 재생 자격 판단</text>
+<path d="M480 676 v20 m-7 -6 7 7 7 -7" fill="none" stroke="hsl(220 12% 44%)" stroke-width="3"/>
+<rect x="64" y="704" width="832" height="136" rx="16" fill="hsl(0 0% 100%)" stroke="hsl(220 15% 78%)"/><text x="480" y="755" fill="hsl(220 20% 18%)" font-size="26" font-weight="650">MediaSession</text><text x="480" y="800" fill="hsl(220 12% 36%)" font-size="22">enterpictureinpicture callback</text>
+<path d="M480 844 v20 m-7 -6 7 7 7 -7" fill="none" stroke="hsl(220 12% 44%)" stroke-width="3"/>
+<rect x="64" y="872" width="832" height="136" rx="16" fill="hsl(0 0% 100%)" stroke="hsl(220 15% 78%)"/><text x="480" y="923" fill="hsl(220 20% 18%)" font-size="26" font-weight="650">Auto PiP</text><text x="480" y="968" fill="hsl(220 12% 36%)" font-size="22">기존 커스텀 renderer</text>
+</g></svg>
