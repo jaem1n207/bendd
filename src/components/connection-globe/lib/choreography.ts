@@ -14,6 +14,7 @@ const travel = cubicBezier(0.645, 0.045, 0.355, 1);
 const coast = cubicBezier(0.4, 0, 0.2, 1);
 const progress = (time: number, from: number, to: number) =>
   clamp((time - from) / (to - from));
+const DISTANCE_LABEL_ENTER_PX = 8;
 
 export const SETTLE_TIMING = {
   appearance: 1000,
@@ -105,6 +106,18 @@ export function createSettleJourney(
       const scene = journey.sample(motion.journeyTime, camera);
       return {
         ...scene,
+        distanceLabel: {
+          x: scene.label.x,
+          y:
+            scene.label.y +
+            DISTANCE_LABEL_ENTER_PX *
+              (1 -
+                progress(
+                  time,
+                  SETTLE_TIMING.connectionStart,
+                  SETTLE_TIMING.arrival
+                )),
+        },
         formationProgress: motion.formation,
         phase:
           time >= SETTLE_TIMING.duration

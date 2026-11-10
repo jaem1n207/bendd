@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bendd Technical Blog Publish"
+  short_description: "기술 블로그 글 작성부터 craft 발행과 PR 병합까지"
+  default_prompt: "Use $bendd-technical-blog-publish to turn this feature topic into a published bendd craft article."

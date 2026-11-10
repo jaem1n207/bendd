@@ -15,8 +15,13 @@ const languages: Record<string, () => LanguageInput> = {
   markdown: () => import('shiki/langs/markdown.mjs'),
   yaml: () => import('shiki/langs/yaml.mjs'),
   svelte: () => import('shiki/langs/svelte.mjs'),
+  coffee: () => import('shiki/langs/coffee.mjs'),
+  stylus: () => import('shiki/langs/stylus.mjs'),
+  sass: () => import('shiki/langs/sass.mjs'),
   scss: () => import('shiki/langs/scss.mjs'),
+  less: () => import('shiki/langs/less.mjs'),
   postcss: () => import('shiki/langs/postcss.mjs'),
+  pug: () => import('shiki/langs/pug.mjs'),
 };
 
 const aliases: Record<string, string> = {
@@ -28,6 +33,9 @@ const aliases: Record<string, string> = {
   zsh: 'shellscript',
   md: 'markdown',
   yml: 'yaml',
+  coffeescript: 'coffee',
+  styl: 'stylus',
+  jade: 'pug',
 };
 
 export async function createMagicMoveHighlighter(lang: string) {

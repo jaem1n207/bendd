@@ -254,12 +254,7 @@ export function useGlobeScene(
         !scene.nearby && scene.seoulMarker.visible
           ? String(!location ? 1 : scene.motion.destination)
           : '0';
-      position(counter, {
-        x: scene.label.x,
-        y:
-          scene.label.y +
-          8 * (1 - clamp((time - SETTLE_TIMING.connectionStart) / 1600)),
-      });
+      position(counter, scene.distanceLabel);
       counter.style.opacity =
         location && !scene.nearby && scene.head.visible ? String(arrival) : '0';
       const distance = formatDistance(meters, scene.routeProgress);

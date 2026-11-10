@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bendd Craft Series Publishing"
+  short_description: "bendd craft 시리즈 글을 안전하게 발행하는 절차"
+  default_prompt: "Use $bendd-craft-series-publishing to publish this MDX article as a bendd craft series post."

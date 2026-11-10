@@ -52,6 +52,34 @@ describe('MagicMove language loading', () => {
     }
   });
 
+  it.each([
+    ['coffee', 'square = (x) -> x * x'],
+    ['coffeescript', 'square = (x) -> x * x'],
+    ['stylus', 'body\n  color red'],
+    ['styl', 'body\n  color red'],
+    ['sass', '$color: red\nbody\n  color: $color'],
+    ['less', '@color: red;\nbody { color: @color; }'],
+    ['pug', 'p Hello'],
+    ['jade', 'p Hello'],
+  ])('highlights restored %s syntax in both themes', async (lang, code) => {
+    const highlighter = await createMagicMoveHighlighter(lang);
+
+    try {
+      for (const theme of ['github-light', 'vitesse-dark']) {
+        const result = highlighter.codeToTokens(code, { lang, theme });
+
+        expect(
+          result.tokens
+            .map(line => line.map(token => token.content).join(''))
+            .join('\n')
+        ).toBe(code);
+        expect(result.tokens.flat().some(token => token.color)).toBe(true);
+      }
+    } finally {
+      highlighter.dispose();
+    }
+  });
+
   it('rejects unsupported languages instead of loading the full bundle', async () => {
     await expect(
       createMagicMoveHighlighter('unknown-language')

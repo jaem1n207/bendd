@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 
 import { useInterval } from '@/hooks/use-interval';
-import { Typography } from './ui/typography';
+import { Typography } from '@/components/ui/typography';
 
 type TextAnimationProps = {
   texts: string[];

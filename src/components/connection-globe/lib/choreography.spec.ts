@@ -15,6 +15,21 @@ import {
 const london = { latitude: 51.5074, longitude: -0.1278 };
 
 describe('home Settle choreography', () => {
+  it.each([
+    [0, 8],
+    [4400, 8],
+    [4800, 4],
+    [5200, 0],
+    [5800, 0],
+  ])('settles the distance label with arrival at %ims', (time, offset) => {
+    const journey = createSettleJourney(london, 760, 414);
+    const scene = journey.sample(time);
+
+    expect(scene).toMatchObject({
+      distanceLabel: { x: scene.label.x, y: scene.label.y + offset },
+    });
+  });
+
   it('finishes the shared route and distance count in 800ms with a short deceleration', () => {
     const journey = createSettleJourney(london, 760, 414);
     expect(journey.sample(4400).routeProgress).toBe(0);

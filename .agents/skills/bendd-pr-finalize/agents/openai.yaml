@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bendd PR Finalize"
+  short_description: "bendd PR을 병합 전 최신 상태로 정리하는 절차"
+  default_prompt: "Use $bendd-pr-finalize to update, verify, and merge this open bendd pull request."
