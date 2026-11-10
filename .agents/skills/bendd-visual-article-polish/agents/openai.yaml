@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bendd Visual Article Polish"
+  short_description: "긴 MDX 글의 시각 자료와 가독성을 검증하는 절차"
+  default_prompt: "Use $bendd-visual-article-polish to polish the visuals, spacing, and readability of this bendd MDX article."
