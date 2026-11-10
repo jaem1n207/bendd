@@ -125,6 +125,41 @@ src/mdx/components/{name}/
 
 새 컴포넌트를 추가한 후 `src/mdx/custom-mdx.tsx`의 `components` 객체에도 등록해야 한다.
 
+### 단계별 코드 설명
+
+새 글에서 코드를 단계적으로 설명할 때는 `CodeWalkthrough`를 우선 사용한다.
+기존 `MagicMove`는 호환성을 위해 유지한다. 홈의 데모는 별도 `CodeStepsDemo`를 사용한다.
+
+```mdx
+<CodeWalkthrough
+  lang="ts"
+  filename="save-note.ts"
+  label="저장 흐름의 단계별 코드 설명"
+  steps={[
+    {
+      title: '완료를 기다리기',
+      code: `async function saveNote() {
+  await save();
+}`,
+      annotations: [
+        {
+          title: '비동기 작업을 기다려요',
+          description: '저장이 끝난 다음 줄로 넘어가도록 await를 붙여요.',
+          focus: [{ startLine: 2, startColumn: 3, endColumn: 7 }],
+        },
+      ],
+    },
+  ]}
+/>
+```
+
+- `lang`과 `steps`는 필수다. 언어 이름과 별칭은 설치된 Shiki가 지원하는 값을 사용한다.
+- 각 단계는 `title`, `code`, 하나 이상의 `annotations`를 갖는다. 설명이 여러 개면 같은 코드를 유지하며 강조할 부분만 바뀐다.
+- 각 설명의 `title`, `description`은 필수이며, `focus`는 생략할 수 있다. 행·열 번호는 1부터 시작하고 끝 번호를 포함한다. `endLine`, `startColumn`, `endColumn`을 생략하면 시작 행 전체를 강조한다.
+- `filename`과 접근성 이름인 `label`은 선택이다. 여러 예제를 넣을 때는 내용을 구분할 수 있는 `label`을 지정한다.
+- 데스크톱에서는 영역 내부 스크롤과 버튼·방향키를 지원한다. 모바일·터치 기기에서는 페이지 스크롤을 유지하고 버튼으로 이동한다. 모션 감소 설정과 키보드 이동은 즉시 전환한다.
+- 구문 토큰은 서버에서 생성한다. MDX 밖에서는 `@/components/code-walkthrough`의 `CodeWalkthrough`를 Server Component에서 사용한다.
+
 ### 이미지 줌
 
 MDX의 모든 `![alt](src)` 이미지는 `MDXZoomImage`로 렌더링된다. 클릭하면 Medium 스타일로 확대되고, 스크롤하면 자동으로 닫힌다. `react-medium-image-zoom` 라이브러리를 사용하며, SVG data URI는 줌 없이 일반 `img`로 렌더링된다.
